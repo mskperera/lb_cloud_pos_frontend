@@ -1,0 +1,9 @@
+.voided-indicator {
+    /* background-color: #f44336; Red background color */
+    color: #f44336; /* White text color */
+    padding: 10px; /* Padding around the text */
+    margin-bottom: 20px; /* Bottom margin to separate from other content */
+    font-weight: bold; /* Bold text */
+    text-align: center; /* Center-align text */
+  }
+  

@@ -1,0 +1,35 @@
+.productMenuItem{
+    display: flex;
+    /* border:1px rgb(204, 204, 204) solid; */
+    border: 0;
+    /* background-color: var(--softBg); */
+    background-color: var(--softBg);
+    width: 225px;
+   
+    align-items: center;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 10px;
+    gap: 10px;
+ 
+}
+
+.productMenuItem .textContainer{
+
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: end;
+    color: var(--softTextColor);
+     word-spacing: 0px;
+  letter-spacing: 0.5px;
+}
+.productMenuImage{
+
+  width: '60px';
+  height: '60px';
+  border-radius: '50%';
+  object-fit: 'cover';
+
+}

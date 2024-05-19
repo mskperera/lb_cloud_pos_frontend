@@ -1,0 +1,138 @@
+/* ReceiptComponent.css */
+
+.receipt {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    width: 300px;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .address, .email {
+    margin-bottom: 2px;
+  }
+  
+  .details p, .footer p {
+    margin: 2px 0;
+  }
+  
+  /* Add styles for the header */
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #000;
+    margin-bottom: 10px;
+  }
+  
+  .item-header > div {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .items .item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .items .line, .items .description, .items .quantity, .items .price {
+    padding: 0 2px;
+  }
+  
+  .items .quantity {
+    text-align: left;
+    flex: 1;
+  }
+  
+  .items .price {
+    text-align: right;
+    flex: 1;
+  }
+  
+
+  .item-row {
+    border-bottom: 1px solid #eee; /* Optional: adds a separator line */
+    padding-bottom: 5px; /* Optional: adds some space below each item */
+    margin-bottom: 5px; /* Optional: adds some space below each item */
+  }
+  
+  .description {
+    font-weight: bold; /* Optional: makes the description stand out */
+    word-wrap: break-word; 
+    max-width: 200px; /* Set a maximum width for the description */
+}
+  
+  .line-qty-price {
+    display: flex;
+    justify-content: space-between;
+   
+  }
+  
+  .line {
+    flex-basis: 10%; /* Adjust the width as needed */
+  }
+  .quantity-price {
+    display: block; /* Stack the quantity and price vertically */
+  }
+  
+  .quantity, .price {
+    flex-basis: 45%; /* Adjust the width as needed */
+    text-align: left;
+  }
+
+
+
+  .footer {
+    border-top: 1px dashed #000;
+    padding-top: 5px;
+  }
+  
+  .totals {
+    border-top: 1px dashed #000;
+    padding-top: 0px;
+    font-weight: bold;
+  }
+
+  .totals .total-row{
+    display:flex;
+    justify-content: space-between;
+  }
+
+  .total-row p {
+    margin: 5px 0px 5px 0px; /* This removes any default margin */
+
+  }
+  
+
+  @media print {
+    @page {
+      size: 88mm auto; /* width of 88mm and automatic height */
+      margin: 10mm;
+    }
+  
+    body * {
+      visibility: hidden; /* Hides everything in the body */
+    }
+  
+    .receipt, .receipt * {
+      visibility: visible; /* Makes only receipt and its children visible */
+    }
+  
+    .receipt {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 88mm; /* Set the width to match the print page width */
+      margin: 0;
+      border: none; /* Optional: remove the border in print */
+    }
+  }

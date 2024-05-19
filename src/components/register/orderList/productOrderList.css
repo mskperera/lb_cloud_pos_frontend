@@ -1,0 +1,29 @@
+.productOrderContainer{
+    /* background-color: rgb(61, 28, 28); */
+overflow-y: auto;
+max-height: 400px;
+
+}
+
+
+.orderlist-datatable th {
+    background-color: var(--bg);
+  }
+
+  .orderlist-datatable .p-datatable-tbody tr {
+    background-color: var(--softBg) !important;
+  }
+
+  .orderlist-datatable .p-datatable-emptymessage {
+    display: none;
+  }
+
+
+  .orderlist-qty-button{
+    /* background-color: var(--primaryColor); */
+    color: var(--primaryColor);
+
+    padding: 10px !important;
+    margin: 0 !important;
+  
+  }

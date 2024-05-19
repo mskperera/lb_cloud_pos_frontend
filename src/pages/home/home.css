@@ -1,0 +1,48 @@
+
+.home-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    height:50vh;
+}
+
+.home-title{
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 32px;
+
+}
+
+.home-menu-container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:center;
+    gap: 10px;
+}
+
+.home-menu-button{
+    color: var(--primary-color);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-direction: column;
+   
+    padding: 10px;
+    font-size: 30px;
+    width: 100px;
+  
+}
+
+
+.home-menu-button i{
+    font-size: 30px;
+    margin: 0;
+}
+
+.home-menu-button p{
+    font-size: 18px;
+    margin: 0;
+
+}

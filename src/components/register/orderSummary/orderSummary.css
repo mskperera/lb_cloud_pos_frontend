@@ -1,0 +1,29 @@
+.orderSummaryContainer{
+  
+    background-color: var(--softBg);
+  border-radius: 10px;
+}
+
+.orderSummaryContainer .orderSummaryRow{
+    display: flex;
+    justify-content: space-between;
+    gap: 55px;
+    padding: 10px;
+}
+
+.orderSummaryItem{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+
+
+}
+
+.orderSummaryItem p{
+    font-size: 1.1rem;
+    font-weight: bold;
+    /* color: var(--softTextColor); */
+    color: var(--softText);
+    margin: 5px;
+}

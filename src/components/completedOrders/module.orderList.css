@@ -1,0 +1,32 @@
+.clear-search-button{
+    background-color: var(--indigo-50);
+    color: var(--textColor);
+}
+
+.date-search-container{
+display: flex;
+gap: 10px;
+width: 100%;
+}
+
+.p-calendar-w-btn .p-datepicker-trigger.p-button {
+    background-color: var(--indigo-500);
+    border: 0 none;
+}
+
+.order-button-void{
+    background-color: var(--indigo-50);
+    color: var(--dangerTextColor);
+}
+
+
+.order-button-print{
+    background-color: var(--indigo-50);
+    color: var(--primaryTextColor);
+}
+
+.action-button-container{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
