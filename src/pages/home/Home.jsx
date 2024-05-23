@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import { setTitle } from '../../state/navBar/navBarSlice';
-import { useDispatch } from 'react-redux';
 import './home.css'
 import { Button } from 'primereact/button';
 
@@ -28,11 +26,6 @@ import { Button } from 'primereact/button';
   
 const Home=()=>{
 
- // const dispatch=useDispatch();
-  useEffect(()=>{
-
- // dispatch(setTitle(null))
-  },[])
 
     return (
 

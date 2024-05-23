@@ -8,9 +8,6 @@ import { parseJwt } from '../../utils/jwt';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  useEffect(() => {
-    // dispatch(setTitle(null))
-  }, []);
 
   const navigate=useNavigate();
 
