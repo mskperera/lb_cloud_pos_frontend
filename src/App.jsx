@@ -2,10 +2,16 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { PrimeReactProvider } from 'primereact/api';
 import './App.css' 
-import "primereact/resources/themes/md-light-indigo/theme.css";
-import 'primeicons/primeicons.css';
-import '/node_modules/primeflex/primeflex.css';
+
+
+
 import TopMenubar from './components/navBar/TopMenubar';
+
+import NotFound from './pages/NotFound';
+import { ToastProvider } from './components/useToast';
+import Customers from './pages/customers';
+import AddCustomer from './pages/addCustomer';
+import Login from './pages/login';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -16,12 +22,7 @@ const Products = React.lazy(() => import("./pages/products"));
 const AddProduct = React.lazy(() => import("./pages/addProduct"));
 const OrdersCompleted = React.lazy(() => import("./pages/ordersCompleted"));
 
-import NotFound from './pages/NotFound';
-import { ToastProvider } from './components/useToast';
-import Customers from './pages/customers';
-import AddCustomer from './pages/addCustomer';
-import Footer from './components/footer/Footer';
-import Login from './pages/login';
+
 
 function AppContent() {
   const location = useLocation();
@@ -29,6 +30,7 @@ function AppContent() {
   const shouldShowNavBar = location.pathname !== '/login';
 
   const value = {
+    appendTo: 'self',
     ripple: false
   };
 
@@ -42,7 +44,7 @@ function AppContent() {
     <PrimeReactProvider value={value}>
       <>
         <ToastProvider>
-          <div className='container'>
+          <div className='app-container'>
             {shouldShowNavBar && <TopMenubar />}
             <div style={appStyle}>
               <React.Suspense fallback={<>Loading...</>}>

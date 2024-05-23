@@ -5,7 +5,7 @@ const customAxios = axios.create({
   baseURL:process.env.REACT_APP_API_PATH, // Your base URL
 });
 
-// console.log('process.env',process.env.REACT_APP_API_PATH)
+ console.log('process.env REACT_APP_API_PATH',process.env.REACT_APP_API_PATH)
 customAxios.interceptors.request.use(
     function (config) {
 
@@ -29,18 +29,18 @@ customAxios.interceptors.request.use(
     
     
       if (error.request.status ===401) {
-        window.location.href = '/login';
+    //    window.location.href = '/login';
        }
       
     
        if (error.response.data.name === 'JsonWebTokenError') {
-        window.location.href = '/login';
+      //  window.location.href = '/login';
        }
     
        if (error.response.data.name === 'TokenExpiredError') {
         console.log('axios.interceptors.resl**', error.response.data);
        // refreshAccessToken();
-         window.location.href = '/login';
+       //  window.location.href = '/login';
        }
       return Promise.reject(error);
     }

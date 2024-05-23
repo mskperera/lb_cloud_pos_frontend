@@ -500,26 +500,12 @@ const Payment = ({  }) => {
                 {paymentMethod.value === PAYMENT_METHODS.CASH && (
                   <CashPaymentMulti
                     onAddPayment={onSplitPaymentHandler}
-                    onClick={(p) => {
-                      console.log("cashpayment", p.amount);
-                      handleInputChange(
-                        setAmountReceived,
-                        amountReceived,
-                        p.amount
-                      );
-                    }}
+                
                   />
                 )}
                 {paymentMethod.value === PAYMENT_METHODS.CARD && (
                   <CardPaymentMulti
                     onAddPayment={onSplitPaymentHandler}
-                    onClick={(p) => {
-                      handleInputChange(
-                        setPaymentMethod,
-                        amountReceived,
-                        p.amount
-                      );
-                    }}
                   />
                 )}
                 {/* {paymentMethod.value === PAYMENT_METHODS.CREDIT && (

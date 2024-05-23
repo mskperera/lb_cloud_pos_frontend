@@ -1,12 +1,15 @@
 import customAxios from "../utils/axios";
+import { getTenantId, getToken } from "./authService";
 
-const tenantId=localStorage.getItem('tenantId');
+// const tenantId=localStorage.getItem('tenantId');
+// const token=localStorage.getItem('token');
 //const API = 'http://localhost:8000/api';
-const token=localStorage.getItem('token');
+
 
   export const getDrpdownCategory = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .get(`/dropdown/getCategories`, {
           headers: {
@@ -28,7 +31,8 @@ const token=localStorage.getItem('token');
   
   export const getDropdownMeasurementUnit = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .get(`/dropdown/getMeasurementUnits`, {
           headers: {
@@ -51,7 +55,8 @@ const token=localStorage.getItem('token');
 
   export const getDropdownDepartments = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .get(`/dropdown/getDepartments`, {
           headers: {
@@ -73,7 +78,8 @@ const token=localStorage.getItem('token');
 
   export const getDrpdownOrderVoidingReason = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .get(`/dropdown/getOrderVoidingReason_dropdown`, {
           headers: {
@@ -96,7 +102,8 @@ const token=localStorage.getItem('token');
 
   export const getDrpSession = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .get(`/dropdown/getDrpSession`, {
           headers: {

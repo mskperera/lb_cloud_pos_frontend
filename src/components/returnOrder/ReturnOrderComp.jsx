@@ -66,10 +66,10 @@ export default function ReturnOrderComp({onAddReturnedProducts }) {
       const orderDetails=ress.data.results[1];
       setOrderHeader(orderHeader);
       const modifiedOrderDetails=[...orderDetails];
-      modifiedOrderDetails.map(o=>{
+      modifiedOrderDetails.map(o=>(
         o.returnQty=0,
         o.remainingQty=o.qty
-      });
+      ));
       setOrderDetails(modifiedOrderDetails);
 
       console.log('orderHeader',orderHeader)

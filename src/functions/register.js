@@ -1,8 +1,9 @@
 import customAxios from "../utils/axios";
+import { getTenantId, getToken } from "./authService";
 
-const tenantId=localStorage.getItem('tenantId');
-const token=localStorage.getItem('token');
-console.log('tttttt',token)
+// const tenantId=localStorage.getItem('tenantId');
+// const token=localStorage.getItem('token');
+
 //const API = 'http://localhost:8000/api';
 // export const getTicketStatusByTicketMasterId = async (categoryId) => {
 //     try {
@@ -27,7 +28,9 @@ console.log('tttttt',token)
 
   export const getOrderReceipt = async (orderId) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
+
       return await customAxios
         .get(`/order/getReceipt/${orderId}`, {
           headers: {
@@ -50,7 +53,8 @@ console.log('tttttt',token)
 
   export const getCategoryMenu = async (data) => {
     try {
-  
+     const tenantId = getTenantId();
+    const token = getToken();
       return await customAxios
         .post(`/register/menu/category`, data, {
           headers: {
@@ -73,7 +77,8 @@ console.log('tttttt',token)
   
   export const addOrder = async (data) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .post(`/order/orderAdd`, data, {
           headers: {
@@ -96,7 +101,8 @@ console.log('tttttt',token)
 
   export const getProducts = async (data) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .post(`/product/products`, data, {
           headers: {
@@ -120,7 +126,8 @@ console.log('tttttt',token)
   //products
   export const addProduct = async (data) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .post(`/product/add`, data, {
           headers: {
@@ -142,7 +149,8 @@ console.log('tttttt',token)
 
     export const updateProduct = async (id,data) => {
       try {
-    
+        const tenantId = getTenantId();
+        const token = getToken();
         return await customAxios
           .put(`/product/update/${id}`, data, {
             headers: {
@@ -165,7 +173,8 @@ console.log('tttttt',token)
 
     export const deleteProduct = async (productId,isConfirm) => {
       try {
-    
+        const tenantId = getTenantId();
+        const token = getToken();
         return await customAxios
           .delete(`/product/delete?productId=${productId}&isConfirm=${isConfirm}`, {
             headers: {
@@ -187,7 +196,8 @@ console.log('tttttt',token)
 
     export const voidOrder = async (data) => {
       try {
-    
+        const tenantId = getTenantId();
+        const token = getToken();
         return await customAxios
           .post(`/order/voidOrder`, data, {
             headers: {
