@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { PrimeReactProvider } from 'primereact/api';
 import './App.css' 
 
 
@@ -41,7 +40,7 @@ function AppContent() {
   };
 
   return (
-    <PrimeReactProvider value={value}>
+
       <>
         <ToastProvider>
           <div className='app-container'>
@@ -68,7 +67,7 @@ function AppContent() {
           </div>
         </ToastProvider>
       </>
-    </PrimeReactProvider>
+
   );
 }
 

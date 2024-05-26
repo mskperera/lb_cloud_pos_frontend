@@ -279,10 +279,12 @@ const Payment = ({  }) => {
 
  console.log('onSubmit:payLoad',payLoad);
     const res = await addOrder(payLoad, "");
+    console.log('onSubmit:addOrder', res.data);
     if (res.data.error) {
       setIsPaymentSubmitting(false);
       const { error } = res.data;
       showToast("error", "Exception", error.message);
+      return;
     }
 
     const { orderNo, outputMessage, responseStatus } = res.data.outputValues;
@@ -326,6 +328,7 @@ const Payment = ({  }) => {
             icon="pi pi-chevron-left custom-target-icon"
             rounded
             text
+            label="Back"
             aria-label="Back"
             tooltip="Back to Home"
             tooltipOptions={{
@@ -336,22 +339,22 @@ const Payment = ({  }) => {
             onClick={()=>{
               navigate('/register')
             }}
-            className="p-button-text p-button-plain"
+            className="p-button-text p-button-plain text-xl"
           />
           <h2>Settle Payment</h2>
           <div></div> {/* Placeholder for alignment purposes */}
         </div>
 
         <div className="flex align-items-center justify-content-between p-0 gap-5 pr-4 mb-3">
-          <div className="flex align-items-top justify-content-left mb-3">
+          <div className="flex align-items-top justify-content-left mb-3"   style={{fontSize:'25px',fontWeight:'bold'}}>
             <label
               htmlFor="customAmount-single"
-              className="text-xl font-semibold mr-5"
+              className="mr-5"
+            
             >
               Grand Total
             </label>
-            <span className="text-xl font-normal">
-              {" "}
+            <span >
               {formatCurrency(orderSummary.grandTotal)}
             </span>
           </div>

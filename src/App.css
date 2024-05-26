@@ -27,6 +27,12 @@ body {
   overflow-x: hidden;
 } */
 
+.form-title{
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+  color: var(--softTextColor);
+}
 
 .app-container{
 
@@ -165,6 +171,15 @@ background-color: rgb(204, 204, 255);
   color:var(--primaryColor) ;
 }
 
+
+.btn-primary{
+  background-color: var(--primaryColor);
+  font-size: medium;
+}
+
+.btn-primary:hover{
+  background-color: var(--primaryColorBlink);
+}
 
 
 @media print {

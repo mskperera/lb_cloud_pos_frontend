@@ -149,7 +149,10 @@ dispatch(addOrder(order));
         </div>
 
         <div className="productMenuPanelContainer">
+          <div style={{margin:'0px 40px 0px 10px'}}>
           <ProductSearch />
+          </div>
+  
           <ScrollPanel style={{ height: "70vh" }}>
             {/* {JSON.stringify(products)} */}
             <div

@@ -223,6 +223,7 @@ setProductNo(p=>({...p,value:''}));
       setIsSubmitting(false);
       const { error } = res.data;
       showToast("error", "Exception", error.message);
+      return;
     }
 
     const { productId, outputMessage, responseStatus } = res.data.outputValues;

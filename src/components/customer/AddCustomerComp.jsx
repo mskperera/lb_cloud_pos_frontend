@@ -177,6 +177,7 @@ useEffect(()=>{
       setIsSubmitting(false);
       const { error } = res.data;
       showToast("error", "Exception", error.message);
+      return;
     }
 
     const { customerCode, outputMessage, responseStatus } = res.data.outputValues;
