@@ -26,7 +26,7 @@ const OrdersCompleted = React.lazy(() => import("./pages/ordersCompleted"));
 function AppContent() {
   const location = useLocation();
 
-  const shouldShowNavBar = location.pathname !== '/login';
+  const shouldShowNavBar = location.pathname !== '/login' && location.pathname !== '/';
 
   const value = {
     appendTo: 'self',
