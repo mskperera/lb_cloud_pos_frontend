@@ -1,11 +1,11 @@
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
-import './customerInfoPanel.css';
+
 
 const Customer = ({ label, imageUrl, onAddCustomer }) => {
   return (
-    <div className="customerCardContainer">
-      <div className="customer">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
         <Avatar image={imageUrl} shape="circle" size="large" className="p-mb-2" />
         {label ? (
           <span className="p-text-bold">{label}</span>

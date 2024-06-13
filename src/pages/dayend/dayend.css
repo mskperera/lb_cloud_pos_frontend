@@ -1,0 +1,120 @@
+.form-container {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  
+}
+
+.title {
+    text-align: center;
+}
+
+.title h2{
+    font-size: large;
+    font-weight: bold;
+}
+
+.form-container .form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    width: 70%;
+    margin-bottom: 3rem;
+}
+
+.form-container .form-body .transactions {
+
+display: flex;
+gap: 4rem;
+justify-content: space-between;
+
+}
+
+.form-container .form-body .cash {
+ 
+    display: flex;
+    gap: 4rem;
+ justify-content: space-between;
+
+}
+
+
+.detail-card{
+    border-radius: 10px;
+    padding: 10px 10px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    /* margin:0 20px; */
+}
+
+.detail-card.primary{
+    background-color: var(--primaryColor);
+    color: var(--colorLight);
+}
+
+.detail-card.success{
+    background-color: var(--successColor);
+    color: var(--colorLight);
+}
+
+.cash-denomination-input{
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+   
+    color: var(--colorLight);
+}
+
+.cash-denomination-input .box{
+    padding:10px;
+    background-color: var(--colorLight);
+    color: var(--textColor);
+    border: 2px solid var(--textColor);
+    border-radius: 5px;
+    font-weight: bold;
+    margin:0;
+    width: 80px;
+    height: 40px;
+    font-size: 16px;
+    text-align: center;
+    background-color: var(--colorLight);
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.cash-denomination-input .label{
+    color: var(--textColor);
+  
+    margin: 0;
+    padding: 0;
+    margin-left: 5px;
+}
+
+.cash-denomination-container{
+ 
+    flex: 1;
+}
+
+
+
+  .button.dayend{
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+
+
+  .dayend-button-container{
+    text-align: center;
+    padding-bottom: 2rem;
+  }
+
+
+
+
+  .cash-summary{
+    flex: 1;
+  }

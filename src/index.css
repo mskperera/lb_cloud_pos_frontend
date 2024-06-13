@@ -1,8 +1,14 @@
 /* src/index.css */
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
 
-@import 'primereact/resources/themes/saga-blue/theme.css'; /* or any other theme */
-@import 'primereact/resources/primereact.min.css';
-@import 'primeicons/primeicons.css';
+
+/* @import 'primereact/resources/themes/saga-blue/theme.css';  */
+/* @import 'primereact/resources/primereact.min.css';
+@import 'primeicons/primeicons.css'; */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 
+
+html, body,:root {
+    @apply bg-[#f8fafc];
+}

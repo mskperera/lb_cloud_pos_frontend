@@ -8,18 +8,19 @@ import { Button } from 'primereact/button';
     const navigate=useNavigate();
 
     return (
-      <Button onClick={()=>{
+      <button onClick={()=>{
         navigate(to);
-      }} text  rounded >
+      }} className='btn btn-lg bg-base-100 h-auto shadow-none p-1 border-none hover:bg-primaryColor hover:text-base-100' >
    
-          <div className="home-menu-button">
-            <i className={`${iconName}`}></i>
+          <div className="flex flex-col align-middle p-4 text-lg ">
+            <i className={`${iconName} text-2xl`}></i>
             <p >
               {label}
             </p>
       
         </div>
-      </Button>
+
+      </button>
     );
   };
   
@@ -30,7 +31,7 @@ const Home=()=>{
     return (
 
       <div className='home-container'>
-  <h1 className='home-title'>Home Menu</h1>
+  <h2 className='text-4xl'>Home Menu</h2>
   <div className='home-menu-container'>
   <HomeMenuButton  label="Register" iconName="pi pi-calculator" to="/register" />
   <HomeMenuButton  label="Customers" iconName="pi pi-users" to="/customers" />
@@ -40,6 +41,8 @@ const Home=()=>{
   <HomeMenuButton  label="Orders" iconName="pi pi-book" to="/ordersCompleted" />
 
   </div>
+
+
       </div>
  
     )

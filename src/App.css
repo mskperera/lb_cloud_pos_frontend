@@ -1,185 +1,58 @@
 
 :root {
-  --bg: #F0F1F6;
+  --bg: #f4fafe;
   --textColor: black;
+  --colorLight: white;
+
   --softBg: #FFFFFF;
   --softTextColor: #454545;
   --dangerTextColor:#ff3737;
-  --primaryColor:#3F51B5 !important;
-  --primaryColorBlink:#4a5dc6 !important;
+
+
   font-size: 14px;
   font-family:Arial, Helvetica, sans-serif;
   word-spacing: 0px;
   letter-spacing: 0.5px;
-}
 
-body{
-  /* background-color: red; */
-}
-/* *{
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-} */
-/* 
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-} */
-
-.form-title{
-  font-size: 1.5rem;
-  text-align: center;
-  font-weight: bold;
-  color: var(--softTextColor);
-}
-
-.app-container{
-
-
-  /* background-color: var(--bg);
-  color: var(--textColor); */
-}
-
-
-
-
-
-#product-list-container{
-  min-height: 690px;
-}
-
-
-.p-menubar {
-  padding:0 10px !important;
-}
-
-
-  .orderlist-datatable ::-webkit-scrollbar {
-width: 12px; /* You can adjust the width as needed */
-}
-
-.orderlist-datatable ::-webkit-scrollbar-thumb {
-background-color: #888; /* You can set the color as needed */
-border-radius: 6px;
-}
-
-.orderlist-datatable ::-webkit-scrollbar-track {
-background-color: #f1f1f1; /* You can set the color as needed */
-}
-
-
-
-
-
-.p-datatable .p-datatable-tbody > tr > td {
-  border-width: 0 0 1px 0 !important;
-  padding: 2px 0.75rem !important;
-
-}
-
-
-/* 
-#custom-input-number input{
-  border-width:0px;
-border-radius:4px;
-background-color: rgb(204, 204, 255);
-}
-
-#custom-input-number .p-inputtext:enabled:focus {
-  box-shadow: none;
-
-}
- */
-
- .custom-link-style {
-  color: white;
-  text-decoration: none; /* Remove underline */
-  transition: background-color 0.3s ease;
-}
-
-.custom-link-style:hover {
-  background-color: #c34c85; /* Change background color on hover */
-}
-
-.sidebar-button-link-style {
+  --successColor: #00CC66;
   
-  transition: background-color 0.3s ease;
-}
-
-.sidebar-button-link-style:hover {
-  background-color: #999999; /* Change background color on hover */
-}
-
-#line-discount-table .p-datatable-thead {
-  display: none;
-}
-#overall-discount-table .p-datatable-thead {
-  display: none;
-}
-
-
-/* datatable selected row style */
-/* DataTableStyles.css */
-
-/* Custom row height */
-.p-datatable .p-datatable-tbody > tr {
-  height: 50px;
-}
-
-.p-datatable .p-datatable-tbody > tr:hover {
-  background-color: #cae6fc !important;
+  --primaryColor: #0284c7;
+  --primaryColorHover: #0369a1;
+ --defalutTextColor: #334155;
+ --defalutTextColorLight: #f8fafc;
 
 }
 
 
-
-
-/* Custom header style */
-.p-datatable thead th {
-  /* background-color: #ecd9d9;  */
-  color: rgb(79, 79, 79); /* Text color */
+label,option{
+  font-size: 1rem;
 }
 
-/* Custom cell padding for more space */
-.p-datatable .p-datatable-tbody > tr > td {
-  padding: .75rem; /* Adjust padding */
-}
-
-/* Zebra striping for rows */
-.p-datatable .p-datatable-tbody > tr:nth-child(odd) {
-  background-color: #f2f2f2; /* Light gray for odd rows */
-}
-
-.p-datatable .p-datatable-tbody > tr:nth-child(even) {
-  background-color: #ffffff; /* White for even rows */
-}
-
-/* Custom style for selected row */
-.p-datatable .p-datatable-tbody > tr.p-highlight {
-  background-color: #007bff !important; /* Blue for selected row */
-  color: white !important;
-}
-
-
-
-.button-primary {
-  background-color:var(--primaryColor) ;
-}
-
-.text-color-primary{
-  color:var(--primaryColor) ;
-}
-
-
-.btn-primary{
+.btn-primary {
+  @apply border-none text-[1rem];
   background-color: var(--primaryColor);
-  font-size: medium;
+  color:var(--defalutTextColorLight);
 }
 
-.btn-primary:hover{
-  background-color: var(--primaryColorBlink);
+.btn-primary:hover {
+  background-color: var(--primaryColorHover);
+
+  /* background-color: var(--primaryColor); */
 }
+
+
+.bg-primary{
+  background-color: var(--primaryColor);
+}
+
+.text-default-light{
+  color:var(--defalutTextColorLight);
+}
+
+
+
+
+
 
 
 @media print {

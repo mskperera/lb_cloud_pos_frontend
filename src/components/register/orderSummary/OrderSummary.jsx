@@ -168,33 +168,36 @@ const OrderSummary=()=> {
           </DataTable>
         </div>
       )}
-   
+
 {/* Displaying Order Summary */}
 <div className="orderSummaryContainer">
-<div className="orderSummaryRow">
-      <div className="orderSummaryItem">
-    <p className="">Sub Total</p>
+<div className="flex justify-between gap-10 p-2">
+
+
+
+      <div className="flex justify-between items-center flex-1">
+    <p className=" text-[1.1rem] font-semibold m-1">Sub Total</p>
     <p className="">{subtotal}</p>
 </div>
 
-<div className="orderSummaryItem">
-            <p className="">Line Discounts</p>
+<div className="flex justify-between items-center flex-1">
+<p className=" text-[1.1rem] font-semibold m-1">Line Discounts</p>
             <p className="">
               {formatCurrency(totalDiscounts)}
           </p>
       </div>
 
 </div>
-<div className="orderSummaryRow">
-      <div className="orderSummaryItem">
-            <p className="">Tax</p>
+<div className="flex justify-between gap-10 p-2">
+<div className="flex justify-between items-center flex-1">
+            <p className=" text-[1.1rem] font-semibold m-1">Tax</p>
             <p className="">
             {formatCurrency(orderSummary.totalTax)}
           </p>
       </div>
 
-      <div className="orderSummaryItem">
-            <p className="">Grand Total</p>
+      <div className="flex justify-between items-center flex-1">
+            <p className=" text-[1.1rem] font-semibold m-1">Grand Total</p>
             <p className="">
             {formatCurrency(orderSummary.grandTotal)}
           </p>

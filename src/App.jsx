@@ -43,9 +43,9 @@ function AppContent() {
 
       <>
         <ToastProvider>
-          <div className='app-container'>
+          <div>
             {shouldShowNavBar && <TopMenubar />}
-            <div style={appStyle}>
+            <div  className='h-full'>
               <React.Suspense fallback={<>Loading...</>}>
                 <Routes>
                   <Route path="/home" element={<Home />} />

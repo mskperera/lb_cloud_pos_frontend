@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux'
 import {store} from './state/store.js';
-import 'primeflex/primeflex.css'; // Import PrimeFlex CSS
+// import 'primeflex/primeflex.css'; // Import PrimeFlex CSS
 import "primereact/resources/themes/md-light-indigo/theme.css";
 import 'primereact/resources/primereact.min.css';         // Core CSS
 import 'primeicons/primeicons.css';                      // Icons CSS    

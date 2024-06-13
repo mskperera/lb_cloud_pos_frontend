@@ -1,284 +1,231 @@
-import React, { useState, useEffect, useRef } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-
-//import { ProductService } from './service/ProductService';
-import { useDispatch, useSelector } from "react-redux";
-import { formatCurrency } from "../../../../utils/format";
-import { deleteProduct, getProducts } from "../../../../functions/register";
-import { InputSwitch } from "primereact/inputswitch";
-import ProductMenuPaginator from "../../../TablePaginator";
-import { useNavigate } from "react-router-dom";
-import { Badge } from "primereact/badge";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { useToast } from "../../../useToast";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { formatCurrency, formatUtcToLocal } from '../../../../utils/format';
+import { deleteProduct, getProducts } from '../../../../functions/register';
+import { useToast } from '../../../useToast';
 import moment from 'moment';
-import { Skeleton } from "primereact/skeleton";
-import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
-import { getDropdownMeasurementUnit, getDrpdownCategory } from "../../../../functions/dropdowns";
-import { validate } from "../../../../utils/formValidation";
-import FormElementMessage from "../../../messges/FormElementMessage";
-import './productList.css';
+import { getDropdownMeasurementUnit, getDrpdownCategory } from '../../../../functions/dropdowns';
+import { validate } from '../../../../utils/formValidation';
+import FormElementMessage from '../../../messges/FormElementMessage';
+import DaisyUIPaginator from '../../../DaisyUIPaginator';
+import ConfirmDialog from '../../../dialog/ConfirmDialog';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export default function ProductOrderList({ }) {
   const [products, setProducts] = useState([]);
-  const [isTableDataLoading, setIsTableDataLoading] = useState([]);
+  const [isTableDataLoading, setIsTableDataLoading] = useState(false);
   const navigate = useNavigate();
   const showToast = useToast();
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
-  const [selectedMeasurmentUnitId, setSelectedMeasurmentUnitId] = useState(-1);
+  const [selectedMeasurementUnitId, setSelectedMeasurementUnitId] = useState(-1);
 
   const [currentPage, setCurrentPage] = useState(0);
-
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [totalRecords, setTotalRecords] = useState(10);
 
-  const onPageChange = (event) => {
-    setCurrentPage(event.page);
-    setRowsPerPage(event.rows);
-    loadProducts(selectedCategoryId, event.page, rowsPerPage);
+  const onPageChange = ({ page, rows }) => {
+    setCurrentPage(page);
+    setRowsPerPage(rows);
+    loadProducts(selectedCategoryId, page, rows);
   };
 
-  const [selectedFilterBy,setSelectedFilterBy] =useState({
-    label: "Filter by",
+  const [selectedFilterBy, setSelectedFilterBy] = useState({
+    label: 'Filter by',
     value: 1,
     isTouched: false,
     isValid: false,
-    rules: { required: false, dataType: "integer" },
+    rules: { required: false, dataType: 'integer' },
   });
 
-  const [searchValue,setSearchValue] =useState({
-    label: "Search Value",
-    value: "",
+  const [searchValue, setSearchValue] = useState({
+    label: 'Search Value',
+    value: '',
     isTouched: false,
     isValid: false,
-    rules: { required: false, dataType: "string" },
+    rules: { required: false, dataType: 'string' },
   });
 
-
   const loadProducts = async () => {
-    try{
-    setIsTableDataLoading(true);
-    const skip = currentPage * rowsPerPage;
-    const limit = rowsPerPage;
+    try {
+      setIsTableDataLoading(true);
+      const skip = currentPage * rowsPerPage;
+      const limit = rowsPerPage;
 
-    const filteredData = {
-      productId: null,
-      productNo: selectedFilterBy.value===1 ? searchValue.value:null,
-      productName: selectedFilterBy.value===2 ? searchValue.value:null,
+      const filteredData = {
+        productId: null,
+        productNo: selectedFilterBy.value === 1 ? searchValue.value : null,
+        productName: selectedFilterBy.value === 2 ? searchValue.value : null,
+        barcode: selectedFilterBy.value === 3 ? searchValue.value : null,
+        categoryId: selectedCategoryId,
+        measurementUnitId: selectedMeasurementUnitId,
+        searchByKeyword: false,
+        skip: skip,
+        limit: limit,
+      };
 
-      barcode: selectedFilterBy.value===3 ? searchValue.value:null,
-      categoryId: selectedCategoryId,
-      measurementUnitId:selectedMeasurmentUnitId,
-      searchByKeyword: false,
-      skip: skip,
-      limit: limit,
-    };
-    const _result = await getProducts(filteredData, null);
-    const { totalRows } = _result.data.outputValues;
-    setTotalRecords(totalRows);
-    console.log("ppppp", _result.data);
-
-    setProducts(_result.data.results[0]);
-    setIsTableDataLoading(false);
-  }
-  catch(err){
-    setIsTableDataLoading(false);
-    console.log('error:',err);
-  }
+      const _result = await getProducts(filteredData, null);
+      const { totalRows } = _result.data.outputValues;
+      setTotalRecords(totalRows);
+      setProducts(_result.data.results[0]);
+      setIsTableDataLoading(false);
+    } catch (err) {
+      setIsTableDataLoading(false);
+      console.log('error:', err);
+    }
   };
 
   useEffect(() => {
-    console.log("useEffect lo");
     loadProducts();
-  }, [selectedCategoryId,selectedMeasurmentUnitId, currentPage, rowsPerPage]);
-
-
+  }, [selectedCategoryId, selectedMeasurementUnitId, currentPage, rowsPerPage]);
 
   useEffect(() => {
-    
-    if(searchValue.value){
-    console.log("useEffect search by value");
-    const delayedLoadProducts = setTimeout(() => {
-      loadProducts();
-    }, 1000);
-    
-    return () => clearTimeout(delayedLoadProducts);
-  }
+    if (searchValue.value) {
+      const delayedLoadProducts = setTimeout(() => {
+        loadProducts();
+      }, 1000);
+      return () => clearTimeout(delayedLoadProducts);
+    }
+  }, [searchValue.value]);
 
-}, [searchValue.value]);
+  const [filterByOptions, setFilterByOptions] = useState([
+    { id: 1, displayName: 'Product No' },
+    { id: 2, displayName: 'Product Name' },
+    { id: 3, displayName: 'Barcode' }
+  ]);
 
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [measurementUnitOptions, setMeasurementUnitOptions] = useState([]);
 
-  const [filterByOptions,setFilterByOptions] =useState([{id:1,displayName:'Product No'},{id:2,displayName:'Product Name'},{id:3,displayName:'Barcode'}]);
-
-  const [categoryOptions,setCategoryOptions] =useState([]);
-  const [measurementUnitOptions,setMeasurementUnitOptions] =useState([]);
-
-
-
-  useEffect(()=>{
+  useEffect(() => {
     loadDrpCategory();
     loadDrpMeasurementUnit();
-  },[]);
+  }, []);
 
-  const loadDrpCategory=async ()=>{
-    const objArr=await getDrpdownCategory();
-    setCategoryOptions([{id:-1,displayName:'All'},...objArr.data.results[0]])
-  }
-
-  const loadDrpMeasurementUnit=async ()=>{
-    const objArr=await getDropdownMeasurementUnit();
-    setMeasurementUnitOptions([{id:-1,displayName:'All'},...objArr.data.results[0]])
-  }
-
-
-
-
-  const actionButtons = (product) => {
-    return (
-      <div className="action-button-group">
-        <Button
-          icon="pi pi-times"
-          onClick={async () => {
-            console.log("deleteAcceptHandler :", product);
-            const result = await deleteProduct(product.productId, false);
-            const { outputMessage, responseStatus } = result.data.outputValues;
-
-            console.log("result :", result.data.outputValues);
-
-            confirm(outputMessage, product.productId);
-          }}
-          rounded
-          text
-          severity="danger"
-          tooltip="Delete Product"
-          aria-label="Delete"
-        />
-        <Button
-          icon="pi pi-pencil"
-          onClick={() => {
-            navigate(`/addProduct/update/${product.productId}`);
-          }}
-          rounded
-          text
-          severity="warning"
-          tooltip="Edit Product"
-          aria-label="Edit"
-        />
-      </div>
-    );
+  const loadDrpCategory = async () => {
+    const objArr = await getDrpdownCategory();
+    setCategoryOptions([{ id: -1, displayName: 'All' }, ...objArr.data.results[0]]);
   };
 
+  const loadDrpMeasurementUnit = async () => {
+    const objArr = await getDropdownMeasurementUnit();
+    setMeasurementUnitOptions([{ id: -1, displayName: 'All' }, ...objArr.data.results[0]]);
+  };
 
-
-
-  
+  const actionButtons = (product) => (
+    <div className="flex space-x-2">
+      <button
+        className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
+        onClick={async () => {
+          const result = await deleteProduct(product.productId, false);
+          const { outputMessage, responseStatus } = result.data.outputValues;
+          confirm(outputMessage, product.productId);
+        }}
+        aria-label="Delete"
+        title='Delete Product'
+      >
+        <FontAwesomeIcon icon={faTrash} />
+      </button>
+      <button
+        className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
+        onClick={() => navigate(`/addProduct/update/${product.productId}`)}
+        aria-label="Edit" title='Edit Product'
+      >
+        <FontAwesomeIcon icon={faEdit} />
+      </button>
+    </div>
+  );
 
   const validationMessages = (state) => {
-    // Ensure that the function returns JSX or null
-    return (
-      !state.isValid &&
-      state.isTouched && (
-        <div>
-          {state.validationMessages.map((message, index) => (
-            <FormElementMessage
-              key={index}
-              className="mt-2 w-full"
-              severity="error"
-              text={`${message}`}
-            />
-          ))}
-        </div>
-      )
-    );
+    if (!state.isValid && state.isTouched) {
+      return state.validationMessages.map((message, index) => (
+        <FormElementMessage
+          key={index}
+          className="mt-2 w-full"
+          severity="error"
+          text={`${message}`}
+        />
+      ));
+    }
+    return null;
   };
 
   const [selectedIdToDelete, setSelectedIdToDelete] = useState(null);
 
   const deleteAcceptHandler = async (productId) => {
     try {
-      console.log("deleteAcceptHandler :", productId);
       const result = await deleteProduct(productId, true);
-
       const { data } = result;
       if (data.error) {
-        showToast("error", "Exception", data.error.message);
+        showToast('danger', 'Exception', data.error.message);
         return;
       }
-
-      setProducts(products.filter(p=>p.productId!==productId));
-      showToast("success", "Successful", data.outputValues.outputMessage);
+      setProducts(products.filter(p => p.productId !== productId));
+      showToast('success', 'Successful', data.outputValues.outputMessage);
     } catch (err) {
-      console.log("err :", err);
+      console.log('err :', err);
     }
   };
+
   const deleteCancelHandler = () => {
-    console.log("delted");
     setSelectedIdToDelete(null);
   };
 
   const confirm = (outputMessage, id) => {
-    confirmDialog({
-      message: outputMessage,
-      header: "Delete Confirmation",
-      icon: "pi pi-info-circle",
-      //defaultFocus: 'reject',
-      acceptClassName: "p-button-danger",
-      accept: () => deleteAcceptHandler(id),
-      reject: deleteCancelHandler,
-    });
+    if (window.confirm(outputMessage)) {
+      deleteAcceptHandler(id);
+    }
   };
 
-  const productNoBodyTemplate = (rowData) => {
-    return isTableDataLoading ? <Skeleton /> : <span>{rowData.productNo}</span>;
-  };
+  const productNoBodyTemplate = (rowData) => (
+    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productNo}</span>
+  );
 
-  const productNameBodyTemplate = (rowData) => {
-    return isTableDataLoading ? <Skeleton /> : <span>{rowData.productName}</span>;
-  };
+  const productNameBodyTemplate = (rowData) => (
+    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productName}</span>
+  );
 
-  const measurementUnitNameBodyTemplate = (rowData) => {
-    return isTableDataLoading ? <Skeleton /> : <span>{rowData.measurementUnitName}</span>;
-  };
-  const unitPriceBodyTemplate = (rowData) => {
-    return isTableDataLoading ? <Skeleton /> : <span>{formatCurrency(rowData.unitPrice)}</span>;
-  };
-  const barcodeBodyTemplate = (rowData) => {
-    return isTableDataLoading ? <Skeleton /> : <span>{rowData.barcode}</span>;
-  };
-  const taxRate_percBodyTemplate = (rowData) => {
-    return isTableDataLoading ? <Skeleton /> : <span>{rowData.taxRate_perc}</span>;
-  };
+  const measurementUnitNameBodyTemplate = (rowData) => (
+    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.measurementUnitName}</span>
+  );
+
+  const unitPriceBodyTemplate = (rowData) => (
+    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.unitPrice)}</span>
+  );
+
+  const barcodeBodyTemplate = (rowData) => (
+    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.barcode}</span>
+  );
+
+  const taxRate_percBodyTemplate = (rowData) => (
+    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.taxRate_perc}</span>
+  );
 
   const categoriesBodyTemplate = (product) => {
     const categories = JSON.parse(product.categories);
     return (
-       isTableDataLoading ? <Skeleton /> : <>
-      {categories.map((c) => (
-        <Badge
-          size="small"
-          className="m-1"
-          key={c.id}
-          value={c.displayName}
-        ></Badge>
-      ))}
-    </>
+      isTableDataLoading ? <span>Loading...</span> :
+        <>
+          {categories.map((c) => (
+            <span
+              key={c.id}
+              className="badge badge-primary bg-green-500 border-none text-white mr-1"
+            >
+              {c.displayName}
+            </span>
+          ))}
+        </>
     );
   };
+
   const modifiedDateBodyTemplate = (product) => {
-    const localFormattedDate = moment.utc(product.modifiedDate_UTC).format('YYYY-MMM-DD hh:mm:ss A');
-    
-    return isTableDataLoading ? <Skeleton /> : <span>{product.modifiedDate_UTC ? localFormattedDate:''}</span>;
+
+   
+    const localFormattedDate =formatUtcToLocal(product.modifiedDate_UTC);
+    return isTableDataLoading ? <span>Loading...</span> : <span>{product.modifiedDate_UTC ? localFormattedDate : ''}</span>;
   };
 
   const handleInputChange = (setState, state, value) => {
-    console.log("Nlllll", state);
-    if (!state.rules) {
-      console.error("No rules defined for validation in the state", state);
-      return;
-    }
     const validation = validate(value, state);
     setState({
       ...state,
@@ -289,197 +236,144 @@ export default function ProductOrderList({ }) {
     });
   };
 
+  const [showDialog, setShowDialog] = useState(false);
+  const [productIdToDelete, setProductIdToDelete] = useState(null);
+
+  const confirmDelete = (outputMessage, productId) => {
+    setProductIdToDelete(productId);
+    setShowDialog(true);
+  };
+
+  const handleDialogConfirm = () => {
+    deleteAcceptHandler(productIdToDelete);
+    setShowDialog(false);
+  };
+
+  const handleDialogCancel = () => {
+    setShowDialog(false);
+  };
+
   return (
-    <>
-      <ConfirmDialog />
+    <div className="px-10">
 
-        <div className="flex justify-content-between align-items-center px-5 gap-2">
-          <div className="col-9">
-            <div className="grid w-full">
-            <div className="col-12 lg:col-3">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      Category
-                    </label>
-                    <Dropdown
-                      id="void-reason"
-                      value={selectedCategoryId}
-                      onChange={(e) => {
-                        setSelectedCategoryId(e.value);
-                      }}
-                      options={categoryOptions}
-                      optionLabel="displayName" // Property to use as the label
-                      optionValue="id" // Property to use as the value
-                      placeholder="Category"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="col-12 lg:col-3">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      Measurement Unit
-                    </label>
-                    <Dropdown
-                      id="void-reason"
-                      value={selectedMeasurmentUnitId}
-                      onChange={(e) => {
-                        setSelectedMeasurmentUnitId(e.value);
-                      }}
-                      options={measurementUnitOptions}
-                      optionLabel="displayName" // Property to use as the label
-                      optionValue="id" // Property to use as the value
-                      placeholder="Measurement Unit"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="col-12 lg:col-2">
-           
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      Filter By
-                    </label>
-                    <Dropdown
-                      id="void-reason"
-                      value={selectedFilterBy.value}
-                      onChange={(e) => {
-                        handleInputChange(
-                          setSelectedFilterBy,
-                          selectedFilterBy,
-                          e.value
-                        );
-                      }}
-                      options={filterByOptions}
-                      optionLabel="displayName" // Property to use as the label
-                      optionValue="id" // Property to use as the value
-                    //  placeholder="Filter by"
-                      className="w-full dropdown-field"
-                    />
-                  </div>
-         
+      {showDialog && (
+        <ConfirmDialog
+          message="Are you sure you want to delete this product?"
+          onConfirm={handleDialogConfirm}
+          onCancel={handleDialogCancel}
+        />)}
 
-              </div>
-              <div className="col-12 lg:col-4">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      Search Value
-                    </label>
-                    <InputText
-                      id="searchValue"
-                     // placeholder="Search here"
-                      value={searchValue.value}
-                      onChange={(e) => {
-                        handleInputChange(
-                          setSearchValue,
-                          searchValue,
-                          e.target.value
-                        );
-                      }}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-          
-            </div>
+      <div className="flex justify-between items-end p-5 gap-2">
+        <div className="flex space-x-4 w-full">
+          <div className="flex flex-col space-y-2 w-1/5">
+            <label className="text-[1rem] font-normal">Category</label>
+            <select
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
+              className="select select-bordered w-full"
+            >
+              {categoryOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
           </div>
-
-          <Button
-            label="Add Product"
-            onClick={() => {
-              navigate(`/addProduct/add/0`);
-            }}
-            icon="pi pi-plus"
-            rounded
-          />
+          <div className="flex flex-col space-y-2 w-1/5">
+            <label className="font-normal">Measurement Unit</label>
+            <select
+              value={selectedMeasurementUnitId}
+              onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
+              className="select select-bordered w-full"
+            >
+              {measurementUnitOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col space-y-2 w-1/5">
+            <label className="font-normal">Filter By</label>
+            <select
+              value={selectedFilterBy.value}
+              onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
+              className="select select-bordered w-full"
+            >
+              {filterByOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col space-y-2 w-2/5">
+            <label className="font-normal">Search Value</label>
+            <input
+              type="text"
+              value={searchValue.value}
+              onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
+              className="input input-bordered w-full"
+            />
+          </div>
         </div>
 
-        {isTableDataLoading ? (
-          <div className="flex justify-content-center">
-            <p className="text-lg">Loading...</p>
-          </div>
-        ) : (
-          <>
-            {" "}
-            <DataTable
-              value={products}
-              scrollable
-              scrollHeight="500px"
-              selectionMode="single" // or "multiple" for multiple row selection
-              tableStyle={{ minWidth: "50rem" }}
-            >
-              {/* Columns */}
-              <Column field="productId" header="Product Id"></Column>
-              <Column
-                field="productNo"
-                body={productNoBodyTemplate}
-                header="Product No"
-              ></Column>
-              <Column
-                field="productName"
-                body={productNameBodyTemplate}
-                header="Product Name"
-              ></Column>
-              <Column
-                field="measurementUnitName"
-                body={measurementUnitNameBodyTemplate}
-                header="Measurement Unit"
-              ></Column>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate(`/addProduct/add/0`)}
+        >
+          Add Product
+        </button>
+      </div>
+      <div className="flex flex-col h-[65vh] overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+      
+        <table className="table w-full border-collapse">
+  <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+    <tr>
+      <th className="px-4 py-2">Product Id</th>
+      <th className="px-4 py-2">Product No</th>
+      <th className="px-4 py-2">Product Name</th>
+      <th className="px-4 py-2">Measurement Unit</th>
+      <th className="px-4 py-2">Unit Price</th>
+      <th className="px-4 py-2">Barcode</th>
+      <th className="px-4 py-2">Category</th>
+      <th className="px-4 py-2">Tax Rate(%)</th>
+      <th className="px-4 py-2">Modified</th>
+      <th className="px-4 py-2">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {products.map(product => (
+      <tr key={product.productId} className="border-b border-gray-200 hover:bg-gray-100 bg-whit">
+        <td className="px-4 py-2">{product.productId}</td>
+        <td className="px-4 py-2">{productNoBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{productNameBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{measurementUnitNameBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{unitPriceBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{barcodeBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{categoriesBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{taxRate_percBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{modifiedDateBodyTemplate(product)}</td>
+        <td className="px-4 py-2">{actionButtons(product)}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
 
-              <Column
-                field="unitPrice"
-                body={unitPriceBodyTemplate}
-                header="Unit Price"
-              ></Column>
-              <Column
-                field="barcode"
-                body={barcodeBodyTemplate}
-                header="Barcode"
-              ></Column>
-              <Column
-                field="categories"
-                body={categoriesBodyTemplate}
-                header="Category"
-              ></Column>
-              <Column
-                field="taxRate_perc"
-                body={taxRate_percBodyTemplate}
-                header="Tax Rate(%)"
-              ></Column>
-              <Column
-                field="modifiedDate_UTC"
-                body={modifiedDateBodyTemplate}
-                header="Modified"
-              ></Column>
-              <Column header="" body={actionButtons}></Column>
-            </DataTable>
-            <ProductMenuPaginator
-              currentPage={currentPage}
-              rowsPerPage={rowsPerPage}
-              totalRecords={totalRecords}
-              onPageChange={onPageChange}
-            />
-          </>
-        )}
-    
-    </>
+          </div>
+      
+      </div>
+
+      <div className="flex justify-end w-full bg-white p-4">
+        <DaisyUIPaginator
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          totalRecords={totalRecords}
+          onPageChange={onPageChange}
+          rowsPerPageOptions={[10, 30, 50, 100]}
+        />
+      </div>
+    </div>
   );
 }

@@ -123,7 +123,7 @@ const onAddCustomerHandler=()=>{
           loadCount={loadCount}
         />
 
-        <DialogModel
+         <DialogModel
           header="Return Order"
           visible={isReturnOrderPopupVisible}
           maximizable
@@ -131,8 +131,8 @@ const onAddCustomerHandler=()=>{
           style={{ width: "50vw" }}
           onHide={() => setIsReturnOrderPopupVisible(false)}
         >
-          <ReturnOrder onAddReturnedProducts={addReturnedProductsHandler} />
-        </DialogModel>
+          <ReturnOrder onAddReturnedProducts={addReturnedProductsHandler}/>
+        </DialogModel> 
 
         <DialogModel
           header="Select Customer"
@@ -142,21 +142,31 @@ const onAddCustomerHandler=()=>{
           style={{ width: "50vw" }}
           onHide={() => setShowCustomerList(false)}
         >
-          <CustomerList
-            selectingMode={true}
-            onselect={onCustomerSelectHandler}
-          />
+          <CustomerList selectingMode={true} onselect={onCustomerSelectHandler} />
         </DialogModel>
 
-        <div className="flex items-start justify-between gap-2 py-2 px-4">
+        <div className="flex items-center justify-between gap-2 py-2 px-4 h-700 bg-blue-950">
           {showPayment ? (
             <PaymentScreen />
           ) : (
             <>
-              <div className="flex flex-col flex-[3] py-2 gap-2">
-                <div className="flex flex-col h-[87vh]">
-                <div className="flex-grow overflow-auto">
-                    <div className="flex flex-col gap-2">
+
+
+
+              <div className="flex-5 h-500 bg-blue-600">
+            
+
+            
+                {/* <div className="productOrderList">
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                    }}
+                  >
+
+                    <div style={{marginTop:'15px'}}>
                       {isCustomerLoading ? (
                         <p>loading...</p>
                       ) : (
@@ -169,50 +179,68 @@ const onAddCustomerHandler=()=>{
                           onAddCustomer={onAddCustomerHandler}
                         />
                       )}
+                    </div>
 
-                      <ProductOrderList
-                        showDiscountPopup={showDiscountPopupHandler}
-                      />
-                    </div>
-                    </div>
-                    <div className="flex-none h-[14rem]">
-                    <div className=" flex flex-col justify-center gap-5">
-                      <OrderSummary />
-                      <div className="flex gap-3 justify-between items-center px-2 ">
-                        <button
-                          className="btn btn-lg h-auto shadow-none py-4 px-5 rounded-full border-none hover:bg-primaryColor hover:text-base-100"
-                          onClick={() => {
-                            changeVisibilityHandler(true);
-                          }}
-                          rounded
-                        >
-                          <i
-                            className="pi pi-bars px-2"
-                            style={{ fontSize: "25px" }}
-                          ></i>
-                          <span className="px-2">Menu</span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            navigate("/payment");
-                          }}
-                          className="btn btn-lg h-auto shadow-none py-4 px-5 rounded-full border-none bg-primaryColor text-base-100"
-                        >
-                          <i
-                            className="pi pi-shopping-cart px-2"
-                            style={{ fontSize: "20px", fontWeight: "bold" }}
-                          ></i>
-                          <span className="px-2">Pay</span>
-                        </button>
-                      </div>
-                    </div>
+                   <ProductOrderList
+                      showDiscountPopup={showDiscountPopupHandler}
+                    /> 
                   </div>
                 </div>
+
+                <div className="productOrderBottom">
+                  <OrderSummary />
+                  <div
+                    style={{ display: "flex", gap: "20px", alignItems: "end" }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <Button
+                        aria-label="Menu"
+                        className="text-color-primary"
+                        onClick={() => {
+                          changeVisibilityHandler(true);
+                        }}
+                        text
+                        rounded
+                      >
+                        <i
+                          className="pi pi-bars px-2"
+                          style={{ fontSize: "25px" }}
+                        ></i>
+                        <span className="px-2">Menu</span>
+                      </Button>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <Button
+                        aria-label="Pay"
+                      className="button-primary"
+                        disabled={!list.length > 0}
+                        onClick={() => {
+                          navigate("/payment");
+                        }}
+
+                        style={{
+                          width: "100%",
+                          padding: "15px",
+                          display: "block",
+                        }}
+                        size="large"
+                        rounded
+                      >
+                        <i
+                          className="pi pi-shopping-cart px-2"
+                          style={{ fontSize: "20px", fontWeight: "bold" }}
+                        ></i>
+                        <span className="px-2">Pay</span>
+                      </Button>
+                    </div>
+                  </div>
+                </div> */}
+          
               </div>
 
-              <div className="flex-[5] ">
-                <ProductList />
+              <div className="flex-5 bg-blue-900 ">
+                {/* <ProductList /> */}
               </div>
             </>
           )}
