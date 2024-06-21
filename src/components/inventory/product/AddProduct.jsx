@@ -135,10 +135,12 @@ export default function AddProduct({ saveType, id }) {
     } = res.data.results[0][0];
 
     setBarcode((p) => ({ ...p, value: barcode }));
-    setProductCategory((p) => ({
-      ...p,
-      value: JSON.parse(categories).map((c) => c.id),
-    }));
+    console.log('ccccssssselectredcate',categories)
+    // setProductCategory((p) => ({
+    //   ...p,
+    //   value: JSON.parse(categories).map((c) => c.id),
+    // }));
+    setSelectedCategories(JSON.parse(categories).map((c) => c.id));
     setMeasurementUnit((p) => ({ ...p, value: measurementUnitId }));
     setProductNo((p) => ({ ...p, value: productNo }));
     setProductName((p) => ({ ...p, value: productName }));
@@ -208,7 +210,7 @@ export default function AddProduct({ saveType, id }) {
       if (res.data.error) {
    
         const { error } = res.data;
-        showToast("warning", "Exception", error.message);
+        showToast("danger", "Exception", error.message);
         return;
       }
       const { outputMessage, responseStatus } = res.data.outputValues;
@@ -223,7 +225,7 @@ export default function AddProduct({ saveType, id }) {
       setIsSubmitting(false);
       if (res.data.error) {
         const { error } = res.data;
-        showToast("warning", "Exception", error.message);
+        showToast("danger", "Exception", error.message);
         return;
       }
       const { outputMessage, responseStatus } = res.data.outputValues;
@@ -423,7 +425,7 @@ export default function AddProduct({ saveType, id }) {
       <option value="" disabled>
         Select Category
       </option>
-      {categoryOptions.map((option) => (
+      { categoryOptions.map((option) => (
         <option key={option.id} value={option.id}>
           {option.displayName}
         </option>
@@ -450,7 +452,7 @@ export default function AddProduct({ saveType, id }) {
     <span className="label-text">Selected Categories</span>
   </label>
   <div className="flex flex-wrap gap-2">
-    {selectedCategories.map((categoryId, index) => {
+    {categoryOptions.length>0 && selectedCategories?.map((categoryId, index) => {
       const category = categoryOptions.find((opt) => opt.id ===parseInt(categoryId));
   
 

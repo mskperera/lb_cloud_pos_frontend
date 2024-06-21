@@ -4,32 +4,12 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { validate } from "../../../utils/formValidation";
 import FormElementMessage from "../../messges/FormElementMessage";
 import { useDispatch, useSelector } from "react-redux";
-import { calculateBalance } from "../../../state/orderList/orderListSlice";
+import { addMultiPayment, addSinglePayment, calculateBalance } from "../../../state/orderList/orderListSlice";
+import { PAYMENT_METHODS } from "../../../utils/constants";
 
-const CashDemomination = ({ currency, amount, isSelected, onClick }) => {
-  return (
-    <div
-      className="col-12 md:col-4 sm:col-4 lg:col-4 xl:col-2 p-1"
-      style={{ cursor: "pointer" }}
-      onClick={onClick}
-    >
-      <div className={`shadow-1 hover:shadow-4 border-round ${isSelected ? 'bg-primary text-white' : ''}`}>
-        <div className="flex justify-content-center flex-wrap p-3">
-          <span className="font-bold">{`${currency}${amount}`}</span>
-        </div>
-      </div>
-    </div>
-  );
-};
+
 
 const CashPayment = forwardRef((props, ref) =>{
-
-  const [cashDenominations,setCashDenominations]=useState([{currency:'Rs',amount:10},
-  {currency:'Rs',amount:20},
-  {currency:'Rs',amount:50},
-  {currency:'Rs',amount:100},{currency:'Rs',amount:500},
-  {currency:'Rs',amount:1000},{currency:'Rs',amount:5000},
-]);
 
 
 const [receivedAmount,setReceivedAmount] = useState({
@@ -128,47 +108,59 @@ console.log('run validation',validation)
   }));
 
 
-    return (
-      <>
-        <div className="flex flex-column mb-4">
-          <div className="grid mb-2">
-            <div className="col-6">
-              <div className="flex align-items-center gap-2">
-                <span className=" pi pi-money-bill text-xl font-semibold"></span>{" "}
-                <span className="text-xl font-semibold">Cash Payment</span>
-              </div>
-            </div>
-          </div>
 
-          <div className="grid mb-5">
-            <div className="col">
-              <div className="flex flex-wrap">
-                {cashDenominations.map((p, index) => (
-                  <CashDemomination
-                    key={index}
-                    currency={p.currency}
-                    amount={p.amount}
-                    isSelected={receivedAmount?.value === p.amount}
-                    //onClick={() => handleDenominationClick(p)}
-                    onClick={() => {
-                      handleInputChange(
-                        setReceivedAmount,
-                        receivedAmount,
-                        p.amount
-                      );
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="col">
-                <div className="flex flex-row align-items-center justify-content-center">
-                  {/* <label htmlFor="customAmount-single"  className="font-normal text-lg mr-2">Custom Amount</label> */}
-                  <InputText
-                    id="customAmount-single"
-                    type="text"
+  
+  const onchangHandler=async(value)=>{
+
+    
+    const paymentData = {
+      methodId: PAYMENT_METHODS.CASH,
+      amountPaid: value,
+      cashPayment: {
+        receivedAmount: value,
+        // balanceAmount: 0,
+      },
+    };
+    console.log("addMultiPayment", paymentData);
+    dispatch(addSinglePayment({ paymentData }));
+
+
+  }
+
+
+  useEffect(()=>{
+    if(receivedAmount.value)
+    onchangHandler(receivedAmount.value);
+  },[receivedAmount])
+
+
+
+    return (
+        <div className="flex flex-col gap-4 w-full">
+        
+        <div className='grid grid-cols-3 gap-2'>
+                  {[1, 2, 5, 10, 20, 50, 100, 500, 1000, 5000].map((amount) => (
+                    <button
+                      key={amount}
+                      onClick={() => {
+                        handleInputChange(
+                          setReceivedAmount,
+                          receivedAmount,
+                          amount
+                        );
+                      }}
+          
+                      className='btn  bg-primaryColor hover:bg-primaryColorHover text-white rounded-full'
+                    >
+                      Rs {amount}
+                    </button>
+                  ))}
+                </div>
+                <div className='flex justify-end items-center gap-2 mt-4'>
+                  <div className='text-lg font-semibold'>Pay amount</div>
+                  <input
+                    type='number'
                     value={receivedAmount && receivedAmount.value}
-                    className="p-inputtext-normal"
-                    placeholder="Enter Custom Amount"
                     onChange={(e) => {
                       handleInputChange(
                         setReceivedAmount,
@@ -176,12 +168,9 @@ console.log('run validation',validation)
                         e.target.value
                       );
                     }}
+                    className='border p-4 rounded'
                   />
                 </div>
-              </div>
-            </div>
-          
-          </div>
 
           <div className="grid">
             <div className="col">
@@ -189,7 +178,6 @@ console.log('run validation',validation)
             </div>
           </div>
         </div>
-      </>
     );
 
 });

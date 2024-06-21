@@ -195,9 +195,7 @@ m-0"
 
 const MultiPaymentList = ({ paymentList, onRemovePayment,orderSummary }) => {
   return (
-    <div className="grid">
-      <div className="col-12">
-        <div className="flex flex-row gap-2 align-items-start">
+    <div className="flex gap-4">
           {paymentList.map((payment) => (
             <PaymentMethodCard
               key={payment.id}
@@ -205,8 +203,6 @@ const MultiPaymentList = ({ paymentList, onRemovePayment,orderSummary }) => {
               onRemove={onRemovePayment}
             />
           ))}
-        </div>
-      </div>
     </div>
   );
 };

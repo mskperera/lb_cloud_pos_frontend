@@ -23,8 +23,13 @@
 
 }
 
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  color: var(--defalutTextColor);
 
-label,option{
+}
+
+label,option,span{
   font-size: 1rem;
 }
 
@@ -49,7 +54,9 @@ label,option{
   color:var(--defalutTextColorLight);
 }
 
-
+.text-default{
+  color:var(--defalutTextColor);
+}
 
 
 

@@ -54,7 +54,7 @@ export default function AddCustomer({saveType,id}) {
   });
 
   const [whatsappNumber, setWhatsappNo] = useState({
-    label: "WhatsappNo",
+    label: "WhatsApp",
     value: "",
     isTouched: false,
     isValid: false,
@@ -176,7 +176,7 @@ useEffect(()=>{
     if (res.data.error) {
       setIsSubmitting(false);
       const { error } = res.data;
-      showToast("error", "Exception", error.message);
+      showToast("danger", "Exception", error.message);
       return;
     }
 
@@ -194,7 +194,7 @@ useEffect(()=>{
     if (res.data.error) {
       setIsSubmitting(false);
       const { error } = res.data;
-      showToast("error", "Exception", error.message);
+      showToast("danger", "Exception", error.message);
     }
 
     const { customerCode, outputMessage, responseStatus } = res.data.outputValues;
@@ -209,143 +209,149 @@ useEffect(()=>{
   }
   }
   return (
-    <>
-     {saveType===SAVE_TYPE.ADD && <h2 className="text-center">Add Customer</h2>}
-     {saveType===SAVE_TYPE.UPDATE && <h2 className="text-center">Update Customer</h2>}
-      <div className="grid px-4">
-        <div className="col-12">
-          <div className="grid mt-4">
-            <div className="col-3">
-              <div className="flex flex-column gap-2">
-               
-                <label htmlFor="customerCode">{customerCode.label}</label>
-                <InputText
-                  id="customerCode"
-                  readOnly={true}
-                  value={customerCode.value}
-                  onChange={(e) => {
-                    console.log("customerCode", e.target.value);
-                    handleInputChange(setCustomerCode, customerCode, e.target.value); // Ensure 'discount' state has 'rules'
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(customerCode)}
-              </div>
-            </div>
-    
-          </div>{" "}
+    <div className="flex justify-center">
+         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 ml-5 w-[70%] py-5">
+      <div className="flex justify-center lg:col-span-3">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold">
+            {saveType === SAVE_TYPE.ADD ? "Add Customer" : "Update Customer"}
+          </h2>
         </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="customerName">{customerName.label}</label>
-            <InputText
-                  id="customerName"
-                  value={customerName.value}
-                  onChange={(e) => {
-                    console.log("customerName", e.target.value);
-                    handleInputChange(setCustomerName, customerName, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(customerName)}
-          </div>
-        </div>
-    
-       
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="email">{email.label}</label>
-            <InputText
-                  id="email"
-                  value={email.value}
-                  onChange={(e) => {
-                    console.log("email", e.target.value);
-                    handleInputChange(setEmail, email, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(email)}
-          </div>
-        </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="email">{mobile.label}</label>
-            <InputText
-                  id="taxRate"
-                  value={mobile.value}
-                  onChange={(e) => {
-                    handleInputChange(setMobile, mobile, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(mobile)}
-          </div>
-        </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="tel">{tel.label}</label>
-            <InputText
-                  id="tel"
-                  value={tel.value}
-                  onChange={(e) => {
-                    console.log("tel", e.target.value);
-                    handleInputChange(setTel, tel, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(tel)}
-          </div>
-        </div>
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="whatsappNumber">{whatsappNumber.label}</label>
-            <InputText
-                  id="whatsappNumber"
-                  value={whatsappNumber.value}
-                  onChange={(e) => {
-                    console.log("whatsappNumber", e.target.value);
-                    handleInputChange(setWhatsappNo, whatsappNumber, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(whatsappNumber)}
-
-          </div>
-        </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="remark">{remark.label}</label>
-            <InputText
-                  id="remark"
-                  value={remark.value}
-                  onChange={(e) => {
-                    console.log("remark", e.target.value);
-                    handleInputChange(setRemark, remark, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(remark)}
-
-          </div>
-        </div>
-
       </div>
 
-      <div className="grid mt-4 px-4">
-        <div className="col-12 p-2 flex justify-content-center">
-          <Button
-            label={isSubmitting ? "Submitting..." : saveType===SAVE_TYPE.UPDATE ? "Update":"Add"}
-            aria-label="Tender"
-            className="p-button-rounded p-button-lg p-button-primary"
-             onClick={onSubmit}
-            style={{ width: "20%" }}
+   
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{customerCode.label}</span>
+        </label>
+        <div className="flex items-center">
+          <input
+            type="text"
+            className="input input-bordered flex-1"
+            readOnly={true}
+            value={customerCode.value}
+            onChange={(e) =>
+              handleInputChange(setCustomerCode, customerCode, e.target.value)
+            }
           />
+   
         </div>
+        {validationMessages(customerCode)}
       </div>
-    </>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{customerName.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={customerName.value}
+          onChange={(e) =>
+            handleInputChange(setCustomerName, customerName, e.target.value)
+          }
+        />
+        {validationMessages(customerName)}
+      </div>
+
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{email.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={email.value}
+          onChange={(e) =>
+            handleInputChange(setEmail, email, e.target.value)
+          }
+        />
+        {validationMessages(email)}
+      </div>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{mobile.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={mobile.value}
+          onChange={(e) =>
+            handleInputChange(setMobile, mobile, e.target.value)
+          }
+        />
+        {validationMessages(mobile)}
+      </div>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{whatsappNumber.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={whatsappNumber.value}
+          onChange={(e) =>
+            handleInputChange(setWhatsappNo, whatsappNumber, e.target.value)
+          }
+        />
+        {validationMessages(whatsappNumber)}
+      </div>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{tel.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={tel.value}
+          onChange={(e) =>
+            handleInputChange(setTel, tel, e.target.value)
+          }
+        />
+        {validationMessages(tel)}
+      </div>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{remark.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={remark.value}
+          onChange={(e) =>
+            handleInputChange(setRemark, remark, e.target.value)
+          }
+        />
+        {validationMessages(remark)}
+      </div>
+         
+<div className="flex justify-center mt-20 col-span-full">
+        <button
+          className={`btn btn-primary w-56 ${isSubmitting ? "loading" : ""}`}
+          onClick={onSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? "Submitting..."
+            : saveType === SAVE_TYPE.UPDATE
+            ? "Update"
+            : "Add"}
+        </button>
+      </div>
+ 
+    </div>
+    </div>
+
   );
 }

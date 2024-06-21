@@ -10,7 +10,7 @@ import FormElementMessage from '../../../messges/FormElementMessage';
 import DaisyUIPaginator from '../../../DaisyUIPaginator';
 import ConfirmDialog from '../../../dialog/ConfirmDialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash,faPlus, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
 
 export default function ProductOrderList({ }) {
   const [products, setProducts] = useState([]);
@@ -46,8 +46,10 @@ export default function ProductOrderList({ }) {
     rules: { required: false, dataType: 'string' },
   });
 
+  const [isSearchValueEntered,setIsSearchValueEntered]=useState(false);
   const loadProducts = async () => {
     try {
+      console.log('loadproducs')
       setIsTableDataLoading(true);
       const skip = currentPage * rowsPerPage;
       const limit = rowsPerPage;
@@ -80,18 +82,39 @@ export default function ProductOrderList({ }) {
   }, [selectedCategoryId, selectedMeasurementUnitId, currentPage, rowsPerPage]);
 
   useEffect(() => {
-    if (searchValue.value) {
+
+    if(isSearchValueEntered){
+
       const delayedLoadProducts = setTimeout(() => {
         loadProducts();
       }, 1000);
       return () => clearTimeout(delayedLoadProducts);
     }
+    
   }, [searchValue.value]);
+
+
+  useEffect(()=>{
+    if([1,2,3].includes(selectedFilterBy.value)){
+      setSelectedCategoryId(-1);
+      setSelectedMeasurementUnitId(-1);
+    }
+    else{
+      setSearchValue({...searchValue,value:""});
+    }
+  },[selectedFilterBy.value]);
+
+  useEffect(() => {
+    setIsSearchValueEntered(true);
+  }, [isSearchValueEntered]);
+
 
   const [filterByOptions, setFilterByOptions] = useState([
     { id: 1, displayName: 'Product No' },
     { id: 2, displayName: 'Product Name' },
-    { id: 3, displayName: 'Barcode' }
+    { id: 3, displayName: 'Barcode' },
+    { id: 4, displayName: 'Category' },
+    { id: 5, displayName: 'Measurement Unit' }
   ]);
 
   const [categoryOptions, setCategoryOptions] = useState([]);
@@ -119,7 +142,7 @@ export default function ProductOrderList({ }) {
         onClick={async () => {
           const result = await deleteProduct(product.productId, false);
           const { outputMessage, responseStatus } = result.data.outputValues;
-          confirm(outputMessage, product.productId);
+          confirmDelete(outputMessage, product.productId);
         }}
         aria-label="Delete"
         title='Delete Product'
@@ -150,32 +173,10 @@ export default function ProductOrderList({ }) {
     return null;
   };
 
-  const [selectedIdToDelete, setSelectedIdToDelete] = useState(null);
 
-  const deleteAcceptHandler = async (productId) => {
-    try {
-      const result = await deleteProduct(productId, true);
-      const { data } = result;
-      if (data.error) {
-        showToast('danger', 'Exception', data.error.message);
-        return;
-      }
-      setProducts(products.filter(p => p.productId !== productId));
-      showToast('success', 'Successful', data.outputValues.outputMessage);
-    } catch (err) {
-      console.log('err :', err);
-    }
-  };
 
-  const deleteCancelHandler = () => {
-    setSelectedIdToDelete(null);
-  };
 
-  const confirm = (outputMessage, id) => {
-    if (window.confirm(outputMessage)) {
-      deleteAcceptHandler(id);
-    }
-  };
+
 
   const productNoBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productNo}</span>
@@ -244,128 +245,200 @@ export default function ProductOrderList({ }) {
     setShowDialog(true);
   };
 
-  const handleDialogConfirm = () => {
+
+  const deleteAcceptHandler = async (productId) => {
+    try {
+      setProductIdToDelete('');
+      const result = await deleteProduct(productId, true);
+      const { data } = result;
+      if (data.error) {
+        showToast('danger', 'Exception', data.error.message);
+        return;
+      }
+      setProducts(products.filter(p => p.productId !== productId));
+      setTotalRecords(totalRecords-1);
+      showToast('success', 'Successful', data.outputValues.outputMessage);
+    } catch (err) {
+      console.log('err :', err);
+    }
+  };
+
+
+
+  const handleConfirm = () => {
     deleteAcceptHandler(productIdToDelete);
     setShowDialog(false);
   };
 
-  const handleDialogCancel = () => {
+  const handleCancel = () => {
+    // Handle the cancellation action here
+    console.log("Cancelled!");
     setShowDialog(false);
+    setProductIdToDelete('');
   };
+
+
 
   return (
     <div className="px-10">
-
       {showDialog && (
         <ConfirmDialog
-          message="Are you sure you want to delete this product?"
-          onConfirm={handleDialogConfirm}
-          onCancel={handleDialogCancel}
-        />)}
+          isVisible={true}
+          message="Are you sure you want to delete this item?"
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          title="Confirm Delete"
+          severity="danger"
+        />
+      )}
 
       <div className="flex justify-between items-end p-5 gap-2">
         <div className="flex space-x-4 w-full">
-          <div className="flex flex-col space-y-2 w-1/5">
-            <label className="text-[1rem] font-normal">Category</label>
+      
+            <div className="flex flex-col space-y-2 w-1/5">
+              <label className="text-[1rem]">Filter By</label>
+              <select
+                value={selectedFilterBy.value}
+                onChange={(e) =>
+                  handleInputChange(
+                    setSelectedFilterBy,
+                    selectedFilterBy,
+                    parseInt(e.target.value)
+                  )
+                }
+                className="select select-bordered w-full"
+              >
+                {filterByOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {[1, 2, 3].includes(selectedFilterBy.value) && (
+              <div className="flex flex-col space-y-2 w-[35%]">
+                <label className="text-[1rem]">Search Value</label>
+                <input
+                  type="text"
+                  value={searchValue.value}
+                  onChange={(e) =>
+                    handleInputChange(
+                      setSearchValue,
+                      searchValue,
+                      e.target.value
+                    )
+                  }
+                  className="input input-bordered w-full"
+                />
+              </div>
+            )}
+
+        {selectedFilterBy.value===4 && <div className="flex flex-col space-y-2 w-1/5">
+            <label className="text-[1rem]">Category</label>
             <select
               value={selectedCategoryId}
               onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
               className="select select-bordered w-full"
             >
-              {categoryOptions.map(option => (
+              {categoryOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.displayName}
                 </option>
               ))}
             </select>
-          </div>
+          </div>}
+
+          {selectedFilterBy.value===5 && 
           <div className="flex flex-col space-y-2 w-1/5">
-            <label className="font-normal">Measurement Unit</label>
+            <label className="text-[1rem]">Measurement Unit</label>
             <select
               value={selectedMeasurementUnitId}
-              onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
+              onChange={(e) =>
+                setSelectedMeasurementUnitId(parseInt(e.target.value))
+              }
               className="select select-bordered w-full"
             >
-              {measurementUnitOptions.map(option => (
+              {measurementUnitOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.displayName}
                 </option>
               ))}
             </select>
-          </div>
-          <div className="flex flex-col space-y-2 w-1/5">
-            <label className="font-normal">Filter By</label>
-            <select
-              value={selectedFilterBy.value}
-              onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
-              className="select select-bordered w-full"
-            >
-              {filterByOptions.map(option => (
-                <option key={option.id} value={option.id}>
-                  {option.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col space-y-2 w-2/5">
-            <label className="font-normal">Search Value</label>
-            <input
-              type="text"
-              value={searchValue.value}
-              onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
-              className="input input-bordered w-full"
-            />
-          </div>
+          </div>}
+       
         </div>
 
+
         <button
-          className="btn btn-primary"
+         className="btn btn-ghost text-[#0284c7] font-bold"
           onClick={() => navigate(`/addProduct/add/0`)}
+          title="Add Product"
         >
-          Add Product
+          <FontAwesomeIcon className="text-xl" icon={faPlusSquare} />Create New Product
         </button>
       </div>
       <div className="flex flex-col h-[65vh] overflow-hidden">
         <div className="flex-1 overflow-y-auto">
-      
-        <table className="table w-full border-collapse">
-  <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
-    <tr>
-      <th className="px-4 py-2">Product Id</th>
-      <th className="px-4 py-2">Product No</th>
-      <th className="px-4 py-2">Product Name</th>
-      <th className="px-4 py-2">Measurement Unit</th>
-      <th className="px-4 py-2">Unit Price</th>
-      <th className="px-4 py-2">Barcode</th>
-      <th className="px-4 py-2">Category</th>
-      <th className="px-4 py-2">Tax Rate(%)</th>
-      <th className="px-4 py-2">Modified</th>
-      <th className="px-4 py-2">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {products.map(product => (
-      <tr key={product.productId} className="border-b border-gray-200 hover:bg-gray-100 bg-whit">
-        <td className="px-4 py-2">{product.productId}</td>
-        <td className="px-4 py-2">{productNoBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{productNameBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{measurementUnitNameBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{unitPriceBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{barcodeBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{categoriesBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{taxRate_percBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{modifiedDateBodyTemplate(product)}</td>
-        <td className="px-4 py-2">{actionButtons(product)}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
-          </div>
-      
+          <table className="table w-full border-collapse">
+            <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+              <tr>
+                {/* <th className="px-4 py-2">Product Id</th> */}
+                <th className="px-4 py-2">Product No</th>
+                <th className="px-4 py-2">Product Name</th>
+                <th className="px-4 py-2">Measurement Unit</th>
+                <th className="px-4 py-2">Unit Price</th>
+                <th className="px-4 py-2">Barcode</th>
+                <th className="px-4 py-2">Category</th>
+                <th className="px-4 py-2">Tax Rate(%)</th>
+                <th className="px-4 py-2">Modified</th>
+                <th className="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr
+                  key={product.productId}
+                  className="border-b border-gray-200 hover:bg-gray-100 bg-white text-[1rem]"
+                >
+                  {/* <td className="px-4 py-2">{product.productId}</td> */}
+                  <td className="px-4 py-2">
+                    {productNoBodyTemplate(product)}
+                  </td>
+                  <td className="px-4 py-2">
+                    {productNameBodyTemplate(product)}
+                  </td>
+                  <td className="px-4 py-2">
+                    {measurementUnitNameBodyTemplate(product)}
+                  </td>
+                  <td className="px-4 py-2">
+                    {unitPriceBodyTemplate(product)}
+                  </td>
+                  <td className="px-4 py-2">{barcodeBodyTemplate(product)}</td>
+                  <td className="px-4 py-2">
+                    {categoriesBodyTemplate(product)}
+                  </td>
+                  <td className="px-4 py-2">
+                    {taxRate_percBodyTemplate(product)}
+                  </td>
+                  <td className="px-4 py-2">
+                    {modifiedDateBodyTemplate(product)}
+                  </td>
+                  <td className="px-4 py-2">{actionButtons(product)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="flex justify-end w-full bg-white p-4">
+      <div className="flex justify-between w-full bg-white p-4">
+        {/* Items count display */}
+        <div className="pl-3">
+          <span className=" text-gray-500">{totalRecords} items found</span>
+        </div>
+
+        {/* DaisyUIPaginator component */}
         <DaisyUIPaginator
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}

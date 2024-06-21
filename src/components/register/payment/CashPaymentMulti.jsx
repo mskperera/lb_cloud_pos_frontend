@@ -6,6 +6,8 @@ import { validate } from "../../../utils/formValidation";
 import { useSelector } from "react-redux";
 import Decimal from "decimal.js";
 import { PAYMENT_METHODS } from "../../../utils/constants";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 
 const CashDemomination = ({ currency, amount, isSelected, onClick }) => {
   return (
@@ -127,80 +129,54 @@ console.log('run validation',validation)
  
     return (
       <>
-        <div className="flex flex-column mb-4">
-          <div className="grid mb-2">
-            <div className="col-6">
-              <div className="flex align-items-center gap-2">
-                <span className=" pi pi-money-bill text-xl font-semibold"></span>{" "}
-                <span className="text-xl font-semibold">Cash Payment</span>
-              </div>
-            </div>
+        <div className="flex flex-col gap-4 border-2 p-5 rounded-md">
+          <div className="flex justify-center gap-2 items-center">
+            <FontAwesomeIcon icon={faMoneyBill} className="text-2xl" />
+            <span className="text-md font-semibold">New Cash Payment</span>
           </div>
 
-          <div className="grid mb-5">
-            <div className="col">
-              <div className="flex flex-wrap">
-                {cashDenominations.map((p, index) => (
-                  <CashDemomination
-                    key={index}
-                    currency={p.currency}
-                    amount={p.amount}
-                    isSelected={amountReceived?.value === p.amount}
-                    //onClick={() => handleDenominationClick(p)}
-                    onClick={() => {
-                      handleInputChange(
-                        setAmountReceived,
-                        amountReceived,
-                        p.amount
-                      );
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="col">
-                <div className="flex flex-row align-items-center justify-content-center">
-                  {/* <label htmlFor="customAmount-single"  className="font-normal text-lg mr-2">Custom Amount</label> */}
-                  <InputText
-                    id="customAmount-single"
-                    type="text"
-                    value={amountReceived && amountReceived.value}
-                    className="p-inputtext-normal"
-                    placeholder="Enter Custom Amount"
-                    onChange={(e) => {
-                      handleInputChange(
-                        setAmountReceived,
-                        amountReceived,
-                        e.target.value
-                      );
-                    }}
-                  />
-                </div>
-              </div>
-       
-
+          <div className="flex flex-col gap-4 items-center">
+            {/* <div className='grid grid-cols-3 gap-2'>
+                  {[1, 2, 5, 10, 20, 50, 100, 500, 1000, 5000].map((amount) => (
+                    <button
+                      key={amount}
+                      onClick={() => {
+                        handleInputChange(
+                          setAmountReceived,
+                          amountReceived,
+                          amount
+                        );
+                      }}
+          
+                      className='btn  bg-primaryColor hover:bg-primaryColorHover text-white rounded-full'
+                    >
+                      Rs {amount}
+                    </button>
+                  ))}
+                </div> */}
+            <div className="flex justify-center items-center gap-2">
+              <div className="">Pay amount</div>
+              <input
+                type="number"
+                value={amountReceived && amountReceived.value}
+                onChange={(e) => {
+                  handleInputChange(
+                    setAmountReceived,
+                    amountReceived,
+                    e.target.value
+                  );
+                }}
+                className="border p-2 rounded"
+              />
+              {validationMessages(amountReceived)}
             </div>
-     
-          </div>
 
-          <div className="grid">
-          <div className="col-4 col-offset-4 flex align-items-end">
-                <div className="flex w-full">
-                  <Button
-                    className="p-3"
-                    aria-label="Pay"
-                    severity="primary"
-                    onClick={splitPaymentHandler}
-                    style={{ width: "100%", display: "block" }}
-                    size="normal"
-                    rounded
-                  >
-                           <span className="px-2">Split Amount</span>
-                  </Button>
-                </div>
-              </div>
-            <div className="col">
-            {validationMessages(amountReceived)}
-            </div>
+            <button
+              className="btn w-[40%] bg-primaryColor hover:bg-primaryColorHover text-white"
+              onClick={splitPaymentHandler}
+            >
+              Add Payment
+            </button>
           </div>
         </div>
       </>
