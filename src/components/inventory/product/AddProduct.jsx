@@ -404,7 +404,8 @@ setStores(productStores);
   };
   
   
-  
+  const isNumeric = (value) => !isNaN(parseFloat(value)) && isFinite(value);
+
   
   const onSubmit = async () => {
 
@@ -440,7 +441,7 @@ setStores(productStores);
     const payLoad = {
       tableId: null,
       productNo:productNo.value,
-      productTypeId:productType.value,
+      productTypeId:parseInt(productType.value),
       storeIdList:stores,
       isProductNoAutoGenerate: autoGenerateProductNo,
       productName: productName.value,
@@ -462,7 +463,7 @@ setStores(productStores);
       isStockTracked:isStockTracked,
       isProductItem:isProductItem,
       brandId: brand.value,
-      unitPrice: unitPrice.value,
+      unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
       sku:sku.value,
       barcode: barcode.value,
       reorderLevel: reorderLevel.value,
@@ -519,8 +520,8 @@ setStores(productStores);
     // Create a new variation with the same number of variationDetails but empty values
     const newVariation = {
       variationProductId: null,
-      sku: sku.value,
-      unitPrice: unitPrice.value,
+      sku: '',
+      unitPrice:'',
       variationDetails: lastVariation
         ? lastVariation.variationDetails.map((detail) => ({
             variationTypeId: detail.variationTypeId,  // Keep the type (variationTypeId)
@@ -572,12 +573,13 @@ const handleAddVariation = () => {
 };
 
 
-// Handle variation removal by product ID
-const handleRemoveVariation = (variationProductId) => {
+// Handle variation removal by index
+const handleRemoveVariation = (variationProductId, index) => {
   setVariations((prevVariations) =>
-    prevVariations.filter((item) => item.variationProductId !== variationProductId)
+    prevVariations.filter((_, i) => i !== index)
   );
 };
+
 
 
 
@@ -605,11 +607,11 @@ const handleRemoveVariationType = (variationTypeId) => {
 
 
 
-// Function to handle variation change
-const handleVariationChange = (value, variationProductId, variationTypeId) => {
+// Function to handle variation change by index
+const handleVariationChange = (value, index, variationTypeId) => {
   setVariations((prevVariations) =>
-    prevVariations.map((variation) =>
-      variation.variationProductId === variationProductId
+    prevVariations.map((variation, i) =>
+      i === index
         ? {
             ...variation,
             variationDetails: Array.isArray(variation.variationDetails)
@@ -624,6 +626,7 @@ const handleVariationChange = (value, variationProductId, variationTypeId) => {
     )
   );
 };
+
 
 
 
@@ -1036,36 +1039,8 @@ const getInstruction = (key) => {
 
                 {/* Grid container for form inputs */}
                 <div className="grid grid-cols-6 gap-6 mb-4">
-                  <div className="flex flex-col space-y-2">
-                    <label className="text-[1rem]">SKU</label>
-                    <input
-                      type="text"
-                      value={newVariation.sku}
-                      onChange={(e) =>
-                        setNewVariation({
-                          ...newVariation,
-                          sku: e.target.value,
-                        })
-                      }
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <label className="text-[1rem]">Unit Price</label>
-                    <input
-                      type="text"
-                      value={newVariation.unitPrice}
-                      onChange={(e) =>
-                        setNewVariation({
-                          ...newVariation,
-                          unitPrice: e.target.value,
-                        })
-                      }
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-
+                 
+                  <div className="col-span-3 flex">   
                   <button
                     type="button"
                     className="btn btn-primary self-end"
@@ -1073,6 +1048,7 @@ const getInstruction = (key) => {
                   >
                     Add Variation
                   </button>
+                  </div>
 
                   <div className="flex-col items-center"></div>
                   <div className="col-span-2 flex items-center gap-4">
@@ -1106,6 +1082,7 @@ const getInstruction = (key) => {
                     >
                       Add Variation Type
                     </button>
+                 
                   </div>
                 </div>
 
@@ -1138,7 +1115,7 @@ const getInstruction = (key) => {
                   </thead>
 
                   <tbody>
-                    {variations.map((variation) => (
+                    {variations.map((variation,index) => (
                       <tr key={variation.variationProductId}>
                         <td className="px-4 py-2">
                           <input
@@ -1148,9 +1125,8 @@ const getInstruction = (key) => {
                             onChange={(e) => {
                               const updatedSku = e.target.value;
                               setVariations((prevVariations) =>
-                                prevVariations.map((item) =>
-                                  item.variationProductId ===
-                                  variation.variationProductId
+                                prevVariations.map((item,i) =>
+                                  i ===index
                                     ? { ...item, sku: updatedSku }
                                     : item
                                 )
@@ -1166,9 +1142,8 @@ const getInstruction = (key) => {
                             onChange={(e) => {
                               const updatedBarcode = e.target.value;
                               setVariations((prevVariations) =>
-                                prevVariations.map((item) =>
-                                  item.variationProductId ===
-                                  variation.variationProductId
+                                prevVariations.map((item,i) =>
+                                  i===index
                                     ? { ...item, barcode: updatedBarcode }
                                     : item
                                 )
@@ -1184,9 +1159,8 @@ const getInstruction = (key) => {
                             onChange={(e) => {
                               const updatedUnitPrice = e.target.value;
                               setVariations((prevVariations) =>
-                                prevVariations.map((item) =>
-                                  item.variationProductId ===
-                                  variation.variationProductId
+                                prevVariations.map((item,i) =>
+                                  i ===index
                                     ? { ...item, unitPrice: updatedUnitPrice }
                                     : item
                                 )
@@ -1195,26 +1169,20 @@ const getInstruction = (key) => {
                           />
                         </td>
                         {variation.variationDetails &&
-                          variation.variationDetails.map((detail) => (
-                            <td
-                              key={detail.variationTypeId}
-                              className="px-4 py-2"
-                            >
-                              <input
-                                type="text"
-                                className="input input-bordered w-full text-sm"
-                                value={detail.variationValue}
-                                onChange={(e) => {
-                                  const updatedValue = e.target.value;
-                                  handleVariationChange(
-                                    updatedValue,
-                                    variation.variationProductId,
-                                    detail.variationTypeId
-                                  );
-                                }}
-                              />
-                            </td>
-                          ))}
+  variation.variationDetails.map((detail) => (
+    <td key={detail.variationTypeId} className="px-4 py-2">
+      <input
+        type="text"
+        className="input input-bordered w-full text-sm"
+        value={detail.variationValue}
+        onChange={(e) => {
+          const updatedValue = e.target.value;
+          handleVariationChange(updatedValue, index, detail.variationTypeId);
+        }}
+      />
+    </td>
+  ))}
+
                         {/* Add Remove button for each variation row */}
                         <td className="px-4 py-2">
                           <button
@@ -1222,7 +1190,7 @@ const getInstruction = (key) => {
                             className="btn text-error btn-xs"
                             onClick={() =>
                               handleRemoveVariation(
-                                variation.variationProductId
+                                variation.variationProductId,index
                               )
                             }
                             aria-label="Remove Variation Row"
