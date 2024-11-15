@@ -1,74 +1,86 @@
-import React, { useRef } from "react";
-import { Button } from "primereact/button";
-import { Menu } from "primereact/menu";
-import { Avatar } from "primereact/avatar";
-import { classNames } from "primereact/utils";
-import { logout } from "../functions/auth";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../functions/auth";
+import profilePic from "../assets/images/profilePic.png"; // Replace with the actual path to your image
 
 export default function ProfileMenu() {
-  const navigate=useNavigate();
-  const menuRight = useRef(null);
-  const toast = useRef(null);
-  
-  const handleLogout =() => {
-    // Add your logout logic here
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = () => {
     console.log("Logout clicked");
     logout();
     navigate('/login');
   };
 
-  const items = [
-    {
-      command: () => {
-        toast.current.show({ severity: "info", summary: "Info", detail: "Item Selected", life: 3000 });
-      },
-      template: (item, options) => {
-        return (
-          <button onClick={(e) => options.onClick(e)} className={classNames(options.className, "w-full p-link flex align-items-center p-2 pl-4 text-color hover:surface-200 border-noround")}>
-            <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" className="mr-2" shape="circle" />
-            <div className="flex flex-column align">
-              <span className="font-bold">Amy Elsner</span>
-              <span className="text-sm">Agent</span>
-            </div>
-          </button>
-        );
-      }
-    },
-    { separator: true },
-    { label: "Settings", icon: "pi pi-fw pi-cog" },
-    {
-      label: "details",
-      items: [{ label: "Profile", icon: "pi pi-fw pi-user" }]
-    },
-    {
-      label: "Logout",
-      icon: "pi pi-fw pi-power-off",
-      command: handleLogout // Assigning handleLogout function to the logout button
-    }
-  ];
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
   return (
-    <div style={{ margin: "1px" }}>
-      <Button
-        icon="pi pi-user"
-        className="button-primary"
-        rounded
-        severity="primary"
-        aria-label="User"
-        onClick={(event) => menuRight.current.toggle(event)}
+    <div className="relative inline-block text-left">
+      {/* Profile Button */}
+      <button
+        className="btn btn-circle btn-primary avatar"
+        onClick={toggleMenu}
         aria-controls="profileMenu"
-        aria-haspopup
-      />
-      <div className="card flex justify-content-center" id="profileMenu">
-        <Menu
-          model={items}
-          popup
-          ref={menuRight}
-          id="popup_menu_right"
-          popupAlignment="right"
+        aria-haspopup="true"
+      >
+        <img
+          className="w-10 h-10 rounded-full"
+          src={profilePic}
+          alt="Profile"
         />
-      </div>
+      </button>
+
+      {/* Dropdown Menu */}
+      {menuOpen && (
+        <div
+          className="absolute right-0 mt-2 w-56 bg-base-100 rounded-lg shadow-lg border border-base-300 z-10"
+          id="profileMenu"
+        >
+          <div className="p-2">
+            {/* Profile Info */}
+            <button className="w-full text-left p-2 rounded-md hover:bg-base-200 flex items-center">
+              {/* <img
+                className="w-10 h-10 rounded-full mr-2"
+                src={profilePic}
+                alt="Profile"
+              /> */}
+              <div>
+                <div className="font-bold">John Perera</div>
+                <div className="text-sm text-base-content">Admin</div>
+              </div>
+            </button>
+
+            <div className="divider my-1"></div>
+
+            {/* Menu Items */}
+            <button
+              className="w-full text-left p-2 rounded-md hover:bg-base-200 flex items-center"
+              onClick={() => navigate('/settings')}
+            >
+              <i className="pi pi-cog mr-2"></i>Settings
+            </button>
+            <button
+              className="w-full text-left p-2 rounded-md hover:bg-base-200 flex items-center"
+              onClick={() => navigate('/profile')}
+            >
+              <i className="pi pi-user mr-2"></i>Profile
+            </button>
+
+            <div className="divider my-1"></div>
+
+            {/* Logout */}
+            <button
+              className="w-full text-left p-2 rounded-md hover:bg-base-200 flex items-center text-red-600"
+              onClick={handleLogout}
+            >
+              <i className="pi pi-power-off mr-2"></i>Logout
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

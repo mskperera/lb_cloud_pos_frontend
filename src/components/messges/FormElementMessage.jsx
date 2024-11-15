@@ -1,10 +1,11 @@
-import { Message } from "primereact/message";
+
 import React from 'react'
 import PropTypes from 'prop-types';
+import DaisyMessage from "../daisyUIMessage/DaisyMessage";
 
 function FormElementMessage({className,severity,text}) {
   return (
-<Message className={className} severity={severity} text={text}/>
+<DaisyMessage className={className} severity={severity} text={text}/>
   )
 }
 

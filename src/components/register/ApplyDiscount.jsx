@@ -1,36 +1,32 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import {
   applyDiscount,
   applyOverallDiscount,
-} from "../../state/orderList/orderListSlice"; // Import actual actions
-import FormElementMessage from "../messges/FormElementMessage";
-import { InputTextarea } from "primereact/inputtextarea";
+} from "../../state/orderList/orderListSlice";
 import {
   DISCOUNT_SCOPE,
   DISCOUNT_TYPES
 } from "../../utils/constants";
+import { validate } from '../../utils/formValidation';
+import FormElementMessage from "../messges/FormElementMessage";
 
-import {validate} from '../../utils/formValidation';
 
-const LineDiscountType = ({ title, isSelected, onClick }) => {
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPercent, faTags } from "@fortawesome/free-solid-svg-icons";
+
+const LineDiscountType = ({ title, isSelected, onClick,icon  }) => {
   return (
     <div
-      className="md:col-3 sm:col-6"
-      style={{ cursor: "pointer" }}
+      className={` p-2 cursor-pointer`}
       onClick={onClick}
     >
-      <div className={`shadow-1 hover:shadow-4 surface-card border-round`}>
-        <div
-          className={`flex justify-content-center flex-wrap p-3 border-round ${
-            isSelected ? "bg-primary" : ""
-          }`}
-        >
-          <span className="font-bold">{title}</span>
+      <div
+        className={`card bordered shadow-md ${isSelected ? "bg-primary text-white" : "bg-base-100"} p-4`}
+      >
+        <div className="flex items-center space-x-2">
+          <FontAwesomeIcon  icon={icon} className={` text-xl ${isSelected ? "text-white" : "text-primaryColor"}`} />
+          <span className="font-bold text-center">{title}</span>
         </div>
       </div>
     </div>
@@ -39,12 +35,8 @@ const LineDiscountType = ({ title, isSelected, onClick }) => {
 
 
 
+
 const handleInputChange = (setState, state, value) => {
-  console.log("Nlllll", state);
-  if (!state.rules) {
-    console.error("No rules defined for validation in the state", state);
-    return;
-  }
   const validation = validate(value, state);
   setState({
     ...state,
@@ -68,16 +60,14 @@ export default function ApplyDiscount({
   discountScope,
   loadCount,
 }) {
-
   const dispatch = useDispatch();
   const orderList = useSelector((state) => state.orderList);
-  //const order = orderList.list.find(o => o.orderListId === orderListId);
+
   const order =
     discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL
       ? orderList.list.find((o) => o.orderListId === orderListId)
-      : orderList.orderSummary; // If overall, you might want to load from orderSummary or similar
+      : orderList.orderSummary;
 
-  //const [selectedDiscountTypeId, setSelectedDiscountTypeId] = useState(DISCOUNT_TYPES.PERCENTAGE);
   const [discountType, setDiscountType] = useState({
     label: "Discount Type",
     value: "",
@@ -85,6 +75,7 @@ export default function ApplyDiscount({
     isValid: false,
     rules: { required: true, dataType: "integer" },
   });
+
   const [reason, setReason] = useState({
     label: "Reason",
     value: "",
@@ -92,6 +83,7 @@ export default function ApplyDiscount({
     isValid: false,
     rules: { required: true, dataType: "string" },
   });
+
   const [discount, setDiscount] = useState({
     label: "Discount",
     value: "",
@@ -100,6 +92,7 @@ export default function ApplyDiscount({
     validationMessages: [],
     rules: { required: true, dataType: "decimal" },
   });
+
   const [otherReasonRemark, setOtherReasonRemark] = useState({
     label: "Remark",
     value: "",
@@ -109,30 +102,23 @@ export default function ApplyDiscount({
   });
 
   const validateAll = () => {
-    // List of all states to validate
     const states = [reason, discountType, discount, otherReasonRemark];
     const updatedStates = states.map((state) => {
-      // Validate each state
       const validation = validate(state.value, state);
-
-      // Return updated state
       return {
         ...state,
         isValid: validation.isValid,
-        isTouched: true, // or based on some other logic
+        isTouched: true,
         validationMessages: validation.messages,
       };
     });
 
-    // Now update all states
     setReason(updatedStates[0]);
     setDiscountType(updatedStates[1]);
     setDiscount(updatedStates[2]);
     setOtherReasonRemark(updatedStates[3]);
 
-    // Check if all states are valid
-    const allValid = updatedStates.every((state) => state.isValid);
-    return allValid;
+    return updatedStates.every((state) => state.isValid);
   };
 
   const clearControllers = () => {
@@ -166,13 +152,9 @@ export default function ApplyDiscount({
   };
 
   useEffect(() => {
-    console.log("load discount details", order);
     if (discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL && order) {
-      // setSelectedDiscountTypeId(order.discountTypeId || DISCOUNT_TYPES.PERCENTAGE);
-
       if (order.discount) {
-        const {   reasonId,reasonName,reasonRemark, discountValue, discountTypeId } =
-          order.discount;
+        const { reasonId, reasonName, reasonRemark, discountValue, discountTypeId } = order.discount;
 
         setDiscountType((prev) => ({
           ...prev,
@@ -208,7 +190,6 @@ export default function ApplyDiscount({
       const {
         overallDiscountTypeId,
         overallDiscountReasonId,
-        overallDiscountReasonName,
         overallDiscountReasonRemark,
         overallDiscountValue,
       } = order;
@@ -239,13 +220,10 @@ export default function ApplyDiscount({
         isTouched: false,
         isValid: !!overallDiscountValue,
       }));
-
-      // ... [Handle other reason remark if applicable]
     }
   }, [orderListId, order, discountScope, loadCount]);
 
   const validationMessages = (state) => {
-    // Ensure that the function returns JSX or null
     return (
       !state.isValid &&
       state.isTouched && (
@@ -264,23 +242,21 @@ export default function ApplyDiscount({
   };
 
   const handleApplyDiscount = () => {
-    const allValid = validateAll();
-
-    if (!allValid) {
-      // Handle validation errors
+    if (!validateAll()) {
       console.error("Validation errors", {
         reason,
         discount,
         otherReasonRemark,
       });
-      return; // Stop the dispatch or handle it accordingly
+      return;
     }
-    const _reason = reasonOptions.filter((r) => r.id === reason.value)[0];
-    // const discountReason = {
-    //   id: _reason.id,
-    //   name: _reason.name,
-    //   remark: otherReasonRemark.value,
-    // };
+
+    const _reason = reasonOptions.find((r) => r.id === parseInt(reason.value));
+
+    if (!_reason) {
+      console.error("Invalid reason selected");
+      return;
+    }
 
     if (discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL) {
       dispatch(
@@ -310,143 +286,102 @@ export default function ApplyDiscount({
   };
 
   return (
-    <div className="">
-      <Dialog
-        header={
-          discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL
-            ? "Apply Line Discount"
-            : "Apply Overall Discount"
-        }
-        style={{ width: "40vw" }}
-        visible={visible}
-        onHide={onHide}
-      >
-        <div className="grid">
-          {/* Reason Selection */}
-          <div className="col-12 m-0 p-0">
-            <div className="field">
-              <label htmlFor="void-reason" className="col-fixed mb-0 pb-0">
-                Discount Reason
-              </label>
-              <div className="col">
-                <Dropdown
+    visible && (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="modal modal-open">
+          <div className="modal-box relative w-full max-w-xl">
+            <h3 className="text-lg font-bold mb-4">
+              {discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL
+                ? "Apply Line Discount"
+                : "Apply Overall Discount"}
+            </h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              handleApplyDiscount();
+            }}>
+              <div className="form-control mb-4">
+                <label htmlFor="void-reason" className="label">
+                  Discount Reason
+                </label>
+                <select
                   id="void-reason"
+                  className="select select-bordered w-full"
                   value={reason.value}
-                  onChange={(e) => {
-                    console.log("discount reason", reason);
-                    handleInputChange(setReason, reason, e.value);
-                  }}
-                  options={reasonOptions}
-                  optionLabel="name" // Property to use as the label
-                  optionValue="id" // Property to use as the value
-                  placeholder="Select the reason"
-                  className="w-full"
-                />
+                  onChange={(e) => handleInputChange(setReason, reason, e.target.value)}
+                >
+                  <option value="" disabled>Select the reason</option>
+                  {reasonOptions.map(option => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
                 {validationMessages(reason)}
               </div>
-            </div>
-          </div>
 
-          {/* Additional Remark Input */}
-
-          <div className="col-12 m-0 p-0">
-            <div className="field">
-              <label htmlFor="discount-perc" className="col-fixed mb-0 pb-0">
-                Other Reason
-              </label>
-              <div className="col">
-                <InputTextarea
+              <div className="form-control mb-4">
+                <label htmlFor="discount-perc" className="label">
+                  Other Reason
+                </label>
+                <textarea
                   id="discount-perc"
-                  className="w-full"
+                  className="textarea textarea-bordered w-full"
                   rows={3}
                   value={otherReasonRemark.value || ""}
-                  onChange={(e) =>
-                    handleInputChange(
-                      setOtherReasonRemark,
-                      otherReasonRemark,
-                      e.target.value
-                    )
-                  }
-                />
+                  onChange={(e) => handleInputChange(setOtherReasonRemark, otherReasonRemark, e.target.value)}
+                ></textarea>
                 {validationMessages(otherReasonRemark)}
               </div>
-            </div>
-          </div>
 
-          {/* Discount Type Selection */}
-          <div className="col-12 m-0 p-0">
-            <div className="flex flex-row flex-wrap mb-4">
-              <LineDiscountType
-                title="Percentage"
-                isSelected={discountType.value === DISCOUNT_TYPES.PERCENTAGE}
-                onClick={() => {
-                  handleInputChange(
-                    setDiscountType,
-                    discountType,
-                    DISCOUNT_TYPES.PERCENTAGE
-                  );
-                  //onDiscountTypeHandler(DISCOUNT_TYPES.PERCENTAGE)
-                }}
-              />
-              <LineDiscountType
-                title="Fixed Amount"
-                isSelected={discountType.value === DISCOUNT_TYPES.FIXED_AMOUNT}
-                onClick={() => {
-                  handleInputChange(
-                    setDiscountType,
-                    discountType,
-                    DISCOUNT_TYPES.FIXED_AMOUNT
-                  );
-                  //onDiscountTypeHandler(DISCOUNT_TYPES.FIXED_AMOUNT)
-                }}
-              />
-            </div>
-            {validationMessages(discountType)}
-          </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <LineDiscountType
+                  title="Percentage"
+                  isSelected={discountType.value === DISCOUNT_TYPES.PERCENTAGE}
+                  onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.PERCENTAGE)}
+                  icon={faPercent}
+                />
+                <LineDiscountType
+                  title="Fixed Amount"
+                  isSelected={discountType.value === DISCOUNT_TYPES.FIXED_AMOUNT}
+                  onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.FIXED_AMOUNT)}
+                  icon={faTags}
+                />
+              </div>
+              {validationMessages(discountType)}
 
-          {/* Discount Value Input */}
-          <div className="col-12 m-0 p-0">
-            <div className="field">
-              <label htmlFor="discount-value" className="col-fixed mb-0 pb-0">
-                {discountType.value === DISCOUNT_TYPES.PERCENTAGE
-                  ? "Percentage (%)"
-                  : "Fixed Amount($)"}
-              </label>
-              <div className="col">
-                <InputText
+              <div className="form-control mb-4">
+                <label htmlFor="discount-value" className="label">
+                  {discountType.value === DISCOUNT_TYPES.PERCENTAGE ? "Percentage" : "Fixed Amount"}
+                </label>
+                <input
                   id="discount-value"
                   type="number"
+                  className="input input-bordered w-full"
                   value={discount.value}
-                  onChange={(e) => {
-                    console.log("discount", e.target.value);
-                    handleInputChange(setDiscount, discount, e.target.value); // Ensure 'discount' state has 'rules'
-                  }}
-                  className="p-inputtext w-full"
+                  onChange={(e) => handleInputChange(setDiscount, discount, e.target.value)}
                 />
                 {validationMessages(discount)}
               </div>
-            </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="col-12">
-            <div className="flex justify-content-around mt-4 gap-4">
-              {/* <Button
-                label="Cancel Discount"
-                severity="danger"
-                className="w-full p-3"
-                onClick={handleCancelDiscount}
-              /> */}
-              <Button
-                label="Apply Discount"
-                severity="primary"
-                className="w-full p-3"
-                onClick={handleApplyDiscount}
-              />
-            </div>
+              <div className="flex justify-between mt-4">
+                <button
+                  type="button"
+                  className="btn btn-outline btn-danger w-1/2 mr-2"
+                  onClick={onHide}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary w-1/2"
+                >
+                  Apply Discount
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </Dialog>
-    </div>
+      </div>
+    )
   );
 }

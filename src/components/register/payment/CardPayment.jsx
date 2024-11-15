@@ -6,26 +6,15 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { validate } from "../../../utils/formValidation";
 import FormElementMessage from "../../messges/FormElementMessage";
 import { useDispatch } from "react-redux";
-import { calculateBalance } from "../../../state/orderList/orderListSlice";
+import { addSinglePayment, calculateBalance } from "../../../state/orderList/orderListSlice";
+import ExpirationDateInput from "../../textInput/ExpirationDateInput";
+import CardType from "./CardType";
+import { PAYMENT_METHODS } from "../../../utils/constants";
 
 
 
 
-const CardType = ({ type, isSelected, onClick }) => {
-  return (
-    <div
-      className="col flex "
-      style={{ cursor: "pointer" }}
-      onClick={onClick}
-    >
-      <div className={`shadow-1 hover:shadow-4  border-round p-2 ${isSelected ? 'bg-primary text-white' : ''}`}>
-        <div className="flex justify-content-center flex-wrap p-3">
-          <span className="font-bold">{type.name}</span>
-        </div>
-      </div>
-    </div>
-  );
-};
+
 
 const CardPayment=forwardRef((props, ref) => {
 
@@ -33,17 +22,7 @@ const CardPayment=forwardRef((props, ref) => {
   const [selectedBank, setSelectedBank] = useState(null);
 
 
-const banksOptions = [
-  { name: "Sampath", id: 1 },
-  { name: "Commercial Bank", id: 2 },
-  { name: "NDB", id: 3 },
-  { name: "BOC", id: 4 },
-  { name: "DFCC", id: 5 },
-];
-
 const cardTypes = [{id:1,name:'VISA'},{id:2,name:'MASTER'},{id:3,name:'AMEX'}]; // Add more card types if needed
-const [selectedCardTypeId, setSelectedCardTypeId] = useState(null);
-
 
 const [receivedAmount,setReceivedAmount] = useState({
   label: "Amount",
@@ -103,7 +82,7 @@ const validationMessages = (state) => {
         {state.validationMessages.map((message, index) => (
           <FormElementMessage
             key={index}
-            className="mt-2 w-full"
+            className="mt-2"
             severity="error"
             text={`Validation: ${message}`}
           />
@@ -160,6 +139,7 @@ const validateAll = () => {
 //   getValidatedData
 // }));
 
+
 useEffect(()=>{
   const isRecevedAmountTouched=receivedAmount.isTouched;
   dispatch(calculateBalance({receivedAmountCard:receivedAmount.value,receivedAmountCash:0,isRecevedAmountTouched}));
@@ -182,198 +162,130 @@ useImperativeHandle(ref, () => ({
   }
 }));
 
-// const getValidatedData = (callback) => {
-//   const allValid = validateAll();
 
-//   if (!allValid) {
-//     // Handle validation errors
-//     console.error("Validation errors", {
-//       cardType,
-//     });
-//     callback(null);
-//     return; 
-//   }
-// return callback({allValid,fields:{cardType:cardType.value}});
-// };
+  
+const onchangHandler=async(value)=>{
+
+  const month = cardExpirationMonth.value.split("/")[0];
+  const year = cardExpirationMonth.value.split("/")[1];
+  const paymentData = {
+    methodId: PAYMENT_METHODS.CARD,
+    amountPaid: receivedAmount.value,
+    cardPayment: {
+      cardHolderName: cardHolderName.value,
+      bankId: 0,
+      cardTypeId: cardType.value,
+      cardLastFourDigits: cardNo.value,
+      cardExpirationMonth: month,
+      cardExpirationYear: year,
+    },
+  };
+
+
+  console.log("addMultiPayment", paymentData);
+  dispatch(addSinglePayment({ paymentData }));
+
+
+}
+
+
+useEffect(()=>{
+  if(receivedAmount.value)
+  onchangHandler(receivedAmount.value);
+},[receivedAmount,cardHolderName,cardType,cardNo,cardExpirationMonth])
+
+
 
     return (
-      <>
-        <div className="mb-4">
-          <div className="flex flex-column">
-            <div className="grid mb-2">
-              <div className="col-6">
-                <div className="flex align-items-center gap-2">
-                  <span className=" pi pi-credit-card text-xl font-semibold"></span>{" "}
-                  <span className="text-xl font-semibold">Card Payment</span>
-                </div>
-              </div>
-              <div className="col-6 pr-4">
-                {/* <div className="flex align-items-top justify-content-end">
-                  <label
-                    htmlFor="customAmount-single"
-                    className="text-xl font-semibold mb-2 mr-5"
-                  >
-                    {" "}
-                    Grand Total
-                  </label>
-                  <span className="text-xl font-normal">Rs 00.00</span>
-                </div> */}
-              </div>
-            </div>
-            <div className="grid mb-5">
-              <div className="col-12 flex">
-                <div className="flex flex-row gap-3 align-items-end">
-                  {cardTypes.map((type) => (
-                    <CardType
-                      key={type.id}
-                      type={type}
-                      isSelected={cardType.value === type.id}
-                      onClick={() => {
-                        handleInputChange(setCardType, cardType, type.id);
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="col-12">{validationMessages(cardType)}</div>
-            </div>
 
-            <div className="grid mb-4">
-              {/* <div className="col-4">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      {" "}
-                      Bank
-                    </label>
-                    <Dropdown
-                      value={bank.value}
-                      onChange={(e) => {
-                        console.log("discount reason", bank);
-                        handleInputChange(setBank, bank, e.value);
-                      }}
-                      options={banksOptions}
-                      optionLabel="name"
-                      placeholder="Select a Bank"
-                      className="w-full p-inputtext-sm"
-                    />
-                  </div>
-                </div>
-                {validationMessages(bank)}
-              </div> */}
-
-              <div className="col-4">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      {" "}
-                      Card Number (Last 4 digits)
-                    </label>
-                    <InputMask
-                      id="card-number"
-                      mask="9999" // Mask for 4 digits
-                      value={cardNo.value}
-                      placeholder="Enter last 4 digits"
-                      onChange={(e) =>
-                        handleInputChange(setCardNo, cardNo, e.value)
-                      }
-                      unmask={true} // Optional: gets the raw value
-                      className="p-inputtext-sm"
-                    />
-                  </div>
-                </div>
-                {validationMessages(cardNo)}
-              </div>
-              <div className="col-4">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      Card Holder Name
-                    </label>
-                    <InputText
-                      id="card-number"
-                      type="text"
-                      className="p-inputtext-sm"
-                      placeholder=""
-                      onChange={(e) => {
-                        handleInputChange(
-                          setCardHolderName,
-                          cardHolderName,
-                          e.target.value
-                        );
-                      }}
-                    />
-                  </div>
-                </div>
-                {validationMessages(cardHolderName)}
-              </div>
-              <div className="col-4">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      Expiration Month/Year
-                    </label>
-                    <InputMask
-                      id="card-expiration"
-                      value={cardExpirationMonth.value} // Make sure this state is defined and updated
-                      className="p-inputtext-sm"
-                      mask="99/99"
-                      placeholder="MM/YY"
-                      onChange={(e) => {
-                        handleInputChange(
-                          setCardExpirationMonth,
-                          cardExpirationMonth,
-                          e.value
-                        );
-                      }}
-                    />
-                  </div>
-                </div>
-                {validationMessages(cardExpirationMonth)}
-              </div>
-              <div className="col-4">
-                <div className="flex">
-                  <div className="flex-1 flex flex-column mr-3">
-                    <label
-                      htmlFor="card-number"
-                      className="text-lg font-normal mb-2 mr-5"
-                    >
-                      {" "}
-                      Amount
-                    </label>
-                    <InputText
-                      type="text"
-                      className="p-inputtext-sm"
-                      placeholder=""
-                      onChange={(e) => {
-                        handleInputChange(
-                          setReceivedAmount,
-                          receivedAmount,
-                          e.target.value
-                        );
-                      }}
-                    />
-                  </div>
-                </div>
-                {validationMessages(receivedAmount)}
-              </div>
+        <div className="grid lg:grid-cols-2 gap-4 mt-4 w-full items-center">
+          <div className="lg:col-span-2 flex flex-col justify-center items-center mb-7">
+            <div className="flex gap-2">
+              {cardTypes.map((type) => (
+                <CardType
+                  key={type.id}
+                  type={type}
+                  isSelected={cardType.value === type.id}
+                  onClick={() => {
+                    handleInputChange(setCardType, cardType, type.id);
+                  }}
+                />
+              ))}
             </div>
-            <div className="grid"></div>
+            <div className="col-12">{validationMessages(cardType)}</div>
           </div>
-        </div>
-      </>
+
+      
+            <div className="flex flex-col gap-2">
+              <label className="w-full"> Card Number (Last 4 digits)</label>
+              <input
+                type="text"
+                className="border p-2 rounded"
+                maxLength="4"
+                value={cardNo.value}
+                placeholder="Enter last 4 digits"
+                onChange={(e) =>
+                  handleInputChange(setCardNo, cardNo, e.target.value)
+                }
+              />
+              {validationMessages(cardNo)}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="w-full">Card Holder</label>
+              <input
+                type="text"
+                className="border p-2 rounded"
+                placeholder=""
+                value={cardHolderName.value}
+                onChange={(e) => {
+                  handleInputChange(
+                    setCardHolderName,
+                    cardHolderName,
+                    e.target.value
+                  );
+                }}
+              />
+              {validationMessages(cardHolderName)}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="w-full"> Expiration MM/YY</label>
+              <ExpirationDateInput
+                type="text"
+                className="border p-2 rounded"
+                placeholder=""
+                value={cardExpirationMonth.value}
+                onChange={(value) => {
+                  handleInputChange(
+                    setCardExpirationMonth,
+                    cardExpirationMonth,
+                    value
+                  );
+                }}
+              />
+              {validationMessages(cardExpirationMonth)}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="w-32"> Pay Amount  </label>
+              <input
+                type="number"
+                className="border p-2 rounded"
+                placeholder=""
+                value={receivedAmount.value}
+                onChange={(e) => {
+                  handleInputChange(
+                    setReceivedAmount,
+                    receivedAmount,
+                    e.target.value
+                  );
+                }}
+              />
+              {validationMessages(receivedAmount)}
+            </div>
+          </div>
+      
     ); 
 });
 CardPayment.displayName='CardPayment';

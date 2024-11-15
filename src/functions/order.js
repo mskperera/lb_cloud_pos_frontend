@@ -1,14 +1,16 @@
 import customAxios from "../utils/axios";
+import { getTenantId, getToken } from "./authService";
 
-const tenantId=localStorage.getItem('tenantId');
-const token=localStorage.getItem('token');
+// const tenantId=localStorage.getItem('tenantId');
+// const token=localStorage.getItem('token');
 
 
   
 
   export const getOrders = async (data) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .post(`/order/getOrders`, data, {
           headers: {
@@ -31,7 +33,8 @@ const token=localStorage.getItem('token');
 
   export const getOrderFull = async (payload) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .post(`/order/getOrderFull`,payload, {
           headers: {

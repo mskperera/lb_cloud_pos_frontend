@@ -1,34 +1,27 @@
-import { TabView, TabPanel } from "primereact/tabview";
+
 import { useEffect, useRef, useState } from "react";
-import InputSwitchCustom from "../../InputSwitchCustom";
 import CashPayment from "./CashPayment";
 import CardPayment from "./CardPayment";
-import CreditPayment from "./CreditPayment";
 import MultiPaymentList from "./MultiPaymentList";
-import { Button } from "primereact/button";
 import CashPaymentMulti from "./CashPaymentMulti";
 import CardPaymentMulti from "./CardPaymentMulti";
-import CreditPaymentMulti from "./CreditPaymentMulti";
-import { Tooltip } from "primereact/tooltip";
 import { useNavigate } from "react-router-dom";
 import { PAYMENT_METHODS } from "../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addMultiPayment,
-  addSinglePayment,
   clearOrderList,
   clearPayment,
   removePayment,
-  setMultiPayment,
 } from "../../../state/orderList/orderListSlice";
 import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { addOrder } from "../../../functions/register";
 import { useToast } from "../../useToast";
 import { formatCurrency } from "../../../utils/format";
-import Decimal from "decimal.js";
-import printReceipt from "../printReceipt/PrintReceipt";
-import ReceiptComponent from "../printReceipt/ReceiptComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import ConfirmDialog from "../../dialog/ConfirmDialog";
 
 const PaymentType = ({ paymentTypeName, isSelected, onClick }) => {
   return (
@@ -50,11 +43,13 @@ const PaymentType = ({ paymentTypeName, isSelected, onClick }) => {
   );
 };
 
-const Payment = ({  }) => {
+const Payment = ({}) => {
   const showToast = useToast();
 
-  const [activeIndex, setActiveIndex] = useState(0); // 0 for Single Payment tab
-  const [isPaymentSubmitting, setIsPaymentSubmitting] = useState(false);
+  const terminalId = JSON.parse(localStorage.getItem('terminalId'));
+  const sessionDetails=JSON.parse(localStorage.getItem('sessionDetails'));
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { paymentList, isMultiPayment, list, orderSummary,customer } = useSelector(
     (state) => state.orderList
@@ -67,22 +62,22 @@ const Payment = ({  }) => {
 
   const [paymentMethod, setPaymentMethod] = useState({
     label: "Payment Method",
-    value: PAYMENT_METHODS.CASH,
+    value: "Cash",
     isTouched: false,
     isValid: false,
     rules: { required: true, dataType: "integer" },
   });
 
-  // Handle tab change
-  const onTabChange = (e) => {
-    setActiveIndex(e.index);
-    const isMulti = e.index !== 0; // Assuming 0 is the index for Single Payment
-    dispatch(setMultiPayment(isMulti));
-  };
+  const [paymentMethodSplit, setPaymentMethodSplit] = useState({
+    label: "Payment Method Split",
+    value: "Cash",
+    isTouched: false,
+    isValid: false,
+    rules: { required: true, dataType: "string" },
+  });
 
-  useEffect(() => {
-    dispatch(clearPayment());
-  }, [isMultiPayment, dispatch]);
+
+
 
   const handleInputChange = (setState, state, value) => {
     
@@ -124,7 +119,7 @@ const Payment = ({  }) => {
     let paymentData = null;
 
     let cashPaymentRes = null;
-    if (paymentMethod.value === PAYMENT_METHODS.CASH) {
+    if (paymentMethod.value === "Cash") {
       cashPaymentRes = await cashPaymentRef.current.getValidatedData();
       console.log("Result from child:", cashPaymentRes);
       if (!cashPaymentRes?.allValid) return;
@@ -142,7 +137,7 @@ const Payment = ({  }) => {
     }
 
     let cardPaymentRes = null;
-    if (paymentMethod.value === PAYMENT_METHODS.CARD) {
+    if (paymentMethod.value === "Card") {
       cardPaymentRes = await cardPaymentRef.current.getValidatedData();
       console.log("Result from child:", cardPaymentRes);
       if (!cardPaymentRes?.allValid) return;
@@ -178,7 +173,7 @@ const Payment = ({  }) => {
     let paymentData = null;
 
     let cashPaymentRes = null;
-    if (paymentMethod.value === PAYMENT_METHODS.CASH) {
+    if (paymentMethodSplit.value ==="Cash") {
       cashPaymentRes = obj;
       console.log("Result from child:", cashPaymentRes);
       if (!cashPaymentRes?.allValid) return;
@@ -193,10 +188,12 @@ const Payment = ({  }) => {
           // balanceAmount: 0,
         },
       };
+
+      setPaymentMethodSplit({...paymentMethodSplit,value:''})
     }
 
     let cardPaymentRes = null;
-    if (paymentMethod.value === PAYMENT_METHODS.CARD) {
+    if (paymentMethodSplit.value ==="Card") {
       cardPaymentRes = obj;
       console.log("Result from child:", cardPaymentRes);
       if (!cardPaymentRes?.allValid) return;
@@ -224,14 +221,22 @@ const Payment = ({  }) => {
           cardExpirationYear: year,
         },
       };
+
+      setPaymentMethodSplit({...paymentMethodSplit,value:''})
     }
     //   console.log('addMultiPayment', paymentData);
     return paymentData;
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (isPayConfirmed) => {
+
+    if(!customer && !isPayConfirmed){
+    setShowDialog(true);
+    return;
+    }
+
     //const {grandTotal}=orderList.orderSummary;
-    setIsPaymentSubmitting(true);
+    setIsSubmitting(true);
 
     const {
       overallDiscountTypeId,
@@ -242,14 +247,14 @@ const Payment = ({  }) => {
 
     const payLoad = {
       customerId: customer?.customerId,
-      terminalId: 1,
-      sessionId: 1,
+      terminalId: terminalId,
+      sessionId: sessionDetails.sessionId,
 
       orderList: list,
       //paymentList:[paymentList]
       isConfirm: true,
     };
-    console.log("listt", list);
+    console.log("payLoad payment", payLoad);
     if (orderSummary.overallDiscounts) {
       payLoad.overallDiscounts = {
         overallDiscountTypeId: overallDiscountTypeId,
@@ -259,39 +264,27 @@ const Payment = ({  }) => {
       };
     }
 
-    if (!isMultiPayment) {
-      const paymentData = await addSinglePaymentToReducer();
-      console.log("paymentData", paymentData);
-      // console.log('addSinglePaymentToReducer', paymentData);
-      if (!paymentData) {
-        setIsPaymentSubmitting(false);
-        return;
-      }
-
-      dispatch(addSinglePayment({ paymentData }));
-      //console.log('onSubmit:paymentList',paymentData);
-
-      payLoad.paymentList = [paymentData];
-    } else {
-      //console.log('onSubmit:multi_paymentList',paymentList);
       payLoad.paymentList = paymentList;
-    }
+
 
  console.log('onSubmit:payLoad',payLoad);
     const res = await addOrder(payLoad, "");
+    console.log('onSubmit:addOrder', res.data);
     if (res.data.error) {
-      setIsPaymentSubmitting(false);
+      setIsSubmitting(false);
       const { error } = res.data;
-      showToast("error", "Exception", error.message);
+      showToast("danger", "Exception", error.message);
+      return;
     }
 
-    const { orderNo, outputMessage, responseStatus } = res.data.outputValues;
-    console.log("addOrder", orderNo);
-    setIsPaymentSubmitting(false);
+    const { orderId, outputMessage, responseStatus } = res.data.outputValues;
+    console.log("addOrder", orderId);
+
     
     dispatch(clearOrderList({ }));
-    navigate(`/paymentConfirm?orderNo=${orderNo}`)
+    navigate(`/paymentConfirm?orderId=${orderId}`)
     showToast("success", "Success", outputMessage);
+    setIsSubmitting(false);
   };
 
   const cashPaymentRef = useRef();
@@ -299,6 +292,7 @@ const Payment = ({  }) => {
 
   const onSplitPaymentHandler = async (obj) => {
     console.log("onaddpayment", obj);
+   
     const paymentData = await addMultiPaymentToReducer(obj);
     console.log("addMultiPayment", paymentData);
     dispatch(addMultiPayment({ paymentData }));
@@ -311,248 +305,250 @@ const Payment = ({  }) => {
     dispatch(removePayment({ id: value }));
   };
 
+  const [selectedTab, setSelectedTab] = useState('Single');
+  
 
+  useEffect(() => {
+    dispatch(clearPayment());
+  }, [selectedTab,dispatch]);
+
+  // useEffect(() => {
+  //   dispatch(clearPayment());
+  // }, [isMultiPayment, dispatch]);
+
+
+  const [amountReceived,setAmountReceived]=useState(0);
+
+  useEffect(()=>{
+    const sum = paymentList.reduce((acc, current) => acc + Number(current.amountPaid), 0);
+    setAmountReceived(sum);
+  },[paymentList])
+
+  const [showDialog, setShowDialog] = useState(false);
+
+  const handleConfirm = () => {
+    setShowDialog(false);
+
+    onSubmit(true);
+  };
+
+
+  const handleCancel = () => {
+    setShowDialog(false);
+
+  };
 
   return (
-    <div className="grid">
-      {/* <div className="col">
-        <ReceiptComponent orderId={29} />
-      </div> */}
-      <div className="col-6 col-offset-3">
-        <Tooltip target=".custom-target-icon" />
+    <>
+    {showDialog && (
+        <ConfirmDialog
+          isVisible={true}
+          message="No customer selected. Continue order as a walk-in customer?"
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          title="Confirmation"
+          severity="info"
+        />
+      )}
 
-        <div className="flex align-items-center justify-content-between p-0 gap-5 pr-4 mb-3">
-          <Button
-            icon="pi pi-chevron-left custom-target-icon"
-            rounded
-            text
-            aria-label="Back"
-            tooltip="Back to Home"
-            tooltipOptions={{
-              position: "bottom",
-              mouseTrack: true,
-              mouseTrackTop: 15,
-            }}
-            onClick={()=>{
-              navigate('/register')
-            }}
-            className="p-button-text p-button-plain"
-          />
-          <h2>Settle Payment</h2>
-          <div></div> {/* Placeholder for alignment purposes */}
+    <div className="flex flex-col gap-1 justify-center items-center py-10">
+
+
+
+      <div className="flex justify-center">
+        <div
+          onClick={() => setSelectedTab("Single")}
+          className={`py-2 px-10 rounded-lg cursor-pointer transition-all duration-300 ${
+            selectedTab === "Single"
+              ? "bg-primaryColor text-white shadow-md"
+              : "bg-gray-200 text-primaryColor"
+          }`}
+        >
+          <p className="font-bold">Single</p>
+        </div>
+        <div
+          onClick={() => setSelectedTab("Split")}
+          className={`py-2 px-10 rounded-lg cursor-pointer transition-all duration-300 ${
+            selectedTab === "Split"
+              ? "bg-primaryColor text-white hover:bg-primaryColorHover"
+              : "bg-gray-200 text-primaryColor "
+          }`}
+        >
+          <p className="font-bold">Split</p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 p-4 bg-primary rounded-lg shadow-md w-[60%] text-white">
+        <div className="flex flex-row justify-between items-center">
+          <div className="flex-[1]">
+            <button
+              className="btn rounded-full btn-sm"
+              onClick={() => {
+                navigate(-1);
+              }}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} /> Back
+            </button>
+          </div>
+          <div className="justify-center">
+            <h2 className="text-2xl font-bold">Payment</h2>
+          </div>
+          <div className="flex-[1]"></div>
         </div>
 
-        <div className="flex align-items-center justify-content-between p-0 gap-5 pr-4 mb-3">
-          <div className="flex align-items-top justify-content-left mb-3">
-            <label
-              htmlFor="customAmount-single"
-              className="text-xl font-semibold mr-5"
-            >
-              Grand Total
-            </label>
-            <span className="text-xl font-normal">
-              {" "}
-              {formatCurrency(orderSummary.grandTotal)}
-            </span>
-          </div>
-          <div className="flex flex-column">
-          <div className="flex align-items-top justify-content-left mb-3">
-            <label
-              htmlFor="customAmount-single"
-              className="text-xl font-semibold mr-5"
-            >
-              Balance Amount
-            </label>
-            <span className="text-xl font-normal">
-              {orderSummary.cashBalance && formatCurrency(orderSummary.cashBalance)}
-            </span>
+        <div className="flex justify-around gap-4">
+
+          <div className="flex flex-col gap-2 items-center font-semibold">
+            <p>Amount Due</p>
+            <p> {formatCurrency(orderSummary.grandTotal)}</p>
+            {/* The total amount that the customer needs to pay for the purchase */}
           </div>
 
-         {orderSummary.shortfall && <div className="flex align-items-top justify-content-left mb-3">
-            <label
-              htmlFor="customAmount-single"
-              className="text-xl font-semibold mr-5"
-            >
-              Due Amount
-            </label>
-            <span className="text-xl font-normal">
-              {formatCurrency(orderSummary.shortfall)}
-            </span>
-          </div>}
-
+          <div className="flex flex-col gap-2 items-center font-semibold">
+            <p>Amount Received</p>
+            <p> {formatCurrency(amountReceived)}</p>
+            {/* Description: The amount of money received from the customer. */}
           </div>
-     
+
+          <div className="flex flex-col gap-2 items-center font-semibold">
+            <p>Change Due</p>
+            <p>
+              {orderSummary.cashBalance &&
+                formatCurrency(orderSummary.cashBalance)}
+            </p>
+            {/* Description: The amount to be returned to the customer if they pay more than the amount due. */}
+          </div>
+
+          <div className="flex flex-col gap-2 items-center font-semibold">
+            <p>Remaining Balance</p>
+            <p> {formatCurrency(orderSummary.shortfall)}</p>
+            {/* Description: The outstanding amount if the received payment is less than the total payable. */}
+          </div>
+        </div>
+      </div>
+
+      <div className="w-[60%] shadow-md border-t border-gray-200 pb-5 pt-5">
+        <div className=" p-6 bg-gray-50  rounded-b-lg ">
+          {selectedTab === "Single" && (
+            <div>
+              <div className="flex items-center gap-10">
+                {/* Vertical Tabs */}
+                <div className="flex flex-col gap-2 flex-1">
+                  {["Cash", "Card", "Credit"].map((method) => (
+                    <div
+                      key={method}
+                      onClick={() =>
+                        setPaymentMethod({ ...paymentMethod, value: method })
+                      }
+                      className={`py-4 px-10 font-bold cursor-pointer transition-all duration-300 rounded-lg
+                         ${
+                           paymentMethod.value === method
+                             ? "bg-primaryColor text-white hover:bg-primaryColorHover"
+                             : "bg-gray-200 text-primaryColor "
+                         }`}
+                    >
+                      {method}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex-[3] ml-4 flex justify-center">
+                  {paymentMethod.value === "Cash" && (
+                    <CashPayment ref={cashPaymentRef} />
+                  )}
+                  {paymentMethod.value === "Card" && (
+                    <CardPayment ref={cardPaymentRef} />
+                  )}
+                </div>
+              </div>
+
+              {validationMessages(paymentMethod)}
+              {orderSummary.cashBalanceException &&
+                orderSummary.isRecevedAmountTouched && (
+                  <FormElementMessage
+                    className="mt-2 w-full"
+                    severity="error"
+                    text={orderSummary.cashBalanceException}
+                  />
+                )}
+            </div>
+          )}
+
+          {selectedTab === "Split" && (
+            <div className="flex flex-col gap-10">
+              <div className="flex justify-center gap-5">
+                <div className="flex items-center gap-4">
+   
+                  <label className="font-bold">Payment method</label>
+                  {/* {JSON.stringify(paymentMethodSplit)} */}
+                  <select className="border p-2 rounded" onChange={(e)=>{
+                    setPaymentMethodSplit({...paymentMethodSplit,value:e.target.value})
+                  }} value={paymentMethodSplit.value}>
+                    <option value="">Select a Payment method</option>
+                    <option>Cash</option>
+                    <option>Card</option>
+                    <option>Credit</option>
+                  </select>
+                </div>
+        
+
+                {/* <button className="btn btn-md  bg-primaryColor hover:bg-primaryColorHover text-white" 
+              onClick={()=>{
+                if(paymentMethodSplit.value==="Cash"){
+                  handleInputChange(
+                    setPaymentMethod,
+                    paymentMethodSplit,
+                  "Cash"
+                  );
+                }
+   
+              else if(paymentMethodSplit.value==="Card")
+                {      
+                   handleInputChange(
+                  setPaymentMethod,
+                  paymentMethodSplit,
+                  "Card"
+                );
+                }
       
+              }}>
+                  Add New Payment
+                </button> */}
+              </div>
+
+              {validationMessages(paymentMethodSplit)}
+
+
+              <div className="">
+                  {paymentMethodSplit.value === "Cash" && (
+                    <CashPaymentMulti onAddPayment={onSplitPaymentHandler} />
+                  )}
+                  {paymentMethodSplit.value === "Card" && (
+                    <CardPaymentMulti onAddPayment={onSplitPaymentHandler} />
+                  )}
+            
+                  <MultiPaymentList
+                    paymentList={paymentList}
+                    onRemovePayment={onRemovePaymentHandler}
+                  />
+             
+              </div>
+            </div>
+          )}
         </div>
-        {orderSummary.cashBalanceException && orderSummary.isRecevedAmountTouched && (
-          <FormElementMessage
-            className="mt-2 w-full"
-            severity="error"
-            text={orderSummary.cashBalanceException}
-          />
-        )}
-        <TabView activeIndex={activeIndex} onTabChange={onTabChange}>
-          <TabPanel header="Single Payment" leftIcon="">
-            <div className="grid">
-              <div className="col-12 mb-4">
-                <div className="flex flex-wrap">
-                  <PaymentType
-                    paymentTypeName="Cash"
-                    isSelected={paymentMethod.value === PAYMENT_METHODS.CASH}
-                    onClick={() => {
-                      handleInputChange(
-                        setPaymentMethod,
-                        paymentMethod,
-                        PAYMENT_METHODS.CASH
-                      );
-                    }}
-                  />
-                  <PaymentType
-                    paymentTypeName="Card"
-                    isSelected={paymentMethod.value === PAYMENT_METHODS.CARD}
-                    onClick={() => {
-                      handleInputChange(
-                        setPaymentMethod,
-                        paymentMethod,
-                        PAYMENT_METHODS.CARD
-                      );
-                    }}
-                  />
-                  {/* <PaymentType
-                  paymentTypeName="Credit"
-                  isSelected={paymentMethod.value === PAYMENT_METHODS.CREDIT}
-                  onClick={() => {
-                    handleInputChange(
-                      setPaymentMethod,
-                      paymentMethod,
-                      PAYMENT_METHODS.CREDIT
-                    );
-                  }}
-                /> */}
-                </div>
-                {validationMessages(paymentMethod)}
-              </div>
-              <div className="col-12 p-2">
-                {paymentMethod.value === PAYMENT_METHODS.CASH && (
-                  <CashPayment ref={cashPaymentRef} />
-                )}
 
-                {paymentMethod.value === PAYMENT_METHODS.CARD && (
-                  <CardPayment ref={cardPaymentRef} />
-                )}
-                {/* {paymentMethod.value === PAYMENT_METHODS.CREDIT && (
-                <CreditPayment
-                  onClick={(p) => {
-                    handleInputChange(
-                      setPaymentMethod,
-                      amountReceived,
-                      p.amount
-                    );
-                  }}
-                />
-              )} */}
-              </div>
-            </div>
-          </TabPanel>
-
-          <TabPanel header="Multiple Payments">
-            <div className="grid">
-              <div className="col-12 mb-4">
-                <div className="flex flex-wrap">
-                  <PaymentType
-                    paymentTypeName="Cash"
-                    isSelected={paymentMethod.value === PAYMENT_METHODS.CASH}
-                    onClick={() => {
-                      handleInputChange(
-                        setPaymentMethod,
-                        paymentMethod,
-                        PAYMENT_METHODS.CASH
-                      );
-                    }}
-                  />
-                  <PaymentType
-                    paymentTypeName="Card"
-                    isSelected={paymentMethod.value === PAYMENT_METHODS.CARD}
-                    onClick={() => {
-                      handleInputChange(
-                        setPaymentMethod,
-                        paymentMethod,
-                        PAYMENT_METHODS.CARD
-                      );
-                    }}
-                  />
-                  {/* <PaymentType
-                  paymentTypeName="Credit"
-                  isSelected={paymentMethod.value === PAYMENT_METHODS.CREDIT}
-                  onClick={() => {
-                    handleInputChange(
-                      setPaymentMethod,
-                      paymentMethod,
-                      PAYMENT_METHODS.CREDIT
-                    );
-                  }}
-                /> */}
-                </div>
-                {validationMessages(paymentMethod)}
-              </div>
-
-              <div className="col-12 p-2">
-                {paymentMethod.value === PAYMENT_METHODS.CASH && (
-                  <CashPaymentMulti
-                    onAddPayment={onSplitPaymentHandler}
-                    onClick={(p) => {
-                      console.log("cashpayment", p.amount);
-                      handleInputChange(
-                        setAmountReceived,
-                        amountReceived,
-                        p.amount
-                      );
-                    }}
-                  />
-                )}
-                {paymentMethod.value === PAYMENT_METHODS.CARD && (
-                  <CardPaymentMulti
-                    onAddPayment={onSplitPaymentHandler}
-                    onClick={(p) => {
-                      handleInputChange(
-                        setPaymentMethod,
-                        amountReceived,
-                        p.amount
-                      );
-                    }}
-                  />
-                )}
-                {/* {paymentMethod.value === PAYMENT_METHODS.CREDIT && (
-                <CreditPaymentMulti />
-              )} */}
-                <MultiPaymentList
-                  paymentList={paymentList}
-                  onRemovePayment={onRemovePaymentHandler}
-                />
-              </div>
-            </div>
-          </TabPanel>
-        </TabView>
-
-        <div className="flex justify-content-center">
-          {/* <Button
-            label="test"
-            onClick={() => {
-              // Trigger print
-              printReceipt(29);
-            }}
-          /> */}
-
-          <Button
-            label={isPaymentSubmitting ? "Submitting..." : "Tender"}
-            aria-label="Tender"
-            className="p-button-rounded p-button-lg p-button-primary"
-            onClick={onSubmit}
-            style={{ width: "50%" }}
-          />
+        <div className="flex justify-center">
+          <button
+            className="btn btn-lg py-4 px-10 bg-primaryColor hover:bg-primaryColorHover font-bold
+ text-white rounded-lg"
+            onClick={()=>onSubmit(false)}
+            disabled={isSubmitting}
+            label={isSubmitting ? "Submitting..." : "Tender"}
+          >
+            Tender
+          </button>
         </div>
       </div>
     </div>
+    </>
   );
 };
 

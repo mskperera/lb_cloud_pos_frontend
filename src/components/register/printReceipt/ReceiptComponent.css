@@ -35,6 +35,7 @@
   .item-header > div {
     text-align: center;
     font-weight: bold;
+    margin-top: 10px;
   }
 
   .items .item-row {

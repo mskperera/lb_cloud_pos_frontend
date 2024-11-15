@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import '../../../../styles/ReceiptComponent.css'; // Ensure you have the CSS file
+import './ReceiptComponent.css'; // Ensure you have the CSS file
 import { getOrderReceipt } from '../../../functions/register';
 import moment from 'moment';
 import { PAYMENT_METHODS } from '../../../utils/constants';
 import './module.printReceipt.css';
 
-const ReceiptComponent = ({ orderId }) => {
+const ReceiptComponent = ({ orderId,setCashPaymentChage }) => {
   // The order details could be passed in as a prop, for example:
   // const orderDetails = [
   //   { line: '0010', description: '12 RULER CLR', qty: 2, price: 60 },
@@ -20,7 +20,17 @@ const ReceiptComponent = ({ orderId }) => {
 
 useEffect(()=>{
   loadOrderReceipt();
+  console.log('ReceiptComponent',orderId)
 },[orderId])
+
+
+useEffect(()=>{
+const cashPayment=payments.find(p=>p.methodId === PAYMENT_METHODS.CASH);
+  setCashPaymentChage(cashPayment?.balanceAmount)
+},[payments])
+
+
+
   const loadOrderReceipt=async()=>{
    const result=await getOrderReceipt(orderId);
    const oh=result.data.results[0][0];
@@ -71,11 +81,12 @@ useEffect(()=>{
         </p>
         <p>{`Receipt #: ${orderHeader?.orderNo}`}</p>
         <p>{`User : ${orderHeader?.displayUserName}`}</p>
-        <p>{`Customer : ${orderHeader?.customerCode} | ${orderHeader?.customerName}`}</p>
+       {orderHeader?.customerCode &&  <p>{`Customer : ${orderHeader?.customerCode} | ${orderHeader?.customerName}`}</p>}
+ 
       </div>
-      {(orderHeader?.isVoided && 
-        <div className="voided-indicator">***This invoice has been voided and is not valid anymore.***</div>
-      )}
+      {orderHeader?.isVoided ? 
+        <div className="voided-indicator">***This invoice has been voided and is not valid anymore.***</div>:""
+      }
       <div className="item-header">
         <div className="line-header">Line</div>
         <div className="description-header">Description</div>

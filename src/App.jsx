@@ -1,11 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { PrimeReactProvider } from 'primereact/api';
 import './App.css' 
-import "primereact/resources/themes/md-light-indigo/theme.css";
-import 'primeicons/primeicons.css';
-import '/node_modules/primeflex/primeflex.css';
+
+
+
 import TopMenubar from './components/navBar/TopMenubar';
+
+import NotFound from './pages/NotFound';
+import { ToastProvider } from './components/useToast';
+import Customers from './pages/customers';
+import AddCustomer from './pages/addCustomer';
+import Login from './pages/login';
+import DayOpen from './pages/dayopen';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -16,19 +22,15 @@ const Products = React.lazy(() => import("./pages/products"));
 const AddProduct = React.lazy(() => import("./pages/addProduct"));
 const OrdersCompleted = React.lazy(() => import("./pages/ordersCompleted"));
 
-import NotFound from './pages/NotFound';
-import { ToastProvider } from './components/useToast';
-import Customers from './pages/customers';
-import AddCustomer from './pages/addCustomer';
-import Footer from './components/footer/Footer';
-import Login from './pages/login';
+
 
 function AppContent() {
   const location = useLocation();
 
-  const shouldShowNavBar = location.pathname !== '/login';
+  const shouldShowNavBar = location.pathname !== '/login' && location.pathname !== '/';
 
   const value = {
+    appendTo: 'self',
     ripple: false
   };
 
@@ -39,18 +41,23 @@ function AppContent() {
   };
 
   return (
-    <PrimeReactProvider value={value}>
+
       <>
         <ToastProvider>
-          <div className='container'>
+          <div>
             {shouldShowNavBar && <TopMenubar />}
-            <div style={appStyle}>
+
+            {/* <div className="flex flex-col h-[92vh] overflow-hidden"> */}
+            {/* <div className="flex-1 overflow-y-auto"> */}
+            <div className="flex flex-col h-[92vh] overflow-hidden"> 
+            <div className="flex-1 overflow-y-auto">
               <React.Suspense fallback={<>Loading...</>}>
                 <Routes>
                   <Route path="/home" element={<Home />} />
                   <Route path="*" element={<NotFound />} />
-                  <Route path="/register" element={<Register />} />
+                  <Route path="/register/:terminalId" element={<Register />} />
                   <Route path="/dayend" element={<DayEnd />} />
+                  <Route path="/daystart/:terminalId" element={<DayOpen />} />
                   <Route path="/payment" element={<Payment />} />
                   <Route path="/addProduct/:saveType/:id" element={<AddProduct />} />
                   <Route path="/paymentConfirm" element={<PaymentConfirm />} />
@@ -62,11 +69,12 @@ function AppContent() {
                   <Route path="/" element={<Login />} />
                 </Routes>
               </React.Suspense>
-            </div>
+        
+            </div></div>
           </div>
         </ToastProvider>
       </>
-    </PrimeReactProvider>
+
   );
 }
 

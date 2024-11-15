@@ -33,9 +33,3 @@
   letter-spacing: 0.5px;
 }
 
-.productMenuPanelContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-}
