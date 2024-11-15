@@ -11,6 +11,8 @@ import {
 } from "../../../state/orderList/orderListSlice";
 import { DISCOUNT_TYPES } from "../../../utils/constants";
 import './productOrderList.css';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProductOrderList({ showDiscountPopup }) {
   const orderList = useSelector((state) => state.orderList);
@@ -73,27 +75,27 @@ export default function ProductOrderList({ showDiscountPopup }) {
     };
   
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-0">
         <button
-          className="btn btn-outline btn-sm text-lg hover:bg-primaryColor border-none bg-base-300"
+          className="btn btn-outline btn-sm text-lg hover:bg-primaryColor border-none bg-base-300 rounded-r-none"
           onClick={handleDecrease}
         >
-          -
+            <FontAwesomeIcon icon={faMinus} className="text-sm" />
         </button>
   
         <input
           type="number"
           value={product.qty}
           onChange={handleChangeQty}
-          className="input input-bordered input-sm text-center w-20"
+          className="input input-bordered input-sm text-center w-20 rounded-none"
           min="1"
         />
   
         <button
-          className="btn btn-outline btn-sm text-lg hover:bg-primaryColor border-none bg-base-300"
+          className="btn btn-outline btn-sm text-lg hover:bg-primaryColor border-none bg-base-300 rounded-l-none"
           onClick={handleIncrease}
         >
-          +
+          <FontAwesomeIcon icon={faPlus} className="text-sm"/>
         </button>
       </div>
     );
@@ -124,7 +126,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
         <div>{rowData.productNo}</div>
         <div>{rowData.description}</div>
       </div>
-      {rowData?.discount && (
+      {/* {rowData?.discount && (
         <div className="flex items-center">
           <div>
             {`Discount: ${rowData.discount.discountValue} ${rowData.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE ? "%" : "Rs"} | ${rowData.discount.reasonName}`}
@@ -137,7 +139,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
             <i className="pi pi-times"></i>
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 
@@ -151,30 +153,55 @@ export default function ProductOrderList({ showDiscountPopup }) {
 
   return (
     <div className="productOrderContainer">
-      <table className="table w-full">
-      <thead className="text-lg text-defalutTextColor">
-  <tr>
-    <th>#</th>
-    <th>Description</th>
-    <th className="text-center">Qty</th>
-    <th className="text-right">Amount</th>
+        
+      <table className="table border-collapse">
+  
+      <thead className=" sticky top-0 text-lg text-defalutTextColor">
+  <tr className="bg-white">
+    <th className="text-[1rem]">#</th>
+    <th className="text-[1rem]">Description</th>
+    <th className="text-[1rem] text-center">Qty</th>
+    <th className="text-[1rem] text-right">Amount</th>
     <th></th>
   </tr>
 </thead>
 
         <tbody className=" text-[1rem] text-defalutTextColor">
           {products.map((product) => (
-            <tr key={product.orderListId} className=" bg-white">
+            <>
+            <tr key={product.orderListId} className={`${product?.discount? "bg-slate-200":" bg-white"}`}>
               <td>{lineNumberBodyTemplate(product)}</td>
               <td>{descriptionBodyTemplate(product)}</td>
               <td>{qty(product)}</td>
               <td>{netAmount(product)}</td>
               <td>{orderListItemMenu(product)}</td>
             </tr>
+            {product?.discount && (
+        <tr className="bg-slate-200">
+          <td colSpan={4} className="">
+            {`Discount: ${product.discount.discountValue} ${product.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE ? "%" : "Rs"} | ${product.discount.reasonName}`}
+         
+     
+          </td>
+          <td className="text-right">
+          <button
+            className="btn btn-danger btn-xs"
+            onClick={() => handleCancelDiscount(product.orderListId)}
+            aria-label="Cancel Discount"
+          >
+            <i className="pi pi-times"></i>
+          </button></td>
+        </tr>
+      )}
+            </>
           ))}
         </tbody>
       </table>
+
     </div>
   );
 }
+
+
+
 

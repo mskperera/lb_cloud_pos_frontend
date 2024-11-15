@@ -16,6 +16,7 @@ const Login = () => {
 
   const signIn=async()=>{
     try{
+      localStorage.clear();
     setIsLoading(true);
     setErrorMessage('');
     const payload = { 
@@ -45,6 +46,7 @@ const Login = () => {
    const plaindata=parseJwt(accessToken);
    console.log('plaindata',plaindata);
    localStorage.setItem('tenantId',plaindata.tenantId);
+   localStorage.setItem('userId',plaindata.userId);
    navigate('/home')
 if(authRes.data.exception){
 

@@ -10,5 +10,8 @@
 @tailwind utilities; 
 
 html, body,:root {
-    @apply bg-[#f8fafc];
+    @apply bg-slate-100;
+    /* @apply bg-[#f8fafc]; */
+
 }
+

@@ -40,7 +40,7 @@ customAxios.interceptors.request.use(
        if (error.response.data.name === 'TokenExpiredError') {
         console.log('axios.interceptors.resl**', error.response.data);
        // refreshAccessToken();
-       //  window.location.href = '/login';
+         window.location.href = '/login';
        }
       return Promise.reject(error);
     }

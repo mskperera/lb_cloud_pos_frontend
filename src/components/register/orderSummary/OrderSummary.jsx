@@ -145,66 +145,35 @@ const OrderSummary=()=> {
 
 
   return (
-    <div>
-  
- 
-    {/* Overall Discount Details */}
-    {orderSummary.overallDiscounts > 0 && (
-        <div className="mt-2">
-          {/* <h4>Overall Discount</h4> */}
-          <DataTable id="overall-discount-table" value={overallDiscountData}>
-            <Column header="Type" body={overallDiscountDetailsTemplate}></Column>
-            <Column header="Discount Amount" body={overallDiscountAmountTemplate}></Column>
-            <Column body={() => (
-              <Button
-                icon="pi pi-times"
-                rounded
-                text
-                severity="danger"
-                onClick={() => dispatch(cancelOverallDiscount())}
-                aria-label="Cancel Overall Discount"
-              />
-            )} header="Cancel" />
-          </DataTable>
+    <div className="">
+      {/* Overall Discount Details */}
+   
+
+      {/* Displaying Order Summary */}
+      <div className="orderSummaryContainer">
+        <div className="flex justify-between gap-10 p-2">
+          <div className="flex justify-between items-center flex-1">
+            <p className=" text-[1.1rem] font-semibold m-1">Sub Total</p>
+            <p className="">{subtotal}</p>
+          </div>
+
+          <div className="flex justify-between items-center flex-1">
+            <p className=" text-[1.1rem] font-semibold m-1">Discounts</p>
+            <p className="">{formatCurrency(totalDiscounts)}</p>
+          </div>
         </div>
-      )}
-
-{/* Displaying Order Summary */}
-<div className="orderSummaryContainer">
-<div className="flex justify-between gap-10 p-2">
-
-
-
-      <div className="flex justify-between items-center flex-1">
-    <p className=" text-[1.1rem] font-semibold m-1">Sub Total</p>
-    <p className="">{subtotal}</p>
-</div>
-
-<div className="flex justify-between items-center flex-1">
-<p className=" text-[1.1rem] font-semibold m-1">Line Discounts</p>
-            <p className="">
-              {formatCurrency(totalDiscounts)}
-          </p>
-      </div>
-
-</div>
-<div className="flex justify-between gap-10 p-2">
-<div className="flex justify-between items-center flex-1">
+        <div className="flex justify-between gap-10 p-2">
+          <div className="flex justify-between items-center flex-1">
             <p className=" text-[1.1rem] font-semibold m-1">Tax</p>
-            <p className="">
-            {formatCurrency(orderSummary.totalTax)}
-          </p>
-      </div>
+            <p className="">{formatCurrency(orderSummary.totalTax)}</p>
+          </div>
 
-      <div className="flex justify-between items-center flex-1">
+          <div className="flex justify-between items-center flex-1">
             <p className=" text-[1.1rem] font-semibold m-1">Grand Total</p>
-            <p className="">
-            {formatCurrency(orderSummary.grandTotal)}
-          </p>
-      </div>
+            <p className="">{formatCurrency(orderSummary.grandTotal)}</p>
+          </div>
 
-
-      {/* <div className="">
+          {/* <div className="">
         <div className="flex justify-content-between">
           <span className="text-md font-semibold">Tax:</span>
           <span className="text-md font-semibold">
@@ -220,11 +189,10 @@ const OrderSummary=()=> {
           </span>
         </div>
       </div> */}
-  
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-  )
+  );
 }
 
 export default OrderSummary

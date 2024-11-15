@@ -41,7 +41,7 @@ export default function CustomerList({selectingMode,onselect }) {
 
   const [searchValue,setSearchValue] =useState({
     label: "Search Value",
-    value: "",
+    value: null,
     isTouched: false,
     isValid: false,
     rules: { required: false, dataType: "string" },
@@ -114,10 +114,10 @@ export default function CustomerList({selectingMode,onselect }) {
     setShowDialog(true);
   };
 
-  const deleteAcceptHandler = async (customerId) => {
+  const deleteAcceptHandler = async (contactId) => {
     try {
       setSelectedIdToDelete('');
-      const result = await deleteCustomer(customerId, true);
+      const result = await deleteCustomer(contactId, true);
 
       const { data } = result;
       if (data.error) {
@@ -125,7 +125,7 @@ export default function CustomerList({selectingMode,onselect }) {
         return;
       }
 
-      setCustomers(products.filter(p=>p.customerId!==customerId));
+      setCustomers(products.filter(p=>p.contactId!==contactId));
       setTotalRecords(totalRecords-1);
       showToast("success", "Successful", data.outputValues.outputMessage);
     } catch (err) {
@@ -173,11 +173,11 @@ export default function CustomerList({selectingMode,onselect }) {
 
 //// replaceed by daisy
   const customerCodeBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.customerCode}</span>
+    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactCode}</span>
   );
 
   const customerNameBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.customerName}</span>
+    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactName}</span>
   );
 
   const emailBodyTemplate = (rowData) => (
@@ -192,9 +192,6 @@ export default function CustomerList({selectingMode,onselect }) {
     isTableDataLoading ? <span>Loading...</span> : <span>{rowData.tel}</span>
   );
 
-  const whatsappNumberBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.whatsappNumber}</span>
-  );
 
   const modifiedDateBodyTemplate = (product) => {
     const localFormattedDate =formatUtcToLocal(product.modifiedDate_UTC);
@@ -210,7 +207,7 @@ const actionButtons = (item) => (
   {selectingMode && <button
       className="btn btn-primary btn-xs bg-[#0284c7] text-base-100"
       onClick={() => {
-        onselect(item.customerId); 
+        onselect(item.contactId); 
       }}
       aria-label="Select" title='Select Customer'
     >
@@ -220,9 +217,9 @@ const actionButtons = (item) => (
     <button
       className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
       onClick={async () => {
-        const result = await deleteCustomer(item.customerId, false);
+        const result = await deleteCustomer(item.contactId, false);
         const { outputMessage, responseStatus } = result.data.outputValues;
-        confirmDelete(outputMessage, item.customerId);
+        confirmDelete(outputMessage, item.contactId);
       }}
       aria-label="Delete"
       title='Delete customer'
@@ -231,7 +228,7 @@ const actionButtons = (item) => (
     </button>
     <button
       className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
-      onClick={() =>    navigate(`/addCustomer/update/${item.customerId}`)}
+      onClick={() =>    navigate(`/addCustomer/update/${item.contactId}`)}
       aria-label="Edit" title='Edit customer'
     >
       <FontAwesomeIcon icon={faEdit} />
@@ -346,7 +343,6 @@ const actionButtons = (item) => (
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Mobile</th>
                 <th className="px-4 py-2">Tel</th>
-                <th className="px-4 py-2">Whatsapp/Mobile</th>
                 <th className="px-4 py-2">Modified</th>
                 <th className="px-4 py-2">Actions</th>
               </tr>
@@ -357,7 +353,7 @@ const actionButtons = (item) => (
                   key={product.customerId}
                   className="border-b border-gray-200 hover:bg-gray-100 bg-white text-[1rem]"
                 >
-                  <td className="px-4 py-2">{product.customerId}</td>
+                  {/* <td className="px-4 py-2">{product.customerId}</td> */}
                   <td className="px-4 py-2">
                     {customerCodeBodyTemplate(product)}
                   </td>
@@ -372,9 +368,7 @@ const actionButtons = (item) => (
                   </td>
                   <td className="px-4 py-2">{telBodyTemplate(product)}</td>
               
-                  <td className="px-4 py-2">
-                    {whatsappNumberBodyTemplate(product)}
-                  </td>
+            
                   <td className="px-4 py-2">
                     {modifiedDateBodyTemplate(product)}
                   </td>

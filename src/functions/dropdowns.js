@@ -76,6 +76,29 @@ import { getTenantId, getToken } from "./authService";
     }
   };
 
+  export const getDropdownBrands = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getBrands`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
   export const getDrpdownOrderVoidingReason = async () => {
     try {
       const tenantId = getTenantId();
@@ -106,6 +129,101 @@ import { getTenantId, getToken } from "./authService";
       const token = getToken();
       return await customAxios
         .get(`/dropdown/getDrpSession`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getTeminallByUserId = async (userId) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getTeminallByUserId?userId=${userId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+  export const getProductTypesDrp = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getProductTypes`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getVariationTypesDrp = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getVariationTypes`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+
+  export const getStoresDrp = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getStores`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,

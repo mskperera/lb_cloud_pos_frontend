@@ -21,11 +21,14 @@
  --defalutTextColor: #334155;
  --defalutTextColorLight: #f8fafc;
 
+ --selectedColor: #0284c7;
+
 }
 
 body{
   font-family:Arial, Helvetica, sans-serif;
   color: var(--defalutTextColor);
+  background-color: white;
 
 }
 

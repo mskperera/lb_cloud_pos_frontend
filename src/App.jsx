@@ -11,6 +11,7 @@ import { ToastProvider } from './components/useToast';
 import Customers from './pages/customers';
 import AddCustomer from './pages/addCustomer';
 import Login from './pages/login';
+import DayOpen from './pages/dayopen';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -45,13 +46,18 @@ function AppContent() {
         <ToastProvider>
           <div>
             {shouldShowNavBar && <TopMenubar />}
-            <div  className='h-full'>
+
+            {/* <div className="flex flex-col h-[92vh] overflow-hidden"> */}
+            {/* <div className="flex-1 overflow-y-auto"> */}
+            <div className="flex flex-col h-[92vh] overflow-hidden"> 
+            <div className="flex-1 overflow-y-auto">
               <React.Suspense fallback={<>Loading...</>}>
                 <Routes>
                   <Route path="/home" element={<Home />} />
                   <Route path="*" element={<NotFound />} />
-                  <Route path="/register" element={<Register />} />
+                  <Route path="/register/:terminalId" element={<Register />} />
                   <Route path="/dayend" element={<DayEnd />} />
+                  <Route path="/daystart/:terminalId" element={<DayOpen />} />
                   <Route path="/payment" element={<Payment />} />
                   <Route path="/addProduct/:saveType/:id" element={<AddProduct />} />
                   <Route path="/paymentConfirm" element={<PaymentConfirm />} />
@@ -63,7 +69,8 @@ function AppContent() {
                   <Route path="/" element={<Login />} />
                 </Routes>
               </React.Suspense>
-            </div>
+        
+            </div></div>
           </div>
         </ToastProvider>
       </>

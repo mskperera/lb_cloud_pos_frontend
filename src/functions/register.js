@@ -121,7 +121,75 @@ import { getTenantId, getToken } from "./authService";
       return err;
     }
   };
+ 
+  export const getProductExtraDetails = async (productId) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/product/products/extra?productId=${productId}`,{
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
 
+  export const getProductAvailaleStores = async (payload) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .post(`/product/getProductAvailaleStores`,payload,{
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getNonSerializedItems = async (payload) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .post(`/product/getNonSerializedItems`,{payload},{
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
 
   //products
   export const addProduct = async (data) => {

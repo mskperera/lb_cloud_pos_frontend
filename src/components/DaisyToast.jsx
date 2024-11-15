@@ -10,7 +10,7 @@ const DaisyToast = ({ messages, removeToast }) => {
     };
 
     return (
-        <div className="toast toast-bottom toast-center mt-20 z-50">
+        <div className="toast toast-top toast-center mt-20 z-50">
             {messages.map((msg, index) => (
                 <div key={index} className={`alert ${severityClasses[msg.severity] || 'bg-gray-100 text-gray-800'} flex items-center justify-between border-none`}>
                     <span>{msg.detail}</span>

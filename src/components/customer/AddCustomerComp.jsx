@@ -53,14 +53,6 @@ export default function AddCustomer({saveType,id}) {
     rules: { required: false, dataType: "string" },
   });
 
-  const [whatsappNumber, setWhatsappNo] = useState({
-    label: "WhatsApp",
-    value: "",
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "string" },
-  });
-
   const [remark, setRemark] = useState({
     label: "Remark",
     value: "",
@@ -117,7 +109,6 @@ export default function AddCustomer({saveType,id}) {
     email:null,
     mobile:null,
     tel:null,
-    whatsappNumber:null,
     searchByKeyword:false
     });
 
@@ -129,7 +120,6 @@ export default function AddCustomer({saveType,id}) {
       email,
       mobile,
       tel,
-      whatsappNumber,
       remark,
       createdDate_UTC,
       modifiedDate_UTC
@@ -140,7 +130,6 @@ export default function AddCustomer({saveType,id}) {
       setEmail(p=>({...p,value:email}));
       setMobile(p=>({...p,value:mobile}));
       setTel(p=>({...p,value:tel}));
-      setWhatsappNo(p=>({...p,value:whatsappNumber}));
       
       setRemark(p=>({...p,value:remark}));
     console.log('customer',ress.data.results[0][0])
@@ -167,7 +156,6 @@ useEffect(()=>{
       email:email.value,
       mobile:mobile.value,
       tel:tel.value,
-      whatsappNumber:whatsappNumber.value,
       remark:remark.value,
     }
 
@@ -286,22 +274,6 @@ useEffect(()=>{
           }
         />
         {validationMessages(mobile)}
-      </div>
-
-
-      <div className="flex flex-col">
-        <label className="label">
-          <span className="label-text">{whatsappNumber.label}</span>
-        </label>
-        <input
-          type="text"
-          className="input input-bordered w-full"
-          value={whatsappNumber.value}
-          onChange={(e) =>
-            handleInputChange(setWhatsappNo, whatsappNumber, e.target.value)
-          }
-        />
-        {validationMessages(whatsappNumber)}
       </div>
 
 

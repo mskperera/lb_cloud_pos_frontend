@@ -1,19 +1,16 @@
-import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 
 const Customer = ({ label, imageUrl, onAddCustomer }) => {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2">
         {/* Replace Avatar with DaisyUI Avatar */}
         <div className="rounded-full overflow-hidden bg-gray-200 w-12 h-12 flex items-center justify-center">
-          {imageUrl ? (
-            <img src={imageUrl} alt="Customer Avatar" className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-gray-500">No Image</span>
-          )}
+       
+        <FontAwesomeIcon className="text-xl" icon={faUser} />
         </div>
         {label ? (
           <span className="">{label}</span>

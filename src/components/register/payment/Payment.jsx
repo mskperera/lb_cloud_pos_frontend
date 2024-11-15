@@ -1,6 +1,5 @@
 
 import { useEffect, useRef, useState } from "react";
-import InputSwitchCustom from "../../InputSwitchCustom";
 import CashPayment from "./CashPayment";
 import CardPayment from "./CardPayment";
 import MultiPaymentList from "./MultiPaymentList";
@@ -11,22 +10,18 @@ import { PAYMENT_METHODS } from "../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addMultiPayment,
-  addSinglePayment,
   clearOrderList,
   clearPayment,
   removePayment,
-  setMultiPayment,
 } from "../../../state/orderList/orderListSlice";
 import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { addOrder } from "../../../functions/register";
 import { useToast } from "../../useToast";
 import { formatCurrency } from "../../../utils/format";
-import Decimal from "decimal.js";
-import printReceipt from "../printReceipt/PrintReceipt";
-import ReceiptComponent from "../printReceipt/ReceiptComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import ConfirmDialog from "../../dialog/ConfirmDialog";
 
 const PaymentType = ({ paymentTypeName, isSelected, onClick }) => {
   return (
@@ -48,11 +43,13 @@ const PaymentType = ({ paymentTypeName, isSelected, onClick }) => {
   );
 };
 
-const Payment = ({  }) => {
+const Payment = ({}) => {
   const showToast = useToast();
 
-  const [activeIndex, setActiveIndex] = useState(0); // 0 for Single Payment tab
-  const [isPaymentSubmitting, setIsPaymentSubmitting] = useState(false);
+  const terminalId = JSON.parse(localStorage.getItem('terminalId'));
+  const sessionDetails=JSON.parse(localStorage.getItem('sessionDetails'));
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { paymentList, isMultiPayment, list, orderSummary,customer } = useSelector(
     (state) => state.orderList
@@ -231,9 +228,15 @@ const Payment = ({  }) => {
     return paymentData;
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (isPayConfirmed) => {
+
+    if(!customer && !isPayConfirmed){
+    setShowDialog(true);
+    return;
+    }
+
     //const {grandTotal}=orderList.orderSummary;
-    setIsPaymentSubmitting(true);
+    setIsSubmitting(true);
 
     const {
       overallDiscountTypeId,
@@ -244,14 +247,14 @@ const Payment = ({  }) => {
 
     const payLoad = {
       customerId: customer?.customerId,
-      terminalId: 1,
-      sessionId: 2,
+      terminalId: terminalId,
+      sessionId: sessionDetails.sessionId,
 
       orderList: list,
       //paymentList:[paymentList]
       isConfirm: true,
     };
-    console.log("listt", list);
+    console.log("payLoad payment", payLoad);
     if (orderSummary.overallDiscounts) {
       payLoad.overallDiscounts = {
         overallDiscountTypeId: overallDiscountTypeId,
@@ -261,41 +264,27 @@ const Payment = ({  }) => {
       };
     }
 
-    // if (!isMultiPayment) {
-    //   const paymentData = await addSinglePaymentToReducer();
-    //   console.log("paymentDatall", paymentData);
-    //   // console.log('addSinglePaymentToReducer', paymentData);
-    //   if (!paymentData) {
-    //     setIsPaymentSubmitting(false);
-    //     return;
-    //   }
-
-    //   dispatch(addSinglePayment({ paymentData }));
-    //   //console.log('onSubmit:paymentList',paymentData);
-
-    //   payLoad.paymentList = [paymentData];
-    // } else {
-      //console.log('onSubmit:multi_paymentList',paymentList);
       payLoad.paymentList = paymentList;
-   // }
+
 
  console.log('onSubmit:payLoad',payLoad);
     const res = await addOrder(payLoad, "");
     console.log('onSubmit:addOrder', res.data);
     if (res.data.error) {
-      setIsPaymentSubmitting(false);
+      setIsSubmitting(false);
       const { error } = res.data;
       showToast("danger", "Exception", error.message);
       return;
     }
 
-    const { orderNo, outputMessage, responseStatus } = res.data.outputValues;
-    console.log("addOrder", orderNo);
-    setIsPaymentSubmitting(false);
+    const { orderId, outputMessage, responseStatus } = res.data.outputValues;
+    console.log("addOrder", orderId);
+
     
     dispatch(clearOrderList({ }));
-    navigate(`/paymentConfirm?orderNo=${orderNo}`)
+    navigate(`/paymentConfirm?orderId=${orderId}`)
     showToast("success", "Success", outputMessage);
+    setIsSubmitting(false);
   };
 
   const cashPaymentRef = useRef();
@@ -335,9 +324,37 @@ const Payment = ({  }) => {
     setAmountReceived(sum);
   },[paymentList])
 
- 
+  const [showDialog, setShowDialog] = useState(false);
+
+  const handleConfirm = () => {
+    setShowDialog(false);
+
+    onSubmit(true);
+  };
+
+
+  const handleCancel = () => {
+    setShowDialog(false);
+
+  };
+
   return (
+    <>
+    {showDialog && (
+        <ConfirmDialog
+          isVisible={true}
+          message="No customer selected. Continue order as a walk-in customer?"
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          title="Confirmation"
+          severity="info"
+        />
+      )}
+
     <div className="flex flex-col gap-1 justify-center items-center py-10">
+
+
+
       <div className="flex justify-center">
         <div
           onClick={() => setSelectedTab("Single")}
@@ -366,7 +383,7 @@ const Payment = ({  }) => {
             <button
               className="btn rounded-full btn-sm"
               onClick={() => {
-                navigate("/register");
+                navigate(-1);
               }}
             >
               <FontAwesomeIcon icon={faChevronLeft} /> Back
@@ -522,14 +539,16 @@ const Payment = ({  }) => {
           <button
             className="btn btn-lg py-4 px-10 bg-primaryColor hover:bg-primaryColorHover font-bold
  text-white rounded-lg"
-            onClick={onSubmit}
-            label={isPaymentSubmitting ? "Submitting..." : "Tender"}
+            onClick={()=>onSubmit(false)}
+            disabled={isSubmitting}
+            label={isSubmitting ? "Submitting..." : "Tender"}
           >
             Tender
           </button>
         </div>
       </div>
     </div>
+    </>
   );
 };
 
