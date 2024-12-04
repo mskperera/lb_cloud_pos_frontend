@@ -1,15 +1,51 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { validate } from "../../../utils/formValidation";
 
-import { getDropdownBrands, getDropdownMeasurementUnit, getDrpdownCategory, getProductTypesDrp, getStoresDrp, getVariationTypesDrp } from "../../../functions/dropdowns";
+import {
+  getDropdownBrands,
+  getDropdownMeasurementUnit,
+  getDrpdownCategory,
+  getProductTypesDrp,
+  getStoresDrp,
+  getVariationTypesDrp,
+} from "../../../functions/dropdowns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../useToast";
-import { addProduct, getProductAvailaleStores, getProductExtraDetails, getProducts, updateProduct } from "../../../functions/register";
+import {
+  addProduct,
+  getProductExtraDetails,
+  getProducts,
+  updateProduct,
+} from "../../../functions/register";
 import { SAVE_TYPE } from "../../../utils/constants";
 import FormElementMessage from "../../messges/FormElementMessage";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClose, faCross,faTrashAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClose, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StoresComponent from "../storeComponent/StoreComponent";
+import { uploadImageResized } from "../../../functions/asset";
+
+
+const CategoryItem=({onClick,category})=>{
+
+return (
+<div
+  className="flex justify-between items-center p-3 border rounded-full gap-2 bg-gray-50"
+>
+  <span className="text-gray-800 font-medium">{category.displayName}</span>
+  <FontAwesomeIcon
+    icon={faTrash}
+    className="text-red-500 hover:text-red-700 cursor-pointer"
+    onClick={onClick}
+  />
+</div>
+
+)}
+
+
+
+
+
+
 
 export default function AddProduct({ saveType, id }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,9 +59,9 @@ export default function AddProduct({ saveType, id }) {
   const navigate = useNavigate();
   const showToast = useToast();
 
-  useEffect(()=>{
-    setProductType((p) => ({ ...p, value:1 }));
-  },[])
+  useEffect(() => {
+    setProductType((p) => ({ ...p, value: 1 }));
+  }, []);
 
   const [productNo, setProductNo] = useState({
     label: "Product No",
@@ -79,6 +115,7 @@ export default function AddProduct({ saveType, id }) {
     isValid: false,
     rules: { required: false, dataType: "decimal" },
   });
+
   const [barcode, setBarcode] = useState({
     label: "Barcode",
     value: "",
@@ -111,7 +148,6 @@ export default function AddProduct({ saveType, id }) {
     rules: { required: false, dataType: "integer" },
   });
 
-
   const [comboIngrednentSku, setComboIngrednentSku] = useState({
     label: "sku",
     value: "",
@@ -126,7 +162,6 @@ export default function AddProduct({ saveType, id }) {
     isValid: false,
     rules: { required: false, dataType: "string" },
   });
-
 
   const [variationType, setVariationType] = useState({
     label: "Variation Type",
@@ -144,11 +179,26 @@ export default function AddProduct({ saveType, id }) {
     rules: { required: false, dataType: "string" },
   });
 
+  const [comboIngredients, setComboIngredients] = useState([]);
+  const [variations, setVariations] = useState([]);
 
+  const [selectedImage, setSelectedImage] = useState(null); // Store selected image
+  const [previewUrl, setPreviewUrl] = useState(null); // Store image preview URL
+  const [uploadResponse, setUploadResponse] = useState(null); // Store response from the upload API
 
-const [comboIngredients,setComboIngredients]=useState([]);
-const [variations,setVariations]=useState([]);
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // setSelectedImage(file);
 
+      const response = await uploadImageResized(file); // Call the upload function
+      console.log("setPreviewUrl", response);
+      setUploadResponse(response);
+      setPreviewUrl(
+        `${process.env.REACT_APP_API_CDN}/${response.hash}?width=200&height=200&quality=80`
+      ); // Generate preview URL
+    }
+  };
 
   const handleInputChange = (setState, state, value) => {
     if (!state.rules) {
@@ -184,11 +234,15 @@ const [variations,setVariations]=useState([]);
   const [brandOptions, setBrandOptions] = useState([]);
   const [productTypeOptions, setProductTypeOptions] = useState([]);
   const [variationTypeOptions, setVariationTypeOptions] = useState([]);
-
+  const [imageUrl, setImageUrl] = useState("");
   const [storesOptions, setStoresOptions] = useState([]);
   const [selectedStoreId, setSelectedStoreId] = useState(0);
-  const [newVariation, setNewVariation] = useState({ sku: '', unitPrice: '', variationDetails: [] });
-  
+  const [newVariation, setNewVariation] = useState({
+    sku: "",
+    unitPrice: "",
+    variationDetails: [],
+  });
+
   const loadDrpStores = async () => {
     const objArr = await getStoresDrp();
     setStoresOptions([...objArr.data.results[0]]);
@@ -198,9 +252,6 @@ const [variations,setVariations]=useState([]);
     loadDrpStores();
   }, []);
 
-
-
-  
   const loadValuesForUpdate = async () => {
     const res = await getProducts({
       productId: id,
@@ -226,11 +277,12 @@ const [variations,setVariations]=useState([]);
       isProductItem,
       isUnique,
       isNotForSelling,
-      sku
+      sku,
+      imageUrl,
     } = res.data.results[0][0];
 
     setBarcode((p) => ({ ...p, value: barcode }));
-   
+
     // setProductCategory((p) => ({
     //   ...p,
     //   value: JSON.parse(categories).map((c) => c.id),
@@ -252,63 +304,47 @@ const [variations,setVariations]=useState([]);
     setIsNotForSelling(isNotForSelling);
     setSku((p) => ({ ...p, value: sku }));
 
-  
+    setImageUrl(imageUrl);
+    setPreviewUrl(
+      `${process.env.REACT_APP_API_CDN}/${imageUrl}?width=200&height=200&quality=80`
+    );
 
-  const details = await getProductExtraDetails(id);
+    const details = await getProductExtraDetails(id);
 
+    if (productTypeId === 1) {
+      const _singleProductSkuBarcode = details.data.results[0][0];
+      console.log("_singleProductSkuBarcode:", _singleProductSkuBarcode);
 
-  if(productTypeId===1){
-    const _singleProductSkuBarcode = details.data.results[0][0];
-    console.log('_singleProductSkuBarcode:',_singleProductSkuBarcode);
+      const _singleProductStores = details.data.results[1];
+      console.log("_singleProductStores:", _singleProductStores);
+      setStores(_singleProductStores);
+    } else if (productTypeId === 2) {
+      const variationDetails = details.data.results[0];
 
-    const _singleProductStores = details.data.results[1];
-    console.log('_singleProductStores:',_singleProductStores)
-    setStores(_singleProductStores);
-    
-    
-      }
+      const parsedVariations = variationDetails.map((variation) => ({
+        ...variation,
+        variationDetails:
+          typeof variation.variationDetails === "string"
+            ? JSON.parse(variation.variationDetails)
+            : variation.variationDetails,
+      }));
 
-      else if(productTypeId===2){
-  const variationDetails = details.data.results[0];
+      setVariations(parsedVariations);
 
-  const parsedVariations = variationDetails.map((variation) => ({
-    ...variation,
-    variationDetails:
-      typeof variation.variationDetails === "string"
-        ? JSON.parse(variation.variationDetails)
-        : variation.variationDetails,
-  }));
+      const productStores = details.data.results[1];
+      setStores(productStores);
+    }
 
-  setVariations(parsedVariations);
+    if (productTypeId === 3) {
+      const _comboProductSKuBarcoe = details.data.results[0];
+      console.log("_comboProductSKuBarcoe:", _comboProductSKuBarcoe);
+      setComboIngredients(_comboProductSKuBarcoe);
 
-const productStores = details.data.results[1];
-setStores(productStores);
-
-  }
-
-
-  
-  if(productTypeId===3){
-    const _comboProductSKuBarcoe = details.data.results[0];
-    console.log('_comboProductSKuBarcoe:',_comboProductSKuBarcoe);
-    setComboIngredients(_comboProductSKuBarcoe);
-
-    const _comboProductStores = details.data.results[1];
-    console.log('_comboProductStores:',_comboProductStores)
-    setStores(_comboProductStores);
-    
-    
-      }
-
-
-
+      const _comboProductStores = details.data.results[1];
+      console.log("_comboProductStores:", _comboProductStores);
+      setStores(_comboProductStores);
+    }
   };
-
-
-
-
-
-
 
   useEffect(() => {
     if (saveType === SAVE_TYPE.UPDATE) {
@@ -334,7 +370,6 @@ setStores(productStores);
     setMeasurementUnitOptions(objArr.data.results[0]);
   };
 
-
   const loadDrpBrands = async () => {
     const objArr = await getDropdownBrands();
     setBrandOptions(objArr.data.results[0]);
@@ -347,139 +382,90 @@ setStores(productStores);
 
   const loadDrpVariationTypes = async () => {
     const objArr = await getVariationTypesDrp();
-   const options= objArr.data.results[0];
+    const options = objArr.data.results[0];
     setVariationTypeOptions(options);
 
     setVariationType((p) => ({ ...p, value: options[0].id }));
-
   };
 
-
   useEffect(() => {
-    if (autoGenerateProductNo) setProductNo((p) => ({ ...p, value: "[Auto Generate]" }));
+    if (autoGenerateProductNo)
+      setProductNo((p) => ({ ...p, value: "[Auto Generate]" }));
     else setProductNo((p) => ({ ...p, value: "" }));
   }, [autoGenerateProductNo]);
 
-  const restructureComboIngredients = (comboIngredients) => {
-    const variationProductMap = {};
-  
-    comboIngredients.forEach(store => {
-      store.products.forEach(product => {
-        const { variationProductId, sku, barcode, unitPrice, variationDetails } = product;
-  
-        // Check if variationProductId already exists in the map
-        if (!variationProductMap[variationProductId]) {
-          variationProductMap[variationProductId] = {
-            variationProductId,
-            sku,
-            barcode,
-            stores: [{ storeId: store.storeId, unitPrice }], // Initialize with the current store's storeId and unitPrice
-            variationDetails: variationDetails.map(v => ({
-              variationTypeId: v.variationTypeId,
-              variationValue: v.variationValue
-            }))
-          };
-        } else {
-          // Check if the storeId already exists in the stores array
-          const existingStore = variationProductMap[variationProductId].stores.find(s => s.storeId === store.storeId);
-          if (!existingStore) {
-            // Add storeId and unitPrice if it doesn't already exist
-            variationProductMap[variationProductId].stores.push({ storeId: store.storeId, unitPrice });
-          } else {
-            // Update the unitPrice for the existing storeId
-            existingStore.unitPrice = unitPrice;
-          }
-        }
-      });
-    });
-  
-    // Convert the map to an array for the desired variationProductList format
-    return Object.values(variationProductMap).map(item => ({
-      variationProductId: item.variationProductId,
-      sku: item.sku,
-      barcode: item.barcode,
-      stores: item.stores, // Contains objects with storeId and unitPrice
-      variationDetails: item.variationDetails
-    }));
-  };
-  
-  
   const isNumeric = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
-  
-  const onSubmit = async () => {
+  const onSubmit = async (e) => {
+    e.preventDefault();
 
-  
+    const _variations = variations.map((v) => ({
+      ...v,
+      variationDetails:
+        typeof v.variationDetails === "string"
+          ? JSON.parse(v.variationDetails) // Parse if it's a JSON string
+          : v.variationDetails, // Use as-is if it's already an object
+    }));
 
-    const _variations=variations.map((v) => ({
-        ...v,
-        variationDetails:
-          typeof v.variationDetails === 'string'
-            ? JSON.parse(v.variationDetails) // Parse if it's a JSON string
-            : v.variationDetails,            // Use as-is if it's already an object
-      }))
- 
-    const _comboIngredients=[...comboIngredients];
-    console.log('_comboIngredients',_comboIngredients)
+    const _comboIngredients = [...comboIngredients];
+    console.log("_comboIngredients", _comboIngredients);
 
-    const _prepaired_comboIngredients=[];
-    _comboIngredients.map(item=>{
+    const _prepaired_comboIngredients = [];
+    _comboIngredients.map((item) => {
       return _prepaired_comboIngredients.push({
         barcode: item.barcode,
-        measurementUnitName:item.measurementUnitName,
+        measurementUnitName: item.measurementUnitName,
         productId: item.productId,
-        productId_mat: item.productTypeId===1 ? item.productId_mat:null,
-        variationProductId_mat: item.productTypeId===2 ? item.productId_mat:null,
-        productName:item.productName,
+        productId_mat: item.productTypeId === 1 ? item.productId_mat : null,
+        variationProductId_mat:
+          item.productTypeId === 2 ? item.productId_mat : null,
+        productName: item.productName,
         productTypeId: item.productTypeId,
-        productTypeName:item.productTypeName,
+        productTypeName: item.productTypeName,
         qty: item.qty,
-        sku:item.sku
-      })
-    })
+        sku: item.sku,
+      });
+    });
 
     const payLoad = {
       tableId: null,
-      productNo:productNo.value,
-      productTypeId:parseInt(productType.value),
-      storeIdList:stores,
+      productNo: productNo.value,
+      productTypeId: parseInt(productType.value),
+      storeIdList: stores,
       isProductNoAutoGenerate: autoGenerateProductNo,
       productName: productName.value,
       categoryIdList: selectedCategories, // Use selectedCategories instead
 
-      variationProductList:_variations,
+      variationProductList: _variations,
 
-    comboProductDetailList:_prepaired_comboIngredients,
-    // comboProductDetailList:[
-    //   {qty:"4",productId_mat:16,variationProductId_mat:null},
-    //   {qty:"7.7",productId_mat:17,variationProductId_mat:null},
-    //   {qty:"2.6",productId_mat:null,variationProductId_mat:10},
-    //    {qty:"7.1",productId_mat:null,variationProductId_mat:11}
-    //   ],
+      comboProductDetailList: _prepaired_comboIngredients,
+      // comboProductDetailList:[
+      //   {qty:"4",productId_mat:16,variationProductId_mat:null},
+      //   {qty:"7.7",productId_mat:17,variationProductId_mat:null},
+      //   {qty:"2.6",productId_mat:null,variationProductId_mat:10},
+      //    {qty:"7.1",productId_mat:null,variationProductId_mat:11}
+      //   ],
       measurementUnitId: measurementUnit.value,
-      isNotForSelling:isNotForSelling,
-      imgUrl:null,///
-      isUnique:isUnique,
-      isStockTracked:isStockTracked,
-      isProductItem:isProductItem,
+      isNotForSelling: isNotForSelling,
+      imgUrl: uploadResponse?.hash || imageUrl, ///
+      isUnique: isUnique,
+      isStockTracked: isStockTracked,
+      isProductItem: isProductItem,
       brandId: brand.value,
       unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
-      sku:sku.value,
+      sku: sku.value,
       barcode: barcode.value,
       reorderLevel: reorderLevel.value,
     };
 
-    
-    console.log('payloadd',payLoad)
+    console.log("payloadd", payLoad);
 
     setIsSubmitting(true);
 
     if (saveType === SAVE_TYPE.ADD) {
-     
       const res = await addProduct(payLoad);
       setIsSubmitting(false);
       if (res.data.error) {
-   
         const { error } = res.data;
         showToast("danger", "Exception", error.message);
         return;
@@ -511,153 +497,140 @@ setStores(productStores);
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
-  
 
   const handleNewAddVariation = () => {
     // Get the last variation to copy its variationDetails structure
     const lastVariation = variations[variations.length - 1];
-  
+
     // Create a new variation with the same number of variationDetails but empty values
     const newVariation = {
       variationProductId: null,
-      sku: '',
-      unitPrice:'',
+      sku: "",
+      unitPrice: "",
       variationDetails: lastVariation
         ? lastVariation.variationDetails.map((detail) => ({
-            variationTypeId: detail.variationTypeId,  // Keep the type (variationTypeId)
-            variationName:detail.variationName,
-            variationValue: '', // Set empty value for new textboxes
+            variationTypeId: detail.variationTypeId, // Keep the type (variationTypeId)
+            variationName: detail.variationName,
+            variationValue: "", // Set empty value for new textboxes
           }))
         : [], // If no previous variation, initialize with empty array
     };
-  
+
     // Add the new variation to the state
     setVariations((prevVariations) => [...prevVariations, newVariation]);
   };
-  
-  
-  
-// Adding a new variation type (e.g., color, size, etc.) to an existing variation
-const handleAddVariation = () => {
-  // Ensure a valid variation type is selected
-  if (!variationType.value) {
-    alert('Please select a valid variation type');
-    return;
-  }
 
-  // Add the selected variation type to each existing variation in variationDetails
-  setVariations((prevIngredients) =>
-    prevIngredients.map((ingredient) => {
-      // Check if this variation already has the selected type
-      const existingVariationType = ingredient.variationDetails.find(
-        (detail) => detail.variationTypeId === variationType.value
+  // Adding a new variation type (e.g., color, size, etc.) to an existing variation
+  const handleAddVariation = () => {
+    // Ensure a valid variation type is selected
+    if (!variationType.value) {
+      alert("Please select a valid variation type");
+      return;
+    }
+
+    // Add the selected variation type to each existing variation in variationDetails
+    setVariations((prevIngredients) =>
+      prevIngredients.map((ingredient) => {
+        // Check if this variation already has the selected type
+        const existingVariationType = ingredient.variationDetails.find(
+          (detail) => detail.variationTypeId === variationType.value
+        );
+
+        if (existingVariationType) {
+          return ingredient; // If the variation type already exists, don't add it again
+        }
+
+        return {
+          ...ingredient,
+          variationDetails: [
+            ...ingredient.variationDetails,
+            {
+              variationTypeId: variationType.value,
+              variationName: variationTypeOptions.find(
+                (o) => o.id == variationType.value
+              )?.displayName,
+              variationValue: "",
+            },
+          ],
+        };
+      })
+    );
+  };
+
+  // Handle variation removal by index
+  const handleRemoveVariation = (variationProductId, index) => {
+    setVariations((prevVariations) =>
+      prevVariations.filter((_, i) => i !== index)
+    );
+  };
+
+  // Removing a variation type from a specific variation
+  const handleRemoveVariationType = (variationTypeId) => {
+    // Loop through each variation and update the variationDetails
+    const updatedVariations = variations.map((item) => {
+      // Parse variationDetails from string to array
+      const variationDetails = item.variationDetails;
+
+      // Filter out the variation type with the specified ID
+      const updatedVariationDetails = variationDetails.filter(
+        (detail) => detail.variationTypeId !== variationTypeId
       );
 
-      if (existingVariationType) {
-        return ingredient; // If the variation type already exists, don't add it again
-      }
-
       return {
-        ...ingredient,
-        variationDetails: [
-          ...ingredient.variationDetails,
-          {
-            variationTypeId: variationType.value,
-            variationName: variationTypeOptions.find(o => o.id == variationType.value)?.displayName,
-            variationValue: '',
-          },
-        ],
+        ...item,
+        variationDetails: updatedVariationDetails,
       };
-    })
-  );
-};
+    });
 
+    setVariations(updatedVariations);
+  };
 
-// Handle variation removal by index
-const handleRemoveVariation = (variationProductId, index) => {
-  setVariations((prevVariations) =>
-    prevVariations.filter((_, i) => i !== index)
-  );
-};
-
-
-
-
-// Removing a variation type from a specific variation
-const handleRemoveVariationType = (variationTypeId) => {
-  // Loop through each variation and update the variationDetails
-  const updatedVariations = variations.map((item) => {
-    // Parse variationDetails from string to array
-    const variationDetails = item.variationDetails;
-
-    // Filter out the variation type with the specified ID
-    const updatedVariationDetails = variationDetails.filter(
-      (detail) => detail.variationTypeId !== variationTypeId
+  // Function to handle variation change by index
+  const handleVariationChange = (value, index, variationTypeId) => {
+    setVariations((prevVariations) =>
+      prevVariations.map((variation, i) =>
+        i === index
+          ? {
+              ...variation,
+              variationDetails: Array.isArray(variation.variationDetails)
+                ? variation.variationDetails.map((detail) =>
+                    detail.variationTypeId === variationTypeId
+                      ? { ...detail, variationValue: value }
+                      : detail
+                  )
+                : [], // Fallback to an empty array if variationDetails is not defined
+            }
+          : variation
+      )
     );
+  };
 
-    return {
-      ...item,
-      variationDetails: updatedVariationDetails,
-    };
-  });
+  const setStoresHandler = (stores) => {
+    setStores(stores);
+  };
 
-  setVariations(updatedVariations);
-};
-
-
-
-
-// Function to handle variation change by index
-const handleVariationChange = (value, index, variationTypeId) => {
-  setVariations((prevVariations) =>
-    prevVariations.map((variation, i) =>
-      i === index
-        ? {
-            ...variation,
-            variationDetails: Array.isArray(variation.variationDetails)
-              ? variation.variationDetails.map((detail) =>
-                  detail.variationTypeId === variationTypeId
-                    ? { ...detail, variationValue: value }
-                    : detail
-                )
-              : [], // Fallback to an empty array if variationDetails is not defined
-          }
-        : variation
-    )
-  );
-};
-
-
-
-
-
-
-const setStoresHandler=(stores)=>{
-  setStores(stores)
-}
-
-const getInstruction = (key) => {
-  switch (key) {
-    case "isProductItem":
-      return isProductItem
-      ? "When checked, this item is treated as a countable (qty) product, suitable for physical goods."
-      : "When unchecked, this item is considered a service. Ideal for services like installation or consultation.";  
-    case "isNotForSelling":
-      return isNotForSelling
-        ? "This item will be marked as 'Not for Sale' and won't appear in sales transactions, perfect for internal use items."
-        : "This item is available for sale. Use this for products you sell regularly.";
-    case "isUnique":
-      return isUnique
-        ? "Marking as 'Unique' means this is a one-of-a-kind item, useful for products with single availability."
-        : "Not unique; this item can be restocked and sold in multiples.";
-    case "isStockTracked":
-      return isStockTracked
-      ? "When checked, this item is tracked in inventory with stock levels. Inventory will automatically update as sales are made."
-      : "Inventory will not auto-update upon sales. Use for items you manage manually or occasionally.";    
-    default:
-      return "";
-  }
-};
+  const getInstruction = (key) => {
+    switch (key) {
+      case "isProductItem":
+        return isProductItem
+          ? "When checked, this item is treated as a countable (qty) product, suitable for physical goods."
+          : "When unchecked, this item is considered a service. Ideal for services like installation or consultation.";
+      case "isNotForSelling":
+        return isNotForSelling
+          ? "This item will be marked as 'Not for Sale' and won't appear in sales transactions, perfect for internal use items."
+          : "This item is available for sale. Use this for products you sell regularly.";
+      case "isUnique":
+        return isUnique
+          ? "Marking as 'Unique' means this is a one-of-a-kind item, useful for products with single availability."
+          : "Not unique; this item can be restocked and sold in multiples.";
+      case "isStockTracked":
+        return isStockTracked
+          ? "When checked, this item is tracked in inventory with stock levels. Inventory will automatically update as sales are made."
+          : "Inventory will not auto-update upon sales. Use for items you manage manually or occasionally.";
+      default:
+        return "";
+    }
+  };
 
   return (
     <>
@@ -823,33 +796,14 @@ const getInstruction = (key) => {
                 <div className="flex flex-wrap gap-2">
                   {categoryOptions.length > 0 &&
                     selectedCategories?.map((categoryId, index) => {
-                      const category = categoryOptions.find(
-                        (opt) => opt.id === parseInt(categoryId)
-                      );
-                      return (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center p-2 border rounded gap-1 bg-gray-50"
-                        >
-                          <span>{category.displayName}</span>
-
-                          <button
-                          type="button"
-                            className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
-                            onClick={() =>
-                              setSelectedCategories(
-                                selectedCategories.filter(
-                                  (id) => id !== categoryId
-                                )
-                              )
-                            }
-                            aria-label="Delete"
-                            title="Remove Category"
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </button>
-                        </div>
-                      );
+                      const category = categoryOptions.find((opt) => opt.id === parseInt(categoryId));          
+return <CategoryItem
+  key={categoryId}
+  category={category}
+  onClick={() =>
+    setSelectedCategories(selectedCategories.filter((id) => id !== categoryId))
+  }
+/>;
                     })}
                 </div>
               </div>
@@ -880,7 +834,7 @@ const getInstruction = (key) => {
             <input
               type="text"
               className="input input-bordered w-full"
-              disabled={!isProductItem || productType.value===3}
+              disabled={!isProductItem || productType.value === 3}
               value={reorderLevel.value}
               onChange={(e) =>
                 handleInputChange(setReorderLevel, reorderLevel, e.target.value)
@@ -1039,15 +993,14 @@ const getInstruction = (key) => {
 
                 {/* Grid container for form inputs */}
                 <div className="grid grid-cols-6 gap-6 mb-4">
-                 
-                  <div className="col-span-3 flex">   
-                  <button
-                    type="button"
-                    className="btn btn-primary self-end"
-                    onClick={handleNewAddVariation}
-                  >
-                    Add Variation
-                  </button>
+                  <div className="col-span-3 flex">
+                    <button
+                      type="button"
+                      className="btn btn-primary self-end"
+                      onClick={handleNewAddVariation}
+                    >
+                      Add Variation
+                    </button>
                   </div>
 
                   <div className="flex-col items-center"></div>
@@ -1082,7 +1035,6 @@ const getInstruction = (key) => {
                     >
                       Add Variation Type
                     </button>
-                 
                   </div>
                 </div>
 
@@ -1115,7 +1067,7 @@ const getInstruction = (key) => {
                   </thead>
 
                   <tbody>
-                    {variations.map((variation,index) => (
+                    {variations.map((variation, index) => (
                       <tr key={variation.variationProductId}>
                         <td className="px-4 py-2">
                           <input
@@ -1125,8 +1077,8 @@ const getInstruction = (key) => {
                             onChange={(e) => {
                               const updatedSku = e.target.value;
                               setVariations((prevVariations) =>
-                                prevVariations.map((item,i) =>
-                                  i ===index
+                                prevVariations.map((item, i) =>
+                                  i === index
                                     ? { ...item, sku: updatedSku }
                                     : item
                                 )
@@ -1142,8 +1094,8 @@ const getInstruction = (key) => {
                             onChange={(e) => {
                               const updatedBarcode = e.target.value;
                               setVariations((prevVariations) =>
-                                prevVariations.map((item,i) =>
-                                  i===index
+                                prevVariations.map((item, i) =>
+                                  i === index
                                     ? { ...item, barcode: updatedBarcode }
                                     : item
                                 )
@@ -1159,8 +1111,8 @@ const getInstruction = (key) => {
                             onChange={(e) => {
                               const updatedUnitPrice = e.target.value;
                               setVariations((prevVariations) =>
-                                prevVariations.map((item,i) =>
-                                  i ===index
+                                prevVariations.map((item, i) =>
+                                  i === index
                                     ? { ...item, unitPrice: updatedUnitPrice }
                                     : item
                                 )
@@ -1169,19 +1121,26 @@ const getInstruction = (key) => {
                           />
                         </td>
                         {variation.variationDetails &&
-  variation.variationDetails.map((detail) => (
-    <td key={detail.variationTypeId} className="px-4 py-2">
-      <input
-        type="text"
-        className="input input-bordered w-full text-sm"
-        value={detail.variationValue}
-        onChange={(e) => {
-          const updatedValue = e.target.value;
-          handleVariationChange(updatedValue, index, detail.variationTypeId);
-        }}
-      />
-    </td>
-  ))}
+                          variation.variationDetails.map((detail) => (
+                            <td
+                              key={detail.variationTypeId}
+                              className="px-4 py-2"
+                            >
+                              <input
+                                type="text"
+                                className="input input-bordered w-full text-sm"
+                                value={detail.variationValue}
+                                onChange={(e) => {
+                                  const updatedValue = e.target.value;
+                                  handleVariationChange(
+                                    updatedValue,
+                                    index,
+                                    detail.variationTypeId
+                                  );
+                                }}
+                              />
+                            </td>
+                          ))}
 
                         {/* Add Remove button for each variation row */}
                         <td className="px-4 py-2">
@@ -1190,7 +1149,8 @@ const getInstruction = (key) => {
                             className="btn text-error btn-xs"
                             onClick={() =>
                               handleRemoveVariation(
-                                variation.variationProductId,index
+                                variation.variationProductId,
+                                index
                               )
                             }
                             aria-label="Remove Variation Row"
@@ -1288,11 +1248,16 @@ const getInstruction = (key) => {
 
                         const _comboIngredents = {
                           measurementUnitName: product.measurementUnitName,
-                          productId:product.productId,
-                          productId_mat:product.productTypeId===1 ? product.productId : (product.productTypeId===2 ? product.variationProductId:null),
+                          productId: product.productId,
+                          productId_mat:
+                            product.productTypeId === 1
+                              ? product.productId
+                              : product.productTypeId === 2
+                              ? product.variationProductId
+                              : null,
                           productName: product.productName,
-                          productTypeId:product.productTypeId,
-                          productTypeName:product.productTypeName,
+                          productTypeId: product.productTypeId,
+                          productTypeName: product.productTypeName,
                           sku: product.sku,
                           qty: comboIngrednentQty.value,
                         };
@@ -1369,65 +1334,94 @@ const getInstruction = (key) => {
                   </table>
                 </div>
               </div>
-          
-             
-                <div className="">
+
+              <div className="">
+                <div className="flex flex-col">
                   <div className="flex flex-col">
-                    <div className="flex flex-col">
-                      <label className="label">
-                        <span className="label-text">{sku.label}</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="input input-bordered w-full"
-                        value={sku.value}
-                        onChange={(e) =>
-                          handleInputChange(setSku, sku, e.target.value)
-                        }
-                      />
-                      {validationMessages(sku)}
-                    </div>
+                    <label className="label">
+                      <span className="label-text">{sku.label}</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full"
+                      value={sku.value}
+                      onChange={(e) =>
+                        handleInputChange(setSku, sku, e.target.value)
+                      }
+                    />
+                    {validationMessages(sku)}
+                  </div>
 
-                    <div className="flex flex-col">
-                      <label className="label">
-                        <span className="label-text">{barcode.label}</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="input input-bordered w-full"
-                        value={barcode.value}
-                        onChange={(e) =>
-                          handleInputChange(setBarcode, barcode, e.target.value)
-                        }
-                      />
-                      {validationMessages(barcode)}
-                    </div>
+                  <div className="flex flex-col">
+                    <label className="label">
+                      <span className="label-text">{barcode.label}</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full"
+                      value={barcode.value}
+                      onChange={(e) =>
+                        handleInputChange(setBarcode, barcode, e.target.value)
+                      }
+                    />
+                    {validationMessages(barcode)}
+                  </div>
 
-                    <div className="flex flex-col">
-                      <label className="label">
-                        <span className="label-text">{unitPrice.label}</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="input input-bordered w-full"
-                        value={unitPrice.value}
-                        onChange={(e) =>
-                          handleInputChange(
-                            setUnitPrice,
-                            unitPrice,
-                            e.target.value
-                          )
-                        }
-                        disabled={isNotForSelling}
-                      />
-                      {validationMessages(unitPrice)}
-                    </div>
+                  <div className="flex flex-col">
+                    <label className="label">
+                      <span className="label-text">{unitPrice.label}</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full"
+                      value={unitPrice.value}
+                      onChange={(e) =>
+                        handleInputChange(
+                          setUnitPrice,
+                          unitPrice,
+                          e.target.value
+                        )
+                      }
+                      disabled={isNotForSelling}
+                    />
+                    {validationMessages(unitPrice)}
                   </div>
                 </div>
-             
+              </div>
             </>
           )}
 
+<div className="flex items-center gap-4 p-4 border-dashed shadow-sm">
+  {/* File Input */}
+  <label className="flex flex-col items-center cursor-pointer">
+    <span className="mb-2 text-sm font-medium text-gray-700">Upload an Image</span>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      className="hidden"
+    />
+    <div className="flex items-center justify-center w-40 h-12 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition">
+      Choose File
+    </div>
+  </label>
+
+  {/* Image Preview */}
+  {previewUrl && (
+    <div className="w-full max-w-md text-center">
+      <div className="relative overflow-hidden rounded-lg ">
+        <img
+          src={previewUrl}
+          alt="Preview"
+          className="object-contain w-full max-h-32 rounded-lg"
+        />
+      </div>
+    </div>
+  )}
+</div>
+
+
+          {/* {JSON.stringify(uploadResponse, null, 2)} */}
           <div className="flex justify-center mt-20 mb-10 col-span-full">
             <button
               className={`btn btn-primary w-56 ${

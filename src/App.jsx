@@ -12,6 +12,8 @@ import Customers from './pages/customers';
 import AddCustomer from './pages/addCustomer';
 import Login from './pages/login';
 import DayOpen from './pages/dayopen';
+import { useDispatch } from 'react-redux';
+import StockEntry from './components/inventory/stockEntry/StockEntry';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -40,17 +42,19 @@ function AppContent() {
     // minHeight: '86vh',
   };
 
+
+
   return (
 
       <>
         <ToastProvider>
-          <div>
+          <div className=''>
             {shouldShowNavBar && <TopMenubar />}
 
             {/* <div className="flex flex-col h-[92vh] overflow-hidden"> */}
             {/* <div className="flex-1 overflow-y-auto"> */}
-            <div className="flex flex-col h-[92vh] overflow-hidden"> 
-            <div className="flex-1 overflow-y-auto">
+       
+            <div className='mt-16'>
               <React.Suspense fallback={<>Loading...</>}>
                 <Routes>
                   <Route path="/home" element={<Home />} />
@@ -66,11 +70,12 @@ function AppContent() {
                   <Route path="/customers" element={<Customers />} />
                   <Route path="/ordersCompleted" element={<OrdersCompleted />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/stockEntry" element={<StockEntry />} />
                   <Route path="/" element={<Login />} />
                 </Routes>
               </React.Suspense>
         
-            </div></div>
+              </div>
           </div>
         </ToastProvider>
       </>

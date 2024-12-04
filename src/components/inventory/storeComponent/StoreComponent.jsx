@@ -3,6 +3,25 @@ import { getStoresDrp } from "../../../functions/dropdowns";
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+
+
+const StoreItem=({onClick,store})=>{
+
+  return (
+  <div
+    className="flex justify-between items-center p-3 border rounded-full gap-2 bg-gray-50"
+  >
+    <span className="text-gray-800 font-medium">{store.storeName}</span>
+    <FontAwesomeIcon
+      icon={faTrash}
+      className="text-red-500 hover:text-red-700 cursor-pointer"
+      onClick={onClick}
+    />
+  </div>
+  
+  )}
+  
+
 const StoresComponent = ({ stores, setStores }) => {
   const [selectedStoreId, setSelectedStoreId] = useState(0);
   const [storesOptions, setStoresOptions] = useState([]);
@@ -59,7 +78,7 @@ const StoresComponent = ({ stores, setStores }) => {
         </div>
         <button
           type="button"
-          className="p-2 bg-blue-500 text-white rounded-md mt-10"
+          className="p-2 btn-primary text-white rounded-md mt-10"
           onClick={handleAddStore}
         >
           Add Store
@@ -69,21 +88,9 @@ const StoresComponent = ({ stores, setStores }) => {
       {/* Stores list with remove button */}
       <div className="flex flex-wrap gap-5 mt-10">
         {stores.map((item) => (
-          <div
-            key={item.storeId}
-            className="flex justify-between items-center bg-slate-100 p-2 gap-3 h-10 rounded-md"
-          >
-            <div>{item.storeName}</div>
-            <button
-            type="button"
-              className="btn btn-error btn-xs bg-[#f87171] text-base-100"
-              onClick={() => handleRemoveStore(item.storeId)}
-              aria-label="Delete"
-              title="Remove Store"
-            >
-              <FontAwesomeIcon icon={faTrash} />
-            </button>
-          </div>
+         
+         <StoreItem  key={item.storeId} store={item} onClick={() => handleRemoveStore(item.storeId)} />
+   
         ))}
       </div>
     </div>

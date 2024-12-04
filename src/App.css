@@ -1,10 +1,10 @@
 
 :root {
-  --bg: #f4fafe;
+  --bg: #f5fbff;
   --textColor: black;
   --colorLight: white;
 
-  --softBg: #FFFFFF;
+  --softBg: #f5fbff;
   --softTextColor: #454545;
   --dangerTextColor:#ff3737;
 
@@ -28,7 +28,8 @@
 body{
   font-family:Arial, Helvetica, sans-serif;
   color: var(--defalutTextColor);
-  background-color: white;
+  background-color:#f1f5f9;
+  /* #f1f5f9 */
 
 }
 

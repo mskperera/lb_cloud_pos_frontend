@@ -47,6 +47,8 @@ const Login = () => {
    console.log('plaindata',plaindata);
    localStorage.setItem('tenantId',plaindata.tenantId);
    localStorage.setItem('userId',plaindata.userId);
+   localStorage.setItem('stores', JSON.stringify(plaindata.stores));
+
    navigate('/home')
 if(authRes.data.exception){
 

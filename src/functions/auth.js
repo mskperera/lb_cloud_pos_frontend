@@ -36,6 +36,7 @@ import customAxiosMain from "../utils/axiosMain";
         
           localStorage.removeItem('token');
           localStorage.removeItem('tenantId');
+          localStorage.removeItem('selectedStore');
           return res;
         })
         .catch((err) => {

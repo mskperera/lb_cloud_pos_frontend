@@ -1,30 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency, formatUtcToLocal } from '../../../../utils/format';
-import { deleteProduct, getNonSerializedItems, getProductAvailaleStores, getProductExtraDetails, getProducts } from '../../../../functions/register';
+import { deleteProduct, getProductExtraDetails, getProducts } from '../../../../functions/register';
 import { useToast } from '../../../useToast';
-import { getDropdownMeasurementUnit, getDrpdownCategory, getProductTypesDrp, getStoresDrp } from '../../../../functions/dropdowns';
+import { getDropdownMeasurementUnit, getDrpdownCategory, getStoresDrp } from '../../../../functions/dropdowns';
 import { validate } from '../../../../utils/formValidation';
 import FormElementMessage from '../../../messges/FormElementMessage';
 import DaisyUIPaginator from '../../../DaisyUIPaginator';
 import ConfirmDialog from '../../../dialog/ConfirmDialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash,faPlus, faPlusSquare, faArrowAltCircleRight, faCompress, faCompressArrowsAlt, faAngleUp, faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-import './productList.css';
+import { faEdit, faTrash, faPlusSquare, faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+
 
 const ProductDetails = ({ selectedProduct }) => {
-  const [availableStores, setAvailableStores] = useState([]);
-  const [extraDetails, setExtraDetails] = useState([]);
   const [stores, setStores] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [singleProductSkuBarcodes, setSingleProductSkuBarcodes] = useState([]);
+  const [variationProductSkuBarcodes, setVariationProductSkuBarcodes] = useState([]);
+  const [comboProductDetails, setComboProductDetails] = useState([]);
+
+  const [productTypeId, setProductTypeId] = useState('');
 
   const loadDetails = async () => {
     if (!selectedProduct) return;
     setLoading(true);
     try {
       const details = await getProductExtraDetails(selectedProduct.productId);
-      setExtraDetails(details);
+     // setExtraDetails(details);
+     const stores=details.data.results[1];
+     const productSkuBarcodes=details.data.results[0];
+  
+     console.log('stores',stores)
+     console.log('singleProductSkuBarcodes',singleProductSkuBarcodes);
+    const productTypeId= details?.data?.outputValues?.productTypeId;
+    setProductTypeId(productTypeId);
+    console.log('productTypeId',productTypeId)
+
+    // setVariations(details.data.results[0])
+    //   setStores(details.data.results[1]); 
+       setCategories(JSON.parse(selectedProduct.categories));
+       setStores(stores);
+ 
+      if(productTypeId==1){
+        setSingleProductSkuBarcodes(productSkuBarcodes[0]);
+      }
+      else if(productTypeId==2){
+        const parsedVariations = productSkuBarcodes.map((variation) => ({
+          ...variation,
+          variationDetails:
+            typeof variation.variationDetails === "string"
+              ? JSON.parse(variation.variationDetails)
+              : variation.variationDetails,
+        }));
+
+        setVariationProductSkuBarcodes(parsedVariations);
+        
+     }
+      else if(productTypeId==3){
+
+        setComboProductDetails(productSkuBarcodes);
+      
+      }
+
+
     } catch (error) {
       console.error("Error fetching product details:", error);
     } finally {
@@ -33,32 +72,19 @@ const ProductDetails = ({ selectedProduct }) => {
   };
 
   useEffect(() => {
-    if (selectedProduct) {
       loadDetails();
-    }
+    
   }, [selectedProduct]);
 
-  useEffect(() => {
-    if (extraDetails?.data?.results) {
-      setStores(extraDetails.data.results[1]); 
-      setCategories(JSON.parse(selectedProduct.categories));
-    }
-  }, [extraDetails]);
 
   const renderExtraDetails = () => {
     if (loading) {
       return <div>Loading...</div>; // Show loading message
     }
 
-    if (!selectedProduct || !extraDetails?.data?.outputValues?.productTypeId) {
-      return null;
-    }
-
-    const productTypeId = extraDetails?.data?.outputValues?.productTypeId;
-
     if (productTypeId === 1) {
-      return <div className='flex justify-start gap-5'> 
-          <div className='bg-white p-4 rounded-md'>
+      return      <div className='grid grid-cols-4'> 
+        <div className='bg-white p-4 m-4 rounded-md'>
            <h3 className='text-center font-bold text-lg pb-2'>Stores</h3>
            <table className="table border-collaps">
              <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
@@ -77,6 +103,7 @@ const ProductDetails = ({ selectedProduct }) => {
                ))}
              </tbody>
            </table>
+
            </div>
 
            <div className='bg-white p-4 rounded-md'>
@@ -95,45 +122,196 @@ const ProductDetails = ({ selectedProduct }) => {
         </div>
         
             </div>
+
+
+            <div className="flex gap-2 w-full items-center mx-5">
+            <label className="label">
+            Last Modified
+            </label>
+            <p
+              className="bg-white p-2 border"
+            >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
+          </div>
+
            </div>;
     }
 
     if (productTypeId === 2) {
       return (
-        <div className='m-4 bg-gray-100 p-4 rounded-md'>
-          <h3 className='text-center font-bold pb-5'>Variations</h3>
-          <table className="table border-collapse">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">SKU</th>
-                <th className="px-4 py-2">Barcode</th>
-                <th className="px-4 py-2">Variation</th>
-              </tr>
-            </thead>
-            <tbody>
-              {extraDetails.data.results[0].map((item) => (
-                <tr key={item.variationProductId}>
-                  <td className="px-4 py-2">{item.sku}</td>
-                  <td className="px-4 py-2">{item.barcode}</td>
-                  <td className="px-4 py-2">
-                    {JSON.parse(item.variationValues).map((v) => (
-                      <div key={v.variationName} className='flex gap-2 border-gray-100 border p-2 rounded-md bg-gray-50'>
-                        <div className='flex-1'>{v.variationName}</div>
-                        <div className='flex-1'>{v.variationValue}</div>
-                      </div>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+         <div className='grid grid-cols-4'> 
+
+<div className='bg-white p-4 m-4 rounded-md'>
+<h3 className='text-center font-bold pb-5'>Stores</h3>
+           <table className="table border-collaps">
+             <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+               <tr>
+                 <th className="px-4 py-2">Store Code</th>
+                 <th className="px-4 py-2">Store Name</th>
+               </tr>
+             </thead>
+             <tbody>
+               {stores.map((item) => (
+                 <tr key={item.storeId} className="hover:bg-gray-100 text-[1rem] m-5">
+                   <td className="px-4 py-2">{item.storeCode}</td>
+                   <td className="px-4 py-2">{item.storeName}</td>
+     
+                 </tr>
+               ))}
+             </tbody>
+           </table>
+       
+           <div className="flex gap-2 w-full items-center mx-5">
+            <label className="label">
+            Last Modified
+            </label>
+            <p
+              className="bg-white p-2 border"
+            >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
+          </div>
+           </div>
+
+           <div className='bg-white p-4 m-4 rounded-md'>
+           <h3 className='text-center font-bold pb-5'>Categories</h3>
+           <div className='flex gap-1 mt-2'>
+          {categories?.map((c) => (
+           <>
+           <span
+              key={c.id}
+              className="badge badge-primary p-4 bg-green-500 border-none text-white mr-1"
+            >
+              {c.displayName}
+            </span> {"/"}
+            </>
+          ))}
         </div>
+            </div>
+
+        <div className='m-4 bg-white p-4 rounded-md col-span-2'>
+          <h3 className='text-center font-bold pb-5'>Variations</h3>
+      
+      
+          <table className="table border-collapse w-full">
+                  <thead className="sticky top-0 bg-base-100 z-10 text-sm border-b">
+                    <tr>
+                      <th className="px-2 py-2">SKU</th>
+                      <th className="px-2 py-2">Barcode</th>
+                      <th className="px-2 py-2">Unit Price</th>
+                      {variationProductSkuBarcodes[0]?.variationDetails &&
+                        variationProductSkuBarcodes[0]?.variationDetails.map((c) => (
+                          <th key={c.variationTypeId} className="px-4 py-2">
+                            <span>{c.variationName}</span>
+                        
+                          </th>
+                        ))}
+                      <th className="px-2 py-2"></th>{" "}
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {variationProductSkuBarcodes && variationProductSkuBarcodes.map((variation,index) => (
+                      <tr key={variation.variationProductId}>
+                        <td className="px-2 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.sku}
+                       readOnly={true}
+                          />
+                        </td>
+                        <td className="px-2 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.barcode}
+                            readOnly={true}
+                          />
+                        </td>
+                        <td className="px-2 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.unitPrice}
+                            readOnly={true}
+                          />
+                        </td>
+                        {variation.variationDetails &&
+  variation.variationDetails.map((detail) => (
+    <td key={detail.variationTypeId} className="px-2 py-2">
+      <input
+        type="text"
+        className="input input-bordered w-full text-sm"
+        value={detail.variationValue}
+        readOnly={true}
+      />
+    </td>
+  ))}
+
+                    
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+
+        </div>
+
+
+</div>
       );
     }
 
     if (productTypeId === 3) {
       return (
-        <div className='m-4 bg-gray-100 p-4 rounded-md'>
+        <div className='grid grid-cols-4'> 
+
+       <div className='bg-white p-4 m-4 rounded-md'>
+<h3 className='text-center font-bold pb-5'>Stores</h3>
+           <table className="table border-collaps">
+             <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+               <tr>
+                 <th className="px-4 py-2">Store Code</th>
+                 <th className="px-4 py-2">Store Name</th>
+               </tr>
+             </thead>
+             <tbody>
+               {stores.map((item) => (
+                 <tr key={item.storeId} className="hover:bg-gray-100 text-[1rem] m-5">
+                   <td className="px-4 py-2">{item.storeCode}</td>
+                   <td className="px-4 py-2">{item.storeName}</td>
+     
+                 </tr>
+               ))}
+             </tbody>
+           </table>
+        
+           <div className="flex gap-2 w-full items-center mx-5">
+            <label className="label">
+            Last Modified
+            </label>
+            <p
+              className="bg-white p-2 border"
+            >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
+          </div>
+
+           </div>
+
+           <div className='bg-white p-4 m-4 rounded-md'>
+           <h3 className='text-center font-bold pb-5'>Categories</h3>
+           <div className='flex gap-1 mt-2'>
+          {categories?.map((c) => (
+           <>
+           <span
+              key={c.id}
+              className="badge badge-primary p-4 bg-green-500 border-none text-white mr-1"
+            >
+              {c.displayName}
+            </span> {"/"}
+            </>
+          ))}
+        </div>
+            </div>
+       
+        <div className='m-4 bg-white p-4 rounded-md col-span-2'>
           <h3 className='text-center font-bold pb-5'>Combo Ingredients</h3>
           <table className="table border-collapse">
             <thead>
@@ -144,7 +322,7 @@ const ProductDetails = ({ selectedProduct }) => {
               </tr>
             </thead>
             <tbody>
-              {extraDetails.data.results[0].map((item) => (
+              {comboProductDetails.map((item) => (
                 <tr key={item.productId}>
                   <td className="px-4 py-2">{item.productName}</td>
                   <td className="px-4 py-2">{item.qty} {item.measurementUnitName}</td>
@@ -154,19 +332,20 @@ const ProductDetails = ({ selectedProduct }) => {
             </tbody>
           </table>
         </div>
+
+        </div>
+
       );
     }
   };
 
   return (
     <div className=" p-2 mb-2">
+ 
       {renderExtraDetails()}
     </div>
   );
 };
-
-///export default ProductDetails;
-
 
 
 export default function ProductOrderList({ }) {
@@ -177,9 +356,7 @@ export default function ProductOrderList({ }) {
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [selectedMeasurementUnitId, setSelectedMeasurementUnitId] = useState(-1);
   const [storesOptions, setStoresOptions] = useState([]);
-
   const [selectedStoreId, setSelectedStoreId] = useState('');
-  const [selectedProdutTypeId, setSelectedProdutTypeId] = useState(-1);
 
    // New states for checkboxes
    const [isSingleProductChecked, setIsSingleProductChecked] = useState(false);
@@ -223,12 +400,10 @@ export default function ProductOrderList({ }) {
       const skip = currentPage * rowsPerPage;
       const limit = rowsPerPage;
 
-           // Prepare the list of product types based on the checked checkboxes
            const productTypeIds = [];
-           if (isSingleProductChecked) productTypeIds.push(1);  // Single Product
-           if (isVariationProductChecked) productTypeIds.push(2);  // Variation Product
-           if (isComboProductChecked) productTypeIds.push(3);  // Combo Product
-
+           if (isSingleProductChecked) productTypeIds.push(1);
+           if (isVariationProductChecked) productTypeIds.push(2);
+           if (isComboProductChecked) productTypeIds.push(3);
 
       const filteredData = {
         productId: null,
@@ -244,8 +419,6 @@ export default function ProductOrderList({ }) {
         limit: limit,
       };
 
-
-      console.log('filteredData ',filteredData )
       const _result = await getProducts(filteredData, null);
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
@@ -305,16 +478,8 @@ export default function ProductOrderList({ }) {
     { id: 5, displayName: 'Measurement Unit' }
   ]);
 
-
-
-
-
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [measurementUnitOptions, setMeasurementUnitOptions] = useState([]);
-
-
-
-
   
   useEffect(() => {
     loadDrpStores();
@@ -322,10 +487,6 @@ export default function ProductOrderList({ }) {
     loadDrpMeasurementUnit();
 
   }, []);
-
-
-
-
 
   const loadDrpStores = async () => {
     const objArr = await getStoresDrp();
@@ -343,18 +504,18 @@ export default function ProductOrderList({ }) {
     setMeasurementUnitOptions([{ id: -1, displayName: 'All' }, ...objArr.data.results[0]]);
   };
 
-  const actionButtons = (item) => (
+  const actionButtons = (index,item) => (
     <div className="flex space-x-2">
         <button
         className="btn btn-primary btn-xs text-base-100"
-        onClick={() => handleRowExpand(item.productId)}
+        onClick={() => handleRowSelect(index, item)}
         aria-label="Edit" title='More'
       >
         More
       </button>
 
       <button
-        className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
+        className="btn btn-error btn-xs bg-[#f87171] text-base-100"
         onClick={async () => {
           const result = await deleteProduct(item.productId, false);
           const { outputMessage, responseStatus } = result.data.outputValues;
@@ -402,10 +563,6 @@ export default function ProductOrderList({ }) {
     isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productName}</span>
   );
 
-  const measurementUnitNameBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.measurementUnitName}</span>
-  );
-
   const unitPriceBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.unitPrice)}</span>
   );
@@ -416,9 +573,6 @@ export default function ProductOrderList({ }) {
 
   const productTypeBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productTypeName}</span>
-  );
-  const storeNameBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.storeName}</span>
   );
 
   const costPriceBodyTemplate = (rowData) => (
@@ -454,13 +608,6 @@ export default function ProductOrderList({ }) {
           ))}
         </div>
     );
-  };
-
-  const modifiedDateBodyTemplate = (item) => {
-
-   
-    const localFormattedDate =formatUtcToLocal(item.modifiedDate_UTC);
-    return isTableDataLoading ? <span>Loading...</span> : <span>{item.modifiedDate_UTC ? localFormattedDate : ''}</span>;
   };
 
   const handleInputChange = (setState, state, value) => {
@@ -736,6 +883,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
               {/* <th className="px-4 py-2">Product Id</th> */}
               <th className=""></th>
               <th className="px-4 py-2">Product No</th>
+              <th className="px-4 py-2">SKU</th>
               <th className="px-4 py-2">Product Name</th>
 
               <th className="px-4 py-2">Brand</th>
@@ -743,7 +891,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
               <th className="px-4 py-2">Unit Price</th>
               <th className="px-4 py-2">Stock Qty</th>
               <th className="px-4 py-2">Product Type</th>
-              <th className="px-4 py-2">SKU</th>
+           
               {/* <th className="px-4 py-2">Category</th> */}
               <th className="px-4 py-2">Tax Rate(%)</th>
               <th className="px-4 py-2">Actions</th>
@@ -776,6 +924,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                     </td>
                   
                   <td className="px-4 py-2">{productNoBodyTemplate(item)}</td>
+                  <td className="px-4 py-2">{barcodeBodyTemplate(item)}</td>
                   <td className="px-4 py-2">{productNameBodyTemplate(item)}</td>
 
                   <td className="px-4 py-2">{brandBodyTemplate(item)}</td>
@@ -786,12 +935,12 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                   <td className="px-4 py-2">{stockQtyBodyTemplate(item)}</td>
                   <td className="px-4 py-2">{productTypeBodyTemplate(item)}</td>
 
-                  <td className="px-4 py-2">{barcodeBodyTemplate(item)}</td>
+             
                   {/* <td className="px-4 py-2">{categoriesBodyTemplate(item)}</td> */}
                   <td className="px-4 py-2">
                     {taxRate_percBodyTemplate(item)}
                   </td>
-                  <td className="px-4 py-2">{actionButtons(item)}</td>
+                  <td className="px-4 py-2">{actionButtons(index,item)}</td>
                 </tr>
                 {/* Extra details row (conditionally rendered) */}
 

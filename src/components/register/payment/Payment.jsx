@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
+import InputSwitchCustom from "../../InputSwitchCustom";
 import CashPayment from "./CashPayment";
 import CardPayment from "./CardPayment";
 import MultiPaymentList from "./MultiPaymentList";
@@ -10,15 +11,20 @@ import { PAYMENT_METHODS } from "../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addMultiPayment,
+  addSinglePayment,
   clearOrderList,
   clearPayment,
   removePayment,
+  setMultiPayment,
 } from "../../../state/orderList/orderListSlice";
 import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { addOrder } from "../../../functions/register";
 import { useToast } from "../../useToast";
 import { formatCurrency } from "../../../utils/format";
+import Decimal from "decimal.js";
+import printReceipt from "../printReceipt/PrintReceipt";
+import ReceiptComponent from "../printReceipt/ReceiptComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import ConfirmDialog from "../../dialog/ConfirmDialog";
@@ -49,7 +55,11 @@ const Payment = ({}) => {
   const terminalId = JSON.parse(localStorage.getItem('terminalId'));
   const sessionDetails=JSON.parse(localStorage.getItem('sessionDetails'));
   
+  const store = JSON.parse(localStorage.getItem('selectedStore'));
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [activeIndex, setActiveIndex] = useState(0); // 0 for Single Payment tab
+
 
   const { paymentList, isMultiPayment, list, orderSummary,customer } = useSelector(
     (state) => state.orderList
@@ -232,6 +242,7 @@ const Payment = ({}) => {
 
     if(!customer && !isPayConfirmed){
     setShowDialog(true);
+
     return;
     }
 
@@ -249,7 +260,7 @@ const Payment = ({}) => {
       customerId: customer?.customerId,
       terminalId: terminalId,
       sessionId: sessionDetails.sessionId,
-
+      storeId:store.storeId,
       orderList: list,
       //paymentList:[paymentList]
       isConfirm: true,

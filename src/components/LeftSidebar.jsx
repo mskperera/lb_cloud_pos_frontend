@@ -23,37 +23,18 @@ const Rightsidebar = ({
 
   const LeftSidebarMenu = ({ onClick, label, icon,iconColor,bgColor,textColor }) => {
     return (
-      <div className={`btn mb-2 flex flex-col px-2 py-9 w-[7rem] min-h-15 ${bgColor? bgColor:'bg-transparent'}`} onClick={onClick}>
-      <div className='flex flex-col gap-2'>     
+      <button className={`flex items-center flex-col rounded-lg w-[7rem] hover:bg-slate-200 py-3 shadow-lg ${bgColor? bgColor:'bg-white'}`} onClick={onClick}>    
          <FontAwesomeIcon icon={icon} className={`text-lg ${iconColor ? iconColor: "text-gray-700"}`} />
-  
-       <div className={` ${textColor ? textColor: "text-gray-700"}`}>{label}</div> 
-       </div>
-      </div>
+       <span className={` ${textColor ? textColor: "text-gray-700 text-md"}`}>{label}</span> 
+      </button>
     );
   };
 
 
   return (
     <div className=''>
-      {/* <div className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg z-50 transform ${visible ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}> */}
-        {/* <div className="flex flex-col p-4 relative"> */}
-          {/* Close Button */}
-          {/* <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            onClick={() => onChangeVisibility(false)}
-          >
-            <FontAwesomeIcon icon={faTimes} className="text-xl" />
-          </button> */}
-          <div className="flex flex-col ">
-          {/* <LeftSidebarMenu
-            label="Go to Main Menu"
-            icon={faHome}
-            onClick={() => {
-              onChangeVisibility(false);
-              navigate("/");
-            }}
-          /> */}
+          <div className="flex flex-col gap-2">
+  
           <LeftSidebarMenu
             label="Orders"
             icon={faBook}
@@ -110,7 +91,7 @@ const Rightsidebar = ({
               navigate("/dayend");
             }}
           />
-                <LeftSidebarMenu
+                {/* <LeftSidebarMenu
             label="Main Menu"
             icon={faThLarge}
             bgColor={"bg-primaryColor"}
@@ -119,10 +100,8 @@ const Rightsidebar = ({
             onClick={() => {
               navigate("/home");
             }}
-          />
+          /> */}
           </div>
-        {/* </div> */}
-      {/* </div> */}
 
       <HoldOrder
         visible={holdOrderShow}

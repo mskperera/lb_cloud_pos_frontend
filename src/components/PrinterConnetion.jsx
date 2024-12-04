@@ -4,26 +4,15 @@ const PrinterConnetion = ({ printerConnected }) => {
   const tooltipText = printerConnected ? 'Printer connected' : 'Printer is not connected';
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div className='m-0 p-0'>
       <i
         className={`pi pi-print`}
-        style={{ fontSize: '1.5rem', margin: '10px' }}
+        style={{ fontSize: '1.5rem' }}
         title={tooltipText}
       ></i>
-      {!printerConnected && (
-        <i
-          className="pi pi-times"
-          style={{
-            fontSize: '1.5rem',
-            position: 'absolute',
-            fontWeight: 'bold',
-            top: '5px',
-            left: '10px',
-            color: 'red',
-          }}
-          title={tooltipText}
-        ></i>
-      )}
+      {!printerConnected && 
+       null
+      }
     </div>
   );
 };

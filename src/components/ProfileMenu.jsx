@@ -2,14 +2,19 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../functions/auth";
 import profilePic from "../assets/images/profilePic.png"; // Replace with the actual path to your image
+import { useDispatch } from "react-redux";
+import { setSelectedStore } from "../state/store/storeSlice";
 
 export default function ProfileMenu() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
+const dispatch=useDispatch();
+
   const handleLogout = () => {
     console.log("Logout clicked");
     logout();
+    dispatch(setSelectedStore({ selectedStore:null }));
     navigate('/login');
   };
 
@@ -18,25 +23,26 @@ export default function ProfileMenu() {
   };
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative inline-block text-left mt-2">
       {/* Profile Button */}
       <button
-        className="btn btn-circle btn-primary avatar"
-        onClick={toggleMenu}
-        aria-controls="profileMenu"
-        aria-haspopup="true"
-      >
-        <img
-          className="w-10 h-10 rounded-full"
-          src={profilePic}
-          alt="Profile"
-        />
-      </button>
+  className="btn btn-circle h-10 w-10 btn-sm btn-primary avatar m-0 p-0"
+  onClick={toggleMenu}
+  aria-controls="profileMenu"
+  aria-haspopup="true"
+>
+  <img
+    className="w-10 h-10 rounded-full"
+    src={profilePic}
+    alt="Profile"
+  />
+</button>
+
 
       {/* Dropdown Menu */}
       {menuOpen && (
         <div
-          className="absolute right-0 mt-2 w-56 bg-base-100 rounded-lg shadow-lg border border-base-300 z-10"
+          className="absolute right-0 w-56 bg-base-100 rounded-lg shadow-lg border border-base-300 z-10"
           id="profileMenu"
         >
           <div className="p-2">

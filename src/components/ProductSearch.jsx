@@ -63,17 +63,29 @@ const ProductSearch = ({ onProductSelect }) => {
   };
 
   return (
-    <div className="relative w-full">
-      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <i className="pi pi-search text-gray-500 sm:text-xl"></i>
-      </div>
-      <input
-        type="text"
-        placeholder="Barcode / Product Search"
-        className="input input-bordered w-full pl-10"
-        value={searchTerm}
-        onChange={handleInputChange}
-      />
+    <div className="relative w-full m-0 p-0">
+<div class="w-full max-w-md m-0 p-0">
+  <div class="relative flex items-center border border-gray-300 rounded-lg shadow-sm bg-white focus-within:ring-2
+   focus-within:ring-blue-500 focus-within:border-blue-500 m-0 p-0">
+
+    <i class="pi pi-search text-gray-500 text-lg absolute left-3"></i>
+
+
+    <input
+      type="text"
+      style={{margin:0,marginLeft:'22px'}}
+      className="w-full py-2 pl-10 pr-4 text-sm bg-white border-none rounded-lg focus:outline-none"
+      placeholder="Barcode / SKU / Product Details"
+      value={searchTerm}
+      onChange={handleInputChange}
+    />
+  </div>
+</div>
+
+
+
+
+
       {showResults && searchResults.length > 0 && (
         <div className="absolute z-10 bg-white shadow-md rounded-md w-full mt-2 max-h-60 overflow-auto">
           <div className="table-container">
