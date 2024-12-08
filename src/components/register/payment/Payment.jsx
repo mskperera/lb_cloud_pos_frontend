@@ -364,8 +364,6 @@ const Payment = ({}) => {
 
     <div className="flex flex-col gap-1 justify-center items-center py-10">
 
-
-
       <div className="flex justify-center">
         <div
           onClick={() => setSelectedTab("Single")}
@@ -405,6 +403,7 @@ const Payment = ({}) => {
           </div>
           <div className="flex-[1]"></div>
         </div>
+
 
         <div className="flex justify-around gap-4">
 

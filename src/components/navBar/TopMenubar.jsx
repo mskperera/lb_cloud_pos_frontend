@@ -1,38 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PrinterConnetion from '../PrinterConnetion';
 import ProfileMenu from '../ProfileMenu';
 import Syncing from '../Syncing';
 import Alert from '../Alert';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore } from '@fortawesome/free-solid-svg-icons';
-import { getSelectedStore } from '../../functions/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedStore } from '../../state/store/storeSlice';
 import io from "socket.io-client";
+import PrinterConnection from '../PrinterConnetion';
+import { getFrontendIdByTerminalId, getPrintdeskByTerminalId } from '../../functions/terminal';
+import { setPrinterList } from '../../state/printer/printerSlice';
 
 const Store=({store})=>(
   <div className='flex justify-start gap-1 items-center mb-1 hover:bg-slate-100 rounded-lg px-2 cursor-pointer'>
 <FontAwesomeIcon icon={faStore} style={{ fontSize: '1.5rem' }} />
- {store && <div className='mt-4'>{`${store.storeCode} | ${store.storeName}`}</div>}
+ {store && <div className='mt-1'>{`${store.storeCode} | ${store.storeName}`}</div>}
  </div>
 )
 export default function TopMenubar() {
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+
 
   const [messages, setMessages] = useState([]);
-  const [frontendId, setFrontendId] = useState("3jkfsjl"); // Example ID
+  //onst [printerList, setPrinterList] = useState([]);
+  const [printDeskInfo, setPrintDeskInfo] = useState(null); // Example ID
+
+  // 3jkfsjl
 
   const { selectedStore } = useSelector((state) => state.store);
-
-
   const [socket, setSocket] = useState(null);
 
+  const loadPrintdeskByTerminalId=async()=>{
+
+    const terminalId=JSON.parse(localStorage.getItem('terminalId'));
+    const result=await getFrontendIdByTerminalId(terminalId);
+    localStorage.setItem("printdeskId",result.data.printdeskId);
+    setPrintDeskInfo(result.data);
+  }
   useEffect(() => {
-    // Establish socket connection
+    loadPrintdeskByTerminalId();
+  },[]);
+
+  useEffect(() => {
     const newSocket = io("http://localhost:5112", {
-      transports: ["websocket"], // Use WebSocket transport
+      transports: ["websocket"],
     });
 
     setSocket(newSocket);
@@ -45,12 +59,22 @@ export default function TopMenubar() {
       connectFrontend(newSocket);
     });
 
-
       // Handle incoming messages
       newSocket.on("printConnectionStatus", (data) => {
         setMessages(data);
       });
 
+      newSocket.on("loadPrinterListToFrontend", (data) => {
+       // setPrinterList(data.printerList);
+
+        //setPrinterList
+       // console.log("loadPrinterListToFrontend:", data.printerList);
+
+        dispatch(setPrinterList({ printerList:data.printerList }));
+
+      });
+
+      
       // Handle error events
       newSocket.on("error", (error) => {
         console.error("Socket Error:", error);
@@ -65,16 +89,22 @@ export default function TopMenubar() {
       console.error("Connection error:", err.message);
     });
 
+
+    newSocket.on("serverShutdown", ({ message }) => {
+      console.log(message);
+      setMessages({status:"serviceDisconnected"});
+    });
+
     // Cleanup on component unmount
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [printDeskInfo]);
 
   const connectFrontend = (socketInstance) => {
     console.log("Attempting to emit connectFrontendToTheService");
     if (socketInstance && socketInstance.connected) {
-      socketInstance.emit("connectFrontendToTheService", { frontendId });
+      socketInstance.emit("connectFrontendToTheService", { frontendId:printDeskInfo?.frontendId });
     } else {
       console.error("Socket is not connected!");
     }
@@ -96,8 +126,6 @@ export default function TopMenubar() {
  // const store = JSON.parse(localStorage.getItem('selectedStore'));
 
 
- const dispatch = useDispatch();
-
    useEffect(() => {
     if(!selectedStore){
 
@@ -110,6 +138,9 @@ export default function TopMenubar() {
 
 
 
+
+
+
   return (
     <div className="navbar fixed top-0 left-0 w-full bg-base-100 shadow-md z-10 px-4 gap-2 m-0 p-0">
       <div className="flex justify-between items-center w-full m-0 p-0">
@@ -117,22 +148,10 @@ export default function TopMenubar() {
           <i className="pi pi-calculator text-2xl"></i>
           <h3 className="text-lg font-bold">LBPOS</h3>
         </div>
-        <button
-          onClick={connectFrontend}
-          style={{
-            marginLeft: "10px",
-            padding: "5px 10px",
-            backgroundColor: "#4CAF50",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Connect Frontend
-        </button>
+       
         <div className="flex items-center gap-4 m-0 p-0">
        
-     {JSON.stringify(messages)}
+     {JSON.stringify(printDeskInfo)}
 
           <div className="flex items-center gap-5 m-0 p-0">
          
@@ -144,7 +163,10 @@ export default function TopMenubar() {
             <i className="pi pi-th-large text-xl"></i>
             {/* <span className="">Main Menu</span> */}
           </button>
-            <PrinterConnetion printerConnected={false} />
+
+<PrinterConnection status={messages.status} />
+
+
             <Alert />
             <Syncing />
             <ProfileMenu />
