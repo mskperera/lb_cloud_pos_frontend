@@ -1,6 +1,8 @@
 
 import axios from 'axios';
+const tenantId=localStorage.getItem('tenantId');
 
+const productImageFolderPath=`${tenantId}/productImages`;
 export const uploadImage = async (file) => {
   try {
     const formData = new FormData();
@@ -9,7 +11,7 @@ export const uploadImage = async (file) => {
     return await axios
       .post(`${process.env.REACT_APP_API_CDN}/upload`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data'
         },
       })
       .then((res) => res.data)
@@ -23,27 +25,53 @@ export const uploadImage = async (file) => {
   }
 };
 
+
+
 export const uploadImageResized = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folderPath', productImageFolderPath);  
+
+    return await axios
+      .post(`${process.env.REACT_APP_API_CDN}/upload-image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error('Error uploading image:', err);
+        return err.response;
+      });
+  } catch (err) {
+    console.error('Unexpected error in uploadImage:', err);
+    return err;
+  }
+};
+
+
+// export const uploadImageResized = async (file) => {
+//     try {
+//       const formData = new FormData();
+//       formData.append('file', file);
   
-      return await axios
-        .post(`${process.env.REACT_APP_API_CDN}/upload-image`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .then((res) => res.data)
-        .catch((err) => {
-          console.error('Error uploading image:', err);
-          return err.response;
-        });
-    } catch (err) {
-      console.error('Unexpected error in uploadImage:', err);
-      return err;
-    }
-  };
+//       return await axios
+//         .post(`${process.env.REACT_APP_API_CDN}/upload-image`, formData, {
+//           headers: {
+//             'Content-Type': 'multipart/form-data',
+//           },
+//         })
+//         .then((res) => res.data)
+//         .catch((err) => {
+//           console.error('Error uploading image:', err);
+//           return err.response;
+//         });
+//     } catch (err) {
+//       console.error('Unexpected error in uploadImage:', err);
+//       return err;
+//     }
+//   };
 
 
 export const viewImage = async (imageHash) => {

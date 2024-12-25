@@ -18,11 +18,13 @@ const HOCSession = ({terminalId, children }) => {
     try {
       console.log('HOCSession terminalId:', terminalId);
       const result = await getLatestSessionDetails(terminalId);
+      console.log('isSessionEnded:', result);
       const { records } = result.data;
       //console.log('getLatestSessionDetails:', result);
       localStorage.setItem('sessionDetails',JSON.stringify(records));
       
       const isSessionEnded=records.isSessionEnded;
+    
       setIsSessionEnded(isSessionEnded);
     } catch (error) {
 

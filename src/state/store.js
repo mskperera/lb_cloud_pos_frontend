@@ -11,7 +11,7 @@ export const store=configureStore({
         orderList:orderListSlice,
         popup:popupSlice,
         store:storeSlice,
-        printer:printerSlice,
+        printer:printerSlice
     }
 })
 

@@ -8,7 +8,7 @@ const ProductItem = ({ p,handleProductClick }) => {
       {/* {JSON.stringify(p)} */}
      {p.imageUrl ?   <button
       className='flex flex-col btn h-auto border-none  md:w-[188px] items-center justify-between 
-      rounded-lg cursor-pointer py-2 px-2 gap-4 hover:bg-base-300 shadow bg-[#ffffff]'
+      rounded-lg cursor-pointer py-2 px-2 gap-4 hover:bg-base-300 bg-slate-50'
          onClick={() => handleProductClick(p)}
       >   
       <div className='flex gap-1 h-[55px] w-full justify-between items-center flex-1'>
@@ -34,7 +34,7 @@ const ProductItem = ({ p,handleProductClick }) => {
 :
       <button
       className='flex flex-col btn h-auto border-none  md:w-[188px] items-center justify-between 
-      rounded-lg cursor-pointer py-2 px-2 gap-4 hover:bg-base-300 shadow bg-[#ffffff]'
+      rounded-lg cursor-pointer py-2 px-2 gap-4 hover:bg-base-300 bg-slate-50'
          onClick={() => handleProductClick(p)}
       >   
       <div className='flex gap-1 h-[55px] w-full justify-between items-center flex-1'>

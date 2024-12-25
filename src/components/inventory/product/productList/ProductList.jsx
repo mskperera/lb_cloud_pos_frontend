@@ -859,7 +859,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
           Create New
         </button>
       </div>
-      <div className="flex justify-between w-full bg-white p-4">
+      <div className="flex justify-between w-full  p-4">
         {/* Items count display */}
         <div className="pl-3">
           <span className=" text-gray-500">{totalRecords} items found</span>
@@ -878,7 +878,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
         {/* <ProductDetails selectedProduct={selectedProduct}  /> */}
 
         <table className="table w-full border-collapse">
-          <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+          <thead className="sticky  top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
             <tr>
               {/* <th className="px-4 py-2">Product Id</th> */}
               <th className=""></th>
@@ -905,7 +905,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                 {/* {JSON.stringify(item)} */}
                 <tr
                   onClick={() => handleRowSelect(index, item)}
-                  className={`border-b border-gray-200 text-[1rem] ${
+                  className={`border-b bg-slate-50 border-gray-200 text-[1rem] ${
                     selectedRowIndex === index
                       ? "bg-blue-500 text-white hover:bg-blue-500 "
                       : "hover:bg-gray-100"

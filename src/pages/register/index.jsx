@@ -26,14 +26,7 @@ const Register = () => {
   const [isReturnOrderPopupVisible, setIsReturnOrderPopupVisible] =
     useState(false);
 
-
-
-
- 
-
   const [showPayment, setShowPayment] = useState(false);
-
-
 
   const PaymentScreen = () => {
     return (
@@ -47,14 +40,9 @@ const Register = () => {
     );
   };
 
-
-
   const addReturnedProductsHandler = (products) => {
     dispatch(addReturnedProduct({ returnedProducts: products }));
   };
-
-
-
   
   return (
     <HOCSession terminalId={terminalId}>

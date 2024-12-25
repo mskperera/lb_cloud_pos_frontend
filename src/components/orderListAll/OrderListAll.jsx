@@ -12,7 +12,7 @@ import { DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/constants";
 import ProductOrderList from "../register/orderList/ProductOrderList";
 import ApplyDiscount from "../register/ApplyDiscount";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import ProductSearch from "../ProductSearch";
+import ProductSearch from "../productSearch/ProductSearch";
 
 
 
@@ -83,22 +83,41 @@ const OrderListAll=()=>{
       const changeVisibilityHandler = (value) => {
         setIsRightSidebarVisible(value);
       };
+      const handleBarcodeEnter = (p) => {
+        //  const v =p.variationValue.map(v=>v.variationValue).join(" | ");
+          const description =`${p.productName}`;
+          const qty = 1;
+          const unitPrice = Number(p.unitPrice);
+    
+          console.log('unitPrice',unitPrice)
+          const order = {
+            productNo: p.productNo,
+            description,
+            productId:p.productTypeId===2 ? p.variationProductId : p.productId,
+            unitPrice,
+            productTypeId: p.productTypeId,
+            lineTaxRate: p.taxRate_perc,
+            qty,
+          };
+          dispatch(addOrder(order));
+        };
 
       const handleProductClick = (p) => {
-        const description = p.productName;
+      //  const v =p.variationValue.map(v=>v.variationValue).join(" | ");
+        const description =`${p.productName}`;
         const qty = 1;
         const unitPrice = Number(p.unitPrice);
-    
+  
         console.log('unitPrice',unitPrice)
         const order = {
           productNo: p.productNo,
           description,
-          productId: p.productId,
+          productId:p.productTypeId===2 ? p.variationProductId : p.productId,
           unitPrice,
+          productTypeId: p.productTypeId,
           lineTaxRate: p.taxRate_perc,
           qty,
         };
-    
         dispatch(addOrder(order));
       };
 
@@ -115,7 +134,7 @@ const OrderListAll=()=>{
       }];
 
     return (
-    <div className="flex flex-col bg-white rounded-md w-full mt-1 ">
+    <div className="flex flex-col bg-slate-50 rounded-md w-full mt-1 ">
                <DialogModel
         header="Select Customer"
         visible={showCustomerList}
@@ -135,9 +154,9 @@ const OrderListAll=()=>{
       />
 
     <div className="flex flex-col gap-0">
-        <div className="flex gap-1 px-4 pt-2">
-        <ProductSearch onProductSelect={handleProductClick} />
-        
+        <div className="flex justify-start gap-4 px-4 pt-2">
+        <ProductSearch onProductSelect={handleProductClick} onBarcodeEnter={handleBarcodeEnter} />
+      
         </div>
 
     <div className="px-4">
@@ -162,7 +181,7 @@ const OrderListAll=()=>{
     </div>
 
   {orderSummary.overallDiscounts > 0 && (
-    <div className="flex justify-between gap-2 items-center h-10 bg-slate-200 rounded-md shadow-sm">
+    <div className="flex justify-between gap-2 items-center h-10 bg-slate-50 rounded-md shadow-sm">
       <div className="flex-2 px-4">{`Overall Discount : ${overallDiscountData[0].value} (${overallDiscountData[0].symbol})  ${overallDiscountData[0].overallDiscountReasonName}`}</div>
       <div className="flex-1 flex justify-end">
         <div

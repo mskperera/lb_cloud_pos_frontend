@@ -240,3 +240,76 @@ import { getTenantId, getToken } from "./authService";
       return err;
     }
   };
+
+
+  export const getContactTypes = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getContactTypes`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+  export const getSuppliers = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/suppliers`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getCustomers = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/customers`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+

@@ -55,9 +55,9 @@ export default function CustomerList({selectingMode,onselect }) {
     const limit = rowsPerPage;
 
     const filteredData = {
-      customerId: null,
-      customerCode: selectedFilterBy.value===1 ? searchValue.value:null,
-      customerName: selectedFilterBy.value===2 ? searchValue.value:null,
+      contactId: null,
+      contactCode: selectedFilterBy.value===1 ? searchValue.value:null,
+      contactName: selectedFilterBy.value===2 ? searchValue.value:null,
 
       email: selectedFilterBy.value===3 ? searchValue.value:null,
       mobile: selectedFilterBy.value===4 ? searchValue.value:null,
@@ -172,6 +172,11 @@ export default function CustomerList({selectingMode,onselect }) {
   
 
 //// replaceed by daisy
+const contactTypeNameBodyTemplate = (rowData) => (
+  isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactTypeName}</span>
+);
+
+
   const customerCodeBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactCode}</span>
   );
@@ -304,7 +309,7 @@ const actionButtons = (item) => (
 {/* <button
           className="btn btn-ghost text-[#0284c7]"
           onClick={() => {
-            onselect(selectedCustomer.customerId); 
+            onselect(selectedCustomer.contactId); 
           }}
           title="Select Cutomer"
         >
@@ -335,11 +340,12 @@ const actionButtons = (item) => (
         <div className="flex flex-col h-[65vh] overflow-hidden">
         <div className="flex-1 overflow-y-auto">
           <table className="table w-full border-collapse">
-            <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+            <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
               <tr>
                 {/* <th className="px-4 py-2">Product Id</th> */}
-                <th className="px-4 py-2">Customer Code</th>
-                <th className="px-4 py-2">Customer Name</th>
+                <th className="px-4 py-2">contact Type</th>
+                <th className="px-4 py-2">Contact Code</th>
+                <th className="px-4 py-2">Contact Name</th>
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Mobile</th>
                 <th className="px-4 py-2">Tel</th>
@@ -350,10 +356,16 @@ const actionButtons = (item) => (
             <tbody>
               {products.map((product) => (
                 <tr
-                  key={product.customerId}
-                  className="border-b border-gray-200 hover:bg-gray-100 bg-white text-[1rem]"
+                  key={product.contactId}
+                  className="border-b border-gray-200 hover:bg-gray-100 bg-slate-50 text-[1rem]"
                 >
-                  {/* <td className="px-4 py-2">{product.customerId}</td> */}
+                  {/* <td className="px-4 py-2">{product.contactId}</td> */}
+
+                  
+                  <td className="px-4 py-2">
+                    {contactTypeNameBodyTemplate(product)}
+                  </td>
+
                   <td className="px-4 py-2">
                     {customerCodeBodyTemplate(product)}
                   </td>
@@ -381,7 +393,7 @@ const actionButtons = (item) => (
       </div>
       
 
-      <div className="flex justify-between w-full bg-white p-4">
+      <div className="flex justify-between w-full p-4">
         {/* Items count display */}
         <div className="pl-3">
           <span className=" text-gray-500">{totalRecords} items found</span>

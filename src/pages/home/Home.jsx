@@ -123,7 +123,7 @@ const Stores = () => {
   <div className='home-menu-container'>
   <HomeMenuButton  label="Customers" iconName="pi pi-users" to="/customers" />
   <HomeMenuButton  label="Products" iconName="pi pi-tags" to="/products" />
-  <HomeMenuButton  label="Inventory" iconName="pi pi-chart-bar" />
+  <HomeMenuButton  label="Stock Entry" iconName="pi pi-chart-bar" to="/stockEntry" />
   <HomeMenuButton  label="Settings" iconName="pi pi-cog" />
   <HomeMenuButton  label="Orders" iconName="pi pi-book" to="/ordersCompleted" />
 

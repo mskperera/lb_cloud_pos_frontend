@@ -61,7 +61,7 @@ const StoresComponent = ({ stores, setStores }) => {
       <div className="flex justify-start gap-4 items-center">
         <div className="flex flex-col">
           <label className="label">
-            <span className="label-text">Store</span>
+            <span className="label-text text-lg">Store</span>
           </label>
           <select
             value={selectedStoreId}

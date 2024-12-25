@@ -7,6 +7,7 @@ import { clearOrderList } from '../../state/orderList/orderListSlice';
 import { saveAs } from 'file-saver';
 import { exPrintReceipt } from '../../functions/exPrint';
 import { getTenantId } from '../../functions/authService';
+import { getOrderReceipt } from '../../functions/register';
 
 function PaymentConfirm() {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ function PaymentConfirm() {
   let searchParams = new URLSearchParams(location.search);
   let orderId = searchParams.get('orderId');
 
-  const [printOption, setPrintOption] = useState('quickPrint');
+  const [printOption, setPrintOption] = useState('printdesk');
   const [selectedPrinter, setSelectedPrinter] = useState('');
   const [change, setChange] = useState('');
   const [emailChecked, setEmailChecked] = useState(false);
@@ -28,9 +29,48 @@ function PaymentConfirm() {
   
   const { printerList } = useSelector((state) => state.printer);
 
+
+
+  const [orderHeader,setOrderHeader]=useState(null);
+  const [orderDetails,setOrderDetails]=useState([]);
+  const [payments,setPayments]=useState([]);
+  const [currency,setCurrency]=useState(null);
+
+
+  useEffect(()=>{
+    loadOrderReceipt();
+    console.log('ReceiptComponent',orderId)
+  },[orderId])
+  
+  
+    const loadOrderReceipt=async()=>{
+     const result=await getOrderReceipt(orderId);
+     const oh=result.data.results[0][0];
+     setCurrency(oh.symbol);
+     setOrderHeader(result.data.results[0][0]);
+  
+     const od=result.data.results[1];
+     console.log('oooo',od);
+     //setOrderDetails2(orderDetails);
+     const orderDetals=[];
+     od.map(o=>{
+      const descr=`${o.productNo} | ${o.productName}`
+      const netAmount = parseFloat(o.netAmount) || 0;
+      const qty = parseFloat(o.qty) || 0;
+      const measurementUnitName=o.measurementUnitName;
+      const  obj ={ line: o.orderDetailId,unitPrice:o.unitPrice, description:descr,productName:descr, qty:qty, netAmount:netAmount,measurementUnitName }
+      orderDetals.push(obj);
+     })
+     setOrderDetails(orderDetals);
+     setPayments(result.data.results[2]);
+    }
+
+
+
+
   // Set default printer when printerList or printOption changes
   useEffect(() => {
-    if (printOption === 'quickPrint' && printerList.length > 0) {
+    if (printOption === 'printdesk' && printerList.length > 0) {
       const defaultPrinter = printerList.find((printer) => printer.IsDefault) || printerList[0];
       setSelectedPrinter(defaultPrinter.PrinterName);
     }
@@ -151,12 +191,12 @@ function PaymentConfirm() {
     if (printOption === 'browserPrint') {
       console.log('Browser Print selected');
       window.print();
-    } else if (printOption === 'quickPrint') {
+    } else if (printOption === 'printdesk') {
       const terminalId = JSON.parse(localStorage.getItem('terminalId'));
       const payload = {
-        receiptInfo: { recriptsize: '80mm' },
-        receiptData:receiptData,
-        printer: selectedPrinter,
+        receiptData:[[orderHeader],orderDetails,payments],
+        printerName: selectedPrinter,
+        receiptSize:"80mm",
         printDeskId:printdeskId
       };
       console.log('Quick Print payload:', payload);
@@ -173,9 +213,12 @@ function PaymentConfirm() {
       <div className="flex justify-center items-center p-4">
         <div className="flex bg-white w-[70%] shadow-md rounded-lg">
           <div className="flex-[1] p-4">
-            <ReceiptComponent orderId={orderId} setCashPaymentChage={setCashPaymentChangeHandler} />
+            <ReceiptComponent orderHeader={orderHeader} orderDetails={orderDetails} payments={payments} currency={currency} setCashPaymentChage={setCashPaymentChangeHandler} />
           </div>
 
+          {/* {JSON.stringify(orderHeader)} */}
+          {/* {JSON.stringify(orderDetails)} */}
+{/* {JSON.stringify(payments)} */}
           <div className="flex-[2] flex flex-col p-20 bg-gray-50 border-l">
             <div className="text-center font-bold text-xl mb-4">Change</div>
             <div className="text-center text-4xl font-bold text-green-600 mb-4">
@@ -194,11 +237,10 @@ function PaymentConfirm() {
                 onChange={(e) => setPrintOption(e.target.value)}
               >
                 <option value="browserPrint">Browser Print</option>
-                <option value="quickPrint">Quick Print</option>
+                <option value="printdesk">Printdesk</option>
               </select>
             </div>
-{JSON.stringify(selectedPrinter)}
-            {printOption === 'quickPrint' && (
+            {printOption === 'printdesk' && (
               <div className="mb-4">
                 <label htmlFor="printer" className="block mb-2 font-bold">
                   Select Printer:

@@ -23,6 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StoresComponent from "../storeComponent/StoreComponent";
 import { uploadImageResized } from "../../../functions/asset";
+import InputField from "../../inputField/InputField";
 
 
 const CategoryItem=({onClick,category})=>{
@@ -190,7 +191,6 @@ export default function AddProduct({ saveType, id }) {
     const file = event.target.files[0];
     if (file) {
       // setSelectedImage(file);
-
       const response = await uploadImageResized(file); // Call the upload function
       console.log("setPreviewUrl", response);
       setUploadResponse(response);
@@ -215,18 +215,7 @@ export default function AddProduct({ saveType, id }) {
     });
   };
 
-  const validationMessages = (state) => {
-    return (
-      !state.isValid &&
-      state.isTouched && (
-        <div>
-          {state.validationMessages.map((message, index) => (
-            <FormElementMessage key={index} severity="error" text={message} />
-          ))}
-        </div>
-      )
-    );
-  };
+
 
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [measurementUnitOptions, setMeasurementUnitOptions] = useState([]);
@@ -510,7 +499,7 @@ export default function AddProduct({ saveType, id }) {
       variationDetails: lastVariation
         ? lastVariation.variationDetails.map((detail) => ({
             variationTypeId: detail.variationTypeId, // Keep the type (variationTypeId)
-            variationName: detail.variationName,
+            variationTypeName: detail.variationTypeName,
             variationValue: "", // Set empty value for new textboxes
           }))
         : [], // If no previous variation, initialize with empty array
@@ -546,7 +535,7 @@ export default function AddProduct({ saveType, id }) {
             ...ingredient.variationDetails,
             {
               variationTypeId: variationType.value,
-              variationName: variationTypeOptions.find(
+              variationTypeName: variationTypeOptions.find(
                 (o) => o.id == variationType.value
               )?.displayName,
               variationValue: "",
@@ -632,6 +621,21 @@ export default function AddProduct({ saveType, id }) {
     }
   };
 
+ ;
+
+  const validationMessages = (state) => {
+    return (
+      !state.isValid &&
+      state.isTouched && (
+        <div>
+          {state.validationMessages.map((message, index) => (
+            <FormElementMessage key={index} severity="error" text={message} />
+          ))}
+        </div>
+      )
+    );
+  };
+
   return (
     <>
       <div className="container mx-auto p-4 lg:px-8 xl:px-16 2xl:px-24">
@@ -646,7 +650,7 @@ export default function AddProduct({ saveType, id }) {
           {/* Product Number with Auto Generate Checkbox */}
           <div className="flex flex-col">
             <label className="label">
-              <span className="label-text">{productNo.label}</span>
+              <span className="label-text text-lg">{productNo.label}</span>
             </label>
             <div className="flex items-center">
               <input
@@ -678,25 +682,20 @@ export default function AddProduct({ saveType, id }) {
           </div>
 
           {/* Product Name */}
-          <div className="flex flex-col">
-            <label className="label">
-              <span className="label-text">{productName.label}</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              value={productName.value}
-              onChange={(e) =>
-                handleInputChange(setProductName, productName, e.target.value)
-              }
-            />
-            {validationMessages(productName)}
-          </div>
+      <InputField
+        label={productName.label}
+        value={productName.value}
+        onChange={(e) =>
+          handleInputChange(setProductName, productName, e.target.value)
+        }
+        validationMessages={validationMessages(productName)}
+        placeholder="Enter product name"
+      />
 
           {/* Measurement Unit */}
           <div className="flex flex-col">
             <label className="label">
-              <span className="label-text">{measurementUnit.label}</span>
+              <span className="label-text text-lg">{measurementUnit.label}</span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -724,7 +723,7 @@ export default function AddProduct({ saveType, id }) {
           {/* Brand */}
           <div className="flex flex-col">
             <label className="label">
-              <span className="label-text">{brand.label}</span>
+              <span className="label-text text-lg">{brand.label}</span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -750,7 +749,7 @@ export default function AddProduct({ saveType, id }) {
             <div className="grid grid-cols-3 gap-4">
               <div className="flex flex-col">
                 <label className="label">
-                  <span className="label-text">{productCategory.label}</span>
+                  <span className="label-text text-lg">{productCategory.label}</span>
                 </label>
                 <div className="flex space-x-2">
                   <select
@@ -791,7 +790,7 @@ export default function AddProduct({ saveType, id }) {
               {/* Selected Categories */}
               <div className="col-span-2 flex flex-col">
                 <label className="label">
-                  <span className="label-text">Selected Categories</span>
+                  <span className="label-text text-lg">Selected Categories</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {categoryOptions.length > 0 &&
@@ -811,37 +810,26 @@ return <CategoryItem
           </div>
 
           {/* Tax Rate */}
-          <div className="flex flex-col">
-            <label className="label">
-              <span className="label-text">{taxRatePerc.label}</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              value={taxRatePerc.value}
-              onChange={(e) =>
-                handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
-              }
-            />
-            {validationMessages(taxRatePerc)}
-          </div>
+          <InputField
+        label={taxRatePerc.label}
+        value={taxRatePerc.value}
+        onChange={(e) =>
+          handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
+        }
+        validationMessages={validationMessages(taxRatePerc)}
+        placeholder="Enter Tax Perc"
+      />
 
           {/* Reorder Level */}
-          <div className="flex flex-col">
-            <label className="label">
-              <span className="label-text">{reorderLevel.label}</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              disabled={!isProductItem || productType.value === 3}
-              value={reorderLevel.value}
-              onChange={(e) =>
-                handleInputChange(setReorderLevel, reorderLevel, e.target.value)
-              }
-            />
-            {validationMessages(reorderLevel)}
-          </div>
+          <InputField
+        label={reorderLevel.label}
+        value={reorderLevel.value}
+        onChange={(e) =>
+          handleInputChange(setReorderLevel, reorderLevel, e.target.value)
+        }
+        validationMessages={validationMessages(reorderLevel)}
+        placeholder="Enter Reorder Level"
+      />
 
           <div className="flex flex-col col-span-3">
             {/* Checkboxes for Inventory Options */}
@@ -913,7 +901,7 @@ return <CategoryItem
 
           <div className="flex flex-col">
             <label className="label">
-              <span className="label-text">{productType.label}</span>
+              <span className="label-text text-lg">{productType.label}</span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -938,57 +926,53 @@ return <CategoryItem
 
           {productType.value == "1" && (
             <>
-              <div className="flex flex-col">
-                <label className="label">
-                  <span className="label-text">{sku.label}</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={sku.value}
-                  onChange={(e) =>
-                    handleInputChange(setSku, sku, e.target.value)
-                  }
-                />
-                {validationMessages(sku)}
-              </div>
+            
+<InputField
+        label={sku.label}
+        value={sku.value}
+        onChange={(e) =>
+          handleInputChange(setSku, sku, e.target.value)
+        }
+        validationMessages={validationMessages(sku)}
+        placeholder="Enter SKU"
+      />
 
-              <div className="flex flex-col">
-                <label className="label">
-                  <span className="label-text">{barcode.label}</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={barcode.value}
-                  onChange={(e) =>
-                    handleInputChange(setBarcode, barcode, e.target.value)
-                  }
-                />
-                {validationMessages(barcode)}
-              </div>
+<InputField
+        label={sku.label}
+        value={sku.value}
+        onChange={(e) =>
+          handleInputChange(setSku, sku, e.target.value)
+        }
+        validationMessages={validationMessages(sku)}
+        placeholder="Enter SKU"
+      />
 
-              <div className="flex flex-col">
-                <label className="label">
-                  <span className="label-text">{unitPrice.label}</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={unitPrice.value}
-                  onChange={(e) =>
-                    handleInputChange(setUnitPrice, unitPrice, e.target.value)
-                  }
-                  disabled={isNotForSelling}
-                />
-                {validationMessages(unitPrice)}
-              </div>
+
+      <InputField
+        label={barcode.label}
+        value={barcode.value}
+        onChange={(e) =>
+          handleInputChange(setBarcode, barcode, e.target.value)
+        }
+        validationMessages={validationMessages(barcode)}
+        placeholder="Enter Barcode"
+      />
+
+<InputField
+        label={unitPrice.label}
+        value={unitPrice.value}
+        onChange={(e) =>
+          handleInputChange(setUnitPrice, unitPrice, e.target.value)
+        }
+        validationMessages={validationMessages(unitPrice)}
+        placeholder="Enter UnitPrice"
+      />
             </>
           )}
 
           {productType.value == "2" && (
             <div className="flex flex-col col-span-3">
-              <div className="bg-slate-200 p-6 rounded-md">
+              <div className="bg-[#ffffff] p-6 rounded-md">
                 <h3 className="text-center font-bold pb-5">Variations</h3>
 
                 {/* Grid container for form inputs */}
@@ -1047,7 +1031,7 @@ return <CategoryItem
                       {variations[0]?.variationDetails &&
                         variations[0].variationDetails.map((c) => (
                           <th key={c.variationTypeId} className="px-4 py-2">
-                            <span>{c.variationName}</span>
+                            <span>{c.variationTypeName}</span>
                             <button
                               type="button"
                               className="btn text-error btn-xs ml-2"

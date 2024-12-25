@@ -15,7 +15,7 @@ import { setPrinterList } from '../../state/printer/printerSlice';
 const Store=({store})=>(
   <div className='flex justify-start gap-1 items-center mb-1 hover:bg-slate-100 rounded-lg px-2 cursor-pointer'>
 <FontAwesomeIcon icon={faStore} style={{ fontSize: '1.5rem' }} />
- {store && <div className='mt-1'>{`${store.storeCode} | ${store.storeName}`}</div>}
+ {store && <div className='mt-1'>{`${store.storeName}`}</div>}
  </div>
 )
 export default function TopMenubar() {
@@ -142,7 +142,7 @@ export default function TopMenubar() {
 
 
   return (
-    <div className="navbar fixed top-0 left-0 w-full bg-base-100 shadow-md z-10 px-4 gap-2 m-0 p-0">
+    <div className="navbar fixed top-0 left-0 w-full bg-slate-50 shadow-sm z-10 px-4 gap-2 m-0 p-0">
       <div className="flex justify-between items-center w-full m-0 p-0">
         <div className="flex items-center gap-4 m-0 p-0">
           <i className="pi pi-calculator text-2xl"></i>
@@ -151,7 +151,7 @@ export default function TopMenubar() {
        
         <div className="flex items-center gap-4 m-0 p-0">
        
-     {JSON.stringify(printDeskInfo)}
+     {/* {JSON.stringify(printDeskInfo)} */}
 
           <div className="flex items-center gap-5 m-0 p-0">
          

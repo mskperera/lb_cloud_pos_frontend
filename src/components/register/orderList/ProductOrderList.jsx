@@ -75,7 +75,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
         >
             <FontAwesomeIcon icon={faMinus} className="text-sm" />
         </button> */}
-  
+  {/* {JSON.stringify(product)} */}
         <input
           type="number"
           value={product.qty}
@@ -83,6 +83,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
           className="input input-bordered input-sm text-center w-20 rounded-xl p-0 mt-3"
           min="1"
         />
+        <span className="pt-3 ml-1">{product.measurementUnitName}</span>
   
         {/* <button
           className="btn btn-outline btn-sm text-lg hover:text-primaryColorHover hover:bg-transparent bg-transparent border-none bg-base-300 rounded-l-none"
