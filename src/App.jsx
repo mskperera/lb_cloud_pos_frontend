@@ -12,8 +12,8 @@ import Customers from './pages/customers';
 import AddCustomer from './pages/addCustomer';
 import Login from './pages/login';
 import DayOpen from './pages/dayopen';
-import { useDispatch } from 'react-redux';
 import StockEntry from './components/inventory/stockEntry/StockEntry';
+import StockEntryList from './components/inventory/stockEntry/StockEntryList';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -71,6 +71,7 @@ function AppContent() {
                   <Route path="/ordersCompleted" element={<OrdersCompleted />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/stockEntry" element={<StockEntry />} />
+                  <Route path="/stockEntryList" element={<StockEntryList />} />
                   <Route path="/" element={<Login />} />
                 </Routes>
               </React.Suspense>

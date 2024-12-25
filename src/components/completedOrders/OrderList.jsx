@@ -1,18 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import TablePaginator from "../TablePaginator";
-import { ConfirmDialog } from "primereact/confirmdialog";
 import moment from "moment";
-import { Skeleton } from "primereact/skeleton";
-import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
 import { validate } from "../../utils/formValidation";
 import { getOrders } from "../../functions/order";
 import { getDrpSession } from "../../functions/dropdowns";
-import { Calendar } from "primereact/calendar";
-import "./module.orderList.css";
 import OrderVoidRemark from "../register/OrderVoidRemark";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faStop } from "@fortawesome/free-solid-svg-icons";
@@ -23,9 +13,6 @@ export default function OrderList({ selectingMode }) {
   const [orders, setOrders] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
-
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(0);
 
   const [rowsPerPage, setRowsPerPage] = useState(30);
@@ -328,7 +315,7 @@ export default function OrderList({ selectingMode }) {
                 loadOrders(null, null, null);
               }}
             >
-              <i className="pi pi-times"></i>
+              <i className="pi pi-times"></i> Clear Search 
             </button>
             </div>
           )}
@@ -375,7 +362,7 @@ export default function OrderList({ selectingMode }) {
           <div className="flex flex-col h-[65vh] overflow-hidden">
             <div className="flex-1 overflow-y-auto">
               <table className="table w-full border-collapse">
-                <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+                <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
                   <tr>
                     {/* <th className="px-4 py-2">orderId</th> */}
                     <th className="px-4 py-2">order No</th>
@@ -391,7 +378,7 @@ export default function OrderList({ selectingMode }) {
                   {orders.map((item) => (
                     <tr
                       key={item.orderId}
-                      className="border-b border-gray-200 hover:bg-gray-100 bg-white text-[1rem]"
+                      className="border-b border-gray-200 hover:bg-gray-100 bg-slate-50 text-[1rem]"
                     >
                       {/* {JSON.stringify(item)} */}
                       {/* <td className="px-4 py-2">{item.productId}</td> */}
@@ -424,7 +411,7 @@ export default function OrderList({ selectingMode }) {
  
             </div>
           </div>
-              <div className="flex justify-between w-full bg-white p-4">
+              <div className="flex justify-between w-full  p-4">
               {/* Items count display */}
               <div className="pl-3">
                 <span className=" text-gray-500">{totalRecords} items found</span>
