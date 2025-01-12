@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { validate } from "../../../utils/formValidation";
+import { validate } from "../../utils/formValidation";
 
 import {
   getDropdownBrands,
@@ -8,22 +8,22 @@ import {
   getProductTypesDrp,
   getStoresDrp,
   getVariationTypesDrp,
-} from "../../../functions/dropdowns";
+} from "../../functions/dropdowns";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../../useToast";
+import { useToast } from "../useToast";
 import {
   addProduct,
   getProductExtraDetails,
   getProducts,
   updateProduct,
-} from "../../../functions/register";
-import { SAVE_TYPE } from "../../../utils/constants";
-import FormElementMessage from "../../messges/FormElementMessage";
+} from "../../functions/register";
+import { SAVE_TYPE } from "../../utils/constants";
+import FormElementMessage from "../messges/FormElementMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StoresComponent from "../storeComponent/StoreComponent";
-import { uploadImageResized } from "../../../functions/asset";
-import InputField from "../../inputField/InputField";
+import { uploadImageResized } from "../../functions/asset";
+import InputField from "../inputField/InputField";
 
 
 const CategoryItem=({onClick,category})=>{
@@ -42,17 +42,13 @@ return (
 
 )}
 
-
-
-
-
-
-
 export default function AddProduct({ saveType, id }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoGenerateProductNo, setAutoGenerateProductNo] = useState(false);
   const [isProductItem, setIsProductItem] = useState(true);
   const [isNotForSelling, setIsNotForSelling] = useState(false);
+  const [isExpiringProduct, setIsExpiringProduct] = useState(false);
+  
 
   const [isUnique, setIsUnique] = useState(false);
   const [isStockTracked, setIsStockTracked] = useState(true);
@@ -247,8 +243,11 @@ export default function AddProduct({ saveType, id }) {
       productNo: null,
       productName: null,
       barcode: null,
+      storeId:1,
       productCategoryId: null,
       searchByKeyword: false,
+      skip:0,
+      limit:1
     });
 
     const {
@@ -268,6 +267,7 @@ export default function AddProduct({ saveType, id }) {
       isNotForSelling,
       sku,
       imageUrl,
+      isExpiringProduct
     } = res.data.results[0][0];
 
     setBarcode((p) => ({ ...p, value: barcode }));
@@ -276,6 +276,8 @@ export default function AddProduct({ saveType, id }) {
     //   ...p,
     //   value: JSON.parse(categories).map((c) => c.id),
     // }));
+
+    console.log(' res.data.results[0][0]', res.data.results[0][0])
     setSelectedCategories(JSON.parse(categories).map((c) => c.id));
     setMeasurementUnit((p) => ({ ...p, value: measurementUnitId }));
     setProductNo((p) => ({ ...p, value: productNo }));
@@ -285,7 +287,7 @@ export default function AddProduct({ saveType, id }) {
     setUnitPrice((p) => ({ ...p, value: unitPrice }));
     setBrand((p) => ({ ...p, value: brandId }));
     setProductType((p) => ({ ...p, value: productTypeId }));
-    //setCostPrice((p) => ({ ...p, value: costPrice }));
+    setIsExpiringProduct(isExpiringProduct);
 
     setIsStockTracked(isStockTracked);
     setIsProductItem(isProductItem);
@@ -445,6 +447,7 @@ export default function AddProduct({ saveType, id }) {
       sku: sku.value,
       barcode: barcode.value,
       reorderLevel: reorderLevel.value,
+      isExpiringProduct:isExpiringProduct,
     };
 
     console.log("payloadd", payLoad);
@@ -830,6 +833,19 @@ return <CategoryItem
         validationMessages={validationMessages(reorderLevel)}
         placeholder="Enter Reorder Level"
       />
+  <div className="flex gap-5 items-center mt-10 justify-center">
+                  <input
+                    type="checkbox"
+                    id="isExpiringProduct"
+                    className="checkbox checkbox-primary"
+                    onChange={(e) => setIsExpiringProduct(e.target.checked)}
+                    checked={isExpiringProduct}
+                  />
+                  <label htmlFor="isExpiringProduct">Expiring Product</label>
+                </div>
+
+
+
 
           <div className="flex flex-col col-span-3">
             {/* Checkboxes for Inventory Options */}
@@ -936,17 +952,6 @@ return <CategoryItem
         validationMessages={validationMessages(sku)}
         placeholder="Enter SKU"
       />
-
-<InputField
-        label={sku.label}
-        value={sku.value}
-        onChange={(e) =>
-          handleInputChange(setSku, sku, e.target.value)
-        }
-        validationMessages={validationMessages(sku)}
-        placeholder="Enter SKU"
-      />
-
 
       <InputField
         label={barcode.label}
@@ -1153,7 +1158,40 @@ return <CategoryItem
 
           {productType.value == "3" && (
             <>
-              <div className="col-span-2">
+             
+                  <InputField
+        label={sku.label}
+        value={sku.value}
+        onChange={(e) =>
+          handleInputChange(setSku, sku, e.target.value)
+        }
+        validationMessages={validationMessages(sku)}
+        placeholder="Enter SKU"
+      />
+
+                  <InputField
+        label={barcode.label}
+        value={barcode.value}
+        onChange={(e) =>
+          handleInputChange(setBarcode, barcode, e.target.value)
+        }
+        validationMessages={validationMessages(barcode)}
+        placeholder="Enter Barcode"
+      />
+
+
+<InputField
+        label={unitPrice.label}
+        value={unitPrice.value}
+        onChange={(e) =>
+          handleInputChange(setUnitPrice, unitPrice, e.target.value)
+        }
+        validationMessages={validationMessages(unitPrice)}
+        placeholder="Enter Unit Price"
+      />
+
+
+              <div className="col-span-2 mt-4">
                 <h3 className="text-center font-bold">Combo Ingredients</h3>
                 <div className="flex justify-start gap-4 items-end">
                   <div className="flex flex-col">
@@ -1215,8 +1253,8 @@ return <CategoryItem
                           productCategoryId: null,
                           measurementUnitId: null,
                           searchByKeyword: false,
-                          skip: null,
-                          limit: null,
+                          skip: 0,
+                          limit: 1,
                         };
 
                         const _result = await getProducts(filteredData);
@@ -1319,59 +1357,7 @@ return <CategoryItem
                 </div>
               </div>
 
-              <div className="">
-                <div className="flex flex-col">
-                  <div className="flex flex-col">
-                    <label className="label">
-                      <span className="label-text">{sku.label}</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      value={sku.value}
-                      onChange={(e) =>
-                        handleInputChange(setSku, sku, e.target.value)
-                      }
-                    />
-                    {validationMessages(sku)}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="label">
-                      <span className="label-text">{barcode.label}</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      value={barcode.value}
-                      onChange={(e) =>
-                        handleInputChange(setBarcode, barcode, e.target.value)
-                      }
-                    />
-                    {validationMessages(barcode)}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="label">
-                      <span className="label-text">{unitPrice.label}</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      value={unitPrice.value}
-                      onChange={(e) =>
-                        handleInputChange(
-                          setUnitPrice,
-                          unitPrice,
-                          e.target.value
-                        )
-                      }
-                      disabled={isNotForSelling}
-                    />
-                    {validationMessages(unitPrice)}
-                  </div>
-                </div>
-              </div>
+         
             </>
           )}
 

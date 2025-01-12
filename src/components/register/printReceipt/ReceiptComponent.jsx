@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './ReceiptComponent.css'; // Ensure you have the CSS file
-import { getOrderReceipt } from '../../../functions/register';
 import moment from 'moment';
 import { PAYMENT_METHODS } from '../../../utils/constants';
 import './module.printReceipt.css';

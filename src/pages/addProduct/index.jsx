@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import AddProducts from "../../components/inventory/product/AddProduct";
+import AddProducts from "../../components/product/AddProduct";
 
 const Products=()=>{
   let { saveType,id } = useParams();

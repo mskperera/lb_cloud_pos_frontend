@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 
-import { Button } from 'primereact/button';
-import WebSocketClient from '../../components/WebSocketClient';
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedStore } from '../../state/store/storeSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -126,7 +124,10 @@ const Stores = () => {
   <HomeMenuButton  label="Stock Entry" iconName="pi pi-chart-bar" to="/stockEntry" />
   <HomeMenuButton  label="Settings" iconName="pi pi-cog" />
   <HomeMenuButton  label="Orders" iconName="pi pi-book" to="/ordersCompleted" />
+  <HomeMenuButton  label="Inventory" iconName="pi pi-book" to="/productInventoryList" />
 
+
+  
   </div>
 
 

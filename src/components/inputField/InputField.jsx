@@ -1,6 +1,7 @@
 import React from "react";
 
 const InputField = ({
+  id,
   label,
   value,
   onChange,
@@ -13,13 +14,14 @@ const InputField = ({
 }) => {
   return (
     <div className="flex flex-col">
-      <label className="label">
+      <label className="label" htmlFor={id}>
         <span className="label-text text-lg">
           {label}{" "}
           {required && <span className="text-red-500">*</span>} {/* Star for required */}
         </span>
       </label>
       <input
+      id={id}
         type={type}
         className="input input-bordered w-full"
         placeholder={placeholder}

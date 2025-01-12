@@ -122,6 +122,29 @@ import { getTenantId, getToken } from "./authService";
     }
   };
 
+  export const getDrpdownStockEntryVoidingReason = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getDrpdownStockEntryVoidingReason`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+  
 
   export const getDrpSession = async () => {
     try {
@@ -312,4 +335,26 @@ import { getTenantId, getToken } from "./authService";
     }
   };
 
+  export const getAdjustmentReasons = async (adjustmentTypeId) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getAdjustmentReasons?adjustmentTypeId=${adjustmentTypeId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
 

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatCurrency, formatUtcToLocal } from '../../../../utils/format';
-import { deleteProduct, getProductExtraDetails, getProducts } from '../../../../functions/register';
-import { useToast } from '../../../useToast';
-import { getDropdownMeasurementUnit, getDrpdownCategory, getStoresDrp } from '../../../../functions/dropdowns';
-import { validate } from '../../../../utils/formValidation';
-import FormElementMessage from '../../../messges/FormElementMessage';
-import DaisyUIPaginator from '../../../DaisyUIPaginator';
-import ConfirmDialog from '../../../dialog/ConfirmDialog';
+import { formatCurrency, formatUtcToLocal } from '../../utils/format';
+import { deleteProduct, getProductExtraDetails, getProducts } from '../../functions/register';
+import { useToast } from '../useToast';
+import { getDropdownMeasurementUnit, getDrpdownCategory, getStoresDrp } from '../../functions/dropdowns';
+import { validate } from '../../utils/formValidation';
+import FormElementMessage from '../messges/FormElementMessage';
+import DaisyUIPaginator from '../DaisyUIPaginator';
+import ConfirmDialog from '../dialog/ConfirmDialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash, faPlusSquare, faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-
+import { faEdit, faTrash, faEllipsisV, faAngleDown, faAngleRight, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { getStockInfo } from '../../functions/stockEntry';
+import StockInfo from './StockInfo';
+import ProductVariationDetails from './ProductVariationDetails';
 
 const ProductDetails = ({ selectedProduct }) => {
   const [stores, setStores] = useState([]);
@@ -21,6 +23,10 @@ const ProductDetails = ({ selectedProduct }) => {
   const [comboProductDetails, setComboProductDetails] = useState([]);
 
   const [productTypeId, setProductTypeId] = useState('');
+
+  const [stockInfo, setStockInfo] = useState([]);
+
+
 
   const loadDetails = async () => {
     if (!selectedProduct) return;
@@ -44,6 +50,12 @@ const ProductDetails = ({ selectedProduct }) => {
  
       if(productTypeId==1){
         setSingleProductSkuBarcodes(productSkuBarcodes[0]);
+
+       const stockInfoRes= await getStockInfo(selectedProduct.inventoryId);
+       const stockInfo=stockInfoRes.data;
+       console.log('stockInfo',stockInfo);
+       setStockInfo(stockInfoRes.data); // Set stock info here
+
       }
       else if(productTypeId==2){
         const parsedVariations = productSkuBarcodes.map((variation) => ({
@@ -56,6 +68,10 @@ const ProductDetails = ({ selectedProduct }) => {
 
         setVariationProductSkuBarcodes(parsedVariations);
         
+        const stockInfoRes= await getStockInfo(selectedProduct.inventoryId);
+        const stockInfo=stockInfoRes.data;
+        console.log('stockInfo',stockInfo);
+        setStockInfo(stockInfoRes.data); // Set stock info here
      }
       else if(productTypeId==3){
 
@@ -77,37 +93,16 @@ const ProductDetails = ({ selectedProduct }) => {
   }, [selectedProduct]);
 
 
+
   const renderExtraDetails = () => {
     if (loading) {
       return <div>Loading...</div>; // Show loading message
     }
+ return <div className='grid grid-cols-4'> 
 
-    if (productTypeId === 1) {
-      return      <div className='grid grid-cols-4'> 
-        <div className='bg-white p-4 m-4 rounded-md'>
-           <h3 className='text-center font-bold text-lg pb-2'>Stores</h3>
-           <table className="table border-collaps">
-             <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
-               <tr>
-                 <th className="px-4 py-2">Store Code</th>
-                 <th className="px-4 py-2">Store Name</th>
-               </tr>
-             </thead>
-             <tbody>
-               {stores.map((item) => (
-                 <tr key={item.storeId} className="hover:bg-gray-100 text-[1rem] m-5">
-                   <td className="px-4 py-2">{item.storeCode}</td>
-                   <td className="px-4 py-2">{item.storeName}</td>
-     
-                 </tr>
-               ))}
-             </tbody>
-           </table>
-
-           </div>
-
-           <div className='bg-white p-4 rounded-md'>
-            <h3 className='text-lg'>Categories </h3>
+<div className='flex flex-col gap-4 col-span-4'>
+   <div className='flex gap-4 align-middle'>
+            <p className='text-lg mt-2'>Categories </p>
            <div className='flex gap-1 mt-2'>
           {categories?.map((c) => (
            <>
@@ -124,194 +119,41 @@ const ProductDetails = ({ selectedProduct }) => {
             </div>
 
 
-            <div className="flex gap-2 w-full items-center mx-5">
+            <div className="flex gap-4">
             <label className="label">
             Last Modified
             </label>
             <p
-              className="bg-white p-2 border"
+              className=" p-2"
             >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
           </div>
-
-           </div>;
-    }
-
-    if (productTypeId === 2) {
-      return (
-         <div className='grid grid-cols-4'> 
-
-<div className='bg-white p-4 m-4 rounded-md'>
-<h3 className='text-center font-bold pb-5'>Stores</h3>
-           <table className="table border-collaps">
-             <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
-               <tr>
-                 <th className="px-4 py-2">Store Code</th>
-                 <th className="px-4 py-2">Store Name</th>
-               </tr>
-             </thead>
-             <tbody>
-               {stores.map((item) => (
-                 <tr key={item.storeId} className="hover:bg-gray-100 text-[1rem] m-5">
-                   <td className="px-4 py-2">{item.storeCode}</td>
-                   <td className="px-4 py-2">{item.storeName}</td>
-     
-                 </tr>
-               ))}
-             </tbody>
-           </table>
-       
-           <div className="flex gap-2 w-full items-center mx-5">
-            <label className="label">
-            Last Modified
-            </label>
-            <p
-              className="bg-white p-2 border"
-            >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
-          </div>
-           </div>
-
-           <div className='bg-white p-4 m-4 rounded-md'>
-           <h3 className='text-center font-bold pb-5'>Categories</h3>
-           <div className='flex gap-1 mt-2'>
-          {categories?.map((c) => (
-           <>
-           <span
-              key={c.id}
-              className="badge badge-primary p-4 bg-green-500 border-none text-white mr-1"
-            >
-              {c.displayName}
-            </span> {"/"}
-            </>
-          ))}
-        </div>
-            </div>
-
-        <div className='m-4 bg-white p-4 rounded-md col-span-2'>
-          <h3 className='text-center font-bold pb-5'>Variations</h3>
-      
-      
-          <table className="table border-collapse w-full">
-                  <thead className="sticky top-0 bg-base-100 z-10 text-sm border-b">
-                    <tr>
-                      <th className="px-2 py-2">SKU</th>
-                      <th className="px-2 py-2">Barcode</th>
-                      <th className="px-2 py-2">Unit Price</th>
-                      {variationProductSkuBarcodes[0]?.variationDetails &&
-                        variationProductSkuBarcodes[0]?.variationDetails.map((c) => (
-                          <th key={c.variationTypeId} className="px-4 py-2">
-                            <span>{c.variationName}</span>
-                        
-                          </th>
-                        ))}
-                      <th className="px-2 py-2"></th>{" "}
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {variationProductSkuBarcodes && variationProductSkuBarcodes.map((variation,index) => (
-                      <tr key={variation.variationProductId}>
-                        <td className="px-2 py-2">
-                          <input
-                            type="text"
-                            className="input input-bordered w-full text-sm"
-                            value={variation.sku}
-                       readOnly={true}
-                          />
-                        </td>
-                        <td className="px-2 py-2">
-                          <input
-                            type="text"
-                            className="input input-bordered w-full text-sm"
-                            value={variation.barcode}
-                            readOnly={true}
-                          />
-                        </td>
-                        <td className="px-2 py-2">
-                          <input
-                            type="text"
-                            className="input input-bordered w-full text-sm"
-                            value={variation.unitPrice}
-                            readOnly={true}
-                          />
-                        </td>
-                        {variation.variationDetails &&
-  variation.variationDetails.map((detail) => (
-    <td key={detail.variationTypeId} className="px-2 py-2">
-      <input
-        type="text"
-        className="input input-bordered w-full text-sm"
-        value={detail.variationValue}
-        readOnly={true}
-      />
-    </td>
-  ))}
-
-                    
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-
-        </div>
-
-
 </div>
-      );
+
+{productTypeId === 1 &&
+    
+<div className='col-span-2'>
+<StockInfo inventoryId={selectedProduct.inventoryId} />
+</div>
+
+}
+
+
+
+{productTypeId === 2 &&
+<>
+<div className='col-span-2'>
+<ProductVariationDetails  variationProductSkuBarcodes={variationProductSkuBarcodes} />
+</div>
+<div className='col-span-2'>
+ <StockInfo inventoryId={selectedProduct.inventoryId} />
+ </div>
+</>
+
+
     }
 
-    if (productTypeId === 3) {
-      return (
-        <div className='grid grid-cols-4'> 
-
-       <div className='bg-white p-4 m-4 rounded-md'>
-<h3 className='text-center font-bold pb-5'>Stores</h3>
-           <table className="table border-collaps">
-             <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
-               <tr>
-                 <th className="px-4 py-2">Store Code</th>
-                 <th className="px-4 py-2">Store Name</th>
-               </tr>
-             </thead>
-             <tbody>
-               {stores.map((item) => (
-                 <tr key={item.storeId} className="hover:bg-gray-100 text-[1rem] m-5">
-                   <td className="px-4 py-2">{item.storeCode}</td>
-                   <td className="px-4 py-2">{item.storeName}</td>
-     
-                 </tr>
-               ))}
-             </tbody>
-           </table>
-        
-           <div className="flex gap-2 w-full items-center mx-5">
-            <label className="label">
-            Last Modified
-            </label>
-            <p
-              className="bg-white p-2 border"
-            >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
-          </div>
-
-           </div>
-
-           <div className='bg-white p-4 m-4 rounded-md'>
-           <h3 className='text-center font-bold pb-5'>Categories</h3>
-           <div className='flex gap-1 mt-2'>
-          {categories?.map((c) => (
-           <>
-           <span
-              key={c.id}
-              className="badge badge-primary p-4 bg-green-500 border-none text-white mr-1"
-            >
-              {c.displayName}
-            </span> {"/"}
-            </>
-          ))}
-        </div>
-            </div>
-       
-        <div className='m-4 bg-white p-4 rounded-md col-span-2'>
+  {productTypeId === 3 && 
+ <div className='m-4 bg-slate-50 p-4 rounded-md col-span-2'>
           <h3 className='text-center font-bold pb-5'>Combo Ingredients</h3>
           <table className="table border-collapse">
             <thead>
@@ -332,12 +174,14 @@ const ProductDetails = ({ selectedProduct }) => {
             </tbody>
           </table>
         </div>
+ }
 
-        </div>
 
-      );
-    }
-  };
+
+  </div>
+}
+    
+
 
   return (
     <div className=" p-2 mb-2">
@@ -348,7 +192,7 @@ const ProductDetails = ({ selectedProduct }) => {
 };
 
 
-export default function ProductOrderList({ }) {
+export default function ProductInventoryList({ }) {
   const [products, setProducts] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState(false);
   const navigate = useNavigate();
@@ -504,37 +348,13 @@ export default function ProductOrderList({ }) {
     setMeasurementUnitOptions([{ id: -1, displayName: 'All' }, ...objArr.data.results[0]]);
   };
 
-  const actionButtons = (index,item) => (
-    <div className="flex space-x-2">
-        <button
-        className="btn btn-primary btn-xs text-base-100"
-        onClick={() => handleRowSelect(index, item)}
-        aria-label="Edit" title='More'
-      >
-        More
-      </button>
+  const [openMenuIndex, setOpenMenuIndex] = useState(null);
 
-      <button
-        className="btn btn-error btn-xs bg-[#f87171] text-base-100"
-        onClick={async () => {
-          const result = await deleteProduct(item.productId, false);
-          const { outputMessage, responseStatus } = result.data.outputValues;
-          confirmDelete(outputMessage, item.productId);
-        }}
-        aria-label="Delete"
-        title='Delete Product'
-      >
-        <FontAwesomeIcon icon={faTrash} />
-      </button>
-      <button
-        className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
-        onClick={() => navigate(`/addProduct/update/${item.productId}`)}
-        aria-label="Edit" title='Edit Product'
-      >
-        <FontAwesomeIcon icon={faEdit} />
-      </button>
-    </div>
-  );
+  const handleToggleMenu = (index) => {
+    // Toggle the current menu or close it if already open
+    setOpenMenuIndex(openMenuIndex === index ? null : index);
+  };
+
 
   const validationMessages = (state) => {
     if (!state.isValid && state.isTouched) {
@@ -553,62 +373,73 @@ export default function ProductOrderList({ }) {
 
 
 
+  const actionButtons = (index, item) => (
+    <div className="flex space-x-2">
+      <button
+        className="btn btn-primary btn-xs text-base-100"
+        onClick={() => handleRowExpand(index, item)}
+      >
+        {expandedRowId === index ? (
+          <FontAwesomeIcon icon={faAngleDown} />
+        ) : (
+          <FontAwesomeIcon icon={faAngleRight} />
+        )}
+        <span className="px-2 text-sm font-normal">More</span>
+      </button>
 
+      <div className="dropdown dropdown-end">
+  <button
+    tabIndex={0}
+    className="btn btn-primary btn-xs text-base-100"
+    aria-label="More Actions"
+    title="More Actions"
+  >
+    <FontAwesomeIcon icon={faEllipsisV} />
+  </button>
+  <ul
+    tabIndex={0}
+    className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 bg-white text-black"
+  >
+    <li>
+      <button
+        onClick={() =>
+          navigate(
+            `/stockAdjustment?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
+          )
+        }
+      >
+        <FontAwesomeIcon icon={faWrench} className="mr-2" />
+        Manage Stock
+      </button>
+    </li>
+    <li>
+      <button
+        onClick={async () => {
+          const result = await deleteProduct(item.productId, false);
+          const { outputMessage, responseStatus } =
+            result.data.outputValues;
+          confirmDelete(outputMessage, item.productId);
+        }}
+      >
+        <FontAwesomeIcon icon={faTrash} className="mr-2" />
+        Delete
+      </button>
+    </li>
+    <li>
+      <button
+        onClick={() => navigate(`/addProduct/update/${item.productId}`)}
+      >
+        <FontAwesomeIcon icon={faEdit} className="mr-2" />
+        Edit
+      </button>
+    </li>
+  </ul>
+</div>
 
-  const productNoBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productNo}</span>
+    </div>
   );
 
-  const productNameBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productName}</span>
-  );
 
-  const unitPriceBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.unitPrice)}</span>
-  );
-
-  const stockQtyBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{`${!rowData.isStockTracked ? 'N/A' : `${rowData.stockQty} ${rowData.measurementUnitName}` }`}</span>
-  );
-
-  const productTypeBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productTypeName}</span>
-  );
-
-  const costPriceBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.costPrice)}</span>
-  );
-
-  const brandBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.brandName}</span>
-  );
-
-
-
-  const barcodeBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.sku}</span>
-  );
-
-  const taxRate_percBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.taxRate_perc}</span>
-  );
-
-  const categoriesBodyTemplate = (item) => {
-    const categories = JSON.parse(item.categories);
-    return (
-      isTableDataLoading ? <span>Loading...</span> :
-        <div className='flex gap-1'>
-          {categories.map((c) => (
-            <span
-              key={c.id}
-              className="badge badge-primary bg-green-500 border-none text-white mr-1"
-            >
-              {c.displayName}
-            </span>
-          ))}
-        </div>
-    );
-  };
 
   const handleInputChange = (setState, state, value) => {
     const validation = validate(value, state);
@@ -662,33 +493,16 @@ export default function ProductOrderList({ }) {
   };
 
 
-
-
-  const [selectedRowId, setSelectedRowId] = useState(null);
-
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [expandedRowId, setExpandedRowId] = useState(null); // Track expanded row
   
-
-  const [nonSerializedDetails, setNonSerializedDetails] = useState([]);
-  const [availableStores, setAvailableStores] = useState([]);
 
   const handleRowSelect = (index,product) => {
     setSelectedRowIndex(index);
     setSelectedProduct(product);
 };
 
-const fetchExtraDetails = (productId) => {
-    // Your API call to fetch extra details
-    // setExtraDetails(response.data);
-};
 
-
-  // const handleRowExpand = async (productId) => {
-  //   const details = await getProductExtraDetails(productId); // Implement this function
-  //   setExtraDetails(details);
-  //   setSelectedProduct(productId);
-  // };
 const [selectedRowIndex,setSelectedRowIndex]=useState(null);
   const handleRowExpand = async (index,product) => {
     
@@ -716,8 +530,12 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
           severity="danger"
         />
       )}
-
+ <div className="pt-4">
+              <h3 className="text-center font-bold text-xl">Product Inventory</h3>
+            </div>
       <div className="flex justify-between py-5 gap-2 items-end">
+
+           
 
         <div className="flex space-x-4 w-full">
           <div className="flex flex-col">
@@ -850,22 +668,12 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
           )}
         </div>
 
-        <button
-          className="btn btn-ghost text-[#0284c7] font-bold"
-          onClick={() => navigate(`/addProduct/add/0`)}
-          title="Add Product"
-        >
-          <FontAwesomeIcon className="text-xl" icon={faPlusSquare} />
-          Create New
-        </button>
       </div>
-      <div className="flex justify-between w-full  p-4">
-        {/* Items count display */}
+      <div className="flex justify-between w-full items-center">
         <div className="pl-3">
           <span className=" text-gray-500">{totalRecords} items found</span>
         </div>
 
-        {/* DaisyUIPaginator component */}
         <DaisyUIPaginator
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
@@ -875,8 +683,6 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
         />
       </div>
       <div className="flex flex-col ">
-        {/* <ProductDetails selectedProduct={selectedProduct}  /> */}
-
         <table className="table w-full border-collapse">
           <thead className="sticky  top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
             <tr>
@@ -900,16 +706,15 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
           <tbody>
             {products.map((item, index) => (
               <React.Fragment key={index}>
-                {/* {JSON.stringify(index)}
-                  {JSON.stringify(expandedRowId)} */}
-                {/* {JSON.stringify(item)} */}
                 <tr
-                  onClick={() => handleRowSelect(index, item)}
-                  className={`border-b bg-slate-50 border-gray-200 text-[1rem] ${
-                    selectedRowIndex === index
-                      ? "bg-blue-500 text-white hover:bg-blue-500 "
-                      : "hover:bg-gray-100"
-                  }`}
+                 // onClick={() => handleRowSelect(index, item)}
+                  className={`border-b  border-gray-200 text-[1rem] 
+                    ${
+                      expandedRowId === index
+                        ? "bg-sky-500 text-white hover:bg-sky-600 "
+                        : "bg-slate-50 hover:bg-gray-100"
+                    }
+                    `}
                 >
             
                     <td
@@ -923,27 +728,22 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                       )}
                     </td>
                   
-                  <td className="px-4 py-2">{productNoBodyTemplate(item)}</td>
-                  <td className="px-4 py-2">{barcodeBodyTemplate(item)}</td>
-                  <td className="px-4 py-2">{productNameBodyTemplate(item)}</td>
+                  <td className="px-4 py-2">{item.productNo}</td>
+                  <td className="px-4 py-2">{item.sku}</td>
+                  <td className="px-4 py-2">{item.productName}</td>
+                  <td className="px-4 py-2">{item.brandName}</td>
+                  <td className="px-4 py-2">{item.costPrice}</td>
+                  <td className="px-4 py-2">{item.unitPrice}</td>
 
-                  <td className="px-4 py-2">{brandBodyTemplate(item)}</td>
-                  <td className="px-4 py-2">{costPriceBodyTemplate(item)}</td>
-
-                  <td className="px-4 py-2">{unitPriceBodyTemplate(item)}</td>
-
-                  <td className="px-4 py-2">{stockQtyBodyTemplate(item)}</td>
-                  <td className="px-4 py-2">{productTypeBodyTemplate(item)}</td>
-
-             
-                  {/* <td className="px-4 py-2">{categoriesBodyTemplate(item)}</td> */}
-                  <td className="px-4 py-2">
-                    {taxRate_percBodyTemplate(item)}
+                  <td className="px-4 py-2">{item.stockQty}</td>
+                  <td className="px-4 py-2">{item.productTypeName}</td>
+                  <td className="px-4 py-2">{item.taxRate_perc} </td>
+                  <td className="px-4 py-2">{
+          
+                  actionButtons(index,item)
+                  }
                   </td>
-                  <td className="px-4 py-2">{actionButtons(index,item)}</td>
                 </tr>
-                {/* Extra details row (conditionally rendered) */}
-
                 {expandedRowId === index && (
                   <tr >
                     <td colSpan="12" className='bg-slate-50'>

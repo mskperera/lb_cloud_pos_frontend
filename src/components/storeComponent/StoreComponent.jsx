@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getStoresDrp } from "../../../functions/dropdowns";
+import { getStoresDrp } from "../../functions/dropdowns";
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

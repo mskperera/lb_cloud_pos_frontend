@@ -12,8 +12,6 @@ import Customers from './pages/customers';
 import AddCustomer from './pages/addCustomer';
 import Login from './pages/login';
 import DayOpen from './pages/dayopen';
-import StockEntry from './components/inventory/stockEntry/StockEntry';
-import StockEntryList from './components/inventory/stockEntry/StockEntryList';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -23,7 +21,11 @@ const PaymentConfirm = React.lazy(() => import("./pages/paymentConfirm"));
 const Products = React.lazy(() => import("./pages/products"));
 const AddProduct = React.lazy(() => import("./pages/addProduct"));
 const OrdersCompleted = React.lazy(() => import("./pages/ordersCompleted"));
-
+const StockEntryFull = React.lazy(() => import("./pages/stockEntryFull"));
+const ProductInventoryList  = React.lazy(() => import("./pages/inventory/productInventoryList"));
+const StockEntry  = React.lazy(() => import("./pages/stockEntry/stockAdd"));
+const StockEntryList  = React.lazy(() => import("./pages/stockEntry/stockList"));
+const StockAdjustment  = React.lazy(() => import("./pages/inventory/stockAdjustment"));
 
 
 function AppContent() {
@@ -72,6 +74,10 @@ function AppContent() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/stockEntry" element={<StockEntry />} />
                   <Route path="/stockEntryList" element={<StockEntryList />} />
+                  <Route path="/stockEntryFull" element={<StockEntryFull />} />
+                  <Route path="/productInventoryList" element={<ProductInventoryList />} />
+                  <Route path="/stockAdjustment" element={<StockAdjustment />} />
+                  
                   <Route path="/" element={<Login />} />
                 </Routes>
               </React.Suspense>
