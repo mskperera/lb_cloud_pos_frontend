@@ -3,6 +3,8 @@ import {
   getCategoryMenu,
   getProductExtraDetails,
   getProducts,
+  getProductsPosMenu,
+  getVariationProductDetails,
 } from "../../../functions/register";
 import { useDispatch } from "react-redux";
 import { addOrder } from "../../../state/orderList/orderListSlice";
@@ -57,10 +59,10 @@ const ProductList = () => {
     };
 
     try {
-      const _result = await getProducts(filteredData, null);
+      const _result = await getProductsPosMenu(filteredData, null);
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
-
+console.log('pos menu',_result.data.results[0])
       setProducts(_result.data.results[0] || []);
     } catch (error) {
       console.error("Error loading products:", error);
@@ -120,6 +122,7 @@ const ProductList = () => {
     }
   };
 
+  
   const handleProductClick = async (p) => {
     const description = p.productName;
     const qty = 1;
@@ -128,8 +131,16 @@ const ProductList = () => {
     if (p.productTypeId === 2) {
       setIsVariationSelectionMenuShow(true);
 
-      const variations = await loadDetails(p.productId);
+
+
+      const payload={productId:p.productId,storeId:store.storeId}
+      const details = await getVariationProductDetails(payload);
+      // setExtraDetails(details);
+    
+      const variations =details.data.results[0]; //await loadDetails(p.productId);
       console.log("variations",variations);
+      console.log("details",details.data.results[0]);
+
       setSelectedVariationProducts(variations);
       setSelectedProduct(p);
     }
@@ -160,7 +171,8 @@ const ProductList = () => {
     console.log("p", p);
     console.log("selectedProduct", p);
 
-    const v =p.variationDetails.map(v=>v.variationValue).join(" | ");
+
+    const v =JSON.parse(p.variationValues).map(v=>v).join(" | ");
     const order = {
       productNo: selectedProduct.productNo,
       description: `${selectedProduct.productName} ${v}`,
@@ -176,40 +188,65 @@ const ProductList = () => {
 
   return (
     <div className="flex flex-col gap-2 h-[40vh] ">
-      <DialogModel
-        header={selectedProduct.productName}
-        visible={isVariationSelectionMenuShow}
-        onHide={() => setIsVariationSelectionMenuShow(false)}
-        width="500px"
-        height="300px"
-      >
-        <div className="flex flex-wrap gap-2 px-4 m-0 p-0 ">
-          {selectedVariationProducts.length > 0 ? (
-            selectedVariationProducts.map((p, index) => (
-              <button
-                key={index}
-                className="flex flex-col btn h-auto border-none  md:w-[188px] items-center justify-between 
-      rounded-lg cursor-pointer py-4 px-2 gap-0 hover:bg-base-300 shadow bg-[#ffffff]"
-                onClick={() => {
-                  handleProductVariationClick(p, selectedProduct);
-                }}
-              >
-                <div className="flex justify-center gap-1 w-full items-center">
-                  <div className="flex gap-2 ">
-                    {p.variationDetails.map((v) => v.variationValue + " / ")}
-                  </div>
-                </div>
+ <DialogModel
+    header={selectedProduct.productName}
+    visible={isVariationSelectionMenuShow}
+    onHide={() => setIsVariationSelectionMenuShow(false)}
+  >
+    <div className="flex flex-wrap gap-4 px-4 m-0 p-0">
+      {selectedVariationProducts.length > 0 ? (
+        selectedVariationProducts.map((p, index) => (
+          <div
+            key={index}
+            className={`flex flex-col w-full md:w-[188px] items-center justify-between
+              rounded-lg cursor-pointer py-4 px-3 bg-white shadow-lg border
+              ${p.stockQty > 0 ? "hover:border-green-500" : "hover:border-red-500"}
+              hover:shadow-xl transition duration-300`}
+            onClick={() => {
+              handleProductVariationClick(p, selectedProduct);
+              setIsVariationSelectionMenuShow(false); // Hides the modal
+            }}
+          >
+            {/* SKU Label */}
+            <div className="w-full text-xs text-gray-500 text-left mb-2">
+              <span className="font-semibold">SKU:</span> {p.sku || "N/A"}
+            </div>
 
-                <p className="text-md font-semibold text-center text-gray-600">
-                  Rs {p.unitPrice}
-                </p>
-              </button>
-            ))
-          ) : (
-            <div>No items found</div>
-          )}
-        </div>
-      </DialogModel>
+            {/* Variation Values */}
+            <div className="flex flex-col items-center mb-3">
+              <div className="flex gap-1 items-center justify-center">
+                {p.variationValues &&
+                  JSON.parse(p.variationValues).map((v, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-1 bg-gray-100 text-sm rounded-md text-gray-700"
+                    >
+                      {v}
+                    </span>
+                  ))}
+              </div>
+            </div>
+
+            {/* Price */}
+            <p className="text-lg font-bold text-center text-gray-800">
+              Rs {p.unitPrice}
+            </p>
+
+            {/* Stock Quantity */}
+            <p
+              className={`text-sm font-medium mt-2 ${
+                p.stockQty > 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {p.stockQty > 0 ? `${p.stockQty} in stock` : "Out of stock"}
+            </p>
+          </div>
+        ))
+      ) : (
+        <div className="text-gray-500 text-center w-full">No items found</div>
+      )}
+    </div>
+  </DialogModel>
 
       {/* <DialogModel
         header={<h4>{selectedProduct.productName}</h4>}
