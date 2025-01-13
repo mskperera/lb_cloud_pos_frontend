@@ -97,12 +97,12 @@ export const voidStockEntry = async (stockEntryId,voidingReasonId) => {
 };
 
 
-export const getStockInfo = async (inventoryId) => {
+export const getStockInfo = async (inventoryId,showZeroStockQtyData) => {
   try {
     const tenantId = getTenantId();
     const token = getToken();
     return await customAxios
-      .get(`/stock/getStockInfo?inventoryId=${inventoryId}`, {
+      .get(`/stock/getStockInfo?inventoryId=${inventoryId}&showZeroStockQtyData=${showZeroStockQtyData}`, {
         headers: {
           'Content-Type': 'application/json',
           "authorization":`Bearer ${token}`,
@@ -217,12 +217,12 @@ export const getPriceChange = async (stockBatchId) => {
 
 
 
-export const releaseStockBatch = async (stockBatchId) => {
+export const releaseStockBatch = async (stockBatchId,stopRelease) => {
   try {
     const tenantId = getTenantId();
     const token = getToken();
     return await customAxios
-      .post(`/stock/releaseStockBatch`, {stockBatchId}, {
+      .post(`/stock/releaseStockBatch`, {stockBatchId,stopRelease}, {
         headers: {
           'Content-Type': 'application/json',
           "authorization":`Bearer ${token}`,

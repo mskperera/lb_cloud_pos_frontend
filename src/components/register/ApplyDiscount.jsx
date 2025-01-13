@@ -14,6 +14,7 @@ import FormElementMessage from "../messges/FormElementMessage";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPercent, faTags } from "@fortawesome/free-solid-svg-icons";
+import DialogModel from "../model/DialogModel";
 
 const LineDiscountType = ({ title, isSelected, onClick,icon  }) => {
   return (
@@ -286,15 +287,22 @@ export default function ApplyDiscount({
   };
 
   return (
-    visible && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="modal modal-open">
-          <div className="modal-box relative w-full max-w-xl">
-            <h3 className="text-lg font-bold mb-4">
-              {discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL
-                ? "Apply Line Discount"
-                : "Apply Overall Discount"}
-            </h3>
+    <DialogModel
+    header={ 
+      discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL
+        ? "Apply Line Discount"
+        : "Apply Overall Discount"}
+        onHide={onHide}
+    visible={visible}
+ 
+  >
+
+   
+          <div className="relative w-full max-w-xl">
+
+
+
+        
             <form onSubmit={(e) => {
               e.preventDefault();
               handleApplyDiscount();
@@ -379,9 +387,9 @@ export default function ApplyDiscount({
                 </button>
               </div>
             </form>
+        
           </div>
-        </div>
-      </div>
-    )
+       </DialogModel>
+    
   );
 }

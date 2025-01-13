@@ -33,7 +33,8 @@ const StockAdjustmentList = ({ inventoryId, product }) => {
   const [newUnitCost, setNewUnitCost] = useState("");
   const [changeReason, setChangeReason] = useState("");
   const [showPriceChangePanel, setShowPriceChangePanel] = useState(false);
-
+  const [showZeroStockQtyData, setShowZeroStockQtyData] = useState(false);  // State for checkbox toggle
+   
   const showToast = useToast();
 
   useEffect(() => {
@@ -50,7 +51,7 @@ const StockAdjustmentList = ({ inventoryId, product }) => {
     if (!inventoryId) return;
     setLoading(true);
     try {
-      const stockInfoRes = await getStockInfo(inventoryId);
+      const stockInfoRes = await getStockInfo(inventoryId,showZeroStockQtyData);
       setStockInfo(stockInfoRes.data);
     } catch (error) {
       console.error("Error fetching product details:", error);
@@ -61,7 +62,7 @@ const StockAdjustmentList = ({ inventoryId, product }) => {
 
   useEffect(() => {
     loadDetails();
-  }, [inventoryId]);
+  }, [inventoryId,showZeroStockQtyData]);
 
   // Handle opening of price change panel
   const handlePriceChange = (batch, index) => {
@@ -73,12 +74,12 @@ const StockAdjustmentList = ({ inventoryId, product }) => {
     setShowAdjustmentPanel(false);
     loadPriceChange(batch.stockBatchId);
   };
-const [stockBatchIdToRelaseConfirm, setStockBatchIdToRelaseConfirm] = useState(null);
+const [stockBatchInfoToRelaseConfirm, setStockBatchInfoToRelaseConfirm] = useState(null);
     // Handle opening of price change panel
 
 
-    const releaseBatch = async (stockBatchId) => {
-      const res = await releaseStockBatch(stockBatchId);
+    const releaseBatch = async (stockBatchInfo) => {
+      const res = await releaseStockBatch(stockBatchInfo.stockBatchId,stockBatchInfo.isStopRelease);
 
       if (res.data.error) {
         console.log(res.data.error.message);
@@ -99,14 +100,16 @@ const [stockBatchIdToRelaseConfirm, setStockBatchIdToRelaseConfirm] = useState(n
       const [showDialogReleaseBatch, setShowDialogReleaseBatch] = useState(false);
     
       const handleReleaseBatchConfirm = () => {
-        releaseBatch(stockBatchIdToRelaseConfirm)
+        releaseBatch(stockBatchInfoToRelaseConfirm)
         setShowDialogReleaseBatch(false);
       };
 
 
+
+     
       
-  const handleReleasePrompt = (item) => {
-    setStockBatchIdToRelaseConfirm(item.stockBatchId);
+  const handleReleasePrompt = (item,isStopRelease) => {
+    setStockBatchInfoToRelaseConfirm({stockBatchId:item.stockBatchId,isStopRelease});
     setShowDialogReleaseBatch(true);
   };
 
@@ -230,12 +233,30 @@ const [stockBatchIdToRelaseConfirm, setStockBatchIdToRelaseConfirm] = useState(n
     }
   };
 
+
+  // Handle checkbox change (toggle visibility of zero stock rows)
+  const handleCheckboxChange = () => {
+    setShowZeroStockQtyData(prevState => !prevState);
+  };
+
   const renderStockInfo = () => {
     if (loading) {
       return <div>Loading stock batch details...</div>;
     }
 
     return (
+      <div className="px-10">
+      {/* Checkbox for toggling stock visibility */}
+      <div className="flex items-center mt-4">
+        <input
+          type="checkbox"
+          id="showZeroStockQtyData"
+          checked={showZeroStockQtyData}
+          onChange={handleCheckboxChange} // Toggle the state when checkbox changes
+          className="mr-2"
+        />
+        <label htmlFor="showZeroStockQtyData">Show Zero Quantity Stocks</label>
+      </div>
       <div className="p-4 rounded-md w-full overflow-x-auto bg-slate-50">
         <h3 className="font-bold text-lg mb-4">Stock Batch Details</h3>
         {/* <div className="text-center mb-4 w-full">
@@ -267,18 +288,18 @@ const [stockBatchIdToRelaseConfirm, setStockBatchIdToRelaseConfirm] = useState(n
                   new Date(a.expDate) - new Date(b.expDate)
               )
               .map((item, index) => {
-                const isSelected = selectedRowIndex === index; // Check if the row is selected
-                const isStockOutOrder = index === 0; // Highlight the first row in the sorted list
-                return (
+      
+           // const isStockOutOrder = index === 0; // Highlight the first row in the sorted list
+               const isStockOutOrder =  !!item.isBatchReleased===true && item.qty>0;
+              
+               return (
                   <tr
                   key={index}
                   className={`${
-                    isSelected
-                      ? "bg-sky-500 hover:bg-sky-600 text-white"
-                      : isStockOutOrder
-                      ? "bg-yellow-200"
-                      : "bg-slate-50"
-                  } hover:bg-gray-100`}
+                    isStockOutOrder
+                      ? "bg-yellow-200 hover:bg-yellow-300"
+                      : "bg-slate-50 hover:bg-gray-100"
+                  }`}
                 >
                   <td className="px-2 py-2">{item.batchNo}</td>
                   <td className="px-2 py-2">{item.qty}</td>
@@ -291,13 +312,22 @@ const [stockBatchIdToRelaseConfirm, setStockBatchIdToRelaseConfirm] = useState(n
                   <td className="px-2 py-2">
                     <div className="flex space-x-2">
                       {/* Release Batch Button */}
-                      <button
-                        onClick={() => handleReleasePrompt(item, index)}
-                        className="btn bg-blue-500 text-white hover:bg-blue-600 border-0 px-4 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={item.isBatchReleased}
+                      {item.isBatchReleased  ? <button
+                        onClick={() => handleReleasePrompt(item,true, index)}
+                        className={`btn border-0 w-36 px-4 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed 
+                          bg-red-500 text-white hover:bg-red-600 `}
+                          disabled={parseInt(item.qty)===0}
                       >
-                        {item.isBatchReleased ? "Released" : "Release Batch"}
-                      </button>
+                        Stop
+                      </button> :
+                      <button
+                        onClick={() => handleReleasePrompt(item,false, index)}
+                        className={`btn border-0 w-36 px-4 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed 
+                          bg-blue-500 text-white hover:bg-blue-600 `}
+                      >
+                      Release Batch
+                      </button>}
+
                       
                       {/* Change Price Button */}
                       <button
@@ -322,6 +352,7 @@ const [stockBatchIdToRelaseConfirm, setStockBatchIdToRelaseConfirm] = useState(n
               })}
           </tbody>
         </table>
+      </div>
       </div>
     );
   };
@@ -608,11 +639,11 @@ const [stockBatchIdToRelaseConfirm, setStockBatchIdToRelaseConfirm] = useState(n
             {showDialogReleaseBatch && (
               <ConfirmDialog
                 isVisible={true}
-                message="Are you sure you want to relese this batch?"
+                message={stockBatchInfoToRelaseConfirm.isStopRelease ? `Are you sure you want to stop this batch?` : `Are you sure you want to relese this batch?`}
                 onConfirm={handleReleaseBatchConfirm}
                 onCancel={handleReleaseBatchCancel}
-                title="Confirm Release"
-                severity="info"
+                title={stockBatchInfoToRelaseConfirm.isStopRelease ? "Confirm Stop" : "Confirm Release"}
+                severity={stockBatchInfoToRelaseConfirm.isStopRelease ? "warning" : "info"}
               />
             )}
       <ProductInfo product={product} />

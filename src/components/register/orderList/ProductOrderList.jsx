@@ -85,7 +85,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
   };
 
   return (
-    <table className="table-auto w-full border border-gray-300 rounded-md shadow-lg">
+    <table className="table-auto w-full">
       <thead className="bg-gray-200">
         <tr className="text-sm text-gray-700">
           <th className="py-3 px-4 text-left">Description</th>
@@ -94,7 +94,8 @@ export default function ProductOrderList({ showDiscountPopup }) {
           <th className="py-3 px-4 text-right">Actions</th>
         </tr>
       </thead>
-      <tbody className="bg-white">
+      <tbody className="bg-slate-50">
+    
         {products.map((product) => (
           <React.Fragment key={product.orderListId}>
             <tr
