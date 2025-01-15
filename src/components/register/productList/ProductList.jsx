@@ -10,7 +10,6 @@ import { useDispatch } from "react-redux";
 import { addOrder } from "../../../state/orderList/orderListSlice";
 import ProductItem from "./productItem/ProductItem";
 import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
-import "./productList.css";
 import DialogModel from "../../model/DialogModel";
 
 const ProductList = () => {
@@ -146,9 +145,10 @@ console.log('pos menu',_result.data.results[0])
     }
 
     if (p.productTypeId === 1 || p.productTypeId === 3) {
-    console.log("unitPrice", unitPrice);
+    console.log("unitPrice", p.sku);
 
     const order = {
+      sku:p.sku,
       productNo: p.productNo,
       description,
       productId: p.productId,
@@ -175,6 +175,7 @@ console.log('pos menu',_result.data.results[0])
     const v =JSON.parse(p.variationValues).map(v=>v).join(" | ");
     const order = {
       productNo: selectedProduct.productNo,
+      sku:p.sku,
       description: `${selectedProduct.productName} ${v}`,
       measurementUnitName:selectedProduct.measurementUnitName,
       productId: p.variationProductId,
@@ -187,7 +188,7 @@ console.log('pos menu',_result.data.results[0])
   };
 
   return (
-    <div className="flex flex-col gap-2 h-[40vh] ">
+    <div className="flex flex-col gap-2">
  <DialogModel
     header={selectedProduct.productName}
     visible={isVariationSelectionMenuShow}
@@ -207,12 +208,10 @@ console.log('pos menu',_result.data.results[0])
               setIsVariationSelectionMenuShow(false); // Hides the modal
             }}
           >
-            {/* SKU Label */}
             <div className="w-full text-xs text-gray-500 text-left mb-2">
               <span className="font-semibold">SKU:</span> {p.sku || "N/A"}
             </div>
 
-            {/* Variation Values */}
             <div className="flex flex-col items-center mb-3">
               <div className="flex gap-1 items-center justify-center">
                 {p.variationValues &&
@@ -227,12 +226,10 @@ console.log('pos menu',_result.data.results[0])
               </div>
             </div>
 
-            {/* Price */}
             <p className="text-lg font-bold text-center text-gray-800">
               Rs {p.unitPrice}
             </p>
 
-            {/* Stock Quantity */}
             <p
               className={`text-sm font-medium mt-2 ${
                 p.stockQty > 0 ? "text-green-600" : "text-red-600"
@@ -248,20 +245,9 @@ console.log('pos menu',_result.data.results[0])
     </div>
   </DialogModel>
 
-      {/* <DialogModel
-        header={<h4>{selectedProduct.productName}</h4>}
-        visible={isVariationSelectionMenuShow}
-        maximizable
-        maximized={true}
-        style={{ width: "20vw" }}
-        onHide={() => setIsVariationSelectionMenuShow(false)}
-      >
-      
-      </DialogModel> */}
 
       <div className="px-4 pt-2 flex justify-between gap-5 m-0 p-0">
-        {/* <ProductSearch onProductSelect={handleProductClick} /> */}
-        {/* {JSON.stringify(isVariationSelectionMenuShow)} */}
+
         <DaisyUIPaginator
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
@@ -285,7 +271,8 @@ console.log('pos menu',_result.data.results[0])
         </select>
       </div>
 
-      <div className="flex flex-wrap gap-2 px-4 m-0 p-0  ">
+      <div className="overflow-auto max-h-[80vh]">
+      <div className="flex flex-wrap gap-2 px-4 m-0 p-0">
         {products.length > 0 ? (
           products.map((p, index) => (
             <ProductItem
@@ -297,6 +284,7 @@ console.log('pos menu',_result.data.results[0])
         ) : (
           <div>No products found</div>
         )}
+      </div>
       </div>
     </div>
   );

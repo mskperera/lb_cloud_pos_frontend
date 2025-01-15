@@ -1,20 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import TablePaginator from "../TablePaginator";
-import { useNavigate, useRouteError } from "react-router-dom";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog } from "primereact/confirmdialog";
 import { useToast } from "../useToast";
 import moment from 'moment';
 import { Skeleton } from "primereact/skeleton";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { validate } from "../../utils/formValidation";
-import { deleteCustomer, getCustomers } from "../../functions/customer";
-import { getOrderFull, getOrders } from "../../functions/order";
-import { getDrpSession } from "../../functions/dropdowns";
-import { Calendar } from "primereact/calendar";
+import { getOrderFull } from "../../functions/order";
 import  './module.returnOrder.css';
 
 export default function ReturnOrderComp({onAddReturnedProducts }) {

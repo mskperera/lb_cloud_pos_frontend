@@ -13,6 +13,7 @@ import { getAdjustmentReasons } from "../../functions/dropdowns";
 import DropdownField from "../inputField/DropdownField";
 import { useToast } from "../useToast";
 import ConfirmDialog from "../dialog/ConfirmDialog";
+import InventoryTransactionHistory from "./InventoryTransactionHistory";
 
 const StockAdjustmentList = ({ inventoryId, product }) => {
   const [loading, setLoading] = useState(true);
@@ -458,47 +459,50 @@ const [stockBatchInfoToRelaseConfirm, setStockBatchInfoToRelaseConfirm] = useSta
           <h3 className="text-center font-bold pb-5">
             Stock Adjustment Details
           </h3>
-          
           <table className="table border-collapse w-full text-left">
-            <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
-              <tr>
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Created</th>
-                <th className="px-4 py-2">Existing Qty</th>
-                <th className="px-4 py-2">Adjusted Qty</th>
-                <th className="px-4 py-2">Adjustment Type</th>
-                <th className="px-4 py-2">Reason Name</th>
-                <th className="px-4 py-2">Other Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stockAdjustments.map((item, index) => {
-                const rowColor =
-                  item.adjustmentTypeName === "Deduction"
-                    ? "bg-red-100"
-                    : "bg-green-100";
+  <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
+    <tr>
+      <th className="px-4 py-2">ID</th>
+      <th className="px-4 py-2">Created</th>
+      <th className="px-4 py-2">Current Stock Qty</th> {/* Updated column name */}
+      <th className="px-4 py-2">Adjustment Amount</th> {/* Updated column name */}
+      <th className="px-4 py-2">Final Stock Qty</th> {/* Updated column name */}
+      <th className="px-4 py-2">Adjustment Type</th>
+      <th className="px-4 py-2">Reason Name</th>
+      <th className="px-4 py-2">Other Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    {stockAdjustments.map((item, index) => {
+      const rowColor =
+        item.adjustmentTypeName === "Deduction"
+          ? "bg-red-100"
+          : "bg-green-100";
 
-                return (
-                  <tr
-                    key={index}
-                    className={`${rowColor} cursor-pointer`}
-                  >
-                    <td className="px-4 py-2">{item.stockAdjustmentId}</td>
-                    <td className="px-4 py-2">
-                      {formatUtcToLocal(item.createdDate_UTC)}
-                    </td>
-                    <td className="px-4 py-2">{item.existingStockQty}</td>
-                    <td className="px-4 py-2">{item.adjustedQty}</td>
-                    <td className="px-4 py-2">{item.adjustmentTypeName}</td>
-                    <td className="px-4 py-2">{item.adjustmentReasonName}</td>
-                    <td className="px-4 py-2">
-                      {item.adjustmentReasonOtherRemark}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      // Calculate the final stock quantity after adjustment
+      const finalStockQty =
+        item.adjustmentTypeId === 1
+          ? item.existingStockQty + item.adjustedQty
+          : item.existingStockQty - item.adjustedQty;
+
+      return (
+        <tr key={index} className={`${rowColor} cursor-pointer`}>
+          <td className="px-4 py-2">{item.stockAdjustmentId}</td>
+          <td className="px-4 py-2">
+            {formatUtcToLocal(item.createdDate_UTC)}
+          </td>
+          <td className="px-4 py-2">{item.existingStockQty}</td>
+          <td className="px-4 py-2">{item.adjustmentTypeId === 1 ? item.adjustedQty : -item.adjustedQty}</td>
+          <td className="px-4 py-2">{finalStockQty}</td>
+          <td className="px-4 py-2">{item.adjustmentTypeName}</td>
+          <td className="px-4 py-2">{item.adjustmentReasonName}</td>
+          <td className="px-4 py-2">{item.adjustmentReasonOtherRemark}</td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
+
         </div>
       </div>
     );
@@ -650,6 +654,7 @@ const [stockBatchInfoToRelaseConfirm, setStockBatchInfoToRelaseConfirm] = useSta
       {renderStockInfo()}
       {renderAdjustmentPanel()}
       {renderPriceChangePanel()}
+      {/* <InventoryTransactionHistory inventoryId={inventoryId} product={product} /> */}
     </div>
   );
 };

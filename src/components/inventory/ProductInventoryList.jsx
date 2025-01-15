@@ -13,15 +13,16 @@ import { faEdit, faTrash, faEllipsisV, faAngleDown, faAngleRight, faWrench } fro
 import { getStockInfo } from '../../functions/stockEntry';
 import StockInfo from './StockInfo';
 import ProductVariationDetails from './ProductVariationDetails';
+import GhostButton from '../iconButtons/GhostButton';
 
-const ProductDetails = ({ selectedProduct }) => {
+const ProductDetails = ({ selectedProduct,confirmDelete }) => {
   const [stores, setStores] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [singleProductSkuBarcodes, setSingleProductSkuBarcodes] = useState([]);
   const [variationProductSkuBarcodes, setVariationProductSkuBarcodes] = useState([]);
   const [comboProductDetails, setComboProductDetails] = useState([]);
-
+  const navigate = useNavigate();
   const [productTypeId, setProductTypeId] = useState('');
 
   const [stockInfo, setStockInfo] = useState([]);
@@ -100,7 +101,7 @@ const ProductDetails = ({ selectedProduct }) => {
     }
  return <div className='grid grid-cols-4'> 
 
-<div className='flex flex-col gap-4 col-span-4'>
+<div className='flex flex-col gap-4 col-span-2'>
    <div className='flex gap-4 align-middle'>
             <p className='text-lg mt-2'>Categories </p>
            <div className='flex gap-1 mt-2'>
@@ -128,11 +129,78 @@ const ProductDetails = ({ selectedProduct }) => {
             >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
           </div>
 </div>
+<div className='col-span-2 flex justify-end gap-5'>
+ {/* Inventory History View */}
+ {/* View Transactional History */}
+ <GhostButton
+   onClick={() =>
+    navigate(
+      `/inventory/transactionHistory?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
+    )
+  }
+    iconClass="pi pi-history"
+    label="View History"
+    tooltip="View all transactional history" // Tooltip text
+    color="text-blue-500"
+    hoverClass="hover:text-blue-700 hover:bg-transparent"
+  />
+
+  {/* Delete */}
+  <GhostButton
+  onClick={async () => {
+    const result = await deleteProduct(selectedProduct.productId, false);
+    const { outputMessage, responseStatus } =
+      result.data.outputValues;
+    confirmDelete(outputMessage, selectedProduct.productId);
+  }}
+    iconClass="pi pi-trash"
+    label="Delete"
+    tooltip="Delete this item" // Tooltip text
+    color="text-red-500"
+    hoverClass="hover:text-red-700 hover:bg-transparent"
+  />
+
+  {/* Edit */}
+  <GhostButton
+           onClick={() => navigate(`/addProduct/update/${selectedProduct.productId}`)}
+    iconClass="pi pi-pencil"
+    label="Edit"
+    tooltip="Edit this item" // Tooltip text
+    color="text-green-500"
+    hoverClass="hover:text-green-700 hover:bg-transparent"
+  />
+
+  {/* Manage Stock */}
+  <GhostButton
+      onClick={() =>
+        navigate(
+          `/inventory/stockAdjustment?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
+        )
+      }
+    iconClass="pi pi-cog"
+    label="Manage Stock"
+    tooltip="Manage stock levels" // Tooltip text
+    color="text-yellow-500"
+    hoverClass="hover:text-yellow-700 hover:bg-transparent"
+  />
+      </div>
+      
 
 {productTypeId === 1 &&
     
 <div className='col-span-2'>
-<StockInfo inventoryId={selectedProduct.inventoryId} />
+<GhostButton
+      onClick={() =>
+        navigate(
+          `/inventory/transactionHistory?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
+        )
+      }
+        iconClass="pi pi-th-large"
+        label="Stock Transactional History"
+        className="text-gray-600"
+        hoverClass="hover:text-blue-500"
+      />
+{/* <StockInfo inventoryId={selectedProduct.inventoryId} /> */}
 </div>
 
 }
@@ -145,7 +213,7 @@ const ProductDetails = ({ selectedProduct }) => {
 <ProductVariationDetails  variationProductSkuBarcodes={variationProductSkuBarcodes} />
 </div>
 <div className='col-span-2'>
- <StockInfo inventoryId={selectedProduct.inventoryId} />
+ {/* <StockInfo inventoryId={selectedProduct.inventoryId} /> */}
  </div>
 </>
 
@@ -181,12 +249,20 @@ const ProductDetails = ({ selectedProduct }) => {
   </div>
 }
     
+<button
 
+>
+<FontAwesomeIcon icon={faWrench} className="mr-2" />
+Manage Stock
+</button>
 
   return (
     <div className=" p-2 mb-2">
  
+
+
       {renderExtraDetails()}
+      
     </div>
   );
 };
@@ -375,36 +451,78 @@ export default function ProductInventoryList({ }) {
 
   const actionButtons = (index, item) => (
     <div className="flex space-x-2">
-      <button
-        className="btn btn-primary btn-xs text-base-100"
-        onClick={() => handleRowExpand(index, item)}
-      >
-        {expandedRowId === index ? (
-          <FontAwesomeIcon icon={faAngleDown} />
-        ) : (
-          <FontAwesomeIcon icon={faAngleRight} />
-        )}
-        <span className="px-2 text-sm font-normal">More</span>
-      </button>
+      
+      <GhostButton
+    onClick={() =>
+      navigate(
+        `/inventory/transactionHistory?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
+      )
+    }
+    iconClass="pi pi-history"
+   // tooltip="View all transactional history"
+    color="text-blue-500"
+    hoverClass="hover:text-blue-700 hover:bg-transparent"
+  />
+
+  <GhostButton
+  onClick={async () => {
+    const result = await deleteProduct(item.productId, false);
+    const { outputMessage, responseStatus } =
+      result.data.outputValues;
+    confirmDelete(outputMessage, item.productId);
+  }}
+    iconClass="pi pi-trash"
+    //tooltip="Delete this item"
+    color="text-red-500"
+    hoverClass="hover:text-red-700 hover:bg-transparent"
+  />
+
+  <GhostButton
+           onClick={() => navigate(`/addProduct/update/${item.productId}`)}
+    iconClass="pi pi-pencil"
+    //tooltip="Edit this item"
+    color="text-green-500"
+    hoverClass="hover:text-green-700 hover:bg-transparent"
+  />
+
+  <GhostButton
+       onClick={() =>
+        navigate(
+          `/inventory/stockAdjustment?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
+        )
+      }
+    iconClass="pi pi-cog"
+   // tooltip="Manage stock levels"
+    color="text-yellow-500"
+    hoverClass="hover:text-yellow-700 hover:bg-transparent"
+  />
+      
+
+      <GhostButton
+  onClick={() => handleRowExpand(index, item)}
+    iconClass={`fas ${expandedRowId === index ? "pi pi-angle-down" : "pi pi-angle-right"}`} // Dynamic icon class
+      label="More"
+    color="text-blue-500"
+    hoverClass="hover:text-blue-700 hover:bg-transparent"
+  />
+
+
+  
 
       <div className="dropdown dropdown-end">
-  <button
-    tabIndex={0}
-    className="btn btn-primary btn-xs text-base-100"
-    aria-label="More Actions"
-    title="More Actions"
-  >
-    <FontAwesomeIcon icon={faEllipsisV} />
-  </button>
+
   <ul
     tabIndex={0}
-    className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 bg-white text-black"
+    className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 text-black"
   >
     <li>
+
+  
+
       <button
         onClick={() =>
           navigate(
-            `/stockAdjustment?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
+            `/inventory/stockAdjustment?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
           )
         }
       >
@@ -711,7 +829,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                   className={`border-b  border-gray-200 text-[1rem] 
                     ${
                       expandedRowId === index
-                        ? "bg-sky-500 text-white hover:bg-sky-600 "
+                        ? "bg-sky-300 text-white hover:bg-sky-400 "
                         : "bg-slate-50 hover:bg-gray-100"
                     }
                     `}
@@ -747,7 +865,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                 {expandedRowId === index && (
                   <tr >
                     <td colSpan="12" className='bg-slate-50'>
-                      <ProductDetails selectedProduct={item} />
+                      <ProductDetails selectedProduct={item} confirmDelete={confirmDelete} />
                     </td>
                   </tr>
                 )}

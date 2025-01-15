@@ -1,7 +1,7 @@
 import { Button } from "primereact/button"
 import Rightsidebar from "../../components/LeftSidebar"
 import {useState } from "react"
-import Customer from "../../components/register/customerInfoPanel/CustomerInfoPanel"
+import Customer from "../../components/register/customer/CustomerInfoPanel"
 import ProductOrderList from "../../components/register/orderList/ProductOrderList"
 import ProductList from "../../components/register/productList/ProductList"
 import { useDispatch, useSelector } from "react-redux"
@@ -11,13 +11,13 @@ import { useNavigate } from "react-router-dom"
 import Payment from "../../components/register/payment/Payment"
 import CustomerList from "../../components/customer/CustomerList"
 import { addReturnedProduct, setCustomer } from "../../state/orderList/orderListSlice"
-import { getCustomers } from "../../functions/customer"
 import './register.css';
 import OrderSummary from "../../components/register/orderSummary/OrderSummary"
 import DialogModel from "../../components/model/DialogModel"
 import ReturnOrder from "../../components/returnOrder/ReturnOrderComp"
 import OrderVoidRemark from "../../components/register/OrderVoidRemark"
 import { setVoidOrderVisible } from "../../state/popup/popupSlice"
+import { getContacts } from "../../functions/contacts"
 
 const Register=()=>{
  
@@ -78,7 +78,7 @@ loadCustomer(customerId);
 const loadCustomer=async(id)=>{
   try{
   setIsCustomerLoading(true);
-  const ress=await  getCustomers({
+  const ress=await  getContacts({
     customerId:id,
     customerCode: null,
     customerName: null,

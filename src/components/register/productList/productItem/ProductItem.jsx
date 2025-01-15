@@ -10,20 +10,20 @@ const ProductItem = ({ p, handleProductClick }) => {
 
   return (
     <div
-    className={`flex flex-col w-full md:w-[220px] = items-center justify-between
-      rounded-lg cursor-pointer py-4 px-3 bg-slate-50 shadow-sm border
+    className={`flex flex-col w-full md:w-[220px] items-center justify-between
+      rounded-lg cursor-pointer py-2 px-0 bg-white shadow-sm border
       ${p.stockQty > 0 ? "hover:border-green-500" : "hover:border-red-500"}
       hover:shadow-xl transition duration-300 
        ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}
       onClick={() => !isDisabled && handleProductClick(p)} // Prevent click if disabled
   >
 
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-3">
         {hasImage && (
           <img
             src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
             alt={p.productName}
-            className="w-[80px] h-[80px] rounded-lg object-cover"
+            className="w-[60px] h-[60px] rounded-lg object-cover"
           />
         )}
         <div className="flex flex-col">
@@ -35,7 +35,7 @@ const ProductItem = ({ p, handleProductClick }) => {
           </p>
         </div>
       </div>
-      <div className="text-lg font-semibold text-gray-800 truncate group-hover:overflow-visible group-hover:text-ellipsis group-hover:whitespace-normal">
+      <div className="text-[1rem] font-semibold text-gray-800 truncate group-hover:overflow-visible group-hover:text-ellipsis group-hover:whitespace-normal">
         {p.productName}
       </div>
       <p className="text-sm text-gray-600">SKU: {p.sku || "N/A"}</p>

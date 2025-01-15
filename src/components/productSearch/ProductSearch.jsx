@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 import { getProductsAllVariations } from '../../functions/register';
 import { useNavigate } from 'react-router-dom';
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
+const ProductSearch = ({ onProductSelect,onBarcodeEnter }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -109,64 +109,77 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
   }, []);
 
   return (
-    <div ref={searchRef} className="relative w-full">
+    <div ref={searchRef} className="relative w-full m-0 p-0">
       <div className="flex gap-2 w-full">
-        <div className="relative flex items-center border border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 w-full transition-all">
+        <div
+          className="relative flex items-center border border-gray-200 rounded-lg bg-white focus-within:ring-2
+        focus-within:ring-sky-500 focus-within:border-sky-500 m-0 p-0 w-full"
+        >
           <i className="pi pi-search text-gray-500 text-lg absolute left-3"></i>
           <input
             type="text"
             style={{ margin: 0, marginLeft: '22px' }}
-            className="w-full py-2 pl-10 pr-4 text-sm bg-white border-none rounded-lg focus:outline-none transition-all"
+            className="w-full py-3 pl-10 pr-4 text-sm bg-white border-none rounded-lg focus:outline-none"
             placeholder={barcodeMode ? 'Scan Barcode' : 'SKU / Product Details'}
             value={searchTerm}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
           />
+
+
+
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className={`flex p-2 items-center btn btn-ghost text-gray-600 hover:bg-transparent rounded-full transition-colors
-              ${barcodeMode ? 'bg-blue-500 text-white' : 'hover:text-primaryColorHover'}`}
-            onClick={() => setBarcodeMode(true)}
-          >
-            <i className="pi pi-qrcode text-xl"></i>
-          </button>
+        <div
+          className="flex gap-2 items-center "
+        >
+<button
+  type="button"
+  onClick={() => {
+    setBarcodeMode(true);
+    setSearchTerm('');
+  }} // Set barcode mode directly
+  className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all border focus:outline-none focus:ring
+    ${barcodeMode ? 'bg-sky-500 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
+>
+  <span className="pi pi-qrcode text-lg"></span>
+</button>
 
-          <button
-            type="button"
-            className={`flex p-2 items-center btn btn-ghost text-gray-600 hover:bg-transparent rounded-full transition-colors
-              ${!barcodeMode ? 'bg-blue-500 text-white' : 'hover:text-primaryColorHover'}`}
-            onClick={() => setBarcodeMode(false)}
-          >
-            <i className="pi pi-search text-xl"></i>
-          </button>
-        </div>
+<button
+  type="button"
+  onClick={() => {
+    setBarcodeMode(false);
+    setSearchTerm('');
+  }} // Set SKU/product details mode directly
+  className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all border focus:outline-none focus:ring
+    ${!barcodeMode ? 'bg-sky-500 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
+>
+  <span className="pi pi-search text-lg"></span>
+</button>
+
+
+
+</div>
+
       </div>
 
       {showResults && (
-        <div className="absolute z-20 bg-white shadow-lg rounded-md w-full mt-2 max-h-60 overflow-auto transition-all">
-          {loading && (
-            <div className="text-center text-gray-500 py-4">
-              <i className="pi pi-spin pi-spinner text-xl"></i> Searching...
-            </div>
-          )}
+        <div className="absolute z-20 bg-white shadow-md rounded-md w-full mt-2 max-h-60 overflow-auto">
           {searchResults.length > 0 ? (
             <div className="table-container">
               <table className="table table-compact w-full">
-                <thead className="bg-gray-100">
+                <thead>
                   <tr>
-                    <th className="text-left">SKU</th>
-                    <th className="text-left">Product Name</th>
-                    <th className="text-left">Unit Price</th>
+                    <th>SKU</th>
+                    <th>Product Name</th>
+                    <th>Unit Price</th>
                   </tr>
                 </thead>
                 <tbody>
                   {searchResults.map((product, index) => (
                     <tr
                       key={index}
-                      className="hover:bg-blue-100 cursor-pointer transition-all"
+                      className="hover cursor-pointer"
                       onClick={() => handleProductClick(product)}
                     >
                       <td>{product.sku}</td>
@@ -179,6 +192,9 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
             </div>
           ) : (
             <div className="text-center text-gray-500 py-4">Items not found</div>
+          )}
+          {loading && (
+            <div className="text-center text-gray-500 py-4">Searching...</div>
           )}
         </div>
       )}

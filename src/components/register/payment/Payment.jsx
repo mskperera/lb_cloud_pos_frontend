@@ -257,7 +257,7 @@ const Payment = ({}) => {
     } = orderSummary;
 
     const payLoad = {
-      customerId: customer?.customerId,
+      customerId: customer?.contactId,
       terminalId: terminalId,
       sessionId: sessionDetails.sessionId,
       storeId:store.storeId,

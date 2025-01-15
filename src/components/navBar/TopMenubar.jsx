@@ -140,13 +140,13 @@ export default function TopMenubar() {
 
 
 
-
+  // bg-slate-50 shadow-sm
   return (
-    <div className="navbar fixed top-0 left-0 w-full bg-slate-50 shadow-sm z-10 px-4 gap-2 m-0 p-0">
+    <div className="navbar fixed top-0 left-0 w-full bg-white z-10 px-10 gap-2 m-0 p-0">
       <div className="flex justify-between items-center w-full m-0 p-0">
         <div className="flex items-center gap-4 m-0 p-0">
-          <i className="pi pi-calculator text-2xl"></i>
-          <h3 className="text-lg font-bold">LBPOS</h3>
+          {/* <i className="pi pi-calculator text-2xl"></i> */}
+          <h3 className="text-xl font-bold">Legendbyte POS</h3>
         </div>
        
         <div className="flex items-center gap-4 m-0 p-0">

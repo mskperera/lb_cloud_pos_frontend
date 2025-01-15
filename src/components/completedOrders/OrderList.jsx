@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faStop } from "@fortawesome/free-solid-svg-icons";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 import DaisyUIPaginator from "../DaisyUIPaginator";
+import GhostButton from "../iconButtons/GhostButton";
+import Pagination from "../pagination/Pagination";
 
 export default function OrderList({ selectingMode }) {
   const [orders, setOrders] = useState([]);
@@ -19,6 +21,10 @@ export default function OrderList({ selectingMode }) {
   const [totalRecords, setTotalRecords] = useState(10);
   const [isVoidRemarkShow, setIsVoidRemarkShow] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState("");
+
+
+
+  const totalPages = Math.ceil(totalRecords / rowsPerPage);
 
   const onPageChange = (event) => {
     setCurrentPage(event.page);
@@ -113,34 +119,34 @@ export default function OrderList({ selectingMode }) {
 
   const actionButtons = (o) => (
     <div className="flex space-x-2">
-      <button
-        className="btn btn-primary btn-xs bg-primaryColor border-none text-base-100 "
-        onClick={() => {
-          window.open(`/paymentConfirm?orderId=${o.orderId}`, "_blank");
-          // navigate(`/paymentConfirm?orderNo=${o.orderNo}`);
-          // onselect(customer.customerId);
-        }}
-        tooltip="View Receipt"
-        aria-label="Delete"
-      >
-        <FontAwesomeIcon icon={faEye} />
-      </button>
+          <GhostButton
+           onClick={() => {
+            window.open(`/paymentConfirm?orderId=${o.orderId}`, "_blank");
+          }}
+          iconClass="pi pi-copy"
+            tooltip="View Receipt"
+          color="text-blue-500"
+          hoverClass="hover:text-blue-700 hover:bg-transparent"
+         aria-label="Delete"
+        />
 
-      {!o.isVoided ? (
-        <button
+{!o.isVoided ? (<GhostButton
           onClick={async () => {
             setSelectedOrderId(o.orderId);
             setIsVoidRemarkShow(true);
           }}
-          className="btn btn-warning btn-xs bg-[#f87171] border-none text-base-100"
-          aria-label="Select"
-          tooltip="Void Order"
-        >
-          <FontAwesomeIcon icon={faStop} />
-        </button>
+          iconClass="pi pi-stop"
+            tooltip="Void Order"
+          color="text-red-500"
+          hoverClass="hover:text-red-700 hover:bg-transparent"
+         aria-label="Void Order"
+        />
       ) : (
         <div>Voided</div>
       )}
+     
+
+    
     </div>
   );
 
@@ -211,7 +217,10 @@ export default function OrderList({ selectingMode }) {
     return isTableDataLoading ? <span>Loading...</span> : <span>{item.createdDate_UTC ? localFormattedDate : ''}</span>;
   };
 
-
+  const handleRowsPerPageChange = (rows) => {
+    setRowsPerPage(rows);
+    setCurrentPage(1);
+  };
 
   return (
     <>
@@ -417,14 +426,23 @@ export default function OrderList({ selectingMode }) {
                 <span className=" text-gray-500">{totalRecords} items found</span>
               </div>
       
-              {/* DaisyUIPaginator component */}
-              <DaisyUIPaginator
+         <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    rowsPerPageOptions={[10, 20, 30, 50, 100]}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={onPageChange}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                  />
+         
+
+              {/* <DaisyUIPaginator
                 currentPage={currentPage}
-                rowsPerPage={rowsPerPage}
+               rowsPerPage={rowsPerPage}
                 totalRecords={totalRecords}
                 onPageChange={onPageChange}
                 rowsPerPageOptions={[10, 30, 50, 100]}
-              />
+              /> */}
             </div>
             </>
         )}

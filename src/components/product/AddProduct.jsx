@@ -42,7 +42,7 @@ return (
 
 )}
 
-export default function AddProduct({ saveType, id }) {
+export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoGenerateProductNo, setAutoGenerateProductNo] = useState(false);
   const [isProductItem, setIsProductItem] = useState(true);

@@ -12,6 +12,7 @@ import Customers from './pages/customers';
 import AddCustomer from './pages/addCustomer';
 import Login from './pages/login';
 import DayOpen from './pages/dayopen';
+import Dashboard from './pages/dashboard';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -26,7 +27,7 @@ const ProductInventoryList  = React.lazy(() => import("./pages/inventory/product
 const StockEntry  = React.lazy(() => import("./pages/stockEntry/stockAdd"));
 const StockEntryList  = React.lazy(() => import("./pages/stockEntry/stockList"));
 const StockAdjustment  = React.lazy(() => import("./pages/inventory/stockAdjustment"));
-
+const InventoryTransactionHistory  = React.lazy(() => import("./pages/inventoryTransactionHistory"));
 
 function AppContent() {
   const location = useLocation();
@@ -61,23 +62,33 @@ function AppContent() {
                 <Routes>
                   <Route path="/home" element={<Home />} />
                   <Route path="*" element={<NotFound />} />
+                  <Route path="/customers/add" element={<AddCustomer />} />
+                  <Route path="/customers/list" element={<Customers />} />
+                 
+                  <Route path="/products/list" element={<Products />} />
+                  <Route path="/products/add" element={<AddProduct />} />
+
+                  <Route path="/inventory/stockentry/add" element={<StockEntry />} />
+                  <Route path="/inventory/stockentry/list" element={<StockEntryList />} />
+                  <Route path="/inventory/list" element={<ProductInventoryList />} />
+
+                  <Route path="/inventory/stockEntryFull" element={<StockEntryFull />} />
+                  <Route path="/inventory/stockAdjustment" element={<StockAdjustment />} />
+                  <Route path="/inventory/transactionHistory" element={<InventoryTransactionHistory />} />
+                 
+                  <Route path="/ordersCompleted" element={<OrdersCompleted />} />
+
+
                   <Route path="/register/:terminalId" element={<Register />} />
                   <Route path="/dayend" element={<DayEnd />} />
                   <Route path="/daystart/:terminalId" element={<DayOpen />} />
                   <Route path="/payment" element={<Payment />} />
-                  <Route path="/addProduct/:saveType/:id" element={<AddProduct />} />
+              
                   <Route path="/paymentConfirm" element={<PaymentConfirm />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/addCustomer/:saveType/:id" element={<AddCustomer />} />
-                  <Route path="/customers" element={<Customers />} />
-                  <Route path="/ordersCompleted" element={<OrdersCompleted />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+         
                   <Route path="/login" element={<Login />} />
-                  <Route path="/stockEntry" element={<StockEntry />} />
-                  <Route path="/stockEntryList" element={<StockEntryList />} />
-                  <Route path="/stockEntryFull" element={<StockEntryFull />} />
-                  <Route path="/productInventoryList" element={<ProductInventoryList />} />
-                  <Route path="/stockAdjustment" element={<StockAdjustment />} />
-                  
+         
                   <Route path="/" element={<Login />} />
                 </Routes>
               </React.Suspense>

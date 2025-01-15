@@ -8,7 +8,7 @@ import Payment from "../../components/register/payment/Payment";
 import {
   addReturnedProduct,
 } from "../../state/orderList/orderListSlice";
-import "./register.css";
+
 import DialogModel from "../../components/model/DialogModel";
 import ReturnOrder from "../../components/returnOrder/ReturnOrderComp";
 import HOCSession from "../../hocComponents/WrapperSession";

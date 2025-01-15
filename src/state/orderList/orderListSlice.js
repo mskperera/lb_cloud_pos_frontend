@@ -29,7 +29,7 @@ const initialState = {
     },
     isMultiPayment:null,
     paymentList:[],
-  overallTaxRate:8,
+  overallTaxRate:0,
     customer:null
 
 }
@@ -304,10 +304,7 @@ const orderListSlice = createSlice({
             orderListSlice.caseReducers.calculateOrderSummary(state);
         },
 
-        // addCustomer:(state,action)=>{
-        //     const {customerId}=action.payload;
-        //     state.customerId=customerId;
-        // },
+ 
         removePayment: (state, action) => {
             const {id} = action.payload;
             state.paymentList = state.paymentList.filter(payment => payment.id !== id);

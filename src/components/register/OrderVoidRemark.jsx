@@ -5,8 +5,15 @@ import { useToast } from "../useToast";
 import { getDrpdownOrderVoidingReason } from "../../functions/dropdowns";
 import { getOrders } from "../../functions/order";
 import ConfirmDialog from "../dialog/ConfirmDialog";
+import DialogModel from "../model/DialogModel";
 
-export default function OrderVoidRemark({ visible, onClose, orderId, onUpdateOrderList }) {
+
+export default function OrderVoidRemark({
+  visible,
+  onClose,
+  orderId,
+  onUpdateOrderList,
+}) {
   const [value, setValue] = useState("");
   const [isShowRemark, setIsShowRemark] = useState(false);
   const [selectedReasonId, setSelectedReasonId] = useState(null);
@@ -57,19 +64,14 @@ export default function OrderVoidRemark({ visible, onClose, orderId, onUpdateOrd
     setIsSubmitting(false);
   };
 
-
-
   const handleConfirm = () => {
     voidAcceptHandler();
     setShowDialog(false);
   };
 
-  
   const confirmVoid = (outputMessage, orderId) => {
     setShowDialog(true);
   };
-
-
 
   const voidOrderHandler = async (e) => {
     e.preventDefault();
@@ -82,7 +84,6 @@ export default function OrderVoidRemark({ visible, onClose, orderId, onUpdateOrd
         return;
       }
       confirmVoid();
-      
     } catch (err) {
       console.error("Error in voidOrderHandler:", err);
       setIsSubmitting(false);
@@ -91,79 +92,82 @@ export default function OrderVoidRemark({ visible, onClose, orderId, onUpdateOrd
 
   return (
     visible && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
+      <DialogModel
+        header="Void Order"
+        visible={visible}
+        onHide={onClose}
+   
+        height="fit-content"
+      >
+        {showDialog && (
+          <ConfirmDialog
+            isVisible={true}
+            message="Are you sure you want to delete this item?"
+            onConfirm={handleConfirm}
+            onCancel={voidCancelHandler}
+            title="Confirm Delete"
+            severity="danger"
+          />
+        )}
 
-{showDialog && (
-      <ConfirmDialog
-        isVisible={true}
-        message="Are you sure you want to delete this item?"
-        onConfirm={handleConfirm}
-        onCancel={voidCancelHandler}
-        title="Confirm Delete"
-        severity="danger"
-      />
-    )}
-
-        <div className="modal modal-open">
-          <div className="modal-box relative">
-            <h3 className="text-lg font-bold">Void Order</h3>
-            <form onSubmit={voidOrderHandler}>
-              <div className="form-control mb-4">
-                <label htmlFor="void-reason" className="label">
-                  Why do you want to void this order?
-                </label>
-                <select
-                  id="void-reason"
-                  className="select select-bordered w-full"
-                  value={selectedReasonId}
-                  onChange={(e) => {
-                    setSelectedReasonId(e.target.value);
-                    // Logic to show remark field based on selected reason, if needed
-                    setIsShowRemark(true); // Example condition
-                  }}
-                >
-                  <option value="" disabled>Select the reason</option>
-                  {voidingReasonOptions.map(option => (
-                    <option key={option.id} value={option.id}>
-                      {option.displayName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {isShowRemark && (
-                <div className="form-control mb-4">
-                  <label htmlFor="remark" className="label">Enter the reason</label>
-                  <textarea
-                    id="remark"
-                    className="textarea textarea-bordered w-full"
-                    placeholder="Enter the reason"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    rows={5}
-                  ></textarea>
-                </div>
-              )}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={onClose}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Voiding..." : "Void Order"}
-                </button>
-              </div>
-            </form>
+        <form onSubmit={voidOrderHandler}>
+          <div className="form-control mb-4">
+            <label htmlFor="void-reason" className="label">
+              Why do you want to void this order?
+            </label>
+            <select
+              id="void-reason"
+              className="select select-bordered w-full"
+              value={selectedReasonId}
+              onChange={(e) => {
+                setSelectedReasonId(e.target.value);
+                // Logic to show remark field based on selected reason, if needed
+                setIsShowRemark(true); // Example condition
+              }}
+            >
+              <option value="" disabled>
+                Select the reason
+              </option>
+              {voidingReasonOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="modal-backdrop" onClick={onClose}></div>
-        </div>
-      </div>
+
+          {isShowRemark && (
+            <div className="form-control mb-4">
+              <label htmlFor="remark" className="label">Enter the reason</label>
+              <textarea
+                id="remark"
+                className="textarea textarea-bordered w-full"
+                placeholder="Enter the reason"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                rows={5}
+              ></textarea>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Voiding..." : "Void Order"}
+            </button>
+          </div>
+        </form>
+      </DialogModel>
     )
   );
 }

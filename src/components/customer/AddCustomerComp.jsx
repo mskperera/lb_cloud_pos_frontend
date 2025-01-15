@@ -1,15 +1,14 @@
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+
 import React, { useState, useEffect, useRef } from "react";
-import { json, useNavigate } from "react-router-dom";
-import { addCustomer, getCustomers, updateCustomer } from "../../functions/customer";
+import { useNavigate } from "react-router-dom";
+import { addContact, updateCustomer,getContacts } from "../../functions/contacts";
 import { validate } from "../../utils/formValidation";
 import FormElementMessage from "../messges/FormElementMessage";
 import { useToast } from "../useToast";
 import { SAVE_TYPE } from "../../utils/constants";
 import { getContactTypes } from "../../functions/dropdowns";
 
-export default function AddCustomer({saveType,id}) {
+export default function AddCustomer({saveType=SAVE_TYPE.ADD,id=0}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const showToast = useToast();
@@ -126,7 +125,7 @@ export default function AddCustomer({saveType,id}) {
 
 
   const loadValuesForUpdate=async()=>{
-  const ress=await  getCustomers({
+  const ress=await  getContacts({
     contactId:id,
     contactCode: null,
     contactName: null,
@@ -186,7 +185,7 @@ useEffect(()=>{
     }
 
     if(saveType===SAVE_TYPE.ADD){
-    const res = await addCustomer(payLoad);
+    const res = await addContact(payLoad);
     if (res.data.error) {
       setIsSubmitting(false);
       const { error } = res.data;
@@ -200,7 +199,7 @@ useEffect(()=>{
     }
     setIsSubmitting(false);
     
-    navigate(`/customers`)
+    navigate(`/customers/list`)
     showToast("success", "Success", outputMessage);
   }
   else if(saveType===SAVE_TYPE.UPDATE){
@@ -219,7 +218,7 @@ useEffect(()=>{
 
     setIsSubmitting(false);
     
-    navigate(`/customers`)
+    navigate(`/customers/list`)
     showToast("success", "Success", outputMessage);
   }
   }
