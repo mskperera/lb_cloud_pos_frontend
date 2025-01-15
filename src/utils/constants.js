@@ -24,6 +24,12 @@ export const SAVE_TYPE = {
   UPDATE: "update"
 };
 
+export const CONTACT_TYPE = {
+  CUSTOMER: 1,
+  SUPPLIER: 2,
+  CUSTOMER_SUPPLIER: 3
+};
+
 
 // dropdown related constants
 export const DROPDOWN_NOT_SELECTED_ID = 0;
