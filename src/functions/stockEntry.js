@@ -239,3 +239,26 @@ export const releaseStockBatch = async (stockBatchId,stopRelease) => {
     return err;
   }
 };
+
+export const getInventoryTransactionHistory = async (payload) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .post(`/stock/getInventoryTransactionHistory`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          "authorization":`Bearer ${token}`,
+         'tenantid':tenantId
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
