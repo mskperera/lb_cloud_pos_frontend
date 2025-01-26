@@ -65,33 +65,3 @@ label,option,span{
 
 
 
-
-@media print {
-  /* @page {
-    size: A4;
-    margin: 0;
-} */
-
-@page {
-  size: 88mm auto; /* width of 88mm and automatic height */
-  margin: 10;
-}
-  .receipt {
-      /* Styles for print */
-  }
-  /* Hide everything else */
-  body * {
-      visibility: hidden;
-      width: 88mm;
-      margin: 10;
-      font-size: 12px; 
-  }
-  .receipt, .receipt * {
-      visibility: visible;
-  }
-  .receipt {
-      position: absolute;
-      left: 0;
-      top: 0;
-  }
-}

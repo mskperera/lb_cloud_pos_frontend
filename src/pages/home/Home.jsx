@@ -13,7 +13,7 @@ const PopupMenu = ({ label, iconName, submenuItems, isDisabled = false }) => {
       {/* Main Button */}
       <button
         tabIndex={0}
-        className={`flex items-center gap-2 py-4 px-4 bg-slate-200 shadow-sm border rounded-lg 
+        className={`flex items-center gap-2 py-4 px-4 bg-white shadow-sm border rounded-lg 
           hover:border-gray-300 hover:bg-slate-100 hover:shadow-lg transition duration-300 
           ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
       >
@@ -56,7 +56,7 @@ const HomeMenuButton = ({
   return (
     <Link
       className={`flex flex-col min-w-[150px] items-center justify-between
-      rounded-lg cursor-pointer py-4 px-3 bg-slate-50 shadow-sm border
+      rounded-lg cursor-pointer py-4 px-3 bg-white shadow-sm border
       hover:border-gray-300 hover:bg-slate-100
       hover:shadow-lg transition duration-300 
        ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
@@ -178,8 +178,10 @@ const Home = () => {
       {!selectedStore ? (
         <Stores />
       ) : (
-        <div className="flex flex-col gap-10 items-center justify-center mt-24 px-10 
-       ">
+        <div
+          className="flex flex-col gap-10 items-center justify-center mt-24 px-10 
+       "
+        >
           <div className="flex gap-4 justify-end w-full ">
             <PopupMenu
               label="Registers"
@@ -195,16 +197,16 @@ const Home = () => {
             />
 
             <PopupMenu
-              label="Customers"
+              label="Contacts"
               iconName="pi pi-users"
               submenuItems={[
                 {
-                  label: "Customers",
+                  label: "Contacts",
                   to: "/customers/list",
                   icon: "pi pi-user",
                 },
                 {
-                  label: "Add Customer",
+                  label: "Add Contact",
                   to: "/customers/add",
                   icon: "pi pi-user-plus",
                 },
@@ -250,6 +252,12 @@ const Home = () => {
                   label="Dashboard"
                   iconName="pi pi-palette"
                   to="/dashboard"
+                />
+
+                <HomeMenuButton
+                  label="Reports"
+                  iconName="pi pi-chart-line"
+                  to="/reports/reportViewer"
                 />
               </div>
               <div className="w-full my-24">

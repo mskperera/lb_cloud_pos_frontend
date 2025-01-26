@@ -186,25 +186,6 @@ const ProductDetails = ({ selectedProduct,confirmDelete }) => {
       </div>
       
 
-{productTypeId === 1 &&
-    
-<div className='col-span-2'>
-<GhostButton
-      onClick={() =>
-        navigate(
-          `/inventory/transactionHistory?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
-        )
-      }
-        iconClass="pi pi-th-large"
-        label="Stock Transactional History"
-        className="text-gray-600"
-        hoverClass="hover:text-blue-500"
-      />
-{/* <StockInfo inventoryId={selectedProduct.inventoryId} /> */}
-</div>
-
-}
-
 
 
 {productTypeId === 2 &&
@@ -221,7 +202,7 @@ const ProductDetails = ({ selectedProduct,confirmDelete }) => {
     }
 
   {productTypeId === 3 && 
- <div className='m-4 bg-slate-50 p-4 rounded-md col-span-2'>
+ <div className='m-4 bg-white p-4 rounded-md col-span-2'>
           <h3 className='text-center font-bold pb-5'>Combo Ingredients</h3>
           <table className="table border-collapse">
             <thead>
@@ -802,7 +783,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
       </div>
       <div className="flex flex-col ">
         <table className="table w-full border-collapse">
-          <thead className="sticky  top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
+          <thead className="sticky top-16 bg-gray-200 z-10 text-[1rem] border-b border-gray-300">
             <tr>
               {/* <th className="px-4 py-2">Product Id</th> */}
               <th className=""></th>
@@ -830,7 +811,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                     ${
                       expandedRowId === index
                         ? "bg-sky-300 text-white hover:bg-sky-400 "
-                        : "bg-slate-50 hover:bg-gray-100"
+                        : "bg-transparent hover:bg-gray-100"
                     }
                     `}
                 >

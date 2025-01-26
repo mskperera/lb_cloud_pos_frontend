@@ -243,7 +243,7 @@ const actionButtons = (item) => (
 
 
   return (
-    <div className="px-10">
+    <div className="">
       {showDialog && (
         <ConfirmDialog
           isVisible={true}
@@ -255,89 +255,58 @@ const actionButtons = (item) => (
         />
       )}
 
-
-<div className="flex justify-between items-end p-5 gap-2">
+      <div className="flex justify-between items-end  gap-2">
         <div className="flex space-x-4 w-full">
-      
-            <div className="flex flex-col space-y-2 w-1/5">
-              <label className="text-[1rem]">Filter By</label>
-              <select
-                value={selectedFilterBy.value}
-                onChange={(e) =>
-                  handleInputChange(
-                    setSelectedFilterBy,
-                    selectedFilterBy,
-                    parseInt(e.target.value)
-                  )
-                }
-                className="select select-bordered w-full"
-              >
-                {filterByOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.displayName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-          
-              <div className="flex flex-col space-y-2 w-[35%]">
-                <label className="text-[1rem]">Search Value</label>
-                <input
-                  type="text"
-                  value={searchValue.value}
-                  onChange={(e) =>
-                    handleInputChange(
-                      setSearchValue,
-                      searchValue,
-                      e.target.value
-                    )
-                  }
-                  className="input input-bordered w-full"
-                />
-              </div>
-        
-
-
-       
-        </div>
-
-
-<div className='flex justify-center items-center'>
-
-{/* <button
-          className="btn btn-ghost text-[#0284c7]"
-          onClick={() => {
-            onselect(selectedCustomer.contactId); 
-          }}
-          title="Select Cutomer"
-        >
-          <FontAwesomeIcon className="text-xl" icon={faSignIn} />Select Cutomer
-        </button> */}
-        <button
-         className="btn btn-ghost text-[#0284c7] font-bold"
-          onClick={() =>        navigate(`/customers/add?saveType=${SAVE_TYPE.ADD}&id=0`)}
-          title="Add Product"
-        >
-          <FontAwesomeIcon className="text-xl" icon={faUserPlus} />New Customer
-        </button>
-</div>
-      </div>
-
-        <div className="flex justify-content-between align-items-center px-5 gap-2">
-          <div className="col-9">
-            <div className="grid w-full">
-          
-           
-            </div>
+          <div className="flex flex-col space-y-2 w-1/5">
+            <label className="text-[1rem]">Filter By</label>
+            <select
+              value={selectedFilterBy.value}
+              onChange={(e) =>
+                handleInputChange(
+                  setSelectedFilterBy,
+                  selectedFilterBy,
+                  parseInt(e.target.value)
+                )
+              }
+              className="select select-bordered w-full"
+            >
+              {filterByOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
           </div>
 
-
+          <div className="flex flex-col space-y-2 w-[35%]">
+            <label className="text-[1rem]">Search Value</label>
+            <input
+              type="text"
+              value={searchValue.value}
+              onChange={(e) =>
+                handleInputChange(setSearchValue, searchValue, e.target.value)
+              }
+              className="input input-bordered w-full"
+            />
+          </div>
         </div>
 
+        <div className="flex justify-center items-center">
+          <button
+            className="btn btn-ghost text-[#0284c7] font-bold"
+            onClick={() =>
+              navigate(`/customers/add?saveType=${SAVE_TYPE.ADD}&id=0`)
+            }
+            title="Add Product"
+          >
+            <FontAwesomeIcon className="text-xl" icon={faUserPlus} />
+            New Customer
+          </button>
+        </div>
+      </div>
 
-        <div className="flex flex-col h-[65vh] overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
+      <div className="flex flex-col h-[50vh]  overflow-hidden">
+        <div className="flex-1 overflow-y-auto w-full">
           <table className="table w-full border-collapse">
             <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
               <tr>
@@ -360,7 +329,6 @@ const actionButtons = (item) => (
                 >
                   {/* <td className="px-4 py-2">{product.contactId}</td> */}
 
-                  
                   <td className="px-4 py-2">
                     {contactTypeNameBodyTemplate(product)}
                   </td>
@@ -371,15 +339,10 @@ const actionButtons = (item) => (
                   <td className="px-4 py-2">
                     {customerNameBodyTemplate(product)}
                   </td>
-                  <td className="px-4 py-2">
-                    {emailBodyTemplate(product)}
-                  </td>
-                  <td className="px-4 py-2">
-                    {mobileBodyTemplate(product)}
-                  </td>
+                  <td className="px-4 py-2">{emailBodyTemplate(product)}</td>
+                  <td className="px-4 py-2">{mobileBodyTemplate(product)}</td>
                   <td className="px-4 py-2">{telBodyTemplate(product)}</td>
-              
-            
+
                   <td className="px-4 py-2">
                     {modifiedDateBodyTemplate(product)}
                   </td>
@@ -390,7 +353,6 @@ const actionButtons = (item) => (
           </table>
         </div>
       </div>
-      
 
       <div className="flex justify-between w-full p-4">
         {/* Items count display */}
@@ -406,9 +368,7 @@ const actionButtons = (item) => (
           onPageChange={onPageChange}
           rowsPerPageOptions={[10, 30, 50, 100]}
         />
-      
       </div>
-
     </div>
   );
 }

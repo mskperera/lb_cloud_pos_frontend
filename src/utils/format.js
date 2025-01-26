@@ -5,12 +5,12 @@
 import moment from "moment";
 
   // };
-  export const formatCurrency = (value) => {
+  export const formatCurrency = (value,showSymbol=true) => {
     const formattedNumber = new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(value);
-    return `Rs ${formattedNumber}`;
+    return  showSymbol ? `Rs. ${formattedNumber}` : formattedNumber;
   };
 
   // export const formatUtcToLocal = (value) => {

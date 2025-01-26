@@ -13,6 +13,7 @@ import AddCustomer from './pages/addCustomer';
 import Login from './pages/login';
 import DayOpen from './pages/dayopen';
 import Dashboard from './pages/dashboard';
+import ReportViewer from './pages/reports/ReportViewer';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -86,7 +87,7 @@ function AppContent() {
               
                   <Route path="/paymentConfirm" element={<PaymentConfirm />} />
                   <Route path="/dashboard" element={<Dashboard />} />
-         
+                  <Route path="/reports/reportViewer" element={<ReportViewer />} />
                   <Route path="/login" element={<Login />} />
          
                   <Route path="/" element={<Login />} />

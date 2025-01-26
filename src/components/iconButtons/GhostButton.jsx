@@ -24,7 +24,7 @@ const GhostButton = ({
 
   {tooltip && (
     <div
-      className="absolute z-50 left-1/2 transform -translate-x-1/2 mt-2 bg-white text-black rounded-lg shadow py-2 px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-48"
+      className="absolute z-50 left-1/2 transform -translate-x-1/2 mt-2 font-normal text-sm bg-white text-black rounded-lg shadow py-2 px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-48"
       style={{ marginTop: "5px" }}
     >
       {tooltip}
