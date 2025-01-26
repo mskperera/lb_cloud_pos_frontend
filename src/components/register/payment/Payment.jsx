@@ -1,6 +1,5 @@
 
 import { useEffect, useRef, useState } from "react";
-import InputSwitchCustom from "../../InputSwitchCustom";
 import CashPayment from "./CashPayment";
 import CardPayment from "./CardPayment";
 import MultiPaymentList from "./MultiPaymentList";
@@ -11,20 +10,15 @@ import { PAYMENT_METHODS } from "../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addMultiPayment,
-  addSinglePayment,
   clearOrderList,
   clearPayment,
   removePayment,
-  setMultiPayment,
 } from "../../../state/orderList/orderListSlice";
 import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { addOrder } from "../../../functions/register";
 import { useToast } from "../../useToast";
 import { formatCurrency } from "../../../utils/format";
-import Decimal from "decimal.js";
-import printReceipt from "../printReceipt/PrintReceipt";
-import ReceiptComponent from "../printReceipt/ReceiptComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import ConfirmDialog from "../../dialog/ConfirmDialog";

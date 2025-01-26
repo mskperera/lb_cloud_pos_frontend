@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "primereact/button";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useToast } from "../../components/useToast";
-import ConfirmDialog from "../../components/dialog/ConfirmDialog";
 import moment from "moment";
-import { getTeminallByUserId } from "../../functions/dropdowns";
-import Dropdown from "../../components/dropdown/Dropdown";
 import { validate } from "../../utils/formValidation";
 import FormElementMessage from "../../components/messges/FormElementMessage";
 import { startSession } from "../../functions/session";

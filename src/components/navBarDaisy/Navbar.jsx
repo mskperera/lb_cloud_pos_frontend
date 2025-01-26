@@ -1,6 +1,6 @@
 
 import React, { useRef, useState } from 'react';
-import { Button } from 'primereact/button';
+
 import ProfileMenu from '../ProfileMenu';
 import Syncing from '../Syncing';
 import Alert from '../Alert';
@@ -28,7 +28,7 @@ const navigation=useNavigate();
 
  
  
-  <Button
+  <button
               className="p-3 text-color-primary"
               aria-label="Main Menu"
               onClick={() => {
@@ -43,7 +43,7 @@ const navigation=useNavigate();
                 style={{ fontSize: "20px" }}
               ></i>
               <span className="px-2">Go to Main Menu</span>
-            </Button>
+            </button>
 
       
 <div className='flex gap-2 justify-content-between'>

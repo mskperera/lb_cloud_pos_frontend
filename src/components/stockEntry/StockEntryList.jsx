@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import moment from "moment";
-import { getOrders } from "../../functions/order";
 import { getDrpSession } from "../../functions/dropdowns";
-import { Calendar } from "primereact/calendar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faStop } from "@fortawesome/free-solid-svg-icons";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";

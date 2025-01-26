@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import './dayend.css';
-import helpIcon from '../../assets/images/help.png'
 import { endSession, getLatestSessionDetails, getSessionEnd } from "../../functions/session";
 import { formatCurrency } from "../../utils/format";
 import { useToast } from "../../components/useToast";
 import ConfirmDialog from "../../components/dialog/ConfirmDialog";
-import { useSelector } from "react-redux";
 
 const BoldDetail = ({ label, value }) => (
   <div className="mb-2 p-2">

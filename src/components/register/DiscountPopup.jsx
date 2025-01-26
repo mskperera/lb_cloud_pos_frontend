@@ -1,7 +1,6 @@
 // DiscountPopup.jsx
 import React, { useState } from 'react';
 import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
 import { useDispatch } from 'react-redux';
 import { InputText } from 'primereact/inputtext';
 import ApplyLineDiscount from './ApplyLineDiscount';
@@ -28,7 +27,7 @@ const DiscountPopup = ({ orderListId, visible, onHide }) => {
                            <div className="col">
                         <InputText type='number' value={discount} id="firstname3" onChange={(e) => setDiscount(e.target.value)} placeholder="Enter Discount Percentage" />
                         </div>
-                        <Button label="Apply" onClick={()=>handleApplyDiscount()} />
+                        <button label="Apply" onClick={()=>handleApplyDiscount()} />
                     </div>
 
             </Dialog>
