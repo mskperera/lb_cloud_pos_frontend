@@ -11,7 +11,7 @@ import { getTenantId, getToken } from "./authService";
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .get(`/dropdown/getCategories`, {
+        .get(`/categories/dropdown`, {
           headers: {
             'Content-Type': 'application/json',
            "authorization":`Bearer ${token}`,
@@ -34,7 +34,7 @@ import { getTenantId, getToken } from "./authService";
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .get(`/dropdown/getMeasurementUnits`, {
+        .get(`/measurementUnits/dropdown`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -146,12 +146,12 @@ import { getTenantId, getToken } from "./authService";
   };
   
 
-  export const getDrpSession = async () => {
+  export const getDrpSession = async (descOrder='asc') => {
     try {
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .get(`/dropdown/getDrpSession`, {
+        .get(`/dropdown/getDrpSession?descOrder=${descOrder}`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
