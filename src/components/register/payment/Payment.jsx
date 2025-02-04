@@ -23,25 +23,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import ConfirmDialog from "../../dialog/ConfirmDialog";
 
-const PaymentType = ({ paymentTypeName, isSelected, onClick }) => {
-  return (
-    <div
-      className={`col-12 md:col-4 sm:col-4 lg:col-4 xl:col-2 p-1`}
-      style={{ cursor: "pointer" }}
-      onClick={onClick}
-    >
-      <div className={`shadow-1 hover:shadow-4 surface-card border-round `}>
-        <div
-          className={`flex justify-content-center flex-wrap p-3 border-round ${
-            isSelected ? "bg-primary" : ""
-          }`}
-        >
-          <span className="font-bold">{paymentTypeName}</span>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Payment = ({}) => {
   const showToast = useToast();

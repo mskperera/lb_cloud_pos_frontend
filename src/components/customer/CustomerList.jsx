@@ -10,6 +10,7 @@ import DaisyUIPaginator from '../DaisyUIPaginator';
 import ConfirmDialog from '../dialog/ConfirmDialog';
 import { validate } from '../../utils/formValidation';
 import { CONTACT_TYPE, SAVE_TYPE } from '../../utils/constants';
+import GhostButton from "../iconButtons/GhostButton";
 
 export default function CustomerList({selectingMode,onselect }) {
   const [products, setCustomers] = useState([]);
@@ -223,7 +224,7 @@ const contactTypeNameBodyTemplate = (rowData) => (
 
   
 const actionButtons = (item) => (
-  <div className="flex space-x-2">
+  <div className="flex gap-4">
 
   {selectingMode && <button
       className="btn btn-primary btn-xs bg-[#0284c7] text-base-100"
@@ -235,25 +236,31 @@ const actionButtons = (item) => (
       <FontAwesomeIcon icon={faSignIn} />
     </button>}
 
-    <button
-      className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
-      onClick={async () => {
-        const result = await deleteCustomer(item.contactId, false);
-        const { outputMessage, responseStatus } = result.data.outputValues;
-        confirmDelete(outputMessage, item.contactId);
-      }}
-      aria-label="Delete"
-      title='Delete customer'
-    >
-      <FontAwesomeIcon icon={faTrash} />
-    </button>
-    <button
-      className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
-      onClick={() =>    navigate(`/customers/add?saveType=${SAVE_TYPE.UPDATE}&id=${item.contactId}`)}
-      aria-label="Edit" title='Edit customer'
-    >
-      <FontAwesomeIcon icon={faEdit} />
-    </button>
+
+      {/* Delete */}
+      <GhostButton
+          onClick={async () => {
+            const result = await deleteCustomer(item.contactId, false);
+            const { outputMessage, responseStatus } = result.data.outputValues;
+            confirmDelete(outputMessage, item.contactId);
+          }}
+            iconClass="pi pi-trash"
+            label="Delete"
+          //  tooltip="Delete this item"
+            color="text-red-500"
+            hoverClass="hover:text-red-700 hover:bg-transparent"
+          />
+
+          {/* Edit */}
+          <GhostButton
+           onClick={() =>    navigate(`/customers/add?saveType=${SAVE_TYPE.UPDATE}&id=${item.contactId}`)}
+    
+            iconClass="pi pi-pencil"
+            label="Edit"
+          //  tooltip="Edit this item"
+            color="text-green-500"
+            hoverClass="hover:text-green-700 hover:bg-transparent"
+          />
   </div>
 );
 
@@ -375,9 +382,9 @@ const actionButtons = (item) => (
 
 
         <div className="flex flex-col h-[65vh] overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-white">
           <table className="table w-full border-collapse">
-            <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
+            <thead className="sticky top-0 bg-gray-200 z-10 text-[1rem] border-b border-gray-300">
               <tr>
                 {/* <th className="px-4 py-2">Product Id</th> */}
                 <th className="px-4 py-2">contact Type</th>
@@ -394,7 +401,7 @@ const actionButtons = (item) => (
               {products.map((product) => (
                 <tr
                   key={product.contactId}
-                  className="border-b border-gray-200 hover:bg-gray-100 bg-slate-50 text-[1rem]"
+                  className="border-b border-gray-200 hover:bg-gray-100 text-[1rem]"
                 >
                   {/* <td className="px-4 py-2">{product.contactId}</td> */}
 

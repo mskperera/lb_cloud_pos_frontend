@@ -1,64 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { formatCurrency, formatUtcToLocal } from '../../utils/format';
-import { deleteProduct, getProductExtraDetails, getProducts } from '../../functions/register';
-import { useToast } from '../useToast';
-import { getDropdownMeasurementUnit, getDrpdownCategory, getStoresDrp } from '../../functions/dropdowns';
-import { validate } from '../../utils/formValidation';
-import FormElementMessage from '../messges/FormElementMessage';
-import DaisyUIPaginator from '../DaisyUIPaginator';
-import ConfirmDialog from '../dialog/ConfirmDialog';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash, faEllipsisV, faAngleDown, faAngleRight, faWrench } from '@fortawesome/free-solid-svg-icons';
-import { getStockInfo } from '../../functions/stockEntry';
-import StockInfo from './StockInfo';
-import ProductVariationDetails from './ProductVariationDetails';
-import GhostButton from '../iconButtons/GhostButton';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { formatCurrency, formatUtcToLocal } from "../../utils/format";
+import {
+  deleteProduct,
+  getProductExtraDetails,
+  getProducts,
+} from "../../functions/register";
+import { useToast } from "../useToast";
+import {
+  getDropdownMeasurementUnit,
+  getDrpdownCategory,
+  getStoresDrp,
+} from "../../functions/dropdowns";
+import { validate } from "../../utils/formValidation";
+import FormElementMessage from "../messges/FormElementMessage";
+import DaisyUIPaginator from "../DaisyUIPaginator";
+import ConfirmDialog from "../dialog/ConfirmDialog";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEdit,
+  faTrash,
+  faAngleDown,
+  faAngleRight,
+  faWrench,
+  faEllipsisV,
+} from "@fortawesome/free-solid-svg-icons";
+import { getStockInfo } from "../../functions/stockEntry";
+import ProductVariationDetails from "./ProductVariationDetails";
+import GhostButton from "../iconButtons/GhostButton";
 
-const ProductDetails = ({ selectedProduct,confirmDelete }) => {
+const ProductDetails = ({ selectedProduct, confirmDelete }) => {
   const [stores, setStores] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [singleProductSkuBarcodes, setSingleProductSkuBarcodes] = useState([]);
-  const [variationProductSkuBarcodes, setVariationProductSkuBarcodes] = useState([]);
+  const [variationProductSkuBarcodes, setVariationProductSkuBarcodes] =
+    useState([]);
   const [comboProductDetails, setComboProductDetails] = useState([]);
   const navigate = useNavigate();
-  const [productTypeId, setProductTypeId] = useState('');
+  const [productTypeId, setProductTypeId] = useState("");
 
   const [stockInfo, setStockInfo] = useState([]);
-
-
 
   const loadDetails = async () => {
     if (!selectedProduct) return;
     setLoading(true);
     try {
       const details = await getProductExtraDetails(selectedProduct.productId);
-     // setExtraDetails(details);
-     const stores=details.data.results[1];
-     const productSkuBarcodes=details.data.results[0];
-  
-     console.log('stores',stores)
-     console.log('singleProductSkuBarcodes',singleProductSkuBarcodes);
-    const productTypeId= details?.data?.outputValues?.productTypeId;
-    setProductTypeId(productTypeId);
-    console.log('productTypeId',productTypeId)
+      // setExtraDetails(details);
+      const stores = details.data.results[1];
+      const productSkuBarcodes = details.data.results[0];
 
-    // setVariations(details.data.results[0])
-    //   setStores(details.data.results[1]); 
-       setCategories(JSON.parse(selectedProduct.categories));
-       setStores(stores);
- 
-      if(productTypeId==1){
+      console.log("stores", stores);
+      console.log("singleProductSkuBarcodes", singleProductSkuBarcodes);
+      const productTypeId = details?.data?.outputValues?.productTypeId;
+      setProductTypeId(productTypeId);
+      console.log("productTypeId", productTypeId);
+
+      // setVariations(details.data.results[0])
+      //   setStores(details.data.results[1]);
+      setCategories(JSON.parse(selectedProduct.categories));
+      setStores(stores);
+
+      if (productTypeId == 1) {
         setSingleProductSkuBarcodes(productSkuBarcodes[0]);
 
-       const stockInfoRes= await getStockInfo(selectedProduct.inventoryId);
-       const stockInfo=stockInfoRes.data;
-       console.log('stockInfo',stockInfo);
-       setStockInfo(stockInfoRes.data); // Set stock info here
-
-      }
-      else if(productTypeId==2){
+        const stockInfoRes = await getStockInfo(selectedProduct.inventoryId);
+        const stockInfo = stockInfoRes.data;
+        console.log("stockInfo", stockInfo);
+        setStockInfo(stockInfoRes.data); // Set stock info here
+      } else if (productTypeId == 2) {
         const parsedVariations = productSkuBarcodes.map((variation) => ({
           ...variation,
           variationDetails:
@@ -68,19 +79,14 @@ const ProductDetails = ({ selectedProduct,confirmDelete }) => {
         }));
 
         setVariationProductSkuBarcodes(parsedVariations);
-        
-        const stockInfoRes= await getStockInfo(selectedProduct.inventoryId);
-        const stockInfo=stockInfoRes.data;
-        console.log('stockInfo',stockInfo);
+
+        const stockInfoRes = await getStockInfo(selectedProduct.inventoryId);
+        const stockInfo = stockInfoRes.data;
+        console.log("stockInfo", stockInfo);
         setStockInfo(stockInfoRes.data); // Set stock info here
-     }
-      else if(productTypeId==3){
-
+      } else if (productTypeId == 3) {
         setComboProductDetails(productSkuBarcodes);
-      
       }
-
-
     } catch (error) {
       console.error("Error fetching product details:", error);
     } finally {
@@ -89,185 +95,173 @@ const ProductDetails = ({ selectedProduct,confirmDelete }) => {
   };
 
   useEffect(() => {
-      loadDetails();
-    
+    loadDetails();
   }, [selectedProduct]);
-
-
 
   const renderExtraDetails = () => {
     if (loading) {
       return <div>Loading...</div>; // Show loading message
     }
- return <div className='grid grid-cols-4'> 
-
-<div className='flex flex-col gap-4 col-span-2'>
-   <div className='flex gap-4 align-middle'>
-            <p className='text-lg mt-2'>Categories </p>
-           <div className='flex gap-1 mt-2'>
-          {categories?.map((c) => (
-           <>
-           <span
-              key={c.id}
-              className="badge badge-primary p-4 bg-green-500 border-none text-white mr-1"
-            >
-              {c.displayName}
-            </span> {"/"}
-            </>
-          ))}
-        </div>
-        
-            </div>
-
-
-            <div className="flex gap-4">
-            <label className="label">
-            Last Modified
-            </label>
-            <p
-              className=" p-2"
-            >{formatUtcToLocal(selectedProduct.modifiedDate_UTC)}</p>
-          </div>
-</div>
-<div className='col-span-2 flex justify-end gap-5'>
- {/* Inventory History View */}
- {/* View Transactional History */}
- <GhostButton
-   onClick={() =>
-    navigate(
-      `/inventory/transactionHistory?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
-    )
-  }
-    iconClass="pi pi-history"
-    label="View History"
-    tooltip="View all transactional history" // Tooltip text
-    color="text-blue-500"
-    hoverClass="hover:text-blue-700 hover:bg-transparent"
-  />
-
-  {/* Delete */}
-  <GhostButton
-  onClick={async () => {
-    const result = await deleteProduct(selectedProduct.productId, false);
-    const { outputMessage, responseStatus } =
-      result.data.outputValues;
-    confirmDelete(outputMessage, selectedProduct.productId);
-  }}
-    iconClass="pi pi-trash"
-    label="Delete"
-    tooltip="Delete this item" // Tooltip text
-    color="text-red-500"
-    hoverClass="hover:text-red-700 hover:bg-transparent"
-  />
-
-  {/* Edit */}
-  <GhostButton
-           onClick={() => navigate(`/addProduct/update/${selectedProduct.productId}`)}
-    iconClass="pi pi-pencil"
-    label="Edit"
-    tooltip="Edit this item" // Tooltip text
-    color="text-green-500"
-    hoverClass="hover:text-green-700 hover:bg-transparent"
-  />
-
-  {/* Manage Stock */}
-  <GhostButton
-      onClick={() =>
-        navigate(
-          `/inventory/stockAdjustment?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
-        )
-      }
-    iconClass="pi pi-cog"
-    label="Manage Stock"
-    tooltip="Manage stock levels" // Tooltip text
-    color="text-yellow-500"
-    hoverClass="hover:text-yellow-700 hover:bg-transparent"
-  />
-      </div>
-      
-
-
-
-{productTypeId === 2 &&
-<>
-<div className='col-span-2'>
-<ProductVariationDetails  variationProductSkuBarcodes={variationProductSkuBarcodes} />
-</div>
-<div className='col-span-2'>
- {/* <StockInfo inventoryId={selectedProduct.inventoryId} /> */}
- </div>
-</>
-
-
-    }
-
-  {productTypeId === 3 && 
- <div className='m-4 bg-white p-4 rounded-md col-span-2'>
-          <h3 className='text-center font-bold pb-5'>Combo Ingredients</h3>
-          <table className="table border-collapse">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">Product Name</th>
-                <th className="px-4 py-2">Qty</th>
-                <th className="px-4 py-2">SKU</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comboProductDetails.map((item) => (
-                <tr key={item.productId}>
-                  <td className="px-4 py-2">{item.productName}</td>
-                  <td className="px-4 py-2">{item.qty} {item.measurementUnitName}</td>
-                  <td className="px-4 py-2">{item.sku}</td>
-                </tr>
+    return (
+      <div className="grid grid-cols-4">
+        <div className="flex flex-col gap-4 col-span-2">
+          <div className="flex gap-4 align-middle">
+            <p className="text-lg mt-2">Categories </p>
+            <div className="flex gap-1 mt-2">
+              {categories?.map((c) => (
+                <>
+                  <span
+                    key={c.id}
+                    className="badge badge-primary p-4 bg-green-500 border-none text-white mr-1"
+                  >
+                    {c.displayName}
+                  </span>{" "}
+                  {"/"}
+                </>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <label className="label">Last Modified</label>
+            <p className=" p-2">
+              {formatUtcToLocal(selectedProduct.modifiedDate_UTC)}
+            </p>
+          </div>
         </div>
- }
+        <div className="col-span-2 flex justify-end gap-5">
+          {/* Inventory History View */}
+          {/* View Transactional History */}
+          <GhostButton
+            onClick={() =>
+              navigate(
+                `/inventory/transactionHistory?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
+              )
+            }
+            iconClass="pi pi-history"
+            label="View History"
+            tooltip="View all transactional history"
+            color="text-blue-500"
+            hoverClass="hover:text-blue-700 hover:bg-transparent"
+          />
 
+          {/* Delete */}
+          <GhostButton
+            onClick={async () => {
+              const result = await deleteProduct(
+                selectedProduct.productId,
+                false
+              );
+              const { outputMessage, responseStatus } =
+                result.data.outputValues;
+              confirmDelete(outputMessage, selectedProduct.productId);
+            }}
+            iconClass="pi pi-trash"
+            label="Delete"
+            tooltip="Delete this item"
+            color="text-red-500"
+            hoverClass="hover:text-red-700 hover:bg-transparent"
+          />
 
+          {/* Edit */}
+          <GhostButton
+            onClick={() =>
+              navigate(
+                `/products/add?saveType=update&id=${selectedProduct.productId}`
+              )
+            }
+            iconClass="pi pi-pencil"
+            label="Edit"
+            tooltip="Edit this item"
+            color="text-green-500"
+            hoverClass="hover:text-green-700 hover:bg-transparent"
+          />
 
-  </div>
-}
-    
-<button
+          {/* Manage Stock */}
+          <GhostButton
+            onClick={() =>
+              navigate(
+                `/inventory/stockAdjustment?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
+              )
+            }
+            iconClass="pi pi-cog"
+            label="Manage Stock"
+            tooltip="Manage stock levels"
+            color="text-yellow-500"
+            hoverClass="hover:text-yellow-700 hover:bg-transparent"
+          />
+        </div>
 
->
-<FontAwesomeIcon icon={faWrench} className="mr-2" />
-Manage Stock
-</button>
+        {productTypeId === 2 && (
+          <>
+            <div className="col-span-2">
+              <ProductVariationDetails
+                variationProductSkuBarcodes={variationProductSkuBarcodes}
+              />
+            </div>
+            <div className="col-span-2">
+              {/* <StockInfo inventoryId={selectedProduct.inventoryId} /> */}
+            </div>
+          </>
+        )}
 
-  return (
-    <div className=" p-2 mb-2">
- 
+        {productTypeId === 3 && (
+          <div className="m-4 bg-white p-4 rounded-md col-span-2">
+            <h3 className="text-center font-bold pb-5">Combo Ingredients</h3>
+            <table className="table border-collapse">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Product Name</th>
+                  <th className="px-4 py-2">Qty</th>
+                  <th className="px-4 py-2">SKU</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comboProductDetails.map((item) => (
+                  <tr key={item.productId}>
+                    <td className="px-4 py-2">{item.productName}</td>
+                    <td className="px-4 py-2">
+                      {item.qty} {item.measurementUnitName}
+                    </td>
+                    <td className="px-4 py-2">{item.sku}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
+  };
 
+  <button>
+    <FontAwesomeIcon icon={faWrench} className="mr-2" />
+    Manage Stock
+  </button>;
 
-      {renderExtraDetails()}
-      
-    </div>
-  );
+  return <div className=" p-2 mb-2">{renderExtraDetails()}</div>;
 };
 
-
-export default function ProductInventoryList({ }) {
+export default function ProductInventoryList({}) {
   const [products, setProducts] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState(false);
   const navigate = useNavigate();
   const showToast = useToast();
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
-  const [selectedMeasurementUnitId, setSelectedMeasurementUnitId] = useState(-1);
+  const [selectedMeasurementUnitId, setSelectedMeasurementUnitId] =
+    useState(-1);
   const [storesOptions, setStoresOptions] = useState([]);
-  const [selectedStoreId, setSelectedStoreId] = useState('');
+  const [selectedStoreId, setSelectedStoreId] = useState("");
 
-   // New states for checkboxes
-   const [isSingleProductChecked, setIsSingleProductChecked] = useState(false);
-   const [isVariationProductChecked, setIsVariationProductChecked] = useState(false);
-   const [isComboProductChecked, setIsComboProductChecked] = useState(false);
+  // New states for checkboxes
+  const [isSingleProductChecked, setIsSingleProductChecked] = useState(false);
+  const [isVariationProductChecked, setIsVariationProductChecked] =
+    useState(false);
+  const [isComboProductChecked, setIsComboProductChecked] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [totalRecords, setTotalRecords] = useState(10);
-
 
   const onPageChange = ({ page, rows }) => {
     setCurrentPage(page);
@@ -275,36 +269,35 @@ export default function ProductInventoryList({ }) {
     loadProducts(selectedCategoryId, page, rows);
   };
 
-
   const [selectedFilterBy, setSelectedFilterBy] = useState({
-    label: 'Filter by',
+    label: "Filter by",
     value: 1,
     isTouched: false,
     isValid: false,
-    rules: { required: false, dataType: 'integer' },
+    rules: { required: false, dataType: "integer" },
   });
 
   const [searchValue, setSearchValue] = useState({
-    label: 'Search Value',
-    value: '',
+    label: "Search Value",
+    value: "",
     isTouched: false,
     isValid: false,
-    rules: { required: false, dataType: 'string' },
+    rules: { required: false, dataType: "string" },
   });
 
-  const [isSearchValueEntered,setIsSearchValueEntered]=useState(false);
- 
+  const [isSearchValueEntered, setIsSearchValueEntered] = useState(false);
+
   const loadProducts = async () => {
     try {
-      console.log('loadproducs')
+      console.log("loadproducs");
       setIsTableDataLoading(true);
       const skip = currentPage * rowsPerPage;
       const limit = rowsPerPage;
 
-           const productTypeIds = [];
-           if (isSingleProductChecked) productTypeIds.push(1);
-           if (isVariationProductChecked) productTypeIds.push(2);
-           if (isComboProductChecked) productTypeIds.push(3);
+      const productTypeIds = [];
+      if (isSingleProductChecked) productTypeIds.push(1);
+      if (isVariationProductChecked) productTypeIds.push(2);
+      if (isComboProductChecked) productTypeIds.push(3);
 
       const filteredData = {
         productId: null,
@@ -313,7 +306,7 @@ export default function ProductInventoryList({ }) {
         barcode: selectedFilterBy.value === 3 ? searchValue.value : null,
         categoryId: selectedCategoryId,
         measurementUnitId: selectedMeasurementUnitId,
-        storeId:selectedStoreId===-1 ? null :selectedStoreId,
+        storeId: selectedStoreId === -1 ? null : selectedStoreId,
         productTypeIds: productTypeIds.length > 0 ? productTypeIds : null,
         searchByKeyword: false,
         skip: skip,
@@ -327,82 +320,85 @@ export default function ProductInventoryList({ }) {
       setIsTableDataLoading(false);
     } catch (err) {
       setIsTableDataLoading(false);
-      console.log('error:', err);
+      console.log("error:", err);
     }
   };
 
-
   useEffect(() => {
-    setSelectedStoreId(storesOptions.length>0 && storesOptions[0].id)
+    setSelectedStoreId(storesOptions.length > 0 && storesOptions[0].id);
   }, [storesOptions]);
-
 
   useEffect(() => {
     loadProducts();
-  }, [selectedStoreId,selectedCategoryId, selectedMeasurementUnitId,isSingleProductChecked, 
-    isVariationProductChecked, 
-    isComboProductChecked, currentPage, rowsPerPage]);
+  }, [
+    selectedStoreId,
+    selectedCategoryId,
+    selectedMeasurementUnitId,
+    isSingleProductChecked,
+    isVariationProductChecked,
+    isComboProductChecked,
+    currentPage,
+    rowsPerPage,
+  ]);
 
   useEffect(() => {
-
-    if(isSearchValueEntered){
-
+    if (isSearchValueEntered) {
       const delayedLoadProducts = setTimeout(() => {
         loadProducts();
       }, 1000);
       return () => clearTimeout(delayedLoadProducts);
     }
-    
   }, [searchValue.value]);
 
-
-  useEffect(()=>{
-    if([1,2,3].includes(selectedFilterBy.value)){
+  useEffect(() => {
+    if ([1, 2, 3].includes(selectedFilterBy.value)) {
       setSelectedCategoryId(-1);
       setSelectedMeasurementUnitId(-1);
+    } else {
+      setSearchValue({ ...searchValue, value: "" });
     }
-    else{
-      setSearchValue({...searchValue,value:""});
-    }
-  },[selectedFilterBy.value]);
+  }, [selectedFilterBy.value]);
 
   useEffect(() => {
     setIsSearchValueEntered(true);
   }, [isSearchValueEntered]);
 
-
   const [filterByOptions, setFilterByOptions] = useState([
-    { id: 1, displayName: 'Product No' },
-    { id: 2, displayName: 'Product Name' },
-    { id: 3, displayName: 'Barcode' },
-    { id: 4, displayName: 'Category' },
-    { id: 5, displayName: 'Measurement Unit' }
+    { id: 1, displayName: "Product No" },
+    { id: 2, displayName: "Product Name" },
+    { id: 3, displayName: "Barcode" },
+    { id: 4, displayName: "Category" },
+    { id: 5, displayName: "Measurement Unit" },
   ]);
 
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [measurementUnitOptions, setMeasurementUnitOptions] = useState([]);
-  
+
   useEffect(() => {
     loadDrpStores();
     loadDrpCategory();
     loadDrpMeasurementUnit();
-
   }, []);
 
   const loadDrpStores = async () => {
     const objArr = await getStoresDrp();
-    setStoresOptions([ ...objArr.data.results[0]]);
+    setStoresOptions([...objArr.data.results[0]]);
   };
-
 
   const loadDrpCategory = async () => {
     const objArr = await getDrpdownCategory();
-    setCategoryOptions([{ id: -1, displayName: 'All' }, ...objArr.data.results[0]]);
+    setCategoryOptions([
+      { id: -1, displayName: "All" },
+      ...objArr.data.results[0],
+    ]);
   };
 
   const loadDrpMeasurementUnit = async () => {
     const objArr = await getDropdownMeasurementUnit();
-    setMeasurementUnitOptions([{ id: -1, displayName: 'All' }, ...objArr.data.results[0]]);
+    setMeasurementUnitOptions([
+      { id: -1, displayName: "All" },
+      ...objArr.data.results[0],
+    ]);
   };
 
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
@@ -411,7 +407,6 @@ export default function ProductInventoryList({ }) {
     // Toggle the current menu or close it if already open
     setOpenMenuIndex(openMenuIndex === index ? null : index);
   };
-
 
   const validationMessages = (state) => {
     if (!state.isValid && state.isTouched) {
@@ -427,118 +422,126 @@ export default function ProductInventoryList({ }) {
     return null;
   };
 
-
-
-
   const actionButtons = (index, item) => (
-    <div className="flex space-x-2">
-      
+    <div className="flex space-x-2 gap-5">
       <GhostButton
-    onClick={() =>
-      navigate(
-        `/inventory/transactionHistory?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
-      )
-    }
-    iconClass="pi pi-history"
-   // tooltip="View all transactional history"
-    color="text-blue-500"
-    hoverClass="hover:text-blue-700 hover:bg-transparent"
-  />
-
-  <GhostButton
-  onClick={async () => {
-    const result = await deleteProduct(item.productId, false);
-    const { outputMessage, responseStatus } =
-      result.data.outputValues;
-    confirmDelete(outputMessage, item.productId);
-  }}
-    iconClass="pi pi-trash"
-    //tooltip="Delete this item"
-    color="text-red-500"
-    hoverClass="hover:text-red-700 hover:bg-transparent"
-  />
-
-  <GhostButton
-           onClick={() => navigate(`/addProduct/update/${item.productId}`)}
-    iconClass="pi pi-pencil"
-    //tooltip="Edit this item"
-    color="text-green-500"
-    hoverClass="hover:text-green-700 hover:bg-transparent"
-  />
-
-  <GhostButton
-       onClick={() =>
-        navigate(
-          `/inventory/stockAdjustment?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
-        )
-      }
-    iconClass="pi pi-cog"
-   // tooltip="Manage stock levels"
-    color="text-yellow-500"
-    hoverClass="hover:text-yellow-700 hover:bg-transparent"
-  />
-      
+        onClick={() =>
+        {
+  
+          navigate(
+            `/inventory/transactionHistory?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
+          )
+        }
+        }
+        iconClass="pi pi-history text-lg"
+           labelClass="text-md font-normal"
+        // tooltip="View all transactional history"
+       // label="History"
+        color="text-blue-500"
+        hoverClass="hover:text-blue-700 hover:bg-transparent"
+      />
 
       <GhostButton
-  onClick={() => handleRowExpand(index, item)}
-    iconClass={`fas ${expandedRowId === index ? "pi pi-angle-down" : "pi pi-angle-right"}`} // Dynamic icon class
-      label="More"
-    color="text-blue-500"
-    hoverClass="hover:text-blue-700 hover:bg-transparent"
-  />
-
-
-  
-
-      <div className="dropdown dropdown-end">
-
-  <ul
-    tabIndex={0}
-    className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 text-black"
-  >
-    <li>
-
-  
-
-      <button
         onClick={() =>
           navigate(
             `/inventory/stockAdjustment?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
           )
         }
-      >
-        <FontAwesomeIcon icon={faWrench} className="mr-2" />
-        Manage Stock
-      </button>
-    </li>
-    <li>
-      <button
+        iconClass="pi pi-cog text-lg"
+          labelClass="text-md font-normal"
+          label="Adjust"
+        // tooltip="Manage stock levels"
+        color="text-yellow-500"
+        hoverClass="hover:text-yellow-700 hover:bg-transparent"
+      />
+
+      {/* <GhostButton
+        onClick={() => handleRowExpand(index, item)}
+        iconClass={`fas ${
+          expandedRowId === index ? "pi pi-angle-down" : "pi pi-angle-right"
+        } text-lg`}
+          labelClass="text-md font-normal"
+        label="More"
+        color="text-blue-500"
+        hoverClass="hover:text-blue-700 hover:bg-transparent"
+      /> */}
+
+      
+<GhostButton
         onClick={async () => {
           const result = await deleteProduct(item.productId, false);
-          const { outputMessage, responseStatus } =
-            result.data.outputValues;
+          const { outputMessage, responseStatus } = result.data.outputValues;
           confirmDelete(outputMessage, item.productId);
         }}
-      >
-        <FontAwesomeIcon icon={faTrash} className="mr-2" />
-        Delete
-      </button>
-    </li>
-    <li>
-      <button
-        onClick={() => navigate(`/addProduct/update/${item.productId}`)}
-      >
-        <FontAwesomeIcon icon={faEdit} className="mr-2" />
-        Edit
-      </button>
-    </li>
-  </ul>
-</div>
+        iconClass="pi pi-trash text-lg"
+        labelClass="text-md font-normal"
+        //tooltip="Delete this item"
+        color="text-red-500"
+        //label="Delete"
+        hoverClass="hover:text-red-700 hover:bg-transparent"
+      />
 
+      <GhostButton
+          onClick={() =>
+           {
+            navigate(
+              `/products/edit?saveType=update&id=${item.productId}`
+            )
+          }}
+        iconClass="pi pi-pencil text-lg"
+                labelClass="text-md font-normal"
+        //tooltip="Edit this item"
+       // label="Edit"
+        color="text-green-500"
+        hoverClass="hover:text-green-700 hover:bg-transparent"
+      />
+
+
+      {/* <div className="dropdown dropdown-end ">
+      <button tabIndex={0} className="btn btn-ghost btn-sm">
+    <FontAwesomeIcon icon={faEllipsisV} className="text-lg" />
+  </button>
+        <ul
+          tabIndex={0}
+          className="dropdown-content menu p-2 shadow rounded-box w-52 text-black bg-white"
+        >
+          <li>
+            <button
+              onClick={() =>
+                navigate(
+                  `/inventory/stockAdjustment?inventoryId=${item.inventoryId}&prodN=${item.productName}&qty=${item.stockQty}&measU=${item.measurementUnitName}&sku=${item.sku}&prodNo=${item.productNo}`
+                )
+              }
+            >
+              <FontAwesomeIcon icon={faWrench} className="mr-2" />
+              Manage Stock
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={async () => {
+                const result = await deleteProduct(item.productId, false);
+                const { outputMessage, responseStatus } =
+                  result.data.outputValues;
+                confirmDelete(outputMessage, item.productId);
+              }}
+            >
+              <FontAwesomeIcon icon={faTrash} className="mr-2" />
+              Delete
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => navigate(`/addProduct/update/${item.productId}`)}
+            >
+              <FontAwesomeIcon icon={faEdit} className="mr-2" />
+              Edit
+            </button>
+          </li>
+        </ul>
+      </div> */}
     </div>
   );
-
-
 
   const handleInputChange = (setState, state, value) => {
     const validation = validate(value, state);
@@ -559,25 +562,22 @@ export default function ProductInventoryList({ }) {
     setShowDialog(true);
   };
 
-
   const deleteAcceptHandler = async (productId) => {
     try {
-      setProductIdToDelete('');
+      setProductIdToDelete("");
       const result = await deleteProduct(productId, true);
       const { data } = result;
       if (data.error) {
-        showToast('danger', 'Exception', data.error.message);
+        showToast("danger", "Exception", data.error.message);
         return;
       }
-      setProducts(products.filter(p => p.productId !== productId));
-      setTotalRecords(totalRecords-1);
-      showToast('success', 'Successful', data.outputValues.outputMessage);
+      setProducts(products.filter((p) => p.productId !== productId));
+      setTotalRecords(totalRecords - 1);
+      showToast("success", "Successful", data.outputValues.outputMessage);
     } catch (err) {
-      console.log('err :', err);
+      console.log("err :", err);
     }
   };
-
-
 
   const handleConfirm = () => {
     deleteAcceptHandler(productIdToDelete);
@@ -588,34 +588,28 @@ export default function ProductInventoryList({ }) {
     // Handle the cancellation action here
     console.log("Cancelled!");
     setShowDialog(false);
-    setProductIdToDelete('');
+    setProductIdToDelete("");
   };
-
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [expandedRowId, setExpandedRowId] = useState(null); // Track expanded row
-  
 
-  const handleRowSelect = (index,product) => {
+  const handleRowSelect = (index, product) => {
     setSelectedRowIndex(index);
     setSelectedProduct(product);
-};
+  };
 
-
-const [selectedRowIndex,setSelectedRowIndex]=useState(null);
-  const handleRowExpand = async (index,product) => {
-    
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const handleRowExpand = async (index, product) => {
     // If clicking the same row, collapse it
     if (expandedRowId === index) {
       setExpandedRowId(null);
-
     } else {
       setExpandedRowId(index);
     }
     setSelectedRowIndex(index);
     setSelectedProduct(product);
   };
-
 
   return (
     <div className="px-10">
@@ -629,16 +623,13 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
           severity="danger"
         />
       )}
- <div className="pt-4">
-              <h3 className="text-center font-bold text-xl">Product Inventory</h3>
-            </div>
-      <div className="flex justify-between py-5 gap-2 items-end">
-
-           
-
+      <div className="pt-4">
+        <h3 className="text-center font-bold text-xl">Product Inventory</h3>
+      </div>
+      <div className="flex justify-between py-4 gap-2 items-end">
         <div className="flex space-x-4 w-full">
           <div className="flex flex-col">
-            <label className="text-[1rem] font-semibold">Product Type</label>
+            <label className="text-[1rem] font-normal">Product Type</label>
             <div className="flex flex-row gap-4 mt-4">
               <div className="flex items-center space-x-2">
                 <input
@@ -766,7 +757,6 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
             </div>
           )}
         </div>
-
       </div>
       <div className="flex justify-between w-full items-center">
         <div className="pl-3">
@@ -781,9 +771,10 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
           rowsPerPageOptions={[10, 30, 50, 100]}
         />
       </div>
-      <div className="flex flex-col ">
+      <div className="flex flex-col h-[65vh] overflow-hidden">
+      <div className="flex-1 overflow-y-auto bg-white">
         <table className="table w-full border-collapse">
-          <thead className="sticky top-16 bg-gray-200 z-10 text-[1rem] border-b border-gray-300">
+        <thead className="sticky top-0 bg-gray-200 z-10 text-[1rem] border-b border-gray-300">
             <tr>
               {/* <th className="px-4 py-2">Product Id</th> */}
               <th className=""></th>
@@ -796,17 +787,18 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
               <th className="px-4 py-2">Unit Price</th>
               <th className="px-4 py-2">Stock Qty</th>
               <th className="px-4 py-2">Product Type</th>
-           
+
               {/* <th className="px-4 py-2">Category</th> */}
               <th className="px-4 py-2">Tax Rate(%)</th>
               <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
+            {/* {JSON.stringify(products)} */}
             {products.map((item, index) => (
               <React.Fragment key={index}>
                 <tr
-                 // onClick={() => handleRowSelect(index, item)}
+                  // onClick={() => handleRowSelect(index, item)}
                   className={`border-b  border-gray-200 text-[1rem] 
                     ${
                       expandedRowId === index
@@ -815,18 +807,16 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                     }
                     `}
                 >
-            
-                    <td
-                      className=" cursor-pointer"
-                      onClick={() => handleRowExpand(index, item)}
-                    >
-                      {expandedRowId === index ? (
-                        <FontAwesomeIcon icon={faAngleDown} />
-                      ) : (
-                        <FontAwesomeIcon icon={faAngleRight} />
-                      )}
-                    </td>
-                  
+                  <td
+                    className=" cursor-pointer"
+                    onClick={() => handleRowExpand(index, item)}
+                  >
+                    {expandedRowId === index ? (
+                      <FontAwesomeIcon icon={faAngleDown} />
+                    ) : (
+                      <FontAwesomeIcon icon={faAngleRight} />
+                    )}
+                  </td>
                   <td className="px-4 py-2">{item.productNo}</td>
                   <td className="px-4 py-2">{item.sku}</td>
                   <td className="px-4 py-2">{item.productName}</td>
@@ -837,16 +827,15 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                   <td className="px-4 py-2">{item.stockQty}</td>
                   <td className="px-4 py-2">{item.productTypeName}</td>
                   <td className="px-4 py-2">{item.taxRate_perc} </td>
-                  <td className="px-4 py-2">{
-          
-                  actionButtons(index,item)
-                  }
-                  </td>
+                  <td className="px-4 py-2">{actionButtons(index, item)}</td>
                 </tr>
                 {expandedRowId === index && (
-                  <tr >
-                    <td colSpan="12" className='bg-slate-50'>
-                      <ProductDetails selectedProduct={item} confirmDelete={confirmDelete} />
+                  <tr>
+                    <td colSpan="12" className="bg-slate-50">
+                      <ProductDetails
+                        selectedProduct={item}
+                        confirmDelete={confirmDelete}
+                      />
                     </td>
                   </tr>
                 )}
@@ -854,6 +843,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   );

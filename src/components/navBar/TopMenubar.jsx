@@ -51,15 +51,12 @@ export default function TopMenubar() {
 
     setSocket(newSocket);
 
-    // Log connection status
     newSocket.on("connect", () => {
       console.log("Socket connected:", newSocket.id);
-
-      // Emit 'connectFrontendToTheService' when the socket connects
+      
       connectFrontend(newSocket);
     });
 
-      // Handle incoming messages
       newSocket.on("printConnectionStatus", (data) => {
         setMessages(data);
       });
@@ -67,15 +64,10 @@ export default function TopMenubar() {
       newSocket.on("loadPrinterListToFrontend", (data) => {
        // setPrinterList(data.printerList);
 
-        //setPrinterList
-       // console.log("loadPrinterListToFrontend:", data.printerList);
-
         dispatch(setPrinterList({ printerList:data.printerList }));
 
       });
 
-      
-      // Handle error events
       newSocket.on("error", (error) => {
         console.error("Socket Error:", error);
       });
@@ -95,7 +87,6 @@ export default function TopMenubar() {
       setMessages({status:"serviceDisconnected"});
     });
 
-    // Cleanup on component unmount
     return () => {
       newSocket.disconnect();
     };
@@ -142,28 +133,33 @@ export default function TopMenubar() {
 
   // bg-slate-50 shadow-sm
   return (
-    <div className="navbar fixed top-0 left-0 w-full bg-white z-10 px-10 gap-2 m-0 p-0">
+
+    <nav className="navbar fixed top-0 left-0 w-full bg-white px-10 gap-2 m-0 p-0  h-16 z-50">
       <div className="flex justify-between items-center w-full m-0 p-0">
-        <div className="flex items-center gap-4 m-0 p-0">
+      <div className="flex justify-start gap-4">
+        <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
-          <h3 className="text-xl font-bold">Legendbyte POS</h3>
+          <h3 className="text-xl font-bold">VibePOS</h3>
+     
         </div>
-       
+
+      
+          </div>
         <div className="flex items-center gap-4 m-0 p-0">
-       
+        <button
+            className=" flex items-center ml-0 btn btn-ghost text-gray-600 p-0 m-0 hover:bg-transparent hover:text-primaryColorHover"
+            onClick={() => navigate('/home')}
+          >
+            <i className="pi pi-th-large text-xl"></i>
+            <span className="">Main Menu</span>
+          </button>
      {/* {JSON.stringify(printDeskInfo)} */}
 
           <div className="flex items-center gap-5 m-0 p-0">
          
-      {selectedStore &&  <Store store={selectedStore}/>}
-          <button
-            className=" flex items-center btn btn-ghost text-gray-600 p-0 m-0 hover:bg-transparent hover:text-primaryColorHover"
-            onClick={() => navigate('/home')}
-          >
-            <i className="pi pi-th-large text-xl"></i>
-            {/* <span className="">Main Menu</span> */}
-          </button>
-
+ 
+        
+          {selectedStore &&  <Store store={selectedStore}/>}
 <PrinterConnection status={messages.status} />
 
 
@@ -173,6 +169,6 @@ export default function TopMenubar() {
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

@@ -23,7 +23,7 @@ const Rightsidebar = ({
 
   const LeftSidebarMenu = ({ onClick, label, icon,iconColor,bgColor,textColor }) => {
     return (
-      <button className={`flex items-center flex-col gap-1 border border-[#dddddd] rounded-lg w-[7rem] hover:bg-slate-200 py-3 shadow-sm ${bgColor? bgColor:'bg-white'}`} onClick={onClick}>    
+      <button className={`flex items-center flex-col gap-1   hover:bg-slate-200 py-3 shadow-sm `} onClick={onClick}>    
          <FontAwesomeIcon icon={icon} className={`text-lg ${iconColor ? iconColor: "text-gray-700"}`} />
        <span className={` ${textColor ? textColor: "text-gray-700 text-md"}`}>{label}</span> 
       </button>
@@ -33,7 +33,7 @@ const Rightsidebar = ({
 
   return (
     <div className=''>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 bg-white w-[6rem]">
   
           <LeftSidebarMenu
             label="Orders"

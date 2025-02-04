@@ -42,7 +42,7 @@ const ProductList = () => {
   };
 
   const loadProducts = async (categoryId, page = 0, limit = rowsPerPage) => {
-    console.log("store", store);
+    console.log("store oooo", store);
     const skip = page * limit;
 
     const filteredData = {

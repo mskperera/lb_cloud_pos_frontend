@@ -10,7 +10,7 @@ const DialogModel = ({
 }) => {
   return (
     <div
-      className={`fixed inset-0 z-50 overflow-auto transition-opacity duration-300 ${
+      className={`fixed inset-0 z-40 overflow-auto transition-opacity duration-300 ${
         visible ? 'opacity-100 visible' : 'opacity-0 invisible'
       }`}
     >

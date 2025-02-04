@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { getStoresDrp } from "../../functions/dropdowns";
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import DialogModel from "../model/DialogModel";
+import GhostButton from "../iconButtons/GhostButton";
 
 
 
@@ -36,29 +38,38 @@ const StoresComponent = ({ stores, setStores }) => {
     loadDrpStores();
   }, []);
 
-  // Handle adding a store to the list
+
   const handleAddStore = () => {
     if (selectedStoreId) {
-      // Find the selected store object from storesOptions
       const selectedStore = storesOptions.find(store => store.id === selectedStoreId);
-      
-      // Add the store if it's not already in the list
+
       if (selectedStore && !stores.find(store => store.storeId === selectedStore.id)) {
         setStores([...stores, { storeId: selectedStore.id, storeName: selectedStore.displayName }]);
       }
-      setSelectedStoreId(0); // Reset the dropdown after adding
+      setSelectedStoreId(0);
+      setIsManageModalOpen(false);
     }
   };
 
-  // Handle removing a store from the list
   const handleRemoveStore = (storeId) => {
     setStores(stores.filter((store) => store.storeId !== storeId));
   };
+  const [isManageModalOpen,setIsManageModalOpen]=useState(false);
+
 
   return (
     <div className="flex justify-start gap-10 items-start rounded-md">
-      {/* Dropdown and Add button */}
-      <div className="flex justify-start gap-4 items-center">
+      
+
+      <DialogModel
+                header={'Add Store'}
+                visible={isManageModalOpen}
+                maximizable
+                onHide={() => {
+                  setIsManageModalOpen(false);
+                }}
+            >
+       <div className="flex justify-start gap-4 items-center">
         <div className="flex flex-col">
           <label className="label">
             <span className="label-text text-lg">Store</span>
@@ -84,14 +95,32 @@ const StoresComponent = ({ stores, setStores }) => {
           Add Store
         </button>
       </div>
+          </DialogModel>
 
-      {/* Stores list with remove button */}
-      <div className="flex flex-wrap gap-5 mt-10">
+
+          <div className="flex justify-between gap-4 items-center mt-10">
+
+    <GhostButton
+        onClick={() =>
+         
+          setIsManageModalOpen(true)
+         
+        }
+        
+        iconClass="pi pi-plus-circle text-lg"
+          labelClass="text-md font-normal"
+          label="Add Store"
+        color="text-blue-500"
+        hoverClass="hover:text-blue-700 hover:bg-transparent"
+      />
+
+      <div className="flex flex-wrap gap-5">
         {stores.map((item) => (
          
          <StoreItem  key={item.storeId} store={item} onClick={() => handleRemoveStore(item.storeId)} />
    
         ))}
+      </div>
       </div>
     </div>
   );

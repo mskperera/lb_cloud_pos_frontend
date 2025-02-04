@@ -33,4 +33,17 @@ export const formatUtcToLocal = (value, dateOnly = false) => {
 };
 
 
+export const formatDate = (value, dateOnly = false) => {
+
+  let localFormattedDate;
+
+  if (dateOnly) {
+    localFormattedDate = moment(value).format('YYYY-MMM-DD');
+  } else {
+    localFormattedDate = moment(value).format('YYYY-MMM-DD hh:mm:ss A');
+  }
+
+  return localFormattedDate;
+};
+
 

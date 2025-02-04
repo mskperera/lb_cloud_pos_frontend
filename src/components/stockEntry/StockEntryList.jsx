@@ -107,7 +107,7 @@ export default function StockEntryList({ selectingMode }) {
       <button
         className="btn btn-primary btn-xs bg-primaryColor border-none text-base-100 "
         onClick={() => {
-          window.open(`/stockEntryFull?stockEntryId=${o.stockEntryId}`, "_blank");
+          window.open(`/inventory/stockEntryFull?stockEntryId=${o.stockEntryId}`, "_blank");
           // navigate(`/paymentConfirm?orderNo=${o.orderNo}`);
           // onselect(customer.customerId);
         }}

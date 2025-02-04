@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../functions/auth";
-import profilePic from "../assets/images/profilePic.png"; // Replace with the actual path to your image
+import { getAuthInfo, logout } from "../functions/auth";
+import profilePic from "../assets/images/profilePic.png";
 import { useDispatch } from "react-redux";
 import { setSelectedStore } from "../state/store/storeSlice";
+
+const userinfo=JSON.parse(localStorage.getItem('user'));
+
 
 export default function ProfileMenu() {
   const navigate = useNavigate();
@@ -15,7 +18,7 @@ const dispatch=useDispatch();
     console.log("Logout clicked");
     logout();
     dispatch(setSelectedStore({ selectedStore:null }));
-    navigate('/login');
+    navigate('/');
   };
 
   const toggleMenu = () => {
@@ -24,7 +27,6 @@ const dispatch=useDispatch();
 
   return (
     <div className="relative inline-block text-left mt-2">
-      {/* Profile Button */}
       <button
   className="btn btn-circle h-10 w-10 btn-sm btn-primary avatar m-0 p-0"
   onClick={toggleMenu}
@@ -39,14 +41,13 @@ const dispatch=useDispatch();
 </button>
 
 
-      {/* Dropdown Menu */}
       {menuOpen && (
         <div
           className="absolute right-0 w-56 bg-base-100 rounded-lg shadow-lg border border-base-300 z-10"
           id="profileMenu"
         >
+          {/* {JSON.stringify(userinfo)} */}
           <div className="p-2">
-            {/* Profile Info */}
             <button className="w-full text-left p-2 rounded-md hover:bg-base-200 flex items-center">
               {/* <img
                 className="w-10 h-10 rounded-full mr-2"
@@ -54,14 +55,12 @@ const dispatch=useDispatch();
                 alt="Profile"
               /> */}
               <div>
-                <div className="font-bold">John Perera</div>
-                <div className="text-sm text-base-content">Admin</div>
+                <div className="font-bold">{userinfo.displayName}</div>
+                {/* <div className="text-sm text-base-content">Admin</div> */}
               </div>
             </button>
 
             <div className="divider my-1"></div>
-
-            {/* Menu Items */}
             <button
               className="w-full text-left p-2 rounded-md hover:bg-base-200 flex items-center"
               onClick={() => navigate('/settings')}
@@ -77,7 +76,6 @@ const dispatch=useDispatch();
 
             <div className="divider my-1"></div>
 
-            {/* Logout */}
             <button
               className="w-full text-left p-2 rounded-md hover:bg-base-200 flex items-center text-red-600"
               onClick={handleLogout}

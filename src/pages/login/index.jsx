@@ -30,9 +30,11 @@ const Login = () => {
       const accessToken = authRes.data.accessToken;
       localStorage.setItem('token', accessToken);
       const plaindata = parseJwt(accessToken);
+      console.log('plaindata',plaindata)
       localStorage.setItem('tenantId', plaindata.tenantId);
       localStorage.setItem('userId', plaindata.userId);
       localStorage.setItem('stores', JSON.stringify(plaindata.stores));
+      localStorage.setItem('user', JSON.stringify(plaindata));
 
       navigate('/home');
     } catch (error) {
@@ -42,21 +44,20 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 to-sky-300 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
       <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-800">
-          Welcome to Legendbyte POS
+        <h2 className="text-4xl font-bold text-center text-gray-800">
+          Welcome to VibePOS
         </h2>
         <p className="text-center text-gray-600 mt-2">
           Sign in to your account
         </p>
 
         <div className="mt-8">
-          {/* Email Input */}
           <div className="mb-6">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-md font-medium text-gray-700"
             >
               Email
             </label>
@@ -69,12 +70,10 @@ const Login = () => {
               placeholder="Enter your email"
             />
           </div>
-
-          {/* Password Input */}
           <div className="mb-6">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-md font-medium text-gray-700"
             >
               Password
             </label>
@@ -88,18 +87,15 @@ const Login = () => {
             />
           </div>
 
-          {/* Error Message */}
           {errorMessage && (
             <div className="mb-4 text-red-500 text-center text-sm">
               {errorMessage}
             </div>
           )}
-
-          {/* Login Button */}
-          <div>
+   
             <button
               onClick={signIn}
-              className={`w-full py-3 px-4 text-white font-medium rounded-lg shadow-lg bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 transition duration-200 ${
+              className={`w-full py-3 px-6 text-white font-medium rounded-full shadow-lg bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 transition duration-200 ${
                 isLoading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
               disabled={isLoading}
@@ -107,9 +103,8 @@ const Login = () => {
               {isLoading ? 'Signing In...' : 'Login'}
             </button>
           </div>
-        </div>
+     
 
-        {/* Footer */}
         <div className="mt-6 text-center text-gray-600">
           <p>
             Need help?{' '}

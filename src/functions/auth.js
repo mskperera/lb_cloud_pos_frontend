@@ -49,3 +49,13 @@ import customAxiosMain from "../utils/axiosMain";
 
 
   
+  export const getAuthInfo = async () => {
+    try {
+  
+      const userinfo=localStorage.getItem('user');
+      return JSON.parse(userinfo);
+     
+    } catch (err) {
+      return err;
+    }
+  };

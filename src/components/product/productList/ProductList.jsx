@@ -528,7 +528,7 @@ export default function ProductOrderList({ }) {
       </button>
       <button
         className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
-        onClick={() => navigate(`/addProduct/update/${item.productId}`)}
+        onClick={() => navigate(`/products/edit?saveType=update&id=${item.productId}`)}
         aria-label="Edit" title='Edit Product'
       >
         <FontAwesomeIcon icon={faEdit} />
@@ -852,7 +852,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
 
         <button
           className="btn btn-ghost text-[#0284c7] font-bold"
-          onClick={() => navigate(`/addProduct/add/0`)}
+          onClick={() => navigate(`/products/add?saveType=add`)}
           title="Add Product"
         >
           <FontAwesomeIcon className="text-xl" icon={faPlusSquare} />

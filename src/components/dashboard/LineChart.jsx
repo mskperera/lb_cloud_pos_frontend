@@ -5,12 +5,15 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 // Register the plugin globally for Chart.js
 Chart.register(ChartDataLabels);
 
-const LineChart = ({ data, options, labels = { show: false, labelType: "percentage",color:null} }) => {
+const LineChart = ({ data,titleVisible=true, options, labels = { show: false, labelType: "percentage",color:null} }) => {
   // Extend options with datalabels configuration based on labels prop
   const extendedOptions = {
     ...options,
     plugins: {
       ...options.plugins,
+      title: {
+        display: titleVisible,
+      },
       datalabels: labels.show
         ? {
             color: labels.color ? labels.color : 'black',
@@ -35,7 +38,7 @@ const LineChart = ({ data, options, labels = { show: false, labelType: "percenta
     responsive: true, // Ensure the chart is responsive
   };
 
-  return <Line data={data} options={extendedOptions} />;
+  return <Line  data={data} options={extendedOptions} />;
 };
 
 export default LineChart;

@@ -46,7 +46,7 @@ const TableView = ({ columns, data, title }) => {
                   className={`px-6 py-4 border-r border-gray-200 ${getAlignmentClass(column.align)}`} // Applying alignment class to row data
                 >
                   {typeof row[column.key] === "number"
-                    ? `$${row[column.key].toLocaleString()}`
+                    ? `${row[column.key].toLocaleString()}`
                     : row[column.key]}
                 </td>
               ))}

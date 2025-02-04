@@ -59,7 +59,7 @@ const Register = () => {
       </DialogModel>
 
   
-      <div className="">
+  
         <div className="flex items-start justify-between gap-2 py-2">
           {showPayment ? (
             <PaymentScreen />
@@ -82,7 +82,7 @@ const Register = () => {
             </div>
           )}
         </div>
-      </div>
+
     </HOCSession>
   );
 };

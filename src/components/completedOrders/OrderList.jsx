@@ -4,10 +4,7 @@ import { validate } from "../../utils/formValidation";
 import { getOrders } from "../../functions/order";
 import { getDrpSession } from "../../functions/dropdowns";
 import OrderVoidRemark from "../register/OrderVoidRemark";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faStop } from "@fortawesome/free-solid-svg-icons";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
-import DaisyUIPaginator from "../DaisyUIPaginator";
 import GhostButton from "../iconButtons/GhostButton";
 import Pagination from "../pagination/Pagination";
 

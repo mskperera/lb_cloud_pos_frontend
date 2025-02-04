@@ -5,23 +5,21 @@ import { useReactToPrint } from "react-to-print";
 import './Reportm.css';
 import GhostButton from "../../components/iconButtons/GhostButton";
 
-const ReusableSubReportViewer = ({ reportData, tableHeaders, title, lblLeft, lblRight, tableBottom,injectableComponents }) => {
+const ReusableSubReportViewer = ({ reportData, tableHeaders, title, lblLeft, lblRight, tableBottom,injectableComponents,isColumnRemovable=false }) => {
   const printRef = useRef();
   const [showRowNumber, setShowRowNumber] = useState(true);
-  const [columns, setColumns] = useState(tableHeaders); // State to manage columns in the table
-  const [availableColumns, setAvailableColumns] = useState([]); // Available columns for addition
-  const [selectedColumn, setSelectedColumn] = useState(''); // Track selected column to add
+  const [columns, setColumns] = useState(tableHeaders);
+  const [availableColumns, setAvailableColumns] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
 
   useEffect(() => {
-    // Set available columns to add from the original tableHeaders
     const availableCols = tableHeaders
-      .map(header => header.text) // Get column names
-      .filter(col => !columns.some(existingCol => existingCol.text === col)); // Filter out columns already in the table
+      .map(header => header.text) 
+      .filter(col => !columns.some(existingCol => existingCol.text === col));
 
     setAvailableColumns(availableCols);
-  }, [columns, tableHeaders]); // Recalculate when columns or tableHeaders change
+  }, [columns, tableHeaders]);
 
-  // Dynamically generate the table headers from the keys of the first report data object
   const tableDataKeyNames = reportData.length > 0 ? Object.keys(reportData[0]) : [];
 
   const handlePrint = useReactToPrint({
@@ -123,7 +121,7 @@ const ReusableSubReportViewer = ({ reportData, tableHeaders, title, lblLeft, lbl
                 <th key={index} className={`border border-gray-300 px-4 py-2 text-${header.alignment || "left"}`}>
                   {header.text}
                 
-                  <GhostButton
+                  {isColumnRemovable &&      <GhostButton
                  onClick={() => handleRemoveColumn(header.text)}
                     iconClass="pi pi-trash"
                     label=""
@@ -131,7 +129,7 @@ const ReusableSubReportViewer = ({ reportData, tableHeaders, title, lblLeft, lbl
                     color="text-red-500"
                     hoverClass="hover:text-red-700 hover:bg-transparent"
                     className="btn-sm remove-column-button"
-                  />
+                  />}
 
               
                 </th>

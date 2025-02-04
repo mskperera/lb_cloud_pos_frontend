@@ -1,8 +1,7 @@
-// utils/axios.js
 import axios from 'axios';
 
 const customAxios = axios.create({
-  baseURL:process.env.REACT_APP_API_PATH, // Your base URL
+  baseURL:process.env.REACT_APP_API_PATH,
 });
 
  console.log('process.env REACT_APP_API_PATH',process.env.REACT_APP_API_PATH)
@@ -14,7 +13,6 @@ customAxios.interceptors.request.use(
       return config;
     },
     function (error) {
-      // Do something with request error
       return Promise.reject(error);
     }
   );
@@ -40,7 +38,7 @@ customAxios.interceptors.request.use(
        if (error.response.data.name === 'TokenExpiredError') {
         console.log('axios.interceptors.resl**', error.response.data);
        // refreshAccessToken();
-         window.location.href = '/login';
+         window.location.href = '/';
        }
       return Promise.reject(error);
     }

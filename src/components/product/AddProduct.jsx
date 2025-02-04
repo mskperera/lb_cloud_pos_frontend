@@ -24,35 +24,27 @@ import { faClose, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StoresComponent from "../storeComponent/StoreComponent";
 import { uploadImageResized } from "../../functions/asset";
 import InputField from "../inputField/InputField";
+import DialogModel from "../model/DialogModel";
+import GhostButton from "../iconButtons/GhostButton";
 
+const CategoryItem = ({ onClick, category }) => {
+  return (
+    <div className="flex justify-between items-center p-3 border rounded-full gap-2 bg-gray-50">
+      <span className="text-gray-800 font-medium">{category.displayName}</span>
+      <FontAwesomeIcon
+        icon={faTrash}
+        className="text-red-500 hover:text-red-700 cursor-pointer"
+        onClick={onClick}
+      />
+    </div>
+  );
+};
 
-const CategoryItem=({onClick,category})=>{
+export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
+  const store = JSON.parse(localStorage.getItem("stores"))[0];
 
-return (
-<div
-  className="flex justify-between items-center p-3 border rounded-full gap-2 bg-gray-50"
->
-  <span className="text-gray-800 font-medium">{category.displayName}</span>
-  <FontAwesomeIcon
-    icon={faTrash}
-    className="text-red-500 hover:text-red-700 cursor-pointer"
-    onClick={onClick}
-  />
-</div>
-
-)}
-
-export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [autoGenerateProductNo, setAutoGenerateProductNo] = useState(false);
-  const [isProductItem, setIsProductItem] = useState(true);
-  const [isNotForSelling, setIsNotForSelling] = useState(false);
-  const [isExpiringProduct, setIsExpiringProduct] = useState(false);
-  
-
-  const [isUnique, setIsUnique] = useState(false);
-  const [isStockTracked, setIsStockTracked] = useState(true);
-  const [stores, setStores] = useState([]);
+  const [autoGenerateProductNo, setAutoGenerateProductNo] = useState(true);
   const navigate = useNavigate();
   const showToast = useToast();
 
@@ -60,6 +52,17 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
     setProductType((p) => ({ ...p, value: 1 }));
   }, []);
 
+  const [stores, setStores] = useState([
+    { storeId: store.storeId, storeName: store.storeName },
+  ]);
+  const [isProductItem, setIsProductItem] = useState(true);
+  const [isNotForSelling, setIsNotForSelling] = useState(false);
+  const [isExpiringProduct, setIsExpiringProduct] = useState(false);
+  const [isUnique, setIsUnique] = useState(false);
+  const [isStockTracked, setIsStockTracked] = useState(true);
+
+  const [comboIngredients, setComboIngredients] = useState([]);
+  const [variations, setVariations] = useState([]);
   const [productNo, setProductNo] = useState({
     label: "Product No",
     value: "",
@@ -176,8 +179,108 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
     rules: { required: false, dataType: "string" },
   });
 
-  const [comboIngredients, setComboIngredients] = useState([]);
-  const [variations, setVariations] = useState([]);
+  const resetValues = () => {
+    setStores([{ storeId: store.storeId, storeName: store.storeName }]);
+    setIsProductItem(true);
+    setIsNotForSelling(false);
+    setIsExpiringProduct(false);
+    setIsUnique(false);
+    setIsStockTracked(true);
+
+    setComboIngredients([]);
+    setVariations([]);
+
+    setProductNo((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setProductName((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setProductCategory((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setMeasurementUnit((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setBrand((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setUnitPrice((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setReorderLevel((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setBarcode((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setSku((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setTaxRatePerc((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setProductType((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setComboIngrednentSku((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setComboIngrednentQty((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setVariationType((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setVariationValue((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+  };
 
   const [selectedImage, setSelectedImage] = useState(null); // Store selected image
   const [previewUrl, setPreviewUrl] = useState(null); // Store image preview URL
@@ -211,8 +314,6 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
     });
   };
 
-
-
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [measurementUnitOptions, setMeasurementUnitOptions] = useState([]);
 
@@ -243,11 +344,11 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
       productNo: null,
       productName: null,
       barcode: null,
-      storeId:1,
+      storeId: 1,
       productCategoryId: null,
       searchByKeyword: false,
-      skip:0,
-      limit:1
+      skip: 0,
+      limit: 1,
     });
 
     const {
@@ -267,7 +368,7 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
       isNotForSelling,
       sku,
       imageUrl,
-      isExpiringProduct
+      isExpiringProduct,
     } = res.data.results[0][0];
 
     setBarcode((p) => ({ ...p, value: barcode }));
@@ -277,7 +378,7 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
     //   value: JSON.parse(categories).map((c) => c.id),
     // }));
 
-    console.log(' res.data.results[0][0]', res.data.results[0][0])
+    console.log(" res.data.results[0][0]", res.data.results[0][0]);
     setSelectedCategories(JSON.parse(categories).map((c) => c.id));
     setMeasurementUnit((p) => ({ ...p, value: measurementUnitId }));
     setProductNo((p) => ({ ...p, value: productNo }));
@@ -390,105 +491,121 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    const _variations = variations.map((v) => ({
-      ...v,
-      variationDetails:
-        typeof v.variationDetails === "string"
-          ? JSON.parse(v.variationDetails) // Parse if it's a JSON string
-          : v.variationDetails, // Use as-is if it's already an object
-    }));
+    try {
+      const _variations = variations.map((v) => ({
+        ...v,
+        variationDetails:
+          typeof v.variationDetails === "string"
+            ? JSON.parse(v.variationDetails) // Parse if it's a JSON string
+            : v.variationDetails, // Use as-is if it's already an object
+      }));
 
-    const _comboIngredients = [...comboIngredients];
-    console.log("_comboIngredients", _comboIngredients);
+      const _comboIngredients = [...comboIngredients];
+      console.log("_comboIngredients", _comboIngredients);
 
-    const _prepaired_comboIngredients = [];
-    _comboIngredients.map((item) => {
-      return _prepaired_comboIngredients.push({
-        barcode: item.barcode,
-        measurementUnitName: item.measurementUnitName,
-        productId: item.productId,
-        productId_mat: item.productTypeId === 1 ? item.productId_mat : null,
-        variationProductId_mat:
-          item.productTypeId === 2 ? item.productId_mat : null,
-        productName: item.productName,
-        productTypeId: item.productTypeId,
-        productTypeName: item.productTypeName,
-        qty: item.qty,
-        sku: item.sku,
+      const _prepaired_comboIngredients = [];
+      _comboIngredients.map((item) => {
+        return _prepaired_comboIngredients.push({
+          barcode: item.barcode,
+          measurementUnitName: item.measurementUnitName,
+          productId: item.productId,
+          productId_mat: item.productTypeId === 1 ? item.productId_mat : null,
+          variationProductId_mat:
+            item.productTypeId === 2 ? item.productId_mat : null,
+          productName: item.productName,
+          productTypeId: item.productTypeId,
+          productTypeName: item.productTypeName,
+          qty: item.qty,
+          sku: item.sku,
+        });
       });
-    });
 
-    const payLoad = {
-      tableId: null,
-      productNo: productNo.value,
-      productTypeId: parseInt(productType.value),
-      storeIdList: stores,
-      isProductNoAutoGenerate: autoGenerateProductNo,
-      productName: productName.value,
-      categoryIdList: selectedCategories, // Use selectedCategories instead
+      const payLoad = {
+        tableId: null,
+        productNo: productNo.value,
+        productTypeId: parseInt(productType.value),
+        storeIdList: stores,
+        isProductNoAutoGenerate: autoGenerateProductNo,
+        productName: productName.value,
+        categoryIdList: selectedCategories, // Use selectedCategories instead
 
-      variationProductList: _variations,
+        variationProductList: _variations,
 
-      comboProductDetailList: _prepaired_comboIngredients,
-      // comboProductDetailList:[
-      //   {qty:"4",productId_mat:16,variationProductId_mat:null},
-      //   {qty:"7.7",productId_mat:17,variationProductId_mat:null},
-      //   {qty:"2.6",productId_mat:null,variationProductId_mat:10},
-      //    {qty:"7.1",productId_mat:null,variationProductId_mat:11}
-      //   ],
-      measurementUnitId: measurementUnit.value,
-      isNotForSelling: isNotForSelling,
-      imgUrl: uploadResponse?.hash || imageUrl, ///
-      isUnique: isUnique,
-      isStockTracked: isStockTracked,
-      isProductItem: isProductItem,
-      brandId: brand.value,
-      unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
-      sku: sku.value,
-      barcode: barcode.value,
-      reorderLevel: reorderLevel.value,
-      isExpiringProduct:isExpiringProduct,
-    };
+        comboProductDetailList: _prepaired_comboIngredients,
+        // comboProductDetailList:[
+        //   {qty:"4",productId_mat:16,variationProductId_mat:null},
+        //   {qty:"7.7",productId_mat:17,variationProductId_mat:null},
+        //   {qty:"2.6",productId_mat:null,variationProductId_mat:10},
+        //    {qty:"7.1",productId_mat:null,variationProductId_mat:11}
+        //   ],
+        measurementUnitId: measurementUnit.value,
+        isNotForSelling: isNotForSelling,
+        imgUrl: uploadResponse?.hash || imageUrl, ///
+        isUnique: isUnique,
+        isStockTracked: isStockTracked,
+        isProductItem: isProductItem,
+        brandId: brand.value,
+        unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
+        sku: sku.value,
+        barcode: barcode.value,
+        reorderLevel: reorderLevel.value,
+        isExpiringProduct: isExpiringProduct,
+      };
 
-    console.log("payloadd", payLoad);
+      console.log("payloadd", payLoad);
 
-    setIsSubmitting(true);
+      setIsSubmitting(true);
+      console.log("lllllllllllllllllllll", SAVE_TYPE.ADD, saveType);
+      if (saveType === SAVE_TYPE.ADD) {
+        const res = await addProduct(payLoad);
+        if (res.data.error) {
+          const { error } = res.data;
 
-    if (saveType === SAVE_TYPE.ADD) {
-      const res = await addProduct(payLoad);
-      setIsSubmitting(false);
-      if (res.data.error) {
-        const { error } = res.data;
-        showToast("danger", "Exception", error.message);
-        return;
-      }
-      const { outputMessage, responseStatus } = res.data.outputValues;
-      if (responseStatus === "failed") {
-        showToast("warning", "Exception", outputMessage);
+          showToast("danger", "Exception", error.message);
+          setIsSubmitting(false);
+          return;
+        }
+
+        const { outputMessage, responseStatus } = res.data.outputValues;
+        if (responseStatus === "failed") {
+          showToast("warning", "Exception", outputMessage);
+          setIsSubmitting(false);
+        } else {
+          showToast("success", "Success", outputMessage);
+          // navigate(`/products/add?saveType=add`);
+          resetValues();
+        }
+      } else if (saveType === SAVE_TYPE.UPDATE) {
+        const res = await updateProduct(id, payLoad);
+        if (res.data.error) {
+          const { error } = res.data;
+          showToast("danger", "Exception", error.message);
+          setIsSubmitting(false);
+          return;
+        }
+        const { outputMessage, responseStatus } = res.data.outputValues;
+        if (responseStatus === "failed") {
+          showToast("warning", "Exception", outputMessage);
+          setIsSubmitting(false);
+        } else {
+          showToast("success", "Success", outputMessage);
+          //navigate(`/products`);
+        }
       } else {
-        showToast("success", "Success", outputMessage);
-        navigate(`/products`);
+        showToast("danger", "Exception", "Invalid Save type");
       }
-    } else if (saveType === SAVE_TYPE.UPDATE) {
-      const res = await updateProduct(id, payLoad);
+
       setIsSubmitting(false);
-      if (res.data.error) {
-        const { error } = res.data;
-        showToast("danger", "Exception", error.message);
-        return;
-      }
-      const { outputMessage, responseStatus } = res.data.outputValues;
-      if (responseStatus === "failed") {
-        showToast("warning", "Exception", outputMessage);
-      } else {
-        showToast("success", "Success", outputMessage);
-        //navigate(`/products`);
-      }
+    } catch (error) {
+      setIsSubmitting(false);
+      console.error("payloadd", error);
     }
   };
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
+
+
 
   const handleNewAddVariation = () => {
     // Get the last variation to copy its variationDetails structure
@@ -508,19 +625,15 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
         : [], // If no previous variation, initialize with empty array
     };
 
-    // Add the new variation to the state
     setVariations((prevVariations) => [...prevVariations, newVariation]);
   };
 
-  // Adding a new variation type (e.g., color, size, etc.) to an existing variation
   const handleAddVariation = () => {
-    // Ensure a valid variation type is selected
     if (!variationType.value) {
       alert("Please select a valid variation type");
       return;
     }
 
-    // Add the selected variation type to each existing variation in variationDetails
     setVariations((prevIngredients) =>
       prevIngredients.map((ingredient) => {
         // Check if this variation already has the selected type
@@ -624,8 +737,6 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
     }
   };
 
- ;
-
   const validationMessages = (state) => {
     return (
       !state.isValid &&
@@ -649,9 +760,10 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
             </h2>
           </div>
         </div>
-        <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {/* Product Number with Auto Generate Checkbox */}
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <label className="label">
               <span className="label-text text-lg">{productNo.label}</span>
             </label>
@@ -682,23 +794,23 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
               </div>
             </div>
             {validationMessages(productNo)}
-          </div>
+          </div> */}
 
-          {/* Product Name */}
-      <InputField
-        label={productName.label}
-        value={productName.value}
-        onChange={(e) =>
-          handleInputChange(setProductName, productName, e.target.value)
-        }
-        validationMessages={validationMessages(productName)}
-        placeholder="Enter product name"
-      />
+          <InputField
+            label={productName.label}
+            value={productName.value}
+            onChange={(e) =>
+              handleInputChange(setProductName, productName, e.target.value)
+            }
+            validationMessages={validationMessages(productName)}
+            placeholder="Enter product name"
+          />
 
-          {/* Measurement Unit */}
           <div className="flex flex-col">
             <label className="label">
-              <span className="label-text text-lg">{measurementUnit.label}</span>
+              <span className="label-text text-lg">
+                {measurementUnit.label}
+              </span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -752,7 +864,9 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
             <div className="grid grid-cols-3 gap-4">
               <div className="flex flex-col">
                 <label className="label">
-                  <span className="label-text text-lg">{productCategory.label}</span>
+                  <span className="label-text text-lg">
+                    {productCategory.label}
+                  </span>
                 </label>
                 <div className="flex space-x-2">
                   <select
@@ -769,43 +883,56 @@ export default function AddProduct({ saveType=SAVE_TYPE.ADD, id=0 }) {
                       </option>
                     ))}
                   </select>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => {
-                      if (
-                        selectedCategory &&
-                        !selectedCategories.includes(selectedCategory)
-                      ) {
-                        setSelectedCategories([
-                          ...selectedCategories,
-                          parseInt(selectedCategory),
-                        ]);
-                        setSelectedCategory("");
-                      }
-                    }}
-                  >
-                    Add
-                  </button>
+          
+                     <GhostButton
+                           onClick={() => {
+                            if (
+                              selectedCategory &&
+                              !selectedCategories.includes(selectedCategory)
+                            ) {
+                              setSelectedCategories([
+                                ...selectedCategories,
+                                parseInt(selectedCategory),
+                              ]);
+                              setSelectedCategory("");
+                            }
+                          }}
+                          
+                          disabled={selectedCategory===""}
+                          iconClass="pi pi-plus-circle text-lg"
+                            labelClass="text-md font-normal"
+                            label="Add"
+                          color="text-blue-500"
+                          hoverClass="hover:text-blue-700 hover:bg-transparent"
+                        />
+              
                 </div>
               </div>
 
               {/* Selected Categories */}
               <div className="col-span-2 flex flex-col">
                 <label className="label">
-                  <span className="label-text text-lg">Selected Categories</span>
+                  {/* <span className="label-text text-lg">Selected Categories</span> */}
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-6">
                   {categoryOptions.length > 0 &&
                     selectedCategories?.map((categoryId, index) => {
-                      const category = categoryOptions.find((opt) => opt.id === parseInt(categoryId));          
-return <CategoryItem
-  key={categoryId}
-  category={category}
-  onClick={() =>
-    setSelectedCategories(selectedCategories.filter((id) => id !== categoryId))
-  }
-/>;
+                      const category = categoryOptions.find(
+                        (opt) => opt.id === parseInt(categoryId)
+                      );
+                      return (
+                        <CategoryItem
+                          key={categoryId}
+                          category={category}
+                          onClick={() =>
+                            setSelectedCategories(
+                              selectedCategories.filter(
+                                (id) => id !== categoryId
+                              )
+                            )
+                          }
+                        />
+                      );
                     })}
                 </div>
               </div>
@@ -814,42 +941,29 @@ return <CategoryItem
 
           {/* Tax Rate */}
           <InputField
-        label={taxRatePerc.label}
-        value={taxRatePerc.value}
-        onChange={(e) =>
-          handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
-        }
-        validationMessages={validationMessages(taxRatePerc)}
-        placeholder="Enter Tax Perc"
-      />
+            label={taxRatePerc.label}
+            value={taxRatePerc.value}
+            onChange={(e) =>
+              handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
+            }
+            validationMessages={validationMessages(taxRatePerc)}
+            placeholder="Enter Tax Perc"
+          />
 
           {/* Reorder Level */}
           <InputField
-        label={reorderLevel.label}
-        value={reorderLevel.value}
-        onChange={(e) =>
-          handleInputChange(setReorderLevel, reorderLevel, e.target.value)
-        }
-        validationMessages={validationMessages(reorderLevel)}
-        placeholder="Enter Reorder Level"
-      />
-  <div className="flex gap-5 items-center mt-10 justify-center">
-                  <input
-                    type="checkbox"
-                    id="isExpiringProduct"
-                    className="checkbox checkbox-primary"
-                    onChange={(e) => setIsExpiringProduct(e.target.checked)}
-                    checked={isExpiringProduct}
-                  />
-                  <label htmlFor="isExpiringProduct">Expiring Product</label>
-                </div>
+            label={reorderLevel.label}
+            value={reorderLevel.value}
+            onChange={(e) =>
+              handleInputChange(setReorderLevel, reorderLevel, e.target.value)
+            }
+            validationMessages={validationMessages(reorderLevel)}
+            placeholder="Enter Reorder Level"
+          />
+      
 
-
-
-
-          <div className="flex flex-col col-span-3">
-            {/* Checkboxes for Inventory Options */}
-            <div className="flex justify-between items-center mt-5 mb-5">
+          <div className="grid grid-cols-3 col-span-3 gap-10">
+       
               <div className="flex flex-col gap-1">
                 <div className="flex gap-5 items-center">
                   <input
@@ -912,7 +1026,17 @@ return <CategoryItem
                   {getInstruction("isStockTracked")}
                 </p>
               </div>
-            </div>
+         
+              <div className="flex gap-5 items-center mt-10 justify-center">
+            <input
+              type="checkbox"
+              id="isExpiringProduct"
+              className="checkbox checkbox-primary"
+              onChange={(e) => setIsExpiringProduct(e.target.checked)}
+              checked={isExpiringProduct}
+            />
+            <label htmlFor="isExpiringProduct">Expiring Product</label>
+          </div>
           </div>
 
           <div className="flex flex-col">
@@ -936,42 +1060,41 @@ return <CategoryItem
             {validationMessages(productType)}
           </div>
 
+    
+  
           <div className="flex flex-col col-span-2 bg-red">
             <StoresComponent stores={stores} setStores={setStoresHandler} />
           </div>
 
           {productType.value == "1" && (
             <>
-            
-<InputField
-        label={sku.label}
-        value={sku.value}
-        onChange={(e) =>
-          handleInputChange(setSku, sku, e.target.value)
-        }
-        validationMessages={validationMessages(sku)}
-        placeholder="Enter SKU"
-      />
+              <InputField
+                label={sku.label}
+                value={sku.value}
+                onChange={(e) => handleInputChange(setSku, sku, e.target.value)}
+                validationMessages={validationMessages(sku)}
+                placeholder="Enter SKU"
+              />
 
-      <InputField
-        label={barcode.label}
-        value={barcode.value}
-        onChange={(e) =>
-          handleInputChange(setBarcode, barcode, e.target.value)
-        }
-        validationMessages={validationMessages(barcode)}
-        placeholder="Enter Barcode"
-      />
+              <InputField
+                label={barcode.label}
+                value={barcode.value}
+                onChange={(e) =>
+                  handleInputChange(setBarcode, barcode, e.target.value)
+                }
+                validationMessages={validationMessages(barcode)}
+                placeholder="Enter Barcode"
+              />
 
-<InputField
-        label={unitPrice.label}
-        value={unitPrice.value}
-        onChange={(e) =>
-          handleInputChange(setUnitPrice, unitPrice, e.target.value)
-        }
-        validationMessages={validationMessages(unitPrice)}
-        placeholder="Enter UnitPrice"
-      />
+              <InputField
+                label={unitPrice.label}
+                value={unitPrice.value}
+                onChange={(e) =>
+                  handleInputChange(setUnitPrice, unitPrice, e.target.value)
+                }
+                validationMessages={validationMessages(unitPrice)}
+                placeholder="Enter UnitPrice"
+              />
             </>
           )}
 
@@ -1158,38 +1281,33 @@ return <CategoryItem
 
           {productType.value == "3" && (
             <>
-             
-                  <InputField
-        label={sku.label}
-        value={sku.value}
-        onChange={(e) =>
-          handleInputChange(setSku, sku, e.target.value)
-        }
-        validationMessages={validationMessages(sku)}
-        placeholder="Enter SKU"
-      />
+              <InputField
+                label={sku.label}
+                value={sku.value}
+                onChange={(e) => handleInputChange(setSku, sku, e.target.value)}
+                validationMessages={validationMessages(sku)}
+                placeholder="Enter SKU"
+              />
 
-                  <InputField
-        label={barcode.label}
-        value={barcode.value}
-        onChange={(e) =>
-          handleInputChange(setBarcode, barcode, e.target.value)
-        }
-        validationMessages={validationMessages(barcode)}
-        placeholder="Enter Barcode"
-      />
+              <InputField
+                label={barcode.label}
+                value={barcode.value}
+                onChange={(e) =>
+                  handleInputChange(setBarcode, barcode, e.target.value)
+                }
+                validationMessages={validationMessages(barcode)}
+                placeholder="Enter Barcode"
+              />
 
-
-<InputField
-        label={unitPrice.label}
-        value={unitPrice.value}
-        onChange={(e) =>
-          handleInputChange(setUnitPrice, unitPrice, e.target.value)
-        }
-        validationMessages={validationMessages(unitPrice)}
-        placeholder="Enter Unit Price"
-      />
-
+              <InputField
+                label={unitPrice.label}
+                value={unitPrice.value}
+                onChange={(e) =>
+                  handleInputChange(setUnitPrice, unitPrice, e.target.value)
+                }
+                validationMessages={validationMessages(unitPrice)}
+                placeholder="Enter Unit Price"
+              />
 
               <div className="col-span-2 mt-4">
                 <h3 className="text-center font-bold">Combo Ingredients</h3>
@@ -1356,40 +1474,39 @@ return <CategoryItem
                   </table>
                 </div>
               </div>
-
-         
             </>
           )}
 
-<div className="flex items-center gap-4 p-4 border-dashed shadow-sm">
-  {/* File Input */}
-  <label className="flex flex-col items-center cursor-pointer">
-    <span className="mb-2 text-sm font-medium text-gray-700">Upload an Image</span>
-    <input
-      type="file"
-      accept="image/*"
-      onChange={handleImageChange}
-      className="hidden"
-    />
-    <div className="flex items-center justify-center w-40 h-12 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition">
-      Choose File
-    </div>
-  </label>
+          <div className="flex items-center gap-4 p-4 border-dashed shadow-sm">
+            {/* File Input */}
+            <label className="flex flex-col items-center cursor-pointer">
+              <span className="mb-2 text-sm font-medium text-gray-700">
+                Upload an Image
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <div className="flex items-center justify-center w-40 h-12 btn-primary text-white text-sm font-medium rounded-lgtransition">
+                Choose File
+              </div>
+            </label>
 
-  {/* Image Preview */}
-  {previewUrl && (
-    <div className="w-full max-w-md text-center">
-      <div className="relative overflow-hidden rounded-lg ">
-        <img
-          src={previewUrl}
-          alt="Preview"
-          className="object-contain w-full max-h-32 rounded-lg"
-        />
-      </div>
-    </div>
-  )}
-</div>
-
+            {/* Image Preview */}
+            {previewUrl && (
+              <div className="w-full max-w-md text-center">
+                <div className="relative overflow-hidden rounded-lg ">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="object-contain w-full max-h-32 rounded-lg"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* {JSON.stringify(uploadResponse, null, 2)} */}
           <div className="flex justify-center mt-20 mb-10 col-span-full">
