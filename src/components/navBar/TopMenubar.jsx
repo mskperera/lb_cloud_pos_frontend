@@ -134,7 +134,7 @@ export default function TopMenubar() {
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full bg-white px-10 gap-2 m-0 p-0  h-16 z-50">
+    <nav className="navbar fixed top-0 left-0 w-full bg-[#f8fafd] px-10 gap-2 m-0 p-0  h-16 z-50">
       <div className="flex justify-between items-center w-full m-0 p-0">
       <div className="flex justify-start gap-4">
         <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">

@@ -1,4 +1,4 @@
-import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk, faCashRegister } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -65,7 +65,7 @@ import './sidebar.css';
 
 const Sidebar = () => {
     return (
-      <div className="sidebar bg-white w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
+      <div className="sidebar bg-[#f8fafd] w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
       <div className="mb-8 flex items-center justify-center">
         <FontAwesomeIcon icon={faHome} className="text-4xl text-primaryColor" />
       </div>
@@ -79,10 +79,10 @@ const Sidebar = () => {
   
           <SidebarMenu
             label="Registers"
-            iconName={faCalculator}
+            iconName={faCashRegister}
             submenuItems={[
-              { label: "Terminal 1", to: "/register/1", icon: faCalculator },
-              { label: "Terminal 2", to: "/register/2", icon: faCalculator },
+              { label: "Terminal 1", to: "/register/1", icon: faCashRegister },
+              { label: "Terminal 2", to: "/register/2", icon: faCashRegister },
       
             ]}
           />
