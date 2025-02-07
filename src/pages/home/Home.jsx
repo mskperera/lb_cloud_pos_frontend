@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk, faCashRegister } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "../../utils/format";
 import { useDispatch } from "react-redux";
 import { setSelectedStore } from "../../state/store/storeSlice";
@@ -105,7 +105,8 @@ const HomeMenuButton = ({
             className="w-[80px] h-[80px] rounded-lg object-cover"
           /> */}
 
-        <i className={`${iconName} text-3xl text-gray-700`} />
+        {/* <i className={`${iconName} text-3xl text-gray-700`} /> */}
+        <FontAwesomeIcon icon={iconName} className="text-xl" />
       </div>
       <div className="text-lg  font-semibold text-gray-800 truncate group-hover:overflow-visible group-hover:text-ellipsis group-hover:whitespace-normal">
         {label}
@@ -333,13 +334,10 @@ const Home = () => {
   
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 ml-64 p-10">
-    
-        <div className="flex gap-4 justify-center w-full">
-        <UserInfo />
-    
-        </div>
-      
+      <div className="flex-1 ml-64">
+      <div className="flex justify-between items-center gap-52">
+  
+
         <div className="w-full my-24">
             {/* <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">
               Registers
@@ -349,17 +347,20 @@ const Home = () => {
               {/* Example for home buttons */}
               <HomeMenuButton
                 label="Terminal 1"
-                iconName="pi pi-calculator"
+                iconName={faCashRegister}
                 to="/register/1"
               />
               <HomeMenuButton
                 label="Terminal 2"
-                iconName="pi pi-calculator"
+                iconName={faCashRegister}
                 to="/register/2"
               />
             </div>
             </div>
 
+            <UserInfo />
+
+      </div>
       </div>
     </div>}
       </>
