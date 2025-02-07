@@ -21,8 +21,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import TopCards from "../../components/dashboard/TopCards";
 import { getDashboardDetails } from "../../functions/dashboard";
 import { getCurrencyInfo } from "../../utils/utils";
-import { formatCurrency } from "../../utils/format";
-import { getDrpSession } from "../../functions/dropdowns";
+import { formatCurrency, formatDate, formatUtcToLocal } from "../../utils/format";
+import { getDrpSession, getStoresDrp } from "../../functions/dropdowns";
+import LowStockProducts from "../../components/lowStockProducts/LowStockProducts";
 
 Chart.register(ChartDataLabels);
 
@@ -52,7 +53,7 @@ function Dashboard() {
     labels: Array.from({ length: 31 }, (_, i) => i + 1), // Days in the month
     datasets: [
       {
-        label: "Daily Revenue",
+        label: "Gross Revenue",
         data: [
           200, 250, 300, 400, 350, 500, 450, 550, 600, 700, 800, 900, 950, 1000,
           1100, 1200, 1250, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000,
@@ -63,16 +64,28 @@ function Dashboard() {
         tension: 0.4, // Smooth curve for the line
       },
       {
-        label: "Daily Profit",
+        label: "Net Revenue",
         data: [
           50, 60, 70, 90, 80, 100, 90, 110, 120, 140, 160, 180, 190, 200, 220,
           250, 260, 270, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500,
           520, 540, 560, 580,
-        ], // Daily profit sample data
+        ], // Net Revenue sample data
         borderColor: "rgba(40, 167, 69, 0.8)", // Greenish color for profit
         backgroundColor: "rgba(40, 167, 69, 0.3)", // Light greenish background
         tension: 0.4, // Smooth curve for the line
       },
+      {
+        label: "Gross Profit",
+        data: [
+          50, 60, 70, 90, 80, 100, 90, 110, 120, 140, 160, 180, 190, 200, 220,
+          250, 260, 270, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500,
+          520, 540, 560, 580,
+        ], // Gross Profit sample data
+        borderColor: "rgba(40, 167, 69, 0.8)", // Greenish color for profit
+        backgroundColor: "rgba(40, 167, 69, 0.3)", // Light greenish background
+        tension: 0.4, // Smooth curve for the line
+      },
+
     ],
   });
 
@@ -93,21 +106,31 @@ function Dashboard() {
     ], // Monthly labels
     datasets: [
       {
-        label: "Monthly Revenue",
+        label: "Gross Revenue",
         data: [
           6000, 7500, 9000, 12000, 10500, 15000, 13500, 16500, 18000, 21000,
           24000, 27000,
-        ], // Monthly revenue sample data
+        ], // Gross Revenue sample data
         borderColor: "rgba(0, 123, 255, 0.8)", // Blueish color for revenue
         backgroundColor: "rgba(0, 123, 255, 0.3)", // Light blueish background
         tension: 0.4,
       },
       {
-        label: "Monthly Profit",
+        label: "Net Revenue",
         data: [
           1000, 1200, 1500, 2000, 1800, 2500, 2200, 2700, 3000, 3500, 4000,
           4500,
-        ], // Monthly profit sample data
+        ], // Net Revenue sample data
+        borderColor: "rgba(40, 167, 69, 0.8)", // Greenish color for profit
+        backgroundColor: "rgba(40, 167, 69, 0.3)", // Light greenish background
+        tension: 0.4,
+      },
+      {
+        label: "Gross Profit",
+        data: [
+          1000, 1200, 1500, 2000, 1800, 2500, 2200, 2700, 3000, 3500, 4000,
+          4500,
+        ], // Gross Profit sample data
         borderColor: "rgba(40, 167, 69, 0.8)", // Greenish color for profit
         backgroundColor: "rgba(40, 167, 69, 0.3)", // Light greenish background
         tension: 0.4,
@@ -129,357 +152,47 @@ function Dashboard() {
   const [selectedSession, setSelectedSession] = useState(null); // Session state
   const [sessionsOptions, setSessionsOptions] = useState([]); // Session options from API
 
-  const loadDashboardDetails = async (sessionId) => {
-    try {
-      const filteredData = { sessionId };
-      const result = await getDashboardDetails(filteredData);
-      const records = result.data.results;
-      const data = records[0][0];
-      setDashboardCards(data);
+  const [selectedStore, setSelectedStore] = useState(null);
+  const [storeOptions, setStoreOptions] = useState([]); // Session options from API
+  const [showCharts, setShowCharts] = useState(false);
+  
 
-      const dailyRevenueRecords = records[1]; // Daily revenue data
-      const monthlyRevenueRecords = records[2]; // Monthly revenue data
-
-      // Prepare daily data (for days 1 to 31)
-      const dailyRevenueData = {
-        labels: Array.from({ length: 31 }, (_, i) => i + 1), // Days 1 to 31
-        datasets: [
-          {
-            label: "Daily Revenue",
-            data: Array.from({ length: 31 }, (_, i) => {
-              const record = dailyRevenueRecords.find(
-                (item) => item.Day === i + 1
-              );
-              return record ? parseFloat(record.DailyRevenue) : 0; // Set to 0 if no data for the day
-            }),
-            borderColor: "rgba(0, 123, 255, 0.8)", // Blueish color for revenue
-            backgroundColor: "rgba(0, 123, 255, 0.8)",
-            tension: 0.4,
-          },
-          {
-            label: "Daily Profit",
-            data: Array.from({ length: 31 }, (_, i) => {
-              const record = dailyRevenueRecords.find(
-                (item) => item.Day === i + 1
-              );
-              return record ? parseFloat(record.DailyProfit) : 0; // Set to 0 if no data for the day
-            }),
-            borderColor: "rgba(40, 167, 69, 0.8)", // Greenish color for profit
-            backgroundColor: "rgba(40, 167, 69, 0.8)", // Light greenish background
-            tension: 0.4,
-          },
-        ],
-      };
-
-      // Prepare monthly data (for months 1 to 12)
-      const monthlyRevenueData = {
-        labels: Array.from({ length: 12 }, (_, i) => `Month ${i + 1}`), // Month 1 to 12
-        datasets: [
-          {
-            label: "Monthly Revenue",
-            data: Array.from({ length: 12 }, (_, i) => {
-              const record = monthlyRevenueRecords.find(
-                (item) => item.Month === i + 1
-              );
-              return record ? parseFloat(record.MonthlyRevenue) : 0; // Set to 0 if no data for the month
-            }),
-            borderColor: "rgba(0, 123, 255, 0.8)", // Blueish color for revenue
-            backgroundColor: "rgba(0, 123, 255, 0.8)",
-            tension: 0.4,
-          },
-          {
-            label: "Monthly Profit",
-            data: Array.from({ length: 12 }, (_, i) => {
-              const record = monthlyRevenueRecords.find(
-                (item) => item.Month === i + 1
-              );
-              return record ? parseFloat(record.MonthlyProfit) : 0; // Set to 0 if no data for the month
-            }),
-            borderColor: "rgba(40, 167, 69, 0.8)", // Greenish color for profit
-            backgroundColor: "rgba(40, 167, 69, 0.8)", // Light greenish background
-            tension: 0.4,
-          },
-        ],
-      };
-
-      // Set the state with the data
-      setDailyRevenueData(dailyRevenueData);
-      setMonthlyRevenueData(monthlyRevenueData);
-
-      const paymenBreakdowntData = records[3];
-
-      const paymentTableData = [];
-      paymenBreakdowntData.forEach((item) => {
-        paymentTableData.push({
-          method: item.method,
-          transactions: item.transactions,
-          amount: formatCurrency(item.amount, false),
-        });
-      });
-
-      setPaymentDataTable(paymentTableData);
-    } catch (err) {
-      console.log("Error fetching categories:", err);
-    }
-  };
-
-  // Sample Data for Charts
-  const salesData = {
-    labels: ["Daily", "Weekly", "Monthly", "Yearly"],
-    datasets: [
-      {
-        label: "Revenue",
-        data: [5000, 35000, 120000, 1440000],
-        borderColor: "rgba(75,192,192,1)",
-        fill: false,
-      },
-    ],
-  };
-
-  const refundsData = {
-    labels: ["Refunds (Number)", "Refunds (Value)"],
-    datasets: [{ data: [15, 3000], backgroundColor: ["#FF5733", "#FFC300"] }],
-  };
-  const inventoryData = {
-    labels: ["In Stock", "Low Stock", "Out of Stock"],
-    datasets: [
-      {
-        data: [300, 50, 20],
-        backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384"],
-      },
-    ],
-  };
-
-  const revenueData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ], // Monthly labels
-    datasets: [
-      {
-        label: "Daily Revenue",
-        data: [200, 250, 300, 400, 350, 500, 450, 550, 600, 700, 800, 900], // Daily revenue sample data
-        borderColor: "rgba(54, 162, 235, 0.8)", // Blue
-        backgroundColor: "rgba(54, 162, 235, 0.3)",
-        tension: 0.4, // Smooth curve
-      },
-      {
-        label: "Weekly Revenue",
-        data: [
-          1400, 1800, 2100, 2800, 2450, 3500, 3150, 3850, 4200, 4900, 5600,
-          6300,
-        ], // Weekly revenue sample data
-        borderColor: "rgba(75, 192, 192, 0.8)", // Teal
-        backgroundColor: "rgba(75, 192, 192, 0.3)",
-        tension: 0.4,
-      },
-      {
-        label: "Monthly Revenue",
-        data: [
-          6000, 7500, 9000, 12000, 10500, 15000, 13500, 16500, 18000, 21000,
-          24000, 27000,
-        ], // Monthly revenue sample data
-        borderColor: "rgba(255, 206, 86, 0.8)", // Yellow
-        backgroundColor: "rgba(255, 206, 86, 0.3)",
-        tension: 0.4,
-      },
-      {
-        label: "Yearly Revenue",
-        data: [
-          100000, 120000, 140000, 160000, 180000, 200000, 220000, 240000,
-          260000, 280000, 300000, 320000,
-        ], // Yearly revenue sample data
-        borderColor: "rgba(255, 99, 132, 0.8)", // Red
-        backgroundColor: "rgba(255, 99, 132, 0.3)",
-        tension: 0.4,
-      },
-    ],
-  };
-
-  //Total revenue (daily, weekly, monthly, yearly).
-  const optionsRevenue = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        // text: "Total Revenue (Daily, Weekly, Monthly, Yearly)",
-        font: {
-          size: 20,
-        },
-      },
+  const [lowStockProductsData,setLowStockProductsData] =useState([
+    {
+      sku: "12345",
+      productName: "Product A",
+      qty: 100,
+      expQty:0,
+      supplier: "Supplier A",
     },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Months",
-          font: {
-            size: 16,
-          },
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Revenue ($)",
-          font: {
-            size: 16,
-          },
-        },
-      },
+    {
+      sku: "67890",
+      productName: "Product B",
+      qty: 50,
+      expQty: 0,
+      supplier: "Supplier B",
     },
-  };
+    {
+      sku: "11223",
+      productName: "Product C",
+      qty: 200,
+      expQty: 2,
+      supplier: "Supplier C",
+    },
+  ]);
 
-  // PaymentMethodChartData
-  const paymentData = {
-    labels: ["Cash", "Card", "Digital Wallets"], // Payment methods
-    datasets: [
-      {
-        label: "Transactions",
-        data: [120, 200, 150], // Example data for each payment method
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.8)", // Cash: Pink
-          "rgba(54, 162, 235, 0.8)", // Card: Blue
-          "rgba(75, 192, 192, 0.8)", // Digital Wallets: Teal
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(75, 192, 192, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  //PaymentMethodChartOptions
-  const optionsPaymentMethods = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top", // Legend at the top
-      },
-      title: {
-        display: true,
-        text: "Payment Method Breakdown",
-        font: {
-          size: 20,
-        },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Payment Methods",
-          font: {
-            size: 16,
-          },
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Number of Transactions",
-          font: {
-            size: 16,
-          },
-        },
-        beginAtZero: true, // Ensures y-axis starts at zero
-      },
-    },
-  };
-
-  // Total daily revenue chart options
-  const optionsDailyRevenue = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "January",
-        font: {
-          size: 14,
-        },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Days",
-          font: {
-            size: 16,
-          },
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Revenue ($)",
-          font: {
-            size: 16,
-          },
-        },
-      },
-    },
-  };
-
-  // Monthly Revenue Chart Options
-  const optionsMonthlyRevenue = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Year 2025",
-        font: {
-          size: 14,
-        },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Months",
-          font: {
-            size: 16,
-          },
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Revenue ($)",
-          font: {
-            size: 16,
-          },
-        },
-      },
-    },
-  };
+  const lowStockProductsColumns = [
+    { name: "SKU", key: "sku", align: "left" },
+    { name: "Product Name", key: "productName", align: "left" },
+    { name: "Qty (Remaining)", key: "qty", align: "right" },
+    { name: "Qty (Expired)", key: "qty", align: "right" },
+    { name: "Supplier", key: "supplier", align: "left" },
+    { name: "Reorder Level", key: "reorderLevel", align: "left" },
+  ];
 
   // Data for products nearing expiration
 
-  const productsExpirationData = [
+  const [productsExpirationData,setProductsExpirationData] = useState([
     {
       sku: "12345",
       productName: "Product A",
@@ -504,53 +217,297 @@ function Dashboard() {
       qty: 200,
       supplier: "Supplier C",
     },
-  ];
+  ]);
 
-  // Column names for the products table
-  const productsExpirationColumns = [
-    { name: "SKU", key: "sku", align: "left" },
-    { name: "Product Name", key: "productName", align: "left" },
-    { name: "Batch No", key: "batchNo", align: "center" },
-    { name: "Expiration Date", key: "expDate", align: "center" },
-    { name: "Qty (Remaining)", key: "qty", align: "right" },
-    { name: "Supplier", key: "supplier", align: "left" },
-  ];
+// Column definitions
+const productsExpirationColumns = [
+  { name: "SKU", key: "sku", align: "left" },
+  { name: "Product Name", key: "productName", align: "left" },
+  { name: "Batch No", key: "batchNo", align: "center" },
+  { name: "Expiration Date", key: "expDate", align: "center" },
+  { name: "Qty (Remaining)", key: "qty", align: "right" },
+  { name: "Supplier", key: "supplier", align: "left" },
+];
 
-  // Column configuration for High-Value Customers with dynamic alignment
-  const highValueCustomerColumns = [
-    { name: "Customer Code", key: "customerCode", align: "left" },
-    { name: "Customer Name", key: "customerName", align: "left" },
-    { name: "Last Purchase Date", key: "lastPurchaseDate", align: "center" },
-    { name: "Loyalty Points", key: "loyaltyPoints", align: "center" },
-  ];
+
+  // Load session data
+  const loadDrpSession = async () => {
+    const objArr = await getDrpSession("desc",selectedStore);
+    setSessionsOptions(objArr.data.results[0]);
+  };
+
+    // Load session data
+    const loadDrpStore= async () => {
+      const objArr = await getStoresDrp();
+      setStoreOptions(objArr.data.results[0]);
+    };
+
+  // Load store from localStorage
+  const loadStoreFromLocalStorage = () => {
+    const store = JSON.parse(localStorage.getItem('stores'))[0];
+    console.log('store',store)
+    if (store) {
+      setSelectedStore(store.storeId);
+    }
+  };
+
+  const loadDashboardDetails = async (sessionId) => {
+    try {
+      const filteredData = { sessionId };
+      const result = await getDashboardDetails(filteredData);
+      const records = result.data.results;
+      const data = records[0][0];
+      setDashboardCards(data);
+
+       const dailyRevenueRecords = records[1]; // Daily revenue data
+      const monthlyRevenueRecords = records[2]; // Monthly revenue data
+
+      // Prepare daily data (for days 1 to 31)
+      const dailyRevenueData = {
+        labels: Array.from({ length: 31 }, (_, i) => i + 1), // Days 1 to 31
+        datasets: [
+          {
+            label: "Gross Revenue",
+            data: Array.from({ length: 31 }, (_, i) => {
+              const record = dailyRevenueRecords.find(
+                (item) => item.Day === i + 1
+              );
+              return record ? parseFloat(record.dailyGrossRevenue) : 0; // Set to 0 if no data for the day
+            }),
+      borderColor: "rgba(0, 123, 255, 0.8)", // Blue
+      backgroundColor: "rgba(0, 123, 255, 0.3)",
+            tension: 0.4,
+          },
+            {
+            label: "Net Revenue",
+            data: Array.from({ length: 31 }, (_, i) => {
+              const record = dailyRevenueRecords.find(
+                (item) => item.Day === i + 1
+              );
+              return record ? parseFloat(record.dailyNetRevenue) : 0; // Set to 0 if no data for the day
+            }),
+  borderColor: "rgba(255, 193, 7, 0.8)", // Yellow
+      backgroundColor: "rgba(255, 193, 7, 0.3)",
+            tension: 0.4,
+          },
+          {
+            label: "Gross Profit",
+            data: Array.from({ length: 31 }, (_, i) => {
+              const record = dailyRevenueRecords.find(
+                (item) => item.Day === i + 1
+              );
+              return record ? parseFloat(record.dailyGrossProfit) : 0; // Set to 0 if no data for the day
+            }),
+       borderColor: "rgba(40, 167, 69, 0.8)", // Green
+      backgroundColor: "rgba(40, 167, 69, 0.3)",
+            tension: 0.4,
+          },
+        ],
+      };
+
+      // Prepare monthly data (for months 1 to 12)
+      const monthlyRevenueData = {
+        labels: Array.from({ length: 12 }, (_, i) => `Month ${i + 1}`), // Month 1 to 12
+        datasets: [
+          {
+            label: "Gross Revenue",
+            data: Array.from({ length: 12 }, (_, i) => {
+              const record = monthlyRevenueRecords.find(
+                (item) => item.Month === i + 1
+              );
+              return record ? parseFloat(record.monthlyGrossRevenue) : 0; // Set to 0 if no data for the month
+            }),
+       borderColor: "rgba(0, 123, 255, 0.8)", // Blue
+      backgroundColor: "rgba(0, 123, 255, 0.3)",
+            tension: 0.4,
+          },
+               {
+            label: "Neet Revenue",
+            data: Array.from({ length: 12 }, (_, i) => {
+              const record = monthlyRevenueRecords.find(
+                (item) => item.Month === i + 1
+              );
+              return record ? parseFloat(record.monthlyNetRevenue) : 0; // Set to 0 if no data for the month
+            }),
+    borderColor: "rgba(255, 193, 7, 0.8)", // Yellow
+      backgroundColor: "rgba(255, 193, 7, 0.3)",
+            tension: 0.4,
+          },
+          {
+            label: "Gross Profit",
+            data: Array.from({ length: 12 }, (_, i) => {
+              const record = monthlyRevenueRecords.find(
+                (item) => item.Month === i + 1
+              );
+              return record ? parseFloat(record.monthlyGrossProfit) : 0; // Set to 0 if no data for the month
+            }),
+      borderColor: "rgba(40, 167, 69, 0.8)", // Green
+      backgroundColor: "rgba(40, 167, 69, 0.3)",
+            tension: 0.4,
+          },
+        ],
+      };
+
+      // Set the state with the data
+      setDailyRevenueData(dailyRevenueData);
+      setMonthlyRevenueData(monthlyRevenueData);
+
+      const paymenBreakdowntData = records[3];
+
+      const paymentTableData = [];
+      paymenBreakdowntData.forEach((item) => {
+        paymentTableData.push({
+          method: item.method,
+          transactions: item.transactions,
+          amount: formatCurrency(item.amount, false),
+        });
+      });
+
+      setPaymentDataTable(paymentTableData);
+
+      //Low Stock Products
+      const lowStockProducts = records[4];
+
+// Process low stock products data
+const lowStockProductsData = lowStockProducts.map((item) => ({
+  sku: item.sku,
+  productName: item.productName,
+  qty: item.qty,
+  expQty: item.expQty || 0,
+  supplier: item.supplier,
+  reorderLevel:item.reorderLevel
+}));
+
+
+
+// Set state with the processed data
+setLowStockProductsData(lowStockProductsData);
+
+
+      const productsNearingExpiration=records[5];
+const productsExpirationData = productsNearingExpiration.map((item) => ({
+  sku: item.sku,
+  productName: item.productName,
+  batchNo: item.batchNo,
+  expDate:formatUtcToLocal(item.expDate,true),
+  qty: item.qty,
+  supplier: item.supplier,
+}));
+
+setProductsExpirationData(productsExpirationData);
+
+
+const inventoryRecords=records[6];
+// Mapping the result to the chart data format
+    
+console.log('inventoryRecords',inventoryRecords);
+const { inStock, lowStock, outOfStock,expiredStock } = inventoryRecords[0]; // Destructure counts
+
+
+setInventoryData({
+  labels: ["In Stock", "Expired Stock", "Low Stock", "Out of Stock"],
+  datasets: [
+    {
+      data: [inStock, expiredStock, lowStock, outOfStock], // Use the counts from your query
+      backgroundColor: [
+        "#36A2EB",  // In Stock (Blue)
+        "#FFCE56",  // Expired Stock (Yellow)
+        "#FF6384",  // Low Stock (Pink)
+        "#FF6F61",  // Out of Stock (Red)
+      ],
+    },
+  ],
+});
+
+
+
+const highValuedCustomerRecords=records[7];
+
+
+// Mapping the highValuedCustomerRecords to the required format with all the columns from the query
+const highValueCustomerData = highValuedCustomerRecords.map((customer) => ({
+  customerCode: customer.customerCode,
+  customerName: customer.customerName,
+  lastPurchaseDate:formatUtcToLocal(customer.lastPurchaseDate),  // The most recent purchase date
+  numberOfPurchases: customer.NumberOfPurchases, // Total number of purchases made by the customer
+  averageOrderValue: customer.averageOrderValue, // Average amount spent per order
+  totalSpend:formatCurrency(customer.totalSpend,false), // Total spend of the customer
+  numberOfReturns: customer.numberOfReturns, // Number of returns made by the customer
+  totalRefundAmount: customer.totalRefundAmount, // Total refund amount based on returns
+  purchaseFrequency: customer.purchaseFrequency, // Purchase frequency (Weekly/Monthly)
+  //mostFrequentItems: customer.mostFrequentItems, // Most frequently purchased items
+  mostUsedPaymentMethod: customer.mostUsedPaymentMethod, // Most used payment method
+}));
+
+
+console.log('High Value Customer Data:', highValueCustomerData);
+setHighValueCustomerData(highValueCustomerData);
+
+
+
+    } catch (err) {
+      console.log("Error fetching categories:", err);
+    }
+  };
+
+  // Sample Data for Charts
+  const salesData = {
+    labels: ["Daily", "Weekly", "Monthly", "Yearly"],
+    datasets: [
+      {
+        label: "Revenue",
+        data: [5000, 35000, 120000, 1440000],
+        borderColor: "rgba(75,192,192,1)",
+        fill: false,
+      },
+    ],
+  };
+
+  const refundsData = {
+    labels: ["Refunds (Number)", "Refunds (Value)"],
+    datasets: [{ data: [15, 3000], backgroundColor: ["#FF5733", "#FFC300"] }],
+  };
+
+
+
+  const [inventoryData,setInventoryData] =useState({
+    labels: ["In Stock", "Low Stock", "Out of Stock"],
+    datasets: [
+      {
+        data: [300, 50, 20],
+        backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384"],
+      },
+    ],
+  });
+
+  const inventoryOptions = {
+    plugins: {
+      legend: {
+        position: "top",
+      },
+    },
+    maintainAspectRatio: false,
+    responsive: true,
+  };
+
+
+ // The columns structure for the table
+const highValueCustomerColumns = [
+  { name: "Customer Code", key: "customerCode", align: "left" },
+  { name: "Customer Name", key: "customerName", align: "left" },
+  { name: "Last Purchase Date", key: "lastPurchaseDate", align: "center" },
+  { name: "Number of Purchases", key: "numberOfPurchases", align: "center" },
+  { name: "Average Order Value", key: "averageOrderValue", align: "center" },
+  { name: "Total Spend", key: "totalSpend", align: "center" },
+  { name: "Number of Returns", key: "numberOfReturns", align: "center" },
+  { name: "Total Refund Amount", key: "totalRefundAmount", align: "center" },
+  { name: "Purchase Frequency", key: "purchaseFrequency", align: "center" },
+  // { name: "Most Frequent Items", key: "mostFrequentItems", align: "left" },
+  { name: "Most Used Payment Method", key: "mostUsedPaymentMethod", align: "left" },
+];
 
   // High-value customers data with keys matching the column "key" values
-  const highValueCustomerData = [
-    {
-      customerCode: "C001",
-      customerName: "John Doe",
-      lastPurchaseDate: "2024-01-10",
-      loyaltyPoints: 1200,
-    },
-    {
-      customerCode: "C002",
-      customerName: "Jane Smith",
-      lastPurchaseDate: "2024-01-08",
-      loyaltyPoints: 1050,
-    },
-    {
-      customerCode: "C003",
-      customerName: "Sam Wilson",
-      lastPurchaseDate: "2024-01-15",
-      loyaltyPoints: 850,
-    },
-    {
-      customerCode: "C004",
-      customerName: "Alice Johnson",
-      lastPurchaseDate: "2024-01-12",
-      loyaltyPoints: 1500,
-    },
-  ];
+  const [highValueCustomerData,setHighValueCustomerData] =useState([]);
 
   // Column configuration for Sales Processed by Staff with dynamic alignment
   const salesProcessedByStaffColumns = [
@@ -588,36 +545,7 @@ function Dashboard() {
     },
   ];
 
-  const paymentBreakdownData = {
-    labels: ["Credit Card", "PayPal", "Bank Transfer", "Cash"],
-    datasets: [
-      {
-        data: [300, 500, 200, 100],
-        backgroundColor: ["#4e73df", "#1cc88a", "#36b9cc", "#f6c23e"],
-        hoverBackgroundColor: ["#375abd", "#17a673", "#2c9faf", "#d4a22c"],
-        borderWidth: 1,
-      },
-    ],
-  };
 
-  const paymentOptions = {
-    plugins: {
-      legend: {
-        position: "top",
-      },
-    },
-    maintainAspectRatio: false,
-    responsive: true,
-  };
-
-  const loadDrpSession = async () => {
-    const objArr = await getDrpSession("desc");
-    setSessionsOptions(objArr.data.results[0]);
-  };
-
-  useEffect(() => {
-    loadDrpSession();
-  }, []);
 
   useEffect(() => {
     if (sessionsOptions.length > 0) {
@@ -627,64 +555,49 @@ function Dashboard() {
     }
   }, [sessionsOptions]);
 
+
+
+
+  // Handle session change
   const handleSessionChange = (e) => {
     const selectedSessionId = e.target.value;
-    console.log("handleSessionChange", selectedSessionId);
     setSelectedSession(selectedSessionId);
-    loadDashboardDetails(selectedSessionId);
   };
 
-  // const profitMarginData = {
-  //   labels: ['Gross Revenue', 'Net Revenue'],
-  //   datasets: [{ data: [1440000, 1200000], backgroundColor: ['#4CAF50', '#36A2EB'] }],
-  // };
+  // Handle store change
+  const handleStoreChange = (e) => {
+    const selectedStoreId = e.target.value;
+    setSelectedStore(selectedStoreId);
+  };
 
-  const [profitMarginData, setProfitMarginData] = useState({
-    labels: ["Gross Revenue", "Net Revenue"],
-    datasets: [
-      {
-        data: [1440000, 1200000], // Placeholder values, will be updated
-        backgroundColor: ["#4CAF50", "#36A2EB"],
-      },
-    ],
-  });
+  useEffect(() => {
+    loadDrpStore();
+  }, []);
+
+  useEffect(() => {
+    loadStoreFromLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    loadDrpSession();
+    //loadStoreFromLocalStorage();
+  }, [selectedStore]);
+
+
+
+
+  useEffect(() => {
+    if (sessionsOptions.length > 0 && selectedStore) {
+      loadDashboardDetails(selectedSession);
+      setShowCharts(true);
+    }
+    else{
+      setShowCharts(false);
+    }
+  }, [sessionsOptions, selectedStore, selectedSession]);
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* <div
-        className={` bg-sky-900 text-white ${
-          isCollapsed ? 'w-20' : 'w-64'
-        } flex-shrink-0 transition-all duration-300 shadow-md overflow-y-auto`}
-      >
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-4 focus:outline-none bg-sky-700 hover:bg-sky-600 w-full text-left"
-        >
-          <span>{isCollapsed ? '☰' : 'Collapse'}</span>
-        </button>
-        <nav className="p-4">
-          <ul className="space-y-4">
-            <li>
-              <a href="#" className="flex items-center gap-4 hover:text-blue-400">
-                <i className="pi pi-chart-line text-3xl text-white" />
-                {!isCollapsed && <span>Sales Overview</span>}
-              </a>
-            </li>
-            <li>
-              <a href="#" className="flex items-center gap-4 hover:text-blue-400">
-                <i className="pi pi-shopping-cart text-3xl text-white" />
-                {!isCollapsed && <span>Inventory</span>}
-              </a>
-            </li>
-            <li>
-              <a href="#" className="flex items-center gap-4 hover:text-blue-400">
-                <i className="pi pi-clipboard text-3xl text-white" />
-                {!isCollapsed && <span>Customer Insights</span>}
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div> */}
 
       <div className="flex-1 ml-5 p-4 overflow-y-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between bg-white shadow-sm rounded-lg p-6 mb-6">
@@ -700,12 +613,39 @@ function Dashboard() {
               </span>
             </p>
           </div>
+
+          <div className="flex justify-start gap-10">
+       
+            <div className="mt-4 md:mt-0">
+            <label
+              htmlFor="session-dropdown"
+              className="text-md font-medium text-gray-700 mr-2"
+            >
+              Store :
+            </label>
+            <select
+              id="session-dropdown"
+              value={selectedStore || "All"}
+              onChange={handleStoreChange}
+              className="input input-bordered"
+            >
+                {/* <option value="All">All Stores</option> */}
+              {storeOptions.map((store) => (
+                <option key={store.id} value={store.id}>
+                  {store.displayName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+
+
           <div className="mt-4 md:mt-0">
             <label
               htmlFor="session-dropdown"
               className="text-md font-medium text-gray-700 mr-2"
             >
-              Select Session:
+             Session:
             </label>
             <select
               id="session-dropdown"
@@ -721,17 +661,75 @@ function Dashboard() {
               ))}
             </select>
           </div>
+          </div>
+
         </div>
 
-        <TopCards data={dashboardCards} />
-
-        {/* Chart Section */}
       
+    {showCharts ?  <>
+      <TopCards data={dashboardCards} />
+
             <RevenueChart
               monthlyRevenueData={monthlyRevenueData}
               dailyRevenueData={dailyRevenueData}
             />
       
+
+      <div className="grid grid-cols-3 gap-5 my-5">
+          <div className="col-span-2">
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-xl mb-4">Payment Method Breakdown</h3>
+            <TableView
+              data={paymentDataTable}
+              columns={paymentDataTableColumns}
+            />
+          </div>
+          </div>
+          </div>
+
+ 
+
+          <div className="grid grid-cols-3 gap-5 my-5">
+          <div className="col-span-2">
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-xl mb-4">Low Stock Products</h3>
+<TableView
+             // title="Low Stock Products"
+              data={lowStockProductsData}
+              columns={lowStockProductsColumns}
+            />
+      </div>
+      </div>
+
+
+   
+
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+      
+            <h3 className="text-xl mb-4">Inventory Status</h3>
+            <DoughnutChart
+              data={inventoryData}
+              options={inventoryOptions}
+              labels={{ show: true, labelType: "percentage" }}
+            />
+          </div>
+</div>
+
+
+
+          {/* <LowStockProducts  lowStockProductsData={lowStockProductsData}
+              lowStockProductsColumns={lowStockProductsColumns}/>
+            */}
+
+
+      {/* <div className="bg-white p-6 rounded-lg shadow-sm mt-6">
+          <PieChart
+            data={profitMarginData}
+            options={paymentOptions}
+            labels={{ show: true, labelType: "value", prefix: "Rs" }}
+          />
+        </div> */}
+
           {/* <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-xl mb-4">Profit Margins</h3>
             <PieChart
@@ -750,52 +748,53 @@ function Dashboard() {
   <h3 className="text-xl mb-4">Monthly Revenue</h3>
   <LineChart data={monthlyRevenueData} options={optionsMonthlyRevenue} labels={{ show: true, labelType: "" }} />
 </div> */}
-        
-        <div className="grid grid-cols-3 gap-5 my-5">
-          <div className="col-span-2">
-            <TableView
-              title="Payment Method Breakdown"
-              data={paymentDataTable}
-              columns={paymentDataTableColumns}
-            />
-          </div>
+      
 
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl mb-4">Inventory Status</h3>
-            <DoughnutChart
-              data={inventoryData}
-              options={paymentOptions}
-              labels={{ show: true, labelType: "percentage" }}
-            />
-          </div>
+   <div className="grid grid-cols-3 gap-5 my-5">
           <div className="col-span-3">
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-xl mb-4">Products Nearing Expiration</h3>
             <TableView
-              title="Products nearing expiration"
+             // title="Products nearing expiration"
               data={productsExpirationData}
               columns={productsExpirationColumns}
             />
+            </div>
           </div>
-          
-      
 
-          <div></div>
-
-          <div className="col-span-2">
+     </div>
+        
+          <div className="grid grid-cols-4 gap-5 my-5">
+          <div className="col-span-4">
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-xl mb-4">High-Value Customers</h3>
             <TableView
               columns={highValueCustomerColumns}
               data={highValueCustomerData}
               title="High-Value Customers"
             />
-          </div>
+             </div>
+             </div>
+         
 
-          <div className="col-span-2">
+             {/* <div className="col-span-4">
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-xl mb-4">Sales Processed by Staff</h3>
             <TableView
               columns={salesProcessedByStaffColumns}
               data={salesProcessedByStaffData}
               title="Sales Processed by Staff"
             />
           </div>
+        </div> */}
         </div>
+        
+        </>:<div class="flex justify-center items-center h-screen bg-gray-100 rounded-lg shadow-sm">
+  <span class="text-4xl text-gray-500 mr-3">🚫</span>
+  <p class="text-xl text-gray-600 font-medium">No data found</p>
+</div>
+
+}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 
 // Table component that accepts dynamic columns and data
-const TableView = ({ columns, data, title }) => {
+const TableView = ({ columns, data, title,isColumnHide=false }) => {
   // Function to map alignment values to CSS classes
   const getAlignmentClass = (align) => {
     switch (align) {
@@ -17,10 +17,9 @@ const TableView = ({ columns, data, title }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
-      <h3 className="text-xl mb-4">{title}</h3>
+    
       <table className="w-full text-sm text-gray-500 bg-white border-separate border-spacing-0">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+       {!isColumnHide &&  <thead className="text-xs text-gray-700 uppercase bg-gray-100">
           <tr>
             {columns.map((column, index) => (
               <th
@@ -31,7 +30,7 @@ const TableView = ({ columns, data, title }) => {
               </th>
             ))}
           </tr>
-        </thead>
+        </thead>}
         <tbody>
           {data.map((row, index) => (
             <tr
@@ -54,7 +53,7 @@ const TableView = ({ columns, data, title }) => {
           ))}
         </tbody>
       </table>
-    </div>
+
   );
 };
 

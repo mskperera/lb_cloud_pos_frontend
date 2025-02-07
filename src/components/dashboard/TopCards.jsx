@@ -1,3 +1,6 @@
+import { formatCurrency } from "../../utils/format";
+import { getCurrencyInfo } from "../../utils/utils";
+
 const TopCards = ({ data }) => {
   if (!data) {
     return <div>Loading...</div>;  // or some other loading state
@@ -5,7 +8,7 @@ const TopCards = ({ data }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
-      <div className="flex flex-col justify-between transform bg-white p-4 rounded-lg shadow-sm">
+      <div className="flex flex-col justify-between transform bg-white p-4 rounded-lg shadow-sm  border-l-4 border-sky-600">
         <div className='flex justify-between'>
           <h3 className="text-lg font-semibold text-gray-500">Transactions</h3>
           <p className="text-xl font-bold">{data.noOfTransactions}</p>
@@ -23,17 +26,17 @@ const TopCards = ({ data }) => {
       </div>
 
       {[
-        { label: 'Today Revenue', value: `$${data.productSales}` },
-        { label: 'Today Profit', value: `$${data.netSales}` },
-        { label: 'ATV', value: `$${data.averageTransactionValueNet}` },
+        { label: 'Today Revenue', value: `${formatCurrency(data.productSales)}` },
+        { label: 'Today Profit', value: `${formatCurrency(data.netSales)}` },
+        { label: 'ATV', value: `${formatCurrency(data.averageTransactionValueNet)}` },
         { label: 'Receipts Printed', value: data.noOfProductsSold },
-        { label: 'Refunds', value: `$${data.totalRefunds}` },
+        { label: 'Refunds', value: `${formatCurrency(data.totalRefunds)}` },
         { label: 'Items Sold', value: data.noOfProductsSold },
         { label: 'Unique Customers', value: data.noOfCustomers },
-        { label: 'Opening Cash', value: `$${data.openingCashAmount}` },
-        { label: 'Expected Cash', value: `$${data.expectedCash}` },
+        { label: 'Opening Cash', value: `${formatCurrency(data.openingCashAmount)}` },
+        { label: 'Expected Cash', value: `${formatCurrency(data.expectedCash)}` },
       ].map((card, index) => (
-        <div key={index} className="flex flex-col justify-between h-28 bg-white p-4 rounded-lg shadow-sm ">
+        <div key={index} className="flex flex-col justify-between h-28 bg-white p-4 rounded-lg shadow-sm  border-l-4 border-sky-600">
           <h3 className="text-lg font-semibold text-gray-500">{card.label}</h3>
           <p className="text-xl font-bold">{card.value}</p>
         </div>

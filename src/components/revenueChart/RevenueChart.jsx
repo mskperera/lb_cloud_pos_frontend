@@ -4,7 +4,8 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart } from 'chart.js';
 import LineChart from '../dashboard/LineChart';
 import { getCurrencyInfo } from '../../utils/utils';
-import PieChart from '../dashboard/PieChart';
+import TableView from '../dashboard/TableView'; // Import the TableView component
+import { formatCurrency } from '../../utils/format';
 
 Chart.register(ChartDataLabels);
 
@@ -21,52 +22,31 @@ ChartJS.register(
 
 function RevenueChart({ dailyRevenueData, monthlyRevenueData }) {
   const [activeTab, setActiveTab] = useState('daily');
-  const [profitMarginData, setProfitMarginData] = useState({
-    labels: ["Revenue", "Profit"], 
-    datasets: [
-      {
-        data: [0, 0], // Initial placeholder values
-        backgroundColor: ["#4CAF50", "#36A2EB"],
-      },
-      
-    ],
-  });
-
-  const paymentOptions = {
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-    },
-    maintainAspectRatio: false,
-    responsive: true,
-  };
+  const [metricData, setMetricData] = useState([
+    { title: "Gross Revenue", amount: 0, formula: "Total Sales" },
+    { title: "Net Revenue", amount: 0, formula: "Gross Revenue - Returns - Discounts" },
+    { title: "Gross Profit", amount: 0, formula: "Gross Revenue - COGS" },
+  ]);
 
   useEffect(() => {
-    const updateProfitMarginData = (isMonthly) => {
+    const updateMetricData = (isMonthly) => {
       const data = isMonthly ? monthlyRevenueData : dailyRevenueData;
-
-
       if (data && data.datasets.length >= 2) {
-        const totalRevenue = data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-        const totalProfit = data.datasets[1].data.reduce((sum, val) => sum + val, 0);
-
-        console.log('updateProfitMarginData',totalRevenue,totalProfit)
-        setProfitMarginData({
-          labels: ["Revenue", "Profit"], 
-          datasets: [
-            {
-              data: [totalRevenue, totalProfit],
-              backgroundColor: ["rgba(0, 123, 255, 0.8)", "rgba(40, 167, 69, 0.8)"]
-            },
-          ],
-        });        
+        const grossRevenue = data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+        const netRevenue = data.datasets[1].data.reduce((sum, val) => sum + val, 0);
+        const grossProfit = data.datasets[2].data.reduce((sum, val) => sum + val, 0);
+  
+        setMetricData([
+          { title: "Gross Revenue", amount: formatCurrency(grossRevenue, false), formula: "Total Sales" },
+          { title: "Net Revenue", amount: formatCurrency(netRevenue, false), formula: "Gross Revenue - Returns - Discounts" },
+          { title: "Gross Profit", amount: formatCurrency(grossProfit, false), formula: "Gross Revenue - COGS" },
+        ]);
       }
     };
-
-    updateProfitMarginData(activeTab === 'monthly');
+  
+    updateMetricData(activeTab === 'monthly');
   }, [activeTab, dailyRevenueData, monthlyRevenueData]);
-
+  
   // Chart options
   const options = {
     responsive: true,
@@ -108,64 +88,75 @@ function RevenueChart({ dailyRevenueData, monthlyRevenueData }) {
     return <div>Loading...</div>;
   }
 
+
+
+  const dailyRevenueColumns = [
+    { name: "Metric", key: "title", align: "left" },
+    { name: `Amount(${getCurrencyInfo().symbol})`, key: "amount", align: "right" },
+    { name: "Description", key: "formula", align: "left" },
+  ];
+  
+  const monthlyRevenueColumns = [
+    { name: "Metric", key: "title", align: "left" },
+    { name: `Amount(${getCurrencyInfo().symbol})`, key: "amount", align: "right" },
+    { name: "Description", key: "formula", align: "left" },
+  ];
+  
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-   
-          <div className="col-span-3 flex justify-between items-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
+        <div className="col-span-3 flex justify-between items-center">
+          <h3 className="text-xl mb-2">{options.plugins.title.text}</h3>
+          <div>
+            <button
+              onClick={() => setActiveTab('daily')}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: activeTab === 'daily' ? '#4CAF50' : '#f1f1f1',
+                color: activeTab === 'daily' ? '#fff' : '#000',
+                border: 'none',
+                cursor: 'pointer',
+                marginRight: '10px',
+                borderRadius: 10
+              }}
+            >
+              Daily Revenue
+            </button>
+            <button
+              onClick={() => setActiveTab('monthly')}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: activeTab === 'monthly' ? '#4CAF50' : '#f1f1f1',
+                color: activeTab === 'monthly' ? '#fff' : '#000',
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: 10
+              }}
+            >
+              Monthly Revenue
+            </button>
+          </div>
+        </div>
 
-      <h3 className="text-xl mb-2">{options.plugins.title.text}</h3>
+        <div className="col-span-2 ">
+          <LineChart 
+            titleVisible={false} 
+            data={activeTab === 'daily' ? dailyRevenueData : monthlyRevenueData} 
+            options={options} 
+            labels={{ show: false, labelType: "percentage" }} 
+          />
+        </div>
 
-            <div>
-        <button
-          onClick={() => setActiveTab('daily')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: activeTab === 'daily' ? '#4CAF50' : '#f1f1f1',
-            color: activeTab === 'daily' ? '#fff' : '#000',
-            border: 'none',
-            cursor: 'pointer',
-            marginRight: '10px',
-            borderRadius: 10
-          }}
-        >
-          Daily Revenue
-        </button>
-        <button
-          onClick={() => setActiveTab('monthly')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: activeTab === 'monthly' ? '#4CAF50' : '#f1f1f1',
-            color: activeTab === 'monthly' ? '#fff' : '#000',
-            border: 'none',
-            cursor: 'pointer',
-            borderRadius: 10
-          }}
-        >
-          Monthly Revenue
-        </button>
+        <div className="pt-9">
+        <h3 className="text-xl mb-4">{`Sum of ${activeTab === 'daily' ? 'Days' : 'Months'}`}</h3>
+        <TableView
+  data={metricData}
+  columns={activeTab === 'daily' ? dailyRevenueColumns : monthlyRevenueColumns}
+/>
+        </div>
       </div>
-
-</div>
-<div className="col-span-2">
-      <LineChart 
-        titleVisible={false} 
-        data={activeTab === 'daily' ? dailyRevenueData : monthlyRevenueData} 
-        options={options} 
-        labels={{ show: false, labelType: "percentage" }} 
-      />
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow-sm mt-6">
-        {/* <h3 className="text-xl mb-4">Profit Margins</h3> */}
-        <PieChart
-          data={profitMarginData}
-          options={paymentOptions}
-          labels={{ show: true, labelType: "value", prefix: "Rs" }}
-        />
-      </div>
-     
-    </div></div>
+    </div>
   );
 }
 
