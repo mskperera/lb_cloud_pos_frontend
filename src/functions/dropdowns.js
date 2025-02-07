@@ -146,12 +146,12 @@ import { getTenantId, getToken } from "./authService";
   };
   
 
-  export const getDrpSession = async (descOrder='asc') => {
+  export const getDrpSession = async (descOrder='asc',storeId=null) => {
     try {
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .get(`/dropdown/getDrpSession?descOrder=${descOrder}`, {
+        .get(`/dropdown/getDrpSession?descOrder=${descOrder}&storeId=${storeId}`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
