@@ -41,10 +41,10 @@ function ReportViewer() {
   const SelectedReportComponent = selectedReport.component;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 mx-auto">
       {/* <h1 className="text-3xl font-semibold text-center mb-6">Report Viewer</h1> */}
 
-      <div className="mb-4 flex justify-between">
+      <div className="mb-4">
         <select
           className="p-2 border rounded-md shadow-md w-1/2"
           onChange={handleReportSelection}
@@ -64,7 +64,7 @@ function ReportViewer() {
         </button> */}
       </div>
 
-   <p className="text-center mb-4 text-gray-600">{selectedReport.description}</p>
+   {/* <p className="text-center mb-4 text-gray-600">{selectedReport.description}</p> */}
 
    
         <div>

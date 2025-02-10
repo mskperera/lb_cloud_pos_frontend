@@ -4,6 +4,7 @@ import { getDailySalesDetails } from "../../../functions/report";
 import { formatCurrency, formatUtcToLocal } from "../../../utils/format";
 import { getDrpSession } from "../../../functions/dropdowns";
 import ReusableSubReportViewer from "../ReusableSubReportViewer";
+import { getCurrencyInfo } from "../../../utils/utils";
 
 const DailySalesReport = ({ refreshReport, title }) => {
   const store = JSON.parse(localStorage.getItem("selectedStore"));
@@ -22,11 +23,12 @@ const DailySalesReport = ({ refreshReport, title }) => {
   const tableHeaders = [
     { text: "SKU", alignment: "right", defaultAdded: true },
     { text: "Product Name", alignment: "right", defaultAdded: true },
-    { text: "Unit Price", alignment: "right", defaultAdded: true },
+    { text: `Unit Price(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
     { text: "Qty Sold", alignment: "right", defaultAdded: true },
-    { text: "Gross Amount", alignment: "right", defaultAdded: true },
-    { text: "Discount Amount", alignment: "right", defaultAdded: true },
-    { text: "Net Amount", alignment: "right", defaultAdded: false },
+    { text: `Gross Amount(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
+    { text: `Discount(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
+    { text: `Tax(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
+    { text: `Net Amount(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: false },
   ];
 
   const tableHeadersPaymentSummary = [
@@ -59,12 +61,14 @@ const DailySalesReport = ({ refreshReport, title }) => {
   ];
 
   const [totalGrossAmount, setTotalGrossAmount] = useState(0);
+  const [totalDiscountAmount, setTotalDiscountAmount] = useState(0);
+  const [totalTaxAmount, setTotalTaxAmount] = useState(0);
   const [totalNetAmount, setTotalNetAmount] = useState(0);
   const [sessionsOptions, setSessionsOptions] = useState([]);
   const [showReport, setShowReport] = useState(false);
 
   const loadDrpSession = async () => {
-    const objArr = await getDrpSession();
+    const objArr = await getDrpSession("desc",storeId);
     setSessionsOptions(objArr.data.results[0]);
   };
 
@@ -73,17 +77,24 @@ const DailySalesReport = ({ refreshReport, title }) => {
   }, []);
 
   const tableBottom = (
-    <tr className="bg-gray-200 font-bold">
-      <td colSpan={tableHeaders.length - 1} className="border border-gray-300 px-4 py-2 text-right">
+    <>
+      <td className=" col-span-3 border border-gray-300 px-4 py-2 text-right">
         Total:
       </td>
+        <td></td>   <td></td>   <td></td>
       <td className="border border-gray-300 px-4 py-2 text-right">
-        {formatCurrency(totalGrossAmount, true)}
+        {formatCurrency(totalGrossAmount, false)}
       </td>
       <td className="border border-gray-300 px-4 py-2 text-right">
-        {formatCurrency(totalNetAmount, true)}
+        {formatCurrency(totalDiscountAmount, false)}
       </td>
-    </tr>
+      <td className="border border-gray-300 px-4 py-2 text-right">
+        {formatCurrency(totalTaxAmount, false)}
+      </td>
+      <td className="border border-gray-300 px-4 py-2 text-right">
+        {formatCurrency(totalNetAmount, false)}
+      </td>
+    </>
   );
 
   const loadReports = async () => {
@@ -106,22 +117,26 @@ const DailySalesReport = ({ refreshReport, title }) => {
       qtySold: `${e.qtySold} ${e.measurementUnitName}`,
       grossAmount: formatCurrency(e.grossAmount, false),
       discountAmount: formatCurrency(e.discountAmount, false),
+      taxAmount: formatCurrency(e.taxAmount, false),
       netAmount: formatCurrency(e.netAmount, false),
 
-      grossAmountn: parseFloat(e.grossAmount), // Convert grossAmount to number
-      netAmountn: parseFloat(e.netAmount),   // Convert netAmount to number
+      grossAmountn: parseFloat(e.grossAmount),
+      discountAmountn: parseFloat(e.discountAmount),
+      taxAmountn: parseFloat(e.taxAmount),
+      netAmountn: parseFloat(e.netAmount)
     }));
     
     setReportData(orderedData);
 
     const grossTotal = orderedData.reduce((acc, curr) => acc + (curr.grossAmountn || 0), 0);
+    const totalDiscount = orderedData.reduce((acc, curr) => acc + (curr.discountAmountn || 0), 0);
+    const totalTax = orderedData.reduce((acc, curr) => acc + (curr.taxAmountn || 0), 0);
     const netTotal = orderedData.reduce((acc, curr) => acc + (curr.netAmountn || 0), 0);
 
     setTotalGrossAmount(grossTotal);
+    setTotalDiscountAmount(totalDiscount);
+    setTotalTaxAmount(totalTax);
     setTotalNetAmount(netTotal);
-
-
-
 
     //payment Summary
     const paymentSummaryOrderedData = paymentSummaryRecords.map((e) => ({

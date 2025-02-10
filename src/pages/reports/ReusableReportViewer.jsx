@@ -152,7 +152,10 @@ const ReportViewer = ({ reportData, tableHeaders, title, lblLeft, lblRight, tabl
               </tr>
             ))}
           </tbody>
+          <tr className="bg-gray-200 font-bold">
+            <td className=" col-span-2"></td>
           {tableBottom}
+          </tr>
         </table>
       
   <div className="new-page">

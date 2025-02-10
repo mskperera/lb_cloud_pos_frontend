@@ -3,6 +3,7 @@ import ReusableReportViewer from "../ReusableReportViewer";
 import { getMonthlySalesDetails } from "../../../functions/report";
 import { formatCurrency, formatUtcToLocal } from "../../../utils/format";
 import ReusableSubReportViewer from "../ReusableSubReportViewer";
+import { getCurrencyInfo } from "../../../utils/utils";
 
 const MonthlySalesReport = ({ refreshReport, title }) => {
   const store = JSON.parse(localStorage.getItem("selectedStore"));
@@ -18,15 +19,18 @@ const MonthlySalesReport = ({ refreshReport, title }) => {
   const [reportDataOrderAndPaymentsVoided, setReportDataOrderAndPaymentsVoided] = useState([]);
   const [reportDataSalesByCustomers, setReportDataSalesByCustomers] = useState([]);
 
-  const tableHeaders = [
-    { text: "SKU", alignment: "right", defaultAdded: true },
-    { text: "Product Name", alignment: "right", defaultAdded: true },
-    { text: "Unit Price", alignment: "right", defaultAdded: true },
-    { text: "Qty Sold", alignment: "right", defaultAdded: true },
-    { text: "Gross Amount", alignment: "right", defaultAdded: true },
-    { text: "Discount Amount", alignment: "right", defaultAdded: true },
-    { text: "Net Amount", alignment: "right", defaultAdded: false },
-  ];
+
+    const tableHeaders = [
+      { text: "SKU", alignment: "right", defaultAdded: true },
+      { text: "Product Name", alignment: "right", defaultAdded: true },
+      { text: `Unit Price(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
+      { text: "Qty Sold", alignment: "right", defaultAdded: true },
+      { text: `Gross Amount(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
+      { text: `Discount(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
+      { text: `Tax(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: true },
+      { text: `Net Amount(${getCurrencyInfo().symbol})`, alignment: "right", defaultAdded: false },
+    ];
+  
 
   const tableHeadersPaymentSummary = [
     { text: "Payment Method", alignment: "right", defaultAdded: true },
@@ -58,9 +62,14 @@ const MonthlySalesReport = ({ refreshReport, title }) => {
   ];
 
   const [totalGrossAmount, setTotalGrossAmount] = useState(0);
+  const [totalDiscountAmount, setTotalDiscountAmount] = useState(0);
+  const [totalTaxAmount, setTotalTaxAmount] = useState(0);
   const [totalNetAmount, setTotalNetAmount] = useState(0);
   const [sessionsOptions, setSessionsOptions] = useState([]);
   const [showReport, setShowReport] = useState(false);
+
+
+
 
   const loadReports = async () => {
     if (!year || !month) return;
@@ -85,7 +94,9 @@ const MonthlySalesReport = ({ refreshReport, title }) => {
       netAmount: formatCurrency(e.netAmount, false),
 
       grossAmountn: parseFloat(e.grossAmount),
-      netAmountn: parseFloat(e.netAmount),
+      discountAmountn: parseFloat(e.discountAmount),
+      taxAmountn: parseFloat(e.taxAmount),
+      netAmountn: parseFloat(e.netAmount)
     }));
     
     setReportData(orderedData);
@@ -138,9 +149,10 @@ const MonthlySalesReport = ({ refreshReport, title }) => {
 
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="flex justify-between px-20">
         {/* Year Dropdown */}
-        <div className="mb-4">
+        <div className="flex justify-start- gap-10">
+        <div className="mb-4 flex justify-start gap-1">
           <label className="block text-sm font-medium text-gray-700">Select Year:</label>
           <select
   value={year}
@@ -154,12 +166,11 @@ const MonthlySalesReport = ({ refreshReport, title }) => {
     </option>
   ))}
 </select>
-
-
         </div>
+        
 
         {/* Month Dropdown */}
-        <div className="mb-4">
+        <div className="mb-4 flex justify-start gap-1">
           <label className="block text-sm font-medium text-gray-700">Select Month:</label>
           <select
             value={month}
@@ -174,7 +185,7 @@ const MonthlySalesReport = ({ refreshReport, title }) => {
             ))}
           </select>
         </div>
-
+</div>
         {/* View Report Button */}
         <button
           className="bg-blue-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition"
@@ -192,17 +203,24 @@ const MonthlySalesReport = ({ refreshReport, title }) => {
           lblRight={`Store : ${store.storeCode} | ${store.storeName}`}
           tableHeaders={tableHeaders}
           tableBottom={
-            <tr className="bg-gray-200 font-bold">
-              <td colSpan={tableHeaders.length - 1} className="border border-gray-300 px-4 py-2 text-right">
-                Total:
-              </td>
-              <td className="border border-gray-300 px-4 py-2 text-right">
-                {formatCurrency(totalGrossAmount, true)}
-              </td>
-              <td className="border border-gray-300 px-4 py-2 text-right">
-                {formatCurrency(totalNetAmount, true)}
-              </td>
-            </tr>
+            <>
+            <td className=" col-span-3 border border-gray-300 px-4 py-2 text-right">
+              Total:
+            </td>
+              <td></td>   <td></td>   <td></td>
+            <td className="border border-gray-300 px-4 py-2 text-right">
+              {formatCurrency(totalGrossAmount, false)}
+            </td>
+            <td className="border border-gray-300 px-4 py-2 text-right">
+              {formatCurrency(totalDiscountAmount, false)}
+            </td>
+            <td className="border border-gray-300 px-4 py-2 text-right">
+              {formatCurrency(totalTaxAmount, false)}
+            </td>
+            <td className="border border-gray-300 px-4 py-2 text-right">
+              {formatCurrency(totalNetAmount, false)}
+            </td>
+          </>
           }
           injectableComponents={
             <>
