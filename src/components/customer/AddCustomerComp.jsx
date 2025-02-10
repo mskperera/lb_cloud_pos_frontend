@@ -8,13 +8,13 @@ import { useToast } from "../useToast";
 import { SAVE_TYPE } from "../../utils/constants";
 import { getContactTypes } from "../../functions/dropdowns";
 
-export default function AddCustomer({saveType=SAVE_TYPE.ADD,id=0}) {
+export default function AddCustomer({saveType,id=0}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const showToast = useToast();
 
   const [contactCode, setCustomerCode] = useState({
-    label: "Customer code",
+    label: "Contact code",
     value: "",
     isTouched: false,
     isValid: false,
@@ -22,7 +22,7 @@ export default function AddCustomer({saveType=SAVE_TYPE.ADD,id=0}) {
   });
 
   const [contactName, setCustomerName] = useState({
-    label: "Customer Name",
+    label: "Contact Name",
     value: "",
     isTouched: false,
     isValid: false,
@@ -77,6 +77,7 @@ export default function AddCustomer({saveType=SAVE_TYPE.ADD,id=0}) {
 
   useEffect(() => {
     loadDrpProductTypes();
+    console.log('EditCustomer id oooooo',id)
   }, []);
 
 
@@ -127,6 +128,7 @@ export default function AddCustomer({saveType=SAVE_TYPE.ADD,id=0}) {
   const loadValuesForUpdate=async()=>{
   const ress=await  getContacts({
     contactId:id,
+    contactTypeIds:[1,2,3],
     contactCode: null,
     contactName: null,
     email:null,
@@ -135,7 +137,7 @@ export default function AddCustomer({saveType=SAVE_TYPE.ADD,id=0}) {
     searchByKeyword:false
     });
 
-
+    console.log("loadValuesForUpdate", ress);
 
     const {customerId,
       contactCode,
@@ -228,7 +230,7 @@ useEffect(()=>{
       <div className="flex justify-center lg:col-span-3">
         <div className="text-center mb-4">
           <h2 className="text-2xl font-bold">
-            {saveType === SAVE_TYPE.ADD ? "Add Customer" : "Update Customer"}
+            {saveType === SAVE_TYPE.ADD ? "Add Contact" : "Update Contact"}
           </h2>
         </div>
       </div>

@@ -9,7 +9,6 @@ import TopMenubar from './components/navBar/TopMenubar';
 import NotFound from './pages/NotFound';
 import { ToastProvider } from './components/useToast';
 import Customers from './pages/customers';
-import AddCustomer from './pages/addCustomer';
 import Login from './pages/login';
 import DayOpen from './pages/dayopen';
 import Dashboard from './pages/dashboard';
@@ -17,6 +16,8 @@ import ReportViewer from './pages/reports/ReportViewer';
 import MainLayout from './layouts/MainLayout';
 import SidebarLayout from './layouts/SidebarLayout';
 import TopbarLayout from './layouts/TopbarLayout';
+import EditCustomer from './pages/customers/editCustomer';
+import AddCustomer from './pages/customers/addCustomer';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -72,6 +73,7 @@ function AppContent() {
               <Route path="/home" element={<Home />} />
               <Route path="*" element={<NotFound />} />
               <Route path="/customers/add" element={<AddCustomer />} />
+              <Route path="/customers/edit" element={<EditCustomer />} />
               <Route path="/customers/list" element={<Customers />} />
 
               <Route path="/products/list" element={<Products />} />

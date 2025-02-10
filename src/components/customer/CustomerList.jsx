@@ -253,7 +253,7 @@ const actionButtons = (item) => (
 
           {/* Edit */}
           <GhostButton
-           onClick={() =>    navigate(`/customers/add?saveType=${SAVE_TYPE.UPDATE}&id=${item.contactId}`)}
+           onClick={() =>    navigate(`/customers/edit?id=${item.contactId}`)}
     
             iconClass="pi pi-pencil"
             label="Edit"
