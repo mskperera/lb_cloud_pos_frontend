@@ -1,4 +1,4 @@
-import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk, faCashRegister } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk, faCashRegister, faHomeAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -71,6 +71,11 @@ const Sidebar = () => {
       </div>
   
         <div className="space-y-4">
+        <SidebarMenu
+            label="Home"
+            iconName={faHomeAlt}
+            to= "/home"
+          />
           <SidebarMenu
             label="Dashboard"
             iconName={faPalette}

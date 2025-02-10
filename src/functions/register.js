@@ -310,12 +310,12 @@ import { getTenantId, getToken } from "./authService";
     };
     
 
-    export const deleteProduct = async (productId,isConfirm) => {
+    export const deleteProduct = async (allProductId,isConfirm) => {
       try {
         const tenantId = getTenantId();
         const token = getToken();
         return await customAxios
-          .delete(`/product/delete?productId=${productId}&isConfirm=${isConfirm}`, {
+          .delete(`/product/delete?productId=${allProductId}&isConfirm=${isConfirm}`, {
             headers: {
               'Content-Type': 'application/json',
               "authorization":`Bearer ${token}`,

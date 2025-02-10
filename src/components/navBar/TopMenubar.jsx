@@ -151,7 +151,7 @@ export default function TopMenubar() {
             onClick={() => navigate('/home')}
           >
             <i className="pi pi-th-large text-xl"></i>
-            <span className="">Main Menu</span>
+            <span className="">Home</span>
           </button>
      {/* {JSON.stringify(printDeskInfo)} */}
 

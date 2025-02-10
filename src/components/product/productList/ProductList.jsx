@@ -517,9 +517,9 @@ export default function ProductOrderList({ }) {
       <button
         className="btn btn-error btn-xs bg-[#f87171] text-base-100"
         onClick={async () => {
-          const result = await deleteProduct(item.productId, false);
+          const result = await deleteProduct(item.allProductId, false);
           const { outputMessage, responseStatus } = result.data.outputValues;
-          confirmDelete(outputMessage, item.productId);
+          confirmDelete(outputMessage, item.allProductId);
         }}
         aria-label="Delete"
         title='Delete Product'

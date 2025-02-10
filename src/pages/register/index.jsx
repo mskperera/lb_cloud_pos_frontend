@@ -22,6 +22,13 @@ const Register = () => {
   const { voidOrderVisible } = useSelector((state) => state.popup);
 
 
+  useEffect(()=>{
+    const selectedStore = localStorage.getItem("selectedStore");
+    if(!selectedStore){
+      navigate('/home');
+    }
+  },[])
+ 
 
   const [isReturnOrderPopupVisible, setIsReturnOrderPopupVisible] =
     useState(false);

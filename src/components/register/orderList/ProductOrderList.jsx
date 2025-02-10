@@ -7,6 +7,7 @@ import {
 } from "../../../state/orderList/orderListSlice";
 import { DISCOUNT_TYPES } from "../../../utils/constants";
 import GhostButton from "../../iconButtons/GhostButton";
+import './productOrderList.css';
 
 export default function ProductOrderList({ showDiscountPopup }) {
   const orderList = useSelector((state) => state.orderList);
@@ -85,14 +86,14 @@ export default function ProductOrderList({ showDiscountPopup }) {
   };
 
   return (
-    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }}>
+    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="orderList">
       <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
         <thead className="bg-gray-200 sticky top-0 z-10">
           <tr className="text-sm text-gray-700">
             <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
             <th className="py-3 px-4 text-center">Qty</th>
             <th className="py-3 px-4 text-right">Amount</th>
-            <th className="py-3 px-4 text-right">Actions</th>
+            <th className="py-3 px-4 text-right"></th>
           </tr>
         </thead>
         <tbody className={`${products.length !== 0 ? 'bg-white': ''}  `}>

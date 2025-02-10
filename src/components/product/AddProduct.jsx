@@ -101,6 +101,14 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     rules: { required: false, dataType: "string" },
   });
 
+  const [unitCost, setUnitCost] = useState({
+    label: "Unit Cost",
+    value: "",
+    isTouched: false,
+    isValid: false,
+    rules: { required: false, dataType: "decimal" },
+  });
+
   const [unitPrice, setUnitPrice] = useState({
     label: "Unit Price",
     value: "",
@@ -190,12 +198,12 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     setComboIngredients([]);
     setVariations([]);
 
-    setProductNo((prev) => ({
-      ...prev,
-      value: "",
-      isTouched: false,
-      isValid: false,
-    }));
+    // setProductNo((prev) => ({
+    //   ...prev,
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: false,
+    // }));
     setProductName((prev) => ({
       ...prev,
       value: "",
@@ -215,6 +223,12 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
       isValid: false,
     }));
     setBrand((prev) => ({
+      ...prev,
+      value: "",
+      isTouched: false,
+      isValid: false,
+    }));
+    setUnitCost((prev) => ({
       ...prev,
       value: "",
       isTouched: false,
@@ -358,8 +372,9 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
       productName,
       productNo,
       reorderLevel,
-      taxRate_perc,
+      unitCost,
       unitPrice,
+      taxPerc,
       brandId,
       productTypeId,
       isStockTracked,
@@ -384,7 +399,8 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     setProductNo((p) => ({ ...p, value: productNo }));
     setProductName((p) => ({ ...p, value: productName }));
     setReorderLevel((p) => ({ ...p, value: reorderLevel }));
-    setTaxRatePerc((p) => ({ ...p, value: taxRate_perc }));
+    setTaxRatePerc((p) => ({ ...p, value: taxPerc }));
+    setUnitCost((p) => ({ ...p, value: unitCost }));
     setUnitPrice((p) => ({ ...p, value: unitPrice }));
     setBrand((p) => ({ ...p, value: brandId }));
     setProductType((p) => ({ ...p, value: productTypeId }));
@@ -545,7 +561,9 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
         isStockTracked: isStockTracked,
         isProductItem: isProductItem,
         brandId: brand.value,
+        unitCost:isNumeric(unitCost.value) ? unitCost.value : null,
         unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
+        taxPerc:isNumeric(taxRatePerc.value) ? taxRatePerc.value : null,
         sku: sku.value,
         barcode: barcode.value,
         reorderLevel: reorderLevel.value,
@@ -939,16 +957,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
             </div>
           </div>
 
-          {/* Tax Rate */}
-          <InputField
-            label={taxRatePerc.label}
-            value={taxRatePerc.value}
-            onChange={(e) =>
-              handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
-            }
-            validationMessages={validationMessages(taxRatePerc)}
-            placeholder="Enter Tax Perc"
-          />
+       
 
           {/* Reorder Level */}
           <InputField
@@ -1085,6 +1094,15 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 validationMessages={validationMessages(barcode)}
                 placeholder="Enter Barcode"
               />
+  <InputField
+                label={unitCost.label}
+                value={unitCost.value}
+                onChange={(e) =>
+                  handleInputChange(setUnitCost, unitCost, e.target.value)
+                }
+                validationMessages={validationMessages(unitCost)}
+                placeholder="Enter unitCost"
+              />
 
               <InputField
                 label={unitPrice.label}
@@ -1095,6 +1113,17 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 validationMessages={validationMessages(unitPrice)}
                 placeholder="Enter UnitPrice"
               />
+
+                 {/* Tax Rate */}
+          <InputField
+            label={taxRatePerc.label}
+            value={taxRatePerc.value}
+            onChange={(e) =>
+              handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
+            }
+            validationMessages={validationMessages(taxRatePerc)}
+            placeholder="Enter Tax Perc"
+          />
             </>
           )}
 
@@ -1155,7 +1184,9 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                     <tr>
                       <th className="px-4 py-2">SKU</th>
                       <th className="px-4 py-2">Barcode</th>
+                      <th className="px-4 py-2">Unit Cost</th>
                       <th className="px-4 py-2">Unit Price</th>
+                      <th className="px-4 py-2">Tax(%)</th>
                       {variations[0]?.variationDetails &&
                         variations[0].variationDetails.map((c) => (
                           <th key={c.variationTypeId} className="px-4 py-2">
@@ -1219,6 +1250,23 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                           <input
                             type="text"
                             className="input input-bordered w-full text-sm"
+                            value={variation.unitCost}
+                            onChange={(e) => {
+                              const updatedUnitCost = e.target.value;
+                              setVariations((prevVariations) =>
+                                prevVariations.map((item, i) =>
+                                  i === index
+                                    ? { ...item, unitCost: updatedUnitCost }
+                                    : item
+                                )
+                              );
+                            }}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
                             value={variation.unitPrice}
                             onChange={(e) => {
                               const updatedUnitPrice = e.target.value;
@@ -1232,6 +1280,24 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                             }}
                           />
                         </td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.taxPerc}
+                            onChange={(e) => {
+                              const updatedTaxPerc = e.target.value;
+                              setVariations((prevVariations) =>
+                                prevVariations.map((item, i) =>
+                                  i === index
+                                    ? { ...item, taxPerc: updatedTaxPerc }
+                                    : item
+                                )
+                              );
+                            }}
+                          />
+                        </td>
+
                         {variation.variationDetails &&
                           variation.variationDetails.map((detail) => (
                             <td
@@ -1298,7 +1364,16 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 validationMessages={validationMessages(barcode)}
                 placeholder="Enter Barcode"
               />
-
+  <InputField
+                label={unitCost.label}
+                value={unitCost.value}
+                onChange={(e) =>
+                  handleInputChange(setUnitCost, unitCost, e.target.value)
+                }
+                validationMessages={validationMessages(unitCost)}
+                placeholder="Enter unitCost"
+              />
+              
               <InputField
                 label={unitPrice.label}
                 value={unitPrice.value}
@@ -1308,6 +1383,17 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 validationMessages={validationMessages(unitPrice)}
                 placeholder="Enter Unit Price"
               />
+
+                 {/* Tax Rate */}
+          <InputField
+            label={taxRatePerc.label}
+            value={taxRatePerc.value}
+            onChange={(e) =>
+              handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
+            }
+            validationMessages={validationMessages(taxRatePerc)}
+            placeholder="Enter Tax Perc"
+          />
 
               <div className="col-span-2 mt-4">
                 <h3 className="text-center font-bold">Combo Ingredients</h3>

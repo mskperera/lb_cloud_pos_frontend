@@ -121,7 +121,7 @@ export default function OrderList({ selectingMode }) {
             window.open(`/paymentConfirm?orderId=${o.orderId}`, "_blank");
           }}
           iconClass="pi pi-copy"
-            tooltip="View Receipt"
+            //tooltip="View Receipt"
           color="text-blue-500"
           hoverClass="hover:text-blue-700 hover:bg-transparent"
          aria-label="Delete"
@@ -133,7 +133,7 @@ export default function OrderList({ selectingMode }) {
             setIsVoidRemarkShow(true);
           }}
           iconClass="pi pi-stop"
-            tooltip="Void Order"
+           // tooltip="Void Order"
           color="text-red-500"
           hoverClass="hover:text-red-700 hover:bg-transparent"
          aria-label="Void Order"
@@ -146,11 +146,6 @@ export default function OrderList({ selectingMode }) {
     
     </div>
   );
-
-
-  const customer = (customer) => {
-    return <span>{`${customer.customerCode} | ${customer.customerName}`}</span>;
-  };
 
   const handleInputChange = (setState, state, value) => {
     console.log("Nlllll", state);
@@ -192,24 +187,22 @@ export default function OrderList({ selectingMode }) {
   );
 
   const grossAmountBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.grossAmount_total}</span>
+    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.grossAmount_total,false)}</span>
   );
 
   const discountBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.all_DiscountAmount_total)}</span>
+    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.all_DiscountAmount_total,false)}</span>
   );
 
   const taxBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.overall_TaxAmount}</span>
+    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.lineTaxAmount_total,false)}</span>
   );
 
   const grandTotalBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.grandTotal}</span>
+    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.grandTotal,false)}</span>
   );
 
   const modifiedDateBodyTemplate = (item) => {
-
-   
     const localFormattedDate =formatUtcToLocal(item.createdDate_UTC);
     return isTableDataLoading ? <span>Loading...</span> : <span>{item.createdDate_UTC ? localFormattedDate : ''}</span>;
   };
@@ -232,6 +225,10 @@ export default function OrderList({ selectingMode }) {
       />
 
       <div className="flex flex-col justify-between  p-5 gap-2">
+      <div className="pt-0">
+        <h3 className="text-center font-bold text-2xl">Sales History</h3>
+      </div>
+      
         <div className="flex space-x-4 w-full">
           <div className="flex flex-col space-y-2 w-1/5">
             <label className="text-[1rem]">Filter By</label>

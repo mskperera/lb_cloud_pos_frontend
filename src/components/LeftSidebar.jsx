@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faBook, faPause, faUndo, faTags, faCartPlus, faCalendarPlus, faTimes, faThLarge, faNoteSticky, faFileText, faCoins } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBook, faPause, faUndo, faTags, faCartPlus, faCalendarPlus, faTimes, faThLarge, faNoteSticky, faFileText, faCoins, faHomeAlt } from '@fortawesome/free-solid-svg-icons';
 import HoldOrder from './register/HoldOrder';
 import ConfirmDialogCustom from './register/ConfirmDialogCustom';
 import ApplyDiscount from './register/ApplyDiscount';
@@ -34,9 +34,15 @@ const Rightsidebar = ({
   return (
     <div className=''>
           <div className="flex flex-col gap-2 bg-white w-[6rem]">
-  
           <LeftSidebarMenu
-            label="Orders"
+            label="Home"
+            icon={faHomeAlt}
+            onClick={() => {
+              navigate("/home");
+            }}
+          />
+          <LeftSidebarMenu
+            label="Sales History"
             icon={faBook}
             onClick={() => {
              // onChangeVisibility(false);

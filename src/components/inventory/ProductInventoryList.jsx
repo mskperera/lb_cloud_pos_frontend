@@ -469,9 +469,9 @@ export default function ProductInventoryList({}) {
       
 <GhostButton
         onClick={async () => {
-          const result = await deleteProduct(item.productId, false);
+          const result = await deleteProduct(item.allProductId, false);
           const { outputMessage, responseStatus } = result.data.outputValues;
-          confirmDelete(outputMessage, item.productId);
+          confirmDelete(outputMessage, item.allProductId);
         }}
         iconClass="pi pi-trash text-lg"
         labelClass="text-md font-normal"
@@ -562,16 +562,16 @@ export default function ProductInventoryList({}) {
     setShowDialog(true);
   };
 
-  const deleteAcceptHandler = async (productId) => {
+  const deleteAcceptHandler = async (allProductId) => {
     try {
       setProductIdToDelete("");
-      const result = await deleteProduct(productId, true);
+      const result = await deleteProduct(allProductId, true);
       const { data } = result;
       if (data.error) {
         showToast("danger", "Exception", data.error.message);
         return;
       }
-      setProducts(products.filter((p) => p.productId !== productId));
+      setProducts(products.filter((p) => p.allProductId !== allProductId));
       setTotalRecords(totalRecords - 1);
       showToast("success", "Successful", data.outputValues.outputMessage);
     } catch (err) {
@@ -785,11 +785,11 @@ export default function ProductInventoryList({}) {
               <th className="px-4 py-2">Brand</th>
               <th className="px-4 py-2">Cost Price</th>
               <th className="px-4 py-2">Unit Price</th>
+              <th className="px-4 py-2">Tax(%)</th>
               <th className="px-4 py-2">Stock Qty</th>
               <th className="px-4 py-2">Product Type</th>
 
-              {/* <th className="px-4 py-2">Category</th> */}
-              <th className="px-4 py-2">Tax Rate(%)</th>
+
               <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
@@ -821,12 +821,13 @@ export default function ProductInventoryList({}) {
                   <td className="px-4 py-2">{item.sku}</td>
                   <td className="px-4 py-2">{item.productName}</td>
                   <td className="px-4 py-2">{item.brandName}</td>
-                  <td className="px-4 py-2">{item.costPrice}</td>
+                  <td className="px-4 py-2">{item.unitCost}</td>
                   <td className="px-4 py-2">{item.unitPrice}</td>
+                  <td className="px-4 py-2">{item.taxPerc} </td>
 
                   <td className="px-4 py-2">{item.stockQty}</td>
                   <td className="px-4 py-2">{item.productTypeName}</td>
-                  <td className="px-4 py-2">{item.taxRate_perc} </td>
+
                   <td className="px-4 py-2">{actionButtons(index, item)}</td>
                 </tr>
                 {expandedRowId === index && (
