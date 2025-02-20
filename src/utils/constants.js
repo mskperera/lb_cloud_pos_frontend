@@ -30,6 +30,12 @@ export const CONTACT_TYPE = {
   CUSTOMER_SUPPLIER: 3
 };
 
+export const USER_ROLE= {
+  ADMIN: 1,
+  MANAGER: 2,
+  CASHIER: 3
+};
+
 
 // dropdown related constants
 export const DROPDOWN_NOT_SELECTED_ID = 0;

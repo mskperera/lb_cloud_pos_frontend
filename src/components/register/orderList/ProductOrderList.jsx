@@ -43,7 +43,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
 
   const qty = (product) => {
     const handleChangeQty = (e) => {
-      const newQty = parseInt(e.target.value, 10);
+      const newQty = parseFloat(e.target.value);
       if (!isNaN(newQty) && newQty >= 0) {
         dispatch(
           increaseQty({
@@ -61,7 +61,8 @@ export default function ProductOrderList({ showDiscountPopup }) {
           value={product.qty}
           onChange={handleChangeQty}
           className="input input-bordered text-center w-20 rounded-md "
-          min="1"
+          step="1"
+          inputMode="decimal" // Suggests decimal input to mobile keyboards
         />
         <span className="text-sm text-gray-500">{product.measurementUnitName}</span>
       </div>

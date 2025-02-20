@@ -2,10 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import './App.css'
 
-
-
-import TopMenubar from './components/navBar/TopMenubar';
-
 import NotFound from './pages/NotFound';
 import { ToastProvider } from './components/useToast';
 import Customers from './pages/customers';
@@ -18,6 +14,10 @@ import SidebarLayout from './layouts/SidebarLayout';
 import TopbarLayout from './layouts/TopbarLayout';
 import EditCustomer from './pages/customers/editCustomer';
 import AddCustomer from './pages/customers/addCustomer';
+import AddUserReg from './components/userRegistration/AddUserReg';
+import EditUserReg from './pages/userRegistration/editUserReg';
+import UserRegList from './pages/userRegistration';
+
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -75,6 +75,10 @@ function AppContent() {
               <Route path="/customers/add" element={<AddCustomer />} />
               <Route path="/customers/edit" element={<EditCustomer />} />
               <Route path="/customers/list" element={<Customers />} />
+
+              <Route path="/userReg/add" element={<AddUserReg />} />
+              <Route path="/userReg/edit" element={<EditUserReg />} />
+              <Route path="/userReg/list" element={<UserRegList />} />
 
               <Route path="/products/list" element={<Products />} />
               <Route path="/products/add" element={<AddProduct />} />
