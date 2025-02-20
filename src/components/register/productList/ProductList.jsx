@@ -145,16 +145,16 @@ console.log('pos menu',_result.data.results[0])
     }
 
     if (p.productTypeId === 1 || p.productTypeId === 3) {
-    console.log("unitPrice", p.sku);
+
 
     const order = {
-      sku:p.sku,
       productNo: p.productNo,
+      sku:p.sku,
       description,
       productId: p.productId,
       productTypeId: p.productTypeId,
       unitPrice,
-      lineTaxRate: p.taxRate_perc,
+      lineTaxRate: p.taxPerc,
       qty,
       measurementUnitName:p.measurementUnitName,
     };
@@ -169,7 +169,7 @@ console.log('pos menu',_result.data.results[0])
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
     console.log("p", p);
-    console.log("selectedProduct", p);
+    console.log("selectedProduct", selectedProduct);
 
 
     const v =JSON.parse(p.variationValues).map(v=>v).join(" | ");
@@ -177,13 +177,16 @@ console.log('pos menu',_result.data.results[0])
       productNo: selectedProduct.productNo,
       sku:p.sku,
       description: `${selectedProduct.productName} ${v}`,
-      measurementUnitName:selectedProduct.measurementUnitName,
       productId: p.variationProductId,
       productTypeId: selectedProduct.productTypeId,
       unitPrice: unitPrice,
+      lineTaxRate: p.taxPerc,
       qty,
+      measurementUnitName:selectedProduct.measurementUnitName,
     };
   
+    console.log("handleProductVariationClick", order);
+
     dispatch(addOrder(order));
   };
 
@@ -194,6 +197,7 @@ console.log('pos menu',_result.data.results[0])
     visible={isVariationSelectionMenuShow}
     onHide={() => setIsVariationSelectionMenuShow(false)}
   >
+    {/* {JSON.stringify(selectedVariationProducts)} */}
     <div className="flex flex-wrap gap-4 px-4 m-0 p-0">
       {selectedVariationProducts.length > 0 ? (
         selectedVariationProducts.map((p, index) => (

@@ -449,7 +449,7 @@ export default function ProductInventoryList({}) {
         }
         iconClass="pi pi-cog text-lg"
           labelClass="text-md font-normal"
-          label="Adjust"
+          label="Manage"
         // tooltip="Manage stock levels"
         color="text-yellow-500"
         hoverClass="hover:text-yellow-700 hover:bg-transparent"

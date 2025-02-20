@@ -52,7 +52,7 @@ const OrderListAll = () => {
       productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
       unitPrice,
       productTypeId: p.productTypeId,
-      lineTaxRate: p.taxRate_perc,
+      lineTaxRate: p.taxPerc,
       qty,
     };
     dispatch(addOrder(order));
@@ -69,7 +69,7 @@ const OrderListAll = () => {
       productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
       unitPrice,
       productTypeId: p.productTypeId,
-      lineTaxRate: p.taxRate_perc,
+      lineTaxRate: p.taxPerc,
       qty,
     };
     dispatch(addOrder(order));

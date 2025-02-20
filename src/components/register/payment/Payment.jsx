@@ -41,9 +41,12 @@ const Payment = ({}) => {
   );
   
   const navigate = useNavigate();
-
   
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    console.log('orderSummary',orderSummary)
+  },[])
 
   const [paymentMethod, setPaymentMethod] = useState({
     label: "Payment Method",
