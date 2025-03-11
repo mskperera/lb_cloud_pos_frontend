@@ -1,139 +1,123 @@
-import React, { useEffect, useState } from 'react';
-import './login.css';
+import React, { useState } from 'react';
 import { userLogin } from '../../functions/auth';
-import FormElementMessage from '../../components/messges/FormElementMessage';
 import { parseJwt } from '../../utils/jwt';
 import { useNavigate } from 'react-router-dom';
+import { setUserAssignedStores } from '../../functions/store';
 
 const Login = () => {
-
-  const navigate=useNavigate();
-
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const signIn=async()=>{
-    try{
+  const signIn = async () => {
+    try {
       localStorage.clear();
-    setIsLoading(true);
-    setErrorMessage('');
-    const payload = { 
-      userName: email,
-       password: password 
-    };
-   const authRes=await userLogin(payload);
+      setIsLoading(true);
+      setErrorMessage('');
+      const payload = {
+        userName: email,
+        password: password,
+      };
+      const authRes = await userLogin(payload);
 
-   if(authRes.status===422){
-    setErrorMessage(authRes.data.error);
-    setIsLoading(false);
-    return;
-   }
+      if (authRes.status === 422 || authRes.status === 401) {
+        setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
+        setIsLoading(false);
+        return;
+      }
 
-   if(authRes.status===401){
-    setErrorMessage(authRes.data.exception.message);
-    setIsLoading(false);
-    return;
-   }
 
-   setIsLoading(false);
-   console.log('authRes',authRes);
-   const accessToken=authRes.data.accessToken;
+      const accessToken = authRes.data.accessToken;
+      localStorage.setItem('token', accessToken);
+      const plaindata = parseJwt(accessToken);
+      console.log('plaindata',plaindata)
+      localStorage.setItem('tenantId', plaindata.tenantId);
+      localStorage.setItem('userId', plaindata.userId);
+      localStorage.setItem('stores', JSON.stringify(plaindata.stores));
+      localStorage.setItem('user', JSON.stringify(plaindata));
+      await setUserAssignedStores(plaindata.userId);
 
-   localStorage.setItem('token',accessToken);
-   console.log('accessToken',accessToken)
-   const plaindata=parseJwt(accessToken);
-   console.log('plaindata',plaindata);
-   localStorage.setItem('tenantId',plaindata.tenantId);
-   localStorage.setItem('userId',plaindata.userId);
-   navigate('/home')
-if(authRes.data.exception){
+      navigate('/home');
+    } catch (error) {
+      setErrorMessage('An error occurred. Please try again.');
+      setIsLoading(false);
+    }
+  };
 
-  setErrorMessage(authRes.data.exception.message);
-  return;
-}
-}
-catch(error){
-  setErrorMessage(error);
-  setIsLoading(false);
-}
-
-  }
   return (
-    <div className="login-container">
-      <div className="login-screen">
-        <div className="login-header">
-          <h2>Welcome to Legendbyte POS</h2>
-          <p>Sign in to your Account</p>
-        </div>
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
+        <h2 className="text-4xl font-bold text-center text-gray-800">
+          Welcome to SkyCrown POS
+        </h2>
+        <p className="text-center text-gray-600 mt-2">
+          Sign in to your account
+        </p>
 
-        <div className="login-form">
-          <div className="input-fields">
-            <div className="input-field">
-             
-            <label for="email" className="input-label">Email</label>
-              {/* <div className="relative mt-4 rounded-md shadow-sm">   */}
-          {/* <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <span className="text-gray-500 sm:text-lg">@</span>
-          </div> */}
-          <input
-            type="text"
-            name="email"
-            id="email"
-            className="input-text"
-            //placeholder="Username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        {/* </div> */}
-                {/* <InputText className="input-text" type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%' }} /> */}
-          
-            </div>
-
-            <div className="input-field">
-              <div for="password" className="input-label">Password</div>
-             
-              <input
-        className="input-text"
-        type="password"
-        name="password"
-        id="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-          />
-
-              {/* <div>
-                <InputText
-                  className="input-text"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ width: "100%" }}
-                />
-              </div> */}
-            </div>
+        <div className="mt-8">
+          <div className="mb-6">
+            <label
+              htmlFor="email"
+              className="block text-md font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="text"
+              id="email"
+              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+          </div>
+          <div className="mb-6">
+            <label
+              htmlFor="password"
+              className="block text-md font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+            />
           </div>
 
-          <div className="button-container">
-            <button onClick={signIn} text rounded>
-              <div className="login-button">
-                {isLoading ? (
-                  <i className="pi pi-spin pi-spinner" />
-                ) : (
-                  <i className="pi pi-calculator" />
-                )}
-                <div>Login</div>
-              </div>
+          {errorMessage && (
+            <div className="mb-4 text-red-500 text-center text-sm">
+              {errorMessage}
+            </div>
+          )}
+   
+            <button
+              onClick={signIn}
+              className={`w-full py-3 px-6 text-white font-medium rounded-full shadow-lg bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 transition duration-200 ${
+                isLoading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing In...' : 'Login'}
             </button>
           </div>
-          {errorMessage && (
-            <FormElementMessage
-              className="mt-2 w-full"
-              severity="error"
-              text={`${errorMessage}`}
-            />
-          )}
+     
+
+        <div className="mt-6 text-center text-gray-600">
+          <p>
+            Need help?{' '}
+            <a
+              href="#"
+              className="text-sky-600 hover:underline focus:underline"
+            >
+              Contact Support
+            </a>
+          </p>
         </div>
       </div>
     </div>

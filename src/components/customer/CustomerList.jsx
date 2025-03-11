@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash,faPlus, faPlay, faSignIn, faPlusSquare, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faSignIn, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 
-import { deleteCustomer, getCustomers } from "../../functions/customer";
+import { deleteCustomer, getContacts } from "../../functions/contacts";
 import { formatUtcToLocal } from '../../utils/format';
 import { useToast } from '../useToast';
 import DaisyUIPaginator from '../DaisyUIPaginator';
 import ConfirmDialog from '../dialog/ConfirmDialog';
 import { validate } from '../../utils/formValidation';
+import { CONTACT_TYPE, SAVE_TYPE } from '../../utils/constants';
+import GhostButton from "../iconButtons/GhostButton";
 
 export default function CustomerList({selectingMode,onselect }) {
   const [products, setCustomers] = useState([]);
@@ -17,8 +18,6 @@ export default function CustomerList({selectingMode,onselect }) {
   const navigate = useNavigate();
   const showToast = useToast();
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
-  const [selectedMeasurmentUnitId, setSelectedMeasurmentUnitId] = useState(-1);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -48,43 +47,18 @@ export default function CustomerList({selectingMode,onselect }) {
   });
 
 
-  const loadCustomers = async () => {
-    try{
-    setIsTableDataLoading(true);
-    const skip = currentPage * rowsPerPage;
-    const limit = rowsPerPage;
-
-    const filteredData = {
-      customerId: null,
-      customerCode: selectedFilterBy.value===1 ? searchValue.value:null,
-      customerName: selectedFilterBy.value===2 ? searchValue.value:null,
-
-      email: selectedFilterBy.value===3 ? searchValue.value:null,
-      mobile: selectedFilterBy.value===4 ? searchValue.value:null,
-      tel: selectedFilterBy.value===5 ? searchValue.value:null,
-      whatsappNumber: selectedFilterBy.value===6 ? searchValue.value:null,
-
-      searchByKeyword: false,
-      skip: skip,
-      limit: limit,
-    };
-    const _result = await getCustomers(filteredData, null);
-    const { totalRows } = _result.data.outputValues;
-    setTotalRecords(totalRows);
-    console.log("ppppp", _result.data);
-
-    setCustomers(_result.data.results[0]);
-    setIsTableDataLoading(false);
-  }
-  catch(err){
-    setIsTableDataLoading(false);
-    console.log('error:',err);
-  }
-  };
+  const [selectedContactType, setSelectedContactType] = useState({
+    label: "Contact Type",
+    value: null,
+    isTouched: false,
+    isValid: true,
+    rules: { required: false },
+  });
+  
 
   useEffect(() => {
     loadCustomers(selectedCategoryId);
-  }, [currentPage, rowsPerPage]);
+  }, [currentPage, rowsPerPage,selectedContactType.value]);
 
   useEffect(() => {
     console.log("useEffect search by value");
@@ -168,10 +142,58 @@ export default function CustomerList({selectingMode,onselect }) {
 
 
   
+  const contactTypeOptions = [
+    { id: null, displayName: "All" },
+    { id: CONTACT_TYPE.CUSTOMER, displayName: "Customer" },
+    { id: CONTACT_TYPE.CUSTOMER_SUPPLIER, displayName: "Customer / Supplier" },
+    { id: CONTACT_TYPE.SUPPLIER, displayName: "Supplier" },
+  ];
+  
+
+  const loadCustomers = async () => {
+    try {
+      setIsTableDataLoading(true);
+      const skip = currentPage * rowsPerPage;
+      const limit = rowsPerPage;
+  
+      const filteredData = {
+        contactId: null,
+        contactTypeIds: selectedContactType.value !== null 
+          ? [selectedContactType.value] 
+          : [CONTACT_TYPE.CUSTOMER, CONTACT_TYPE.SUPPLIER, CONTACT_TYPE.CUSTOMER_SUPPLIER],
+        contactCode: selectedFilterBy.value === 1 ? searchValue.value : null,
+        contactName: selectedFilterBy.value === 2 ? searchValue.value : null,
+        email: selectedFilterBy.value === 3 ? searchValue.value : null,
+        mobile: selectedFilterBy.value === 4 ? searchValue.value : null,
+        tel: selectedFilterBy.value === 5 ? searchValue.value : null,
+        whatsappNumber: selectedFilterBy.value === 6 ? searchValue.value : null,
+        searchByKeyword: false,
+        skip: skip,
+        limit: limit,
+      };
+  
+      const _result = await getContacts(filteredData, null);
+      const { totalRows } = _result.data.outputValues;
+      setTotalRecords(totalRows);
+      console.log("ppppp", _result.data);
+  
+      setCustomers(_result.data.results[0]);
+      setIsTableDataLoading(false);
+    } catch (err) {
+      setIsTableDataLoading(false);
+      console.log("error:", err);
+    }
+  };
+  
 
   
 
 //// replaceed by daisy
+const contactTypeNameBodyTemplate = (rowData) => (
+  isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactTypeName}</span>
+);
+
+
   const customerCodeBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactCode}</span>
   );
@@ -202,7 +224,7 @@ export default function CustomerList({selectingMode,onselect }) {
 
   
 const actionButtons = (item) => (
-  <div className="flex space-x-2">
+  <div className="flex gap-4">
 
   {selectingMode && <button
       className="btn btn-primary btn-xs bg-[#0284c7] text-base-100"
@@ -214,25 +236,31 @@ const actionButtons = (item) => (
       <FontAwesomeIcon icon={faSignIn} />
     </button>}
 
-    <button
-      className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
-      onClick={async () => {
-        const result = await deleteCustomer(item.contactId, false);
-        const { outputMessage, responseStatus } = result.data.outputValues;
-        confirmDelete(outputMessage, item.contactId);
-      }}
-      aria-label="Delete"
-      title='Delete customer'
-    >
-      <FontAwesomeIcon icon={faTrash} />
-    </button>
-    <button
-      className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
-      onClick={() =>    navigate(`/addCustomer/update/${item.contactId}`)}
-      aria-label="Edit" title='Edit customer'
-    >
-      <FontAwesomeIcon icon={faEdit} />
-    </button>
+
+      {/* Delete */}
+      <GhostButton
+          onClick={async () => {
+            const result = await deleteCustomer(item.contactId, false);
+            const { outputMessage, responseStatus } = result.data.outputValues;
+            confirmDelete(outputMessage, item.contactId);
+          }}
+            iconClass="pi pi-trash"
+            label="Delete"
+          //  tooltip="Delete this item"
+            color="text-red-500"
+            hoverClass="hover:text-red-700 hover:bg-transparent"
+          />
+
+          {/* Edit */}
+          <GhostButton
+           onClick={() =>    navigate(`/customers/edit?id=${item.contactId}`)}
+    
+            iconClass="pi pi-pencil"
+            label="Edit"
+          //  tooltip="Edit this item"
+            color="text-green-500"
+            hoverClass="hover:text-green-700 hover:bg-transparent"
+          />
   </div>
 );
 
@@ -253,6 +281,27 @@ const actionButtons = (item) => (
 
 
 <div className="flex justify-between items-end p-5 gap-2">
+<div className="flex flex-col space-y-2 w-1/5">
+          <label className="text-[1rem]">Contact Type</label>
+          <select
+            value={selectedContactType.value}
+            onChange={(e) =>
+              handleInputChange(
+                setSelectedContactType,
+                selectedContactType,
+                e.target.value !== "null" ? parseInt(e.target.value) : null
+              )
+            }
+            className="select select-bordered w-full"
+          >
+            {contactTypeOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex space-x-4 w-full">
       
             <div className="flex flex-col space-y-2 w-1/5">
@@ -304,7 +353,7 @@ const actionButtons = (item) => (
 {/* <button
           className="btn btn-ghost text-[#0284c7]"
           onClick={() => {
-            onselect(selectedCustomer.customerId); 
+            onselect(selectedCustomer.contactId); 
           }}
           title="Select Cutomer"
         >
@@ -312,7 +361,7 @@ const actionButtons = (item) => (
         </button> */}
         <button
          className="btn btn-ghost text-[#0284c7] font-bold"
-          onClick={() =>        navigate(`/addCustomer/add/0`)}
+          onClick={() =>        navigate(`/customers/add?saveType=${SAVE_TYPE.ADD}&id=0`)}
           title="Add Product"
         >
           <FontAwesomeIcon className="text-xl" icon={faUserPlus} />New Customer
@@ -333,13 +382,14 @@ const actionButtons = (item) => (
 
 
         <div className="flex flex-col h-[65vh] overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-white">
           <table className="table w-full border-collapse">
-            <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
+            <thead className="sticky top-0 bg-gray-200 z-10 text-[1rem] border-b border-gray-300">
               <tr>
                 {/* <th className="px-4 py-2">Product Id</th> */}
-                <th className="px-4 py-2">Customer Code</th>
-                <th className="px-4 py-2">Customer Name</th>
+                <th className="px-4 py-2">contact Type</th>
+                <th className="px-4 py-2">Contact Code</th>
+                <th className="px-4 py-2">Contact Name</th>
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Mobile</th>
                 <th className="px-4 py-2">Tel</th>
@@ -350,10 +400,16 @@ const actionButtons = (item) => (
             <tbody>
               {products.map((product) => (
                 <tr
-                  key={product.customerId}
-                  className="border-b border-gray-200 hover:bg-gray-100 bg-white text-[1rem]"
+                  key={product.contactId}
+                  className="border-b border-gray-200 hover:bg-gray-100 text-[1rem]"
                 >
-                  {/* <td className="px-4 py-2">{product.customerId}</td> */}
+                  {/* <td className="px-4 py-2">{product.contactId}</td> */}
+
+                  
+                  <td className="px-4 py-2">
+                    {contactTypeNameBodyTemplate(product)}
+                  </td>
+
                   <td className="px-4 py-2">
                     {customerCodeBodyTemplate(product)}
                   </td>
@@ -381,7 +437,7 @@ const actionButtons = (item) => (
       </div>
       
 
-      <div className="flex justify-between w-full bg-white p-4">
+      <div className="flex justify-between w-full p-4">
         {/* Items count display */}
         <div className="pl-3">
           <span className=" text-gray-500">{totalRecords} items found</span>

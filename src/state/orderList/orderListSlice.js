@@ -29,7 +29,7 @@ const initialState = {
     },
     isMultiPayment:null,
     paymentList:[],
-  overallTaxRate:8,
+  overallTaxRate:0,
     customer:null
 
 }
@@ -68,8 +68,7 @@ const orderListSlice = createSlice({
         };
         state.isMultiPayment = null;
         state.paymentList = [];
-        state.customerId = null;
-        // Add any other fields you want to reset
+        state.customer = null;
     },    
         increaseQty: (state, action) => {
             const { orderListId, increment } = action.payload;
@@ -97,7 +96,7 @@ const orderListSlice = createSlice({
                 let qty = new Decimal(order.qty);
 
                 qty = qty.minus(decrementDecimal);
-                if (qty.lessThan(1)) qty = new Decimal(1); // Ensure qty doesn't go below 1
+                if (qty.lessThan(1)) qty = new Decimal(1);
 
                 const unitPrice = new Decimal(order.unitPrice);
                 const lineTaxAmount = new Decimal(order.lineTaxAmount);
@@ -127,7 +126,7 @@ const orderListSlice = createSlice({
                 grossAmount: grossAmount.toNumber(),
                // netAmount: netAmount.toNumber(),
               // discountAmount: discountAmount.toNumber(), // Initially 0, change as needed
-              lineTaxAmount: lineTaxAmount.toNumber(), // Add line tax
+              lineTaxAmount: lineTaxAmount.toNumber(),
               netAmount: grossAmount.plus(lineTaxAmount).toNumber()
             };
 
@@ -135,7 +134,6 @@ const orderListSlice = createSlice({
 
             const existingOrderIndex = state.list.findIndex(order => order.productId === newOrder.productId);
 
-            // If the product already exists, update the quantity and amounts
             if (existingOrderIndex !== -1) {
                 const existingOrder = state.list[existingOrderIndex];
                 const existingQty = new Decimal(existingOrder.qty);
@@ -145,13 +143,11 @@ const orderListSlice = createSlice({
                 const updatedLineTaxAmount = updatedGrossAmount.times(lineTaxRate.dividedBy(100));
                 const updatedNetAmount = updatedGrossAmount.plus(updatedLineTaxAmount);//.minus(existingOrder.discountAmount * updatedQty);
 
-                // Update existing order details
                 existingOrder.qty = updatedQty.toNumber();
                 existingOrder.grossAmount = updatedGrossAmount.toNumber();
                 existingOrder.lineTaxAmount= updatedLineTaxAmount.toNumber();
                 existingOrder.netAmount = updatedNetAmount.toNumber();
             } else {
-                // If the product does not exist, add the new order
                 state.list.push(newOrder);
             }
             orderListSlice.caseReducers.calculateOrderSummary(state);
@@ -238,56 +234,51 @@ const orderListSlice = createSlice({
             state.overallTaxRate = action.payload;
         },
         calculateOrderSummary: (state) => {
-            let subtotal = new Decimal(0);
-            let totalLineDiscounts = new Decimal(0);
-            let totalDiscounts = new Decimal(0); // This will include line item and overall discounts
-            let overallTaxRate = new Decimal(state.overallTaxRate);
-            let totalLineTaxAmount = new Decimal(0);
-            // Calculate subtotal and line item discounts
-            state.list.forEach(order => {
-                let unitPrice = new Decimal(order.unitPrice);
-                let qty = new Decimal(order.qty);
-  
-                const lineTaxAmount=new Decimal(order.lineTaxAmount);
-
-                let discountAmount =new Decimal(0);
-                if(order.discount){
-                discountAmount = new Decimal(order.discount.discountAmount);
-                }
-        
-                subtotal = subtotal.plus(unitPrice.times(qty));
-                totalLineDiscounts = totalLineDiscounts.plus(discountAmount.times(qty));
-                totalLineTaxAmount = totalLineTaxAmount.plus(lineTaxAmount);
-            });
-        
-            let netTotal = subtotal.minus(totalLineDiscounts);
-        
-            // Apply overall discount based on its type
-            let overallDiscountAmount = new Decimal(state.orderSummary.overallDiscountValue || 0);
-            if (state.orderSummary.overallDiscountTypeId === DISCOUNT_TYPES.PERCENTAGE)  {
-                overallDiscountAmount = netTotal.times(overallDiscountAmount.dividedBy(100));
-            }
-        
-            // Subtract overall discount from net total
-            netTotal = netTotal.minus(overallDiscountAmount);
-        
-            // Update total discounts
-            totalDiscounts = totalLineDiscounts.plus(overallDiscountAmount);
-        
-            let overallTaxAmount = netTotal.times(overallTaxRate.dividedBy(100));
-            let grandTotal = netTotal.plus(overallTaxAmount).plus(totalLineTaxAmount);
-        
-            // Update order summary
-            state.orderSummary.subtotal = subtotal.toNumber();
-            state.orderSummary.lineDiscounts = totalLineDiscounts.toNumber();
-            state.orderSummary.overallDiscounts=overallDiscountAmount.toNumber();
-            state.orderSummary.discounts = totalDiscounts.toNumber(); // Includes both line and overall discounts
-            state.orderSummary.netTotal = netTotal.toNumber();
-            state.orderSummary.overallTax = overallTaxAmount.toNumber();
-            state.orderSummary.totalLineTax = totalLineTaxAmount.toNumber();
-            state.orderSummary.totalTax = overallTaxAmount.plus(totalLineTaxAmount).toNumber();
-            state.orderSummary.grandTotal =(grandTotal.toNumber()).toFixed(2);
-        },        
+          let subtotal = 0;
+          let totalLineDiscounts = 0;
+          let totalDiscounts = 0;
+          let totalLineTaxAmount = 0.00;
+      
+          state.list.forEach(order => {
+              let unitPrice = order.unitPrice;
+              let qty = order.qty;
+      
+              const lineTaxAmount = order.lineTaxAmount;
+      
+              let discountAmount = 0;
+              if (order.discount) {
+                  discountAmount = order.discount.discountAmount;
+              }
+      
+              subtotal += unitPrice * qty;
+              totalLineDiscounts += discountAmount * qty;
+              totalLineTaxAmount += lineTaxAmount;
+          });
+      
+          let netTotal = subtotal - totalLineDiscounts;
+      
+          let overallDiscountAmount = state.orderSummary.overallDiscountValue || 0;
+          if (state.orderSummary.overallDiscountTypeId === DISCOUNT_TYPES.PERCENTAGE) {
+              overallDiscountAmount = netTotal * (overallDiscountAmount / 100);
+          }
+      
+          netTotal -= overallDiscountAmount;
+      
+          totalDiscounts = totalLineDiscounts + overallDiscountAmount;
+      
+          //let overallTaxAmount = netTotal * (overallTaxRate / 100);
+          let grandTotal = netTotal  + totalLineTaxAmount;
+      
+          state.orderSummary.subtotal = subtotal;
+          state.orderSummary.lineDiscounts = totalLineDiscounts;
+          state.orderSummary.overallDiscounts = overallDiscountAmount;
+          state.orderSummary.discounts = totalDiscounts;
+          state.orderSummary.netTotal = netTotal;
+          //state.orderSummary.overallTax = overallTaxAmount;
+          state.orderSummary.totalLineTax = totalLineTaxAmount;
+          state.orderSummary.totalTax = totalLineTaxAmount;
+          state.orderSummary.grandTotal = grandTotal.toFixed(2);
+      },    
         applyOverallDiscount: (state, action) => {
             const { discountValue, discountTypeId,reasonId,reasonName,reasonRemark  } = action.payload;
             state.orderSummary.overallDiscountValue = discountValue;
@@ -300,22 +291,16 @@ const orderListSlice = createSlice({
         cancelOverallDiscount: (state) => {
             state.orderSummary.overallDiscountValue = 0;
             state.orderSummary.overallDiscountTypeId = DISCOUNT_TYPES.NONE;
-            state.orderSummary.overallDiscountReason = null;
+            state.orderSummary.overallDiscountReasonName = null;
             orderListSlice.caseReducers.calculateOrderSummary(state);
         },
-
-        // addCustomer:(state,action)=>{
-        //     const {customerId}=action.payload;
-        //     state.customerId=customerId;
-        // },
         removePayment: (state, action) => {
             const {id} = action.payload;
             state.paymentList = state.paymentList.filter(payment => payment.id !== id);
           },
 
           addSinglePayment: (state, action) => {
-
-
+            
             const { paymentData } = action.payload;
             const { methodId, amountPaid, cardPayment, cashPayment } =paymentData;
 
@@ -324,7 +309,6 @@ const orderListSlice = createSlice({
             }
             console.log('cashhh',action.payload)
             state.isMultiPayment=false;
-            // Check if methodId already exists in the paymentList   
         
               if (methodId === PAYMENT_METHODS.CARD) {
                 const {
@@ -385,7 +369,6 @@ const orderListSlice = createSlice({
           console.log("Payment data:", action.payload);
           state.isMultiPayment = true;
 
-          // Handle card payment
           if (methodId === PAYMENT_METHODS.CARD) {
             const {
               cardHolderName,
@@ -419,24 +402,23 @@ const orderListSlice = createSlice({
             state.paymentList.push(cardPaymentDetail);
           }
 
-          // Handle cash payment
           if (methodId === PAYMENT_METHODS.CASH) {
             let existingCashPaymentIndex = state.paymentList.findIndex(
               (p) => p.methodId === PAYMENT_METHODS.CASH
             );
 
             if (existingCashPaymentIndex >= 0) {
-              // Update existing cash payment
+
               const amountPaid_decimal = new Decimal(
                 state.paymentList[existingCashPaymentIndex].amountPaid
               );
               state.paymentList[existingCashPaymentIndex].amountPaid =
                 amountPaid_decimal.plus(amountPaid).toNumber();
               // state.paymentList[existingCashPaymentIndex].cashPayment.receivedAmount += receivedAmount;
-              // Assuming you want to update the balanceAmount as well
+
               //state.paymentList[existingCashPaymentIndex].cashPayment.balanceAmount = balanceAmount;
             } else {
-              // Add new cash payment
+
               const newPaymentId =
                 state.paymentList.reduce(
                   (max, payment) => Math.max(max, payment.id),
@@ -544,7 +526,7 @@ const orderListSlice = createSlice({
             const cashPaymentIndex = state.paymentList.findIndex(p => p.id === id);
       
             if (cashPaymentIndex !== -1) {
-              // Update the existing cash payment
+
               state.paymentList[cashPaymentIndex].cashPayment.receivedAmount = receivedAmount;
             }
           },

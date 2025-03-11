@@ -1,5 +1,4 @@
-import { Avatar } from "primereact/avatar";
-import { Button } from "primereact/button";
+
 
 const Customer = ({ label, imageUrl,onAddCustomer }) => {
   return (
@@ -20,7 +19,7 @@ const Customer = ({ label, imageUrl,onAddCustomer }) => {
         </div>
      
         <div className="flex align-items-center">
-        <Button icon="pi pi-plus" onClick={onAddCustomer} rounded aria-label="Filter" />
+        <button icon="pi pi-plus" onClick={onAddCustomer} rounded aria-label="Filter" />
         </div>
       </div>
 

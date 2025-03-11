@@ -1,0 +1,18 @@
+.sidebar {
+    /* scrollbar-width: thin;
+    scrollbar-color: transparent transparent; */
+  }
+  
+  .sidebar::-webkit-scrollbar {
+    width: 6px; /* Width of the scrollbar */
+  }
+  
+  .sidebar::-webkit-scrollbar-track {
+    background: transparent; /* Track color */
+  }
+  
+  .sidebar::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners of the thumb */
+  }
+  

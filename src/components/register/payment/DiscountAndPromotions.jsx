@@ -1,15 +1,4 @@
-
-import { TabView, TabPanel } from 'primereact/tabview';
 import { useState } from 'react';
-import InputSwitchCustom from '../../InputSwitchCustom';
-import CashPayment from './CashPayment';
-import CardPayment from './CardPayment';
-import CreditPayment from './CreditPayment';
-import MultiPaymentList from './MultiPaymentList';
-import { Button } from 'primereact/button';
-import CashPaymentMulti from './CashPaymentMulti';
-import CardPaymentMulti from './CardPaymentMulti';
-import CreditPaymentMulti from './CreditPaymentMulti';
 import { Tooltip } from 'primereact/tooltip';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -71,7 +60,7 @@ const  Promotion= ({promotionName}) => {
   const actions = (product) => {
     return (
       <>
-        <Button
+        <button
           icon="pi pi-percentage"
           label="Apply Discount"
           onClick={() => {
@@ -108,17 +97,13 @@ const  Promotion= ({promotionName}) => {
         <Tooltip target=".custom-target-icon" />
 
         <div className='flex flex-row align-items-center justify-content-start p-0 gap-5 pr-4'>
-    <Button icon="pi pi-chevron-left custom-target-icon" 
+    <button icon="pi pi-chevron-left custom-target-icon" 
     rounded text aria-label="Filter" size='large' tooltip="Back to Home" 
     tooltipOptions={{ position: 'bottom', mouseTrack: true, mouseTrackTop: 15 }} />
         <div className="flex align-items-center gap-2">
           <span className=" pi pi-percentage text-xl font-semibold"></span>{" "}
           <span className="text-xl font-semibold">Discounts</span>
         </div>
-    {/* <div className='flex flex-row gap-5 justify-content-end'>
-        <InputSwitchCustom label="Print Receipt" />
-        <InputSwitchCustom label="Send Email" />
-    </div> */}
 </div>
 
 

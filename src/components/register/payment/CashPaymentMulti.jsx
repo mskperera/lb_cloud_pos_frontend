@@ -1,13 +1,10 @@
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+
 import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { useSelector } from "react-redux";
-import Decimal from "decimal.js";
-import { PAYMENT_METHODS } from "../../../utils/constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMoneyBill } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 const CashDemomination = ({ currency, amount, isSelected, onClick }) => {
   return (

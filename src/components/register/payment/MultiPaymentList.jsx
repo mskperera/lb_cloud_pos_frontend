@@ -1,10 +1,9 @@
-import { Card } from "primereact/card";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMoneyBillAlt,
   faCreditCard,
 } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "primereact/button";
 import { PAYMENT_METHODS } from "../../../utils/constants";
 
 // const MultiPaymentList = ({paymentList}) => {
@@ -182,7 +181,7 @@ m-0"
           {icon}
           <p className="text-lg font-semibold ml-2">{title}</p>
         </div>
-        <Button
+        <button
           icon="pi pi-times"
           className="p-button-rounded p-button-text p-button-danger p-button-sm"
           onClick={() => onRemove(payment.id)}

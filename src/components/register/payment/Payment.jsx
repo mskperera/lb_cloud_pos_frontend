@@ -23,25 +23,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import ConfirmDialog from "../../dialog/ConfirmDialog";
 
-const PaymentType = ({ paymentTypeName, isSelected, onClick }) => {
-  return (
-    <div
-      className={`col-12 md:col-4 sm:col-4 lg:col-4 xl:col-2 p-1`}
-      style={{ cursor: "pointer" }}
-      onClick={onClick}
-    >
-      <div className={`shadow-1 hover:shadow-4 surface-card border-round `}>
-        <div
-          className={`flex justify-content-center flex-wrap p-3 border-round ${
-            isSelected ? "bg-primary" : ""
-          }`}
-        >
-          <span className="font-bold">{paymentTypeName}</span>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Payment = ({}) => {
   const showToast = useToast();
@@ -49,16 +30,23 @@ const Payment = ({}) => {
   const terminalId = JSON.parse(localStorage.getItem('terminalId'));
   const sessionDetails=JSON.parse(localStorage.getItem('sessionDetails'));
   
+  const store = JSON.parse(localStorage.getItem('selectedStore'));
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [activeIndex, setActiveIndex] = useState(0); // 0 for Single Payment tab
+
 
   const { paymentList, isMultiPayment, list, orderSummary,customer } = useSelector(
     (state) => state.orderList
   );
   
   const navigate = useNavigate();
-
   
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    console.log('orderSummary',orderSummary)
+  },[])
 
   const [paymentMethod, setPaymentMethod] = useState({
     label: "Payment Method",
@@ -232,6 +220,7 @@ const Payment = ({}) => {
 
     if(!customer && !isPayConfirmed){
     setShowDialog(true);
+
     return;
     }
 
@@ -246,10 +235,10 @@ const Payment = ({}) => {
     } = orderSummary;
 
     const payLoad = {
-      customerId: customer?.customerId,
+      customerId: customer?.contactId,
       terminalId: terminalId,
       sessionId: sessionDetails.sessionId,
-
+      storeId:store.storeId,
       orderList: list,
       //paymentList:[paymentList]
       isConfirm: true,
@@ -353,8 +342,6 @@ const Payment = ({}) => {
 
     <div className="flex flex-col gap-1 justify-center items-center py-10">
 
-
-
       <div className="flex justify-center">
         <div
           onClick={() => setSelectedTab("Single")}
@@ -394,6 +381,7 @@ const Payment = ({}) => {
           </div>
           <div className="flex-[1]"></div>
         </div>
+
 
         <div className="flex justify-around gap-4">
 

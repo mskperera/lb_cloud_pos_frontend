@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faBook, faPause, faUndo, faTags, faCartPlus, faCalendarPlus, faTimes, faThLarge, faNoteSticky, faFileText, faCoins } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBook, faPause, faUndo, faTags, faCartPlus, faCalendarPlus, faTimes, faThLarge, faNoteSticky, faFileText, faCoins, faHomeAlt } from '@fortawesome/free-solid-svg-icons';
 import HoldOrder from './register/HoldOrder';
 import ConfirmDialogCustom from './register/ConfirmDialogCustom';
 import ApplyDiscount from './register/ApplyDiscount';
@@ -23,39 +23,26 @@ const Rightsidebar = ({
 
   const LeftSidebarMenu = ({ onClick, label, icon,iconColor,bgColor,textColor }) => {
     return (
-      <div className={`btn mb-2 flex flex-col px-2 py-9 w-[7rem] min-h-15 ${bgColor? bgColor:'bg-transparent'}`} onClick={onClick}>
-      <div className='flex flex-col gap-2'>     
+      <button className={`flex items-center flex-col gap-1   hover:bg-slate-200 py-3 shadow-sm `} onClick={onClick}>    
          <FontAwesomeIcon icon={icon} className={`text-lg ${iconColor ? iconColor: "text-gray-700"}`} />
-  
-       <div className={` ${textColor ? textColor: "text-gray-700"}`}>{label}</div> 
-       </div>
-      </div>
+       <span className={` ${textColor ? textColor: "text-gray-700 text-md"}`}>{label}</span> 
+      </button>
     );
   };
 
 
   return (
     <div className=''>
-      {/* <div className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg z-50 transform ${visible ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}> */}
-        {/* <div className="flex flex-col p-4 relative"> */}
-          {/* Close Button */}
-          {/* <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            onClick={() => onChangeVisibility(false)}
-          >
-            <FontAwesomeIcon icon={faTimes} className="text-xl" />
-          </button> */}
-          <div className="flex flex-col ">
-          {/* <LeftSidebarMenu
-            label="Go to Main Menu"
-            icon={faHome}
-            onClick={() => {
-              onChangeVisibility(false);
-              navigate("/");
-            }}
-          /> */}
+          <div className="flex flex-col gap-2 bg-white w-[6rem]">
           <LeftSidebarMenu
-            label="Orders"
+            label="Home"
+            icon={faHomeAlt}
+            onClick={() => {
+              navigate("/home");
+            }}
+          />
+          <LeftSidebarMenu
+            label="Sales History"
             icon={faBook}
             onClick={() => {
              // onChangeVisibility(false);
@@ -78,14 +65,14 @@ const Rightsidebar = ({
               setIsReturnOrderPopupVisible(true);
             }}
           />
-          <LeftSidebarMenu
+          {/* <LeftSidebarMenu
             label="Discount"
             icon={faTags}
             onClick={() => {
              // onChangeVisibility(false);
               setIsDiscountPopupVisible(true);
             }}
-          />
+          /> */}
           <LeftSidebarMenu
             label="Manage Cash"
             icon={faCoins}
@@ -110,7 +97,7 @@ const Rightsidebar = ({
               navigate("/dayend");
             }}
           />
-                <LeftSidebarMenu
+                {/* <LeftSidebarMenu
             label="Main Menu"
             icon={faThLarge}
             bgColor={"bg-primaryColor"}
@@ -119,10 +106,8 @@ const Rightsidebar = ({
             onClick={() => {
               navigate("/home");
             }}
-          />
+          /> */}
           </div>
-        {/* </div> */}
-      {/* </div> */}
 
       <HoldOrder
         visible={holdOrderShow}

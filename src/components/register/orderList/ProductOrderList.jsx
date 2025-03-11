@@ -1,145 +1,84 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  applyDiscount,
-  calculateOrderSummary,
   cancelDiscount,
-  cancelOverallDiscount,
-  decreaseQty,
-  increaseQty,
   removeOrder,
+  increaseQty,
 } from "../../../state/orderList/orderListSlice";
 import { DISCOUNT_TYPES } from "../../../utils/constants";
+import GhostButton from "../../iconButtons/GhostButton";
 import './productOrderList.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProductOrderList({ showDiscountPopup }) {
   const orderList = useSelector((state) => state.orderList);
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState(null);
 
-  // Initialize products with original line numbers when the component mounts or orderList changes
   useEffect(() => {
     const productsWithLineNumber = orderList.list.map((product, index) => ({
       ...product,
-      originalLineNumber: index + 1, // Assigning a unique line number based on index
+      originalLineNumber: index + 1,
     }));
     setProducts(productsWithLineNumber);
   }, [orderList]);
 
-  const orderListItemMenu = (product) => {
-    const removeOrderHandler = () => {
-      dispatch(removeOrder({ orderListId: product.orderListId }));
-    };
-
-    const addLineDiscountHandler = () => {
-      showDiscountPopup(product.orderListId);
-    };
-
-    return (
-      <div className="flex gap-2">
-        <button
-          className="btn btn-success btn-xs text-base-100"
-          onClick={addLineDiscountHandler}
-          aria-label="Discount"
-        >
-          <i className="pi pi-percentage "></i>
-        </button>
-        <button
-          className="btn btn-danger btn-xs bg-red-400 text-base-100"
-          onClick={removeOrderHandler}
-          aria-label="Cancel"
-        >
-          <i className="pi pi-times"></i>
-        </button>
-      </div>
-    );
-  };
+  const orderListItemMenu = (product) => (
+    <div className="flex gap-2 justify-end">
+      <GhostButton
+        onClick={() => showDiscountPopup(product.orderListId)}
+        iconClass="pi pi-percentage"
+        color="text-sky-500"
+        hoverClass="hover:text-sky-700 hover:bg-transparent"
+        aria-label="Discount"
+      />
+      <GhostButton
+        onClick={() => dispatch(removeOrder({ orderListId: product.orderListId }))}
+        iconClass="pi pi-trash"
+        color="text-red-500"
+        hoverClass="hover:text-red-700 hover:bg-transparent"
+        aria-label="Remove item"
+      />
+    </div>
+  );
 
   const qty = (product) => {
-    const handleDecrease = () => {
-      dispatch(decreaseQty({ orderListId: product.orderListId, decrement: 1 }));
-    };
-  
-    const handleIncrease = () => {
-      dispatch(increaseQty({ orderListId: product.orderListId, increment: 1 }));
-    };
-  
     const handleChangeQty = (e) => {
-      const newQty = parseInt(e.target.value, 10);
+      const newQty = parseFloat(e.target.value);
       if (!isNaN(newQty) && newQty >= 0) {
-        dispatch(increaseQty({ orderListId: product.orderListId, increment: newQty - product.qty }));
+        dispatch(
+          increaseQty({
+            orderListId: product.orderListId,
+            increment: newQty - product.qty,
+          })
+        );
       }
     };
-  
+
     return (
-      <div className="flex items-center gap-0">
-        <button
-          className="btn btn-outline btn-sm text-lg hover:bg-primaryColor border-none bg-base-300 rounded-r-none"
-          onClick={handleDecrease}
-        >
-            <FontAwesomeIcon icon={faMinus} className="text-sm" />
-        </button>
-  
+      <div className="flex items-center gap-2">
         <input
           type="number"
           value={product.qty}
           onChange={handleChangeQty}
-          className="input input-bordered input-sm text-center w-20 rounded-none"
-          min="1"
+          className="input input-bordered text-center w-20 rounded-md "
+          step="1"
+          inputMode="decimal" // Suggests decimal input to mobile keyboards
         />
-  
-        <button
-          className="btn btn-outline btn-sm text-lg hover:bg-primaryColor border-none bg-base-300 rounded-l-none"
-          onClick={handleIncrease}
-        >
-          <FontAwesomeIcon icon={faPlus} className="text-sm"/>
-        </button>
+        <span className="text-sm text-gray-500">{product.measurementUnitName}</span>
       </div>
     );
   };
-  
 
-  const grossAmount = (rowData) => (
-    <div className="flex justify-end">
-      {rowData.grossAmount.toFixed(2)}
+  const netAmount = (product) => (
+    <div className="text-right text-sm font-medium text-gray-700">
+      {product.netAmount.toFixed(2)}
     </div>
   );
 
-  const netAmount = (rowData) => (
-    <div className="flex justify-end">
-      {rowData.netAmount.toFixed(2)}
-    </div>
-  );
-
-  const unitPrice = (rowData) => (
-    <div className="flex justify-end">
-      {rowData.unitPrice.toFixed(2)}
-    </div>
-  );
-
-  const descriptionBodyTemplate = (rowData) => (
-    <div className="flex flex-col gap-1 w-[12rem]">
-      <div>
-        <div>{rowData.productNo}</div>
-        <div>{rowData.description}</div>
-      </div>
-      {/* {rowData?.discount && (
-        <div className="flex items-center">
-          <div>
-            {`Discount: ${rowData.discount.discountValue} ${rowData.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE ? "%" : "Rs"} | ${rowData.discount.reasonName}`}
-          </div>
-          <button
-            className="btn btn-danger btn-xs"
-            onClick={() => handleCancelDiscount(rowData.orderListId)}
-            aria-label="Cancel Discount"
-          >
-            <i className="pi pi-times"></i>
-          </button>
-        </div>
-      )} */}
+  const descriptionBodyTemplate = (product) => (
+    <div className="flex flex-col gap-1">
+      <span className="font-semibold text-[1rem] text-gray-800">{product.sku}</span>
+      <span className="text-gray-600 text-sm">{product.description}</span>
     </div>
   );
 
@@ -147,61 +86,60 @@ export default function ProductOrderList({ showDiscountPopup }) {
     dispatch(cancelDiscount({ orderListId }));
   };
 
-  const lineNumberBodyTemplate = (rowData) => (
-    <React.Fragment>{rowData.originalLineNumber}</React.Fragment>
-  );
-
   return (
-    <div className="productOrderContainer">
-        
-      <table className="table border-collapse">
-  
-      <thead className=" sticky top-0 text-lg text-defalutTextColor">
-  <tr className="bg-white">
-    <th className="text-[1rem]">#</th>
-    <th className="text-[1rem]">Description</th>
-    <th className="text-[1rem] text-center">Qty</th>
-    <th className="text-[1rem] text-right">Amount</th>
-    <th></th>
-  </tr>
-</thead>
-
-        <tbody className=" text-[1rem] text-defalutTextColor">
-          {products.map((product) => (
-            <>
-            <tr key={product.orderListId} className={`${product?.discount? "bg-slate-200":" bg-white"}`}>
-              <td>{lineNumberBodyTemplate(product)}</td>
-              <td>{descriptionBodyTemplate(product)}</td>
-              <td>{qty(product)}</td>
-              <td>{netAmount(product)}</td>
-              <td>{orderListItemMenu(product)}</td>
+    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="orderList">
+      <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
+        <thead className="bg-gray-200 sticky top-0 z-10">
+          <tr className="text-sm text-gray-700">
+            <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
+            <th className="py-3 px-4 text-center">Qty</th>
+            <th className="py-3 px-4 text-right">Amount</th>
+            <th className="py-3 px-4 text-right"></th>
+          </tr>
+        </thead>
+        <tbody className={`${products.length !== 0 ? 'bg-white': ''}  `}>
+          {products.length === 0 ? (
+            <tr>
+               <td colSpan="4" className="py-4 text-center pt-24 text-gray-500">
+                No products added to the order list.
+              </td>
             </tr>
-            {product?.discount && (
-        <tr className="bg-slate-200">
-          <td colSpan={4} className="">
-            {`Discount: ${product.discount.discountValue} ${product.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE ? "%" : "Rs"} | ${product.discount.reasonName}`}
-         
-     
-          </td>
-          <td className="text-right">
-          <button
-            className="btn btn-danger btn-xs"
-            onClick={() => handleCancelDiscount(product.orderListId)}
-            aria-label="Cancel Discount"
-          >
-            <i className="pi pi-times"></i>
-          </button></td>
-        </tr>
-      )}
-            </>
-          ))}
+          ) : (
+            products.map((product) => (
+              <React.Fragment key={product.orderListId}>
+                <tr
+                  className={`${product?.discount ? "bg-gray-100" : ""} border-b last:border-none`}
+                >
+                  <td className="py-3 px-4">{descriptionBodyTemplate(product)}</td>
+                  <td className="py-3 px-4 text-center">{qty(product)}</td>
+                  <td className="py-3 px-4">{netAmount(product)}</td>
+                  <td className="py-3 px-4 text-right">{orderListItemMenu(product)}</td>
+                </tr>
+                {product?.discount && (
+                  <tr className="bg-gray-50 text-sm text-gray-600 border-b last:border-none">
+                    <td colSpan={3} className="py-2 px-4">
+                      {`Discount: ${product.discount.discountValue} ${
+                        product.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE
+                          ? "%"
+                          : "Rs"
+                      } | ${product.discount.reasonName}`}
+                    </td>
+                    <td className="py-2 px-4 text-right">
+                      <button
+                        className="text-red-400 hover:text-red-500"
+                        onClick={() => handleCancelDiscount(product.orderListId)}
+                        aria-label="Cancel Discount"
+                      >
+                        <i className="pi pi-times text-sm"></i>
+                      </button>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))
+          )}
         </tbody>
       </table>
-
     </div>
   );
 }
-
-
-
-

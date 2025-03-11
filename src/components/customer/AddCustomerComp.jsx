@@ -1,28 +1,28 @@
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+
 import React, { useState, useEffect, useRef } from "react";
-import { json, useNavigate } from "react-router-dom";
-import { addCustomer, getCustomers, updateCustomer } from "../../functions/customer";
+import { useNavigate } from "react-router-dom";
+import { addContact, updateCustomer,getContacts } from "../../functions/contacts";
 import { validate } from "../../utils/formValidation";
 import FormElementMessage from "../messges/FormElementMessage";
 import { useToast } from "../useToast";
-import { SAVE_TYPE } from "../../utils/constants";
+import { CONTACT_TYPE, SAVE_TYPE } from "../../utils/constants";
+import { getContactTypes } from "../../functions/dropdowns";
 
-export default function AddCustomer({saveType,id}) {
+export default function AddCustomer({saveType,id=0}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const showToast = useToast();
 
-  const [customerCode, setCustomerCode] = useState({
-    label: "Customer code",
+  const [contactCode, setCustomerCode] = useState({
+    label: "Contact code",
     value: "",
     isTouched: false,
     isValid: false,
     rules: { required: false, dataType: "string"  },
   });
 
-  const [customerName, setCustomerName] = useState({
-    label: "Customer Name",
+  const [contactName, setCustomerName] = useState({
+    label: "Contact Name",
     value: "",
     isTouched: false,
     isValid: false,
@@ -61,6 +61,30 @@ export default function AddCustomer({saveType,id}) {
     rules: { required: false, dataType: "string"  },
   });
 
+
+    const [contactType, setContactType] = useState({
+      label: "Contact Type",
+      value: CONTACT_TYPE.CUSTOMER,
+      isTouched: false,
+      isValid: false,
+      rules: { required: false, dataType: "integer" },
+    });
+
+
+  const [contactTypeOptions, setContactTypeOptions] = useState([]);
+
+
+
+  useEffect(() => {
+    loadDrpProductTypes();
+    console.log('EditCustomer id oooooo',id)
+  }, []);
+
+
+  const loadDrpProductTypes = async () => {
+    const objArr = await getContactTypes();
+    setContactTypeOptions(objArr.data.results[0]);
+  };
 
 
 
@@ -102,35 +126,37 @@ export default function AddCustomer({saveType,id}) {
 
 
   const loadValuesForUpdate=async()=>{
-  const ress=await  getCustomers({
-    customerId:id,
-    customerCode: null,
-    customerName: null,
+  const ress=await  getContacts({
+    contactId:id,
+    contactTypeIds:[1,2,3],
+    contactCode: null,
+    contactName: null,
     email:null,
     mobile:null,
     tel:null,
     searchByKeyword:false
     });
 
-
+    console.log("loadValuesForUpdate", ress);
 
     const {customerId,
-      customerCode,
-      customerName,
+      contactCode,
+      contactName,
       email,
       mobile,
       tel,
       remark,
+      contactTypeId,
       createdDate_UTC,
       modifiedDate_UTC
     }=ress.data.results[0][0];
 
-    setCustomerCode(p=>({...p,value:customerCode}));
-      setCustomerName(p=>({...p,value:customerName}));
+    setCustomerCode(p=>({...p,value:contactCode}));
+      setCustomerName(p=>({...p,value:contactName}));
       setEmail(p=>({...p,value:email}));
       setMobile(p=>({...p,value:mobile}));
       setTel(p=>({...p,value:tel}));
-      
+      setContactType(p=>({...p,value:contactTypeId}));
       setRemark(p=>({...p,value:remark}));
     console.log('customer',ress.data.results[0][0])
 
@@ -139,7 +165,7 @@ export default function AddCustomer({saveType,id}) {
     if(saveType===SAVE_TYPE.UPDATE){
       loadValuesForUpdate();
     }
-  },[saveType]);
+  },[saveType,contactTypeOptions]);
 
 
 
@@ -152,7 +178,8 @@ useEffect(()=>{
 
     const payLoad={   
       tableId:null,
-      customerName:customerName.value,
+      contactTypeId:contactType.value,
+      contactName:contactName.value,
       email:email.value,
       mobile:mobile.value,
       tel:tel.value,
@@ -160,7 +187,7 @@ useEffect(()=>{
     }
 
     if(saveType===SAVE_TYPE.ADD){
-    const res = await addCustomer(payLoad);
+    const res = await addContact(payLoad);
     if (res.data.error) {
       setIsSubmitting(false);
       const { error } = res.data;
@@ -168,13 +195,13 @@ useEffect(()=>{
       return;
     }
 
-    const { customerCode, outputMessage, responseStatus } = res.data.outputValues;
+    const { outputMessage, responseStatus } = res.data.outputValues;
     if(responseStatus==="failed"){
       showToast("warning", "Exception",outputMessage);
     }
     setIsSubmitting(false);
     
-    navigate(`/customers`)
+    navigate(`/customers/list`)
     showToast("success", "Success", outputMessage);
   }
   else if(saveType===SAVE_TYPE.UPDATE){
@@ -183,16 +210,17 @@ useEffect(()=>{
       setIsSubmitting(false);
       const { error } = res.data;
       showToast("danger", "Exception", error.message);
+      return;
     }
-
-    const { customerCode, outputMessage, responseStatus } = res.data.outputValues;
+    console.log('outputValues',res)
+    const { outputMessage, responseStatus } = res.data.outputValues;
     if(responseStatus==="failed"){
       showToast("warning", "Exception",outputMessage);
     }
-    console.log("customerCode", customerCode);
+
     setIsSubmitting(false);
     
-    navigate(`/customers`)
+    navigate(`/customers/list`)
     showToast("success", "Success", outputMessage);
   }
   }
@@ -202,45 +230,64 @@ useEffect(()=>{
       <div className="flex justify-center lg:col-span-3">
         <div className="text-center mb-4">
           <h2 className="text-2xl font-bold">
-            {saveType === SAVE_TYPE.ADD ? "Add Customer" : "Update Customer"}
+            {saveType === SAVE_TYPE.ADD ? "Add Contact" : "Update Contact"}
           </h2>
         </div>
       </div>
 
+  <div className="flex flex-col">
+            <label className="label">
+              <span className="label-text">{contactType.label}</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={contactType.value}
+              onChange={(e) =>
+                handleInputChange(setContactType, contactType, e.target.value)
+              }
+            >
+              {contactTypeOptions.map((option) => (
+                <option key={option.id} value={option.id} className="text-lg">
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
+            {validationMessages(contactType)}
+          </div>
    
       <div className="flex flex-col">
         <label className="label">
-          <span className="label-text">{customerCode.label}</span>
+          <span className="label-text">{contactCode.label}</span>
         </label>
         <div className="flex items-center">
           <input
             type="text"
             className="input input-bordered flex-1"
             readOnly={true}
-            value={customerCode.value}
+            value={contactCode.value}
             onChange={(e) =>
-              handleInputChange(setCustomerCode, customerCode, e.target.value)
+              handleInputChange(setCustomerCode, contactCode, e.target.value)
             }
           />
    
         </div>
-        {validationMessages(customerCode)}
+        {validationMessages(contactCode)}
       </div>
 
 
       <div className="flex flex-col">
         <label className="label">
-          <span className="label-text">{customerName.label}</span>
+          <span className="label-text">{contactName.label}</span>
         </label>
         <input
           type="text"
           className="input input-bordered w-full"
-          value={customerName.value}
+          value={contactName.value}
           onChange={(e) =>
-            handleInputChange(setCustomerName, customerName, e.target.value)
+            handleInputChange(setCustomerName, contactName, e.target.value)
           }
         />
-        {validationMessages(customerName)}
+        {validationMessages(contactName)}
       </div>
 
 

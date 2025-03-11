@@ -7,3 +7,11 @@ export const bufferToBoolean = (bufferObject) => {
 
   
 
+
+
+export const getCurrencyInfo = (bufferObject) => {
+   
+    return {symbol:'Rs',currencyCode:'LKR'};
+  };
+
+  

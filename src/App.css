@@ -1,10 +1,10 @@
 
 :root {
-  --bg: #f4fafe;
+  --bg: #f5fbff;
   --textColor: black;
   --colorLight: white;
 
-  --softBg: #FFFFFF;
+  --softBg: #f5fbff;
   --softTextColor: #454545;
   --dangerTextColor:#ff3737;
 
@@ -25,12 +25,23 @@
 
 }
 
-body{
+
+
+html, body {
   font-family:Arial, Helvetica, sans-serif;
   color: var(--defalutTextColor);
-  background-color: white;
-
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
+
+
+
+/* .nav-top-m{
+  margin-top: 3rem;
+} */
+
+
 
 label,option,span{
   font-size: 1rem;
@@ -62,35 +73,23 @@ label,option,span{
 }
 
 
+/* 
+* {
+  scrollbar-width:thin;
+  scrollbar-color: #ccc transparent; 
+}
 
 
+*::-webkit-scrollbar {
+  width: 10px;
+}
 
-@media print {
-  /* @page {
-    size: A4;
-    margin: 0;
+*::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 40px;
 } */
 
-@page {
-  size: 88mm auto; /* width of 88mm and automatic height */
-  margin: 10;
-}
-  .receipt {
-      /* Styles for print */
-  }
-  /* Hide everything else */
-  body * {
-      visibility: hidden;
-      width: 88mm;
-      margin: 10;
-      font-size: 12px; 
-  }
-  .receipt, .receipt * {
-      visibility: visible;
-  }
-  .receipt {
-      position: absolute;
-      left: 0;
-      top: 0;
-  }
-}

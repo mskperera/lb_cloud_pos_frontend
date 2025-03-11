@@ -1,19 +1,10 @@
 
 import React, { useRef, useState } from 'react';
-import { Menubar } from 'primereact/menubar';
-import { InputText } from 'primereact/inputtext';
-import { Avatar } from 'primereact/avatar';
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
-import Rightsidebar from '../LeftSidebar';
-import { Menu } from 'primereact/menu';
+
 import ProfileMenu from '../ProfileMenu';
 import Syncing from '../Syncing';
 import Alert from '../Alert';
-import ProductSearch from '../ProductSearch';
 import { useNavigate } from 'react-router-dom';
-import CustomSidebar from '../Sidebar';
-import { useSelector } from 'react-redux';
 import PrinterConnetion from '../PrinterConnetion';
 
 export default function Navbar() {
@@ -22,15 +13,6 @@ export default function Navbar() {
     const menuRight = useRef(null);
  
 const navigation=useNavigate();
-
-    const items = [
-        {
-           
-        },
-
-   
-    ];
-  
 
     const start = <div className='flex gap-5 justify-content-between'>
         <div className='flex align-items-center '>
@@ -46,7 +28,7 @@ const navigation=useNavigate();
 
  
  
-  <Button
+  <button
               className="p-3 text-color-primary"
               aria-label="Main Menu"
               onClick={() => {
@@ -61,7 +43,7 @@ const navigation=useNavigate();
                 style={{ fontSize: "20px" }}
               ></i>
               <span className="px-2">Go to Main Menu</span>
-            </Button>
+            </button>
 
       
 <div className='flex gap-2 justify-content-between'>

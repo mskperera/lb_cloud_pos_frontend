@@ -50,6 +50,26 @@ export const validate = (value, state) => {
         }
         break;
 
+
+        case "datetime":
+          // Validate datetime
+          trimmedValue = value.toString().trim();
+          const dateValue = new Date(trimmedValue);
+          if (rules.required && (trimmedValue === "" || isNaN(dateValue.getTime()))) {
+            isValid = false;
+            messages.push(`${state.label} is required or invalid`);
+          } else if (!isNaN(dateValue.getTime())) {
+            if (rules.minDate && dateValue < new Date(rules.minDate)) {
+              isValid = false;
+              messages.push(`${state.label} must be after ${rules.minDate}`);
+            }
+            if (rules.maxDate && dateValue > new Date(rules.maxDate)) {
+              isValid = false;
+              messages.push(`${state.label} must be before ${rules.maxDate}`);
+            }
+          }
+          break;
+
         case "cardExpiration":
       // Assuming value is in MM/YY format
       trimmedValue = value.toString().trim();

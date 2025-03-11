@@ -1,4 +1,4 @@
-import ProductOrderList from "../../components/inventory/product/productList/ProductList";
+import ProductOrderList from "../../components/product/productList/ProductList";
 
 
 const Products=()=>{

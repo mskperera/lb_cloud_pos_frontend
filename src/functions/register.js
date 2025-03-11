@@ -104,7 +104,7 @@ import { getTenantId, getToken } from "./authService";
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .post(`/product/products`, data, {
+        .post(`/products/get`, data, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -121,6 +121,77 @@ import { getTenantId, getToken } from "./authService";
       return err;
     }
   };
+
+
+  export const getProductsPosMenu = async (data) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .post(`/product/getProductsPosMenu`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getVariationProductDetails = async (data) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .post(`/product/getVariationProductDetails`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getProductsAllVariations = async (data) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .post(`/product/productsAllVariations`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+  
  
   export const getProductExtraDetails = async (productId) => {
     try {
@@ -197,7 +268,7 @@ import { getTenantId, getToken } from "./authService";
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .post(`/product/add`, data, {
+        .post(`/products`, data, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -220,7 +291,7 @@ import { getTenantId, getToken } from "./authService";
         const tenantId = getTenantId();
         const token = getToken();
         return await customAxios
-          .put(`/product/update/${id}`, data, {
+          .put(`/products/${id}`, data, {
             headers: {
               'Content-Type': 'application/json',
               "authorization":`Bearer ${token}`,
@@ -239,12 +310,12 @@ import { getTenantId, getToken } from "./authService";
     };
     
 
-    export const deleteProduct = async (productId,isConfirm) => {
+    export const deleteProduct = async (allProductId,isConfirm) => {
       try {
         const tenantId = getTenantId();
         const token = getToken();
         return await customAxios
-          .delete(`/product/delete?productId=${productId}&isConfirm=${isConfirm}`, {
+          .delete(`/products?productId=${allProductId}&isConfirm=${isConfirm}`, {
             headers: {
               'Content-Type': 'application/json',
               "authorization":`Bearer ${token}`,
@@ -269,9 +340,9 @@ import { getTenantId, getToken } from "./authService";
         return await customAxios
           .post(`/order/voidOrder`, data, {
             headers: {
-              'Content-Type': 'application/json',
-              "authorization":`Bearer ${token}`,
-             'tenantid':tenantId
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+              tenantid: tenantId,
             },
           })
           .then((res) => {

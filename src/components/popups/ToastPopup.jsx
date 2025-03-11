@@ -1,26 +1,32 @@
+import React, { useEffect } from "react";
 
-import React, { useEffect, useRef } from 'react';
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
+export default function ToastPopup({ summary, detail, severity }) {
+  const toastSeverityStyles = {
+    success: "bg-green-500 text-white",
+    error: "bg-red-500 text-white",
+    info: "bg-blue-500 text-white",
+    warning: "bg-yellow-500 text-black",
+  };
 
-export default function ToastPopup({summary,detail,severity}) {
+  const toastStyle = toastSeverityStyles[severity] || "bg-gray-500 text-white";
 
-   
-    const toast = useRef(null);
-
-    toast.current.show({ severity, summary, detail, sticky:true});
-  
-    return (
-        <div className="card flex justify-content-center">
-            <Toast ref={toast} />
-       
-        </div>
-    )
+  return (
+    <div
+      className={`toast fixed bottom-4 left-1/2 transform -translate-x-1/2 p-4 rounded shadow-lg ${toastStyle}`}
+      role="alert"
+    >
+      <div className="font-bold">{summary}</div>
+      <div>{detail}</div>
+    </div>
+  );
 }
 
-export const showToastBottomCenter=()=>{
-
-    return (
-        <ToastPopup summary="summary" detail="detail" severity="error" />
-    )
-}
+export const showToastBottomCenter = () => {
+  return (
+    <ToastPopup
+      summary="Example Summary"
+      detail="This is an example detail."
+      severity="error"
+    />
+  );
+};
