@@ -107,7 +107,7 @@ const OrderListAll = () => {
         loadCount={loadCount}
       />
 
-      <div className="flex flex-col gap-2 flex-grow">
+      <div className="flex flex-col gap-2 mr-4">
         <div className="">
           <ProductSearch onProductSelect={handleProductClick} onBarcodeEnter={handleBarcodeEnter} />
         </div>

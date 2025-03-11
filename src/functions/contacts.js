@@ -11,7 +11,7 @@ const token=localStorage.getItem('token');
     try {
   
       return await customAxios
-        .post(`/contacts/getContacts`, data, {
+        .post(`/contacts/get`, data, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -34,7 +34,7 @@ const token=localStorage.getItem('token');
     try {
   
       return await customAxios
-        .post(`/contacts/add`, data, {
+        .post(`/contacts`, data, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -56,7 +56,7 @@ const token=localStorage.getItem('token');
       try {
    
         return await customAxios
-          .put(`/contacts/update/${id}`, data, {
+          .put(`/contacts/${id}`, data, {
             headers: {
               'Content-Type': 'application/json',
               "authorization":`Bearer ${token}`,
@@ -79,7 +79,7 @@ const token=localStorage.getItem('token');
       try {
     
         return await customAxios
-          .delete(`/contacts/delete?contactId=${id}&isConfirm=${isConfirm}`, {
+          .delete(`/contacts?contactId=${id}&isConfirm=${isConfirm}`, {
             headers: {
               'Content-Type': 'application/json',
               "authorization":`Bearer ${token}`,

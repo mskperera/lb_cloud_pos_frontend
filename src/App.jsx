@@ -17,7 +17,10 @@ import AddCustomer from './pages/customers/addCustomer';
 import AddUserReg from './components/userRegistration/AddUserReg';
 import EditUserReg from './pages/userRegistration/editUserReg';
 import UserRegList from './pages/userRegistration';
-
+import SystemDataSetup from './pages/systemDataInitialization';
+import SelectStore from './pages/store';
+import About from './pages/about';
+import PrivacyPolicy from './pages/privacyPolicy';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -36,7 +39,6 @@ const StockAdjustment  = React.lazy(() => import("./pages/inventory/stockAdjustm
 const InventoryTransactionHistory  = React.lazy(() => import("./pages/inventoryTransactionHistory"));
 const Categories  = React.lazy(() => import("./pages/categories"));
 const MeasurementUnits= React.lazy(() => import("./pages/measurementUnits"));
-
 
 function AppContent() {
   const location = useLocation();
@@ -67,11 +69,18 @@ function AppContent() {
         <React.Suspense fallback={<>Loading...</>}>
           <Routes>
             {/* <Route path="/login" element={<Login />} /> */}
+            <Route path="*" element={<NotFound />} />
             <Route path="/" element={<Login />} />
+            <Route path="/systemDataInitialization" element={<SystemDataSetup />} />
+            <Route path="/selectStore" element={<SelectStore />} />
+
+              <Route path="/paymentConfirm" element={<PaymentConfirm />} />
             {/* <Route path="/" element={<Login />} /> */}
             <Route element={<MainLayout />}>
               <Route path="/home" element={<Home />} />
-              <Route path="*" element={<NotFound />} />
+   
+              
+       
               <Route path="/customers/add" element={<AddCustomer />} />
               <Route path="/customers/edit" element={<EditCustomer />} />
               <Route path="/customers/list" element={<Customers />} />
@@ -116,10 +125,22 @@ function AppContent() {
          
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/reports/reportViewer" element={<ReportViewer />} />
+
+              <Route
+                path="/about"
+                element={<About />}
+              />
+
+<Route
+                path="/privacy-policy"
+                element={<PrivacyPolicy />}
+              />
+
             </Route>
 
             {/* Only TopMenubar */}
             <Route element={<TopbarLayout />}>
+              {/* <Route path="/register/:terminalId" element={<Register />} /> */}
               <Route path="/register/:terminalId" element={<Register />} />
               <Route path="/dayend" element={<DayEnd />} />
               <Route path="/daystart/:terminalId" element={<DayOpen />} />

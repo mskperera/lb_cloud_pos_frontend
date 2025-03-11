@@ -1,53 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk, faCashRegister } from "@fortawesome/free-solid-svg-icons";
+import { faStore, faChevronDown,faCashRegister } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "../../utils/format";
 import { useDispatch } from "react-redux";
 import { setSelectedStore } from "../../state/store/storeSlice";
 import Sidebar from "../../components/navBar/SideBar";
-
-
-
-
-const PopupMenu = ({ label, iconName, submenuItems, isDisabled = false }) => {
-  return (
-    <div className="dropdown">
-      {/* Main Button */}
-      <button
-        tabIndex={0}
-        className={`flex items-center gap-2 py-4 px-4 bg-white shadow-sm border rounded-lg 
-          hover:border-gray-300 hover:bg-slate-100 hover:shadow-lg transition duration-300 
-          ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
-      >
-        <i className={`${iconName} text-xl`} />
-        <span className="text-lg font-semibold">{label}</span>
-        <FontAwesomeIcon
-          icon={faChevronDown}
-          className="ml-auto text-gray-500"
-        />
-      </button>
-
-      <ul
-        tabIndex={0}
-        className="dropdown-content mt-2 p-2 shadow bg-white rounded-md w-52 border"
-      >
-        {submenuItems.map((item, index) => (
-          <li key={index}>
-            <Link
-              to={item.to}
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-200 hover:text-gray-900 rounded-md"
-            >
-              <i className={`${item.icon} text-lg`} />
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
+import { getTeminallByUserId } from "../../functions/dropdowns";
 
 
 const UserInfo = () => {
@@ -260,110 +219,70 @@ const HomeMenuButton = ({
 
 
 const Home = () => {
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [assignedTerminals, setAssignedTerminals] = useState([
     { terminalId: 1, terminalName: "Testing Terminal 1" },
   ]);
+  const userinfo=JSON.parse(localStorage.getItem('user'));
 
   const selectedStore = JSON.parse(localStorage.getItem("selectedStore"));
-  const store = JSON.parse(localStorage.getItem("stores"))[0];
-  const [assignedStores, setAssignedStores] = useState([store]);
-  const [selectedStoreId, setSelectedStoreId] = useState(
-    assignedStores[0].storeId
-  );
-  const [isSelectedStoreApplied, setIsSelectedStoreApplied] = useState(false);
 
-  const handleStoreSelect = (e) => {
-    setSelectedStoreId(e.target.value);
-  };
 
-  const storeSelectHandler = () => {
-    setIsSelectedStoreApplied(selectedStoreId ? true : false);
-    const store = assignedStores.find(
-      (s) => s.storeId === parseInt(selectedStoreId)
-    );
-    if (store) {
-      dispatch(setSelectedStore({ selectedStore: store }));
-      localStorage.setItem("selectedStore", JSON.stringify(store));
-    } else {
-      console.error(
-        "No matching store found for the selectedStoreId:",
-        selectedStoreId
-      );
+  useEffect(()=>{
+console.log("selectStore",selectedStore)
+    if(!selectedStore){
+      navigate('/selectStore')
     }
-  };
 
+  },[selectedStore])
 
-  const Stores = () => (
-    <div className="flex flex-col gap-10 items-center justify-center mt-28">
-      <div className="flex justify-start gap-1 items-center mb-6">
-        <FontAwesomeIcon icon={faStore} style={{ fontSize: "2rem" }} />
-        <h2 className="text-2xl font-bold pt-1">Select your store</h2>
-      </div>
-      <div className="flex flex-col justify-between gap-5 w-full max-w-xs">
-        <select
-          value={selectedStoreId}
-          onChange={handleStoreSelect}
-          className="select select-bordered w-full max-w-xs"
-        >
-          {assignedStores.map((c) => (
-            <option key={c.storeId} value={c.storeId}>
-              {c.storeCode} | {c.storeName}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={storeSelectHandler}
-          type="button"
-          className="btn shadow-none py-4 px-10 rounded-lg border-none bg-primaryColor text-base-100 mt-4"
-        >
-          Continue
-        </button>
-      </div>
-    </div>
-  );
-  
+  useEffect(()=>{
+    loadTeminals();
+    
+      },[])
 
+const [terminals,setTerminals]=useState(null);
+const loadTeminals=async ()=>{
+ const terminals= await getTeminallByUserId(userinfo.userId);
+ setTerminals(terminals.data);
+ localStorage.setItem('assignedTerminals', JSON.stringify(terminals.data));
+}
   return (
     <>
-        {!selectedStore ? (
-      <Stores />
-    ) :
-    
-  
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-      <div className="flex justify-between items-center gap-52">
-  
-
-        <div className="w-full my-24">
-            {/* <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 ml-64">
+          <div className="flex justify-between items-center gap-52">
+            <div className="w-full my-24">
+              {/* <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">
               Registers
             </h3> */}
-            <div className="flex gap-4">
-              
-              {/* Example for home buttons */}
-              <HomeMenuButton
-                label="Terminal 1"
-                iconName={faCashRegister}
-                to="/register/1"
-              />
-              <HomeMenuButton
+
+              <div className="flex gap-4">
+                {/* Example for home buttons */}
+
+                {terminals?.map((t) => (
+                  <HomeMenuButton
+                    label={t.displayName}
+                    iconName={faCashRegister}
+                    to={`/register/${t.id}`}
+                  />
+                ))}
+
+                {/* <HomeMenuButton
                 label="Terminal 2"
                 iconName={faCashRegister}
                 to="/register/2"
-              />
-            </div>
+              /> */}
+              </div>
             </div>
 
             <UserInfo />
-
+          </div>
+        </div>
       </div>
-      </div>
-    </div>}
-      </>
+    </>
   );
 };
 

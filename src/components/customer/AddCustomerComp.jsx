@@ -5,7 +5,7 @@ import { addContact, updateCustomer,getContacts } from "../../functions/contacts
 import { validate } from "../../utils/formValidation";
 import FormElementMessage from "../messges/FormElementMessage";
 import { useToast } from "../useToast";
-import { SAVE_TYPE } from "../../utils/constants";
+import { CONTACT_TYPE, SAVE_TYPE } from "../../utils/constants";
 import { getContactTypes } from "../../functions/dropdowns";
 
 export default function AddCustomer({saveType,id=0}) {
@@ -64,7 +64,7 @@ export default function AddCustomer({saveType,id=0}) {
 
     const [contactType, setContactType] = useState({
       label: "Contact Type",
-      value: "",
+      value: CONTACT_TYPE.CUSTOMER,
       isTouched: false,
       isValid: false,
       rules: { required: false, dataType: "integer" },

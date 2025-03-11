@@ -198,7 +198,7 @@ import { getTenantId, getToken } from "./authService";
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .get(`/dropdown/getProductTypes`, {
+        .get(`/dropdown/productTypes`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -381,3 +381,98 @@ import { getTenantId, getToken } from "./authService";
       return err;
     }
   }; 
+
+
+
+  export const getCurrencies = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/currencies`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+
+  export const getTimezones = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/timezones`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+
+
+  export const getCountries = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/countries`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+  export const getLanguages = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/languages`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+  

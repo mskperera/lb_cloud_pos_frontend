@@ -38,7 +38,8 @@ const ProductItem = ({ p, handleProductClick }) => {
       <div className="text-[1rem] font-semibold text-gray-800 truncate group-hover:overflow-visible group-hover:text-ellipsis group-hover:whitespace-normal">
         {p.productName}
       </div>
-      <p className="text-sm text-gray-600">SKU: {p.sku || "N/A"}</p>
+      {p.producttypeId != 2 && <p className="text-sm text-gray-600">SKU: {p.sku}</p>}
+
 
       {/* Display message for new stock if available */}
       {isNewStock ? (
@@ -46,6 +47,7 @@ const ProductItem = ({ p, handleProductClick }) => {
           New unreleased stock available!
         </p>
       ):''}
+      
     </div>
   );
 };

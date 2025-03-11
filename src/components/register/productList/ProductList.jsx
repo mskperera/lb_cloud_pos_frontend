@@ -27,6 +27,7 @@ const ProductList = () => {
   const [selectedProduct, setSelectedProduct] = useState("");
 
   const [saleType, setSaleType] = useState("products");
+  const [productListLoading, setIsProductListLoading] = useState(false);
 
   const store = JSON.parse(localStorage.getItem("selectedStore"));
   const handleCategorySelect = (e) => {
@@ -58,12 +59,15 @@ const ProductList = () => {
     };
 
     try {
+      setIsProductListLoading(true);
       const _result = await getProductsPosMenu(filteredData, null);
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
-console.log('pos menu',_result.data.results[0])
+
       setProducts(_result.data.results[0] || []);
+      setIsProductListLoading(false);
     } catch (error) {
+      setIsProductListLoading(false);
       console.error("Error loading products:", error);
       setProducts([]);
     }
@@ -192,66 +196,70 @@ console.log('pos menu',_result.data.results[0])
 
   return (
     <div className="flex flex-col gap-2">
- <DialogModel
-    header={selectedProduct.productName}
-    visible={isVariationSelectionMenuShow}
-    onHide={() => setIsVariationSelectionMenuShow(false)}
-  >
-    {/* {JSON.stringify(selectedVariationProducts)} */}
-    <div className="flex flex-wrap gap-4 px-4 m-0 p-0">
-      {selectedVariationProducts.length > 0 ? (
-        selectedVariationProducts.map((p, index) => (
-          <div
-            key={index}
-            className={`flex flex-col w-full md:w-[188px] items-center justify-between
+      <DialogModel
+        header={selectedProduct.productName}
+        visible={isVariationSelectionMenuShow}
+        onHide={() => setIsVariationSelectionMenuShow(false)}
+      >
+        {/* {JSON.stringify(selectedVariationProducts)} */}
+        <div className="flex flex-wrap gap-4 px-4 m-0 p-0">
+          {selectedVariationProducts.length > 0 ? (
+            selectedVariationProducts.map((p, index) => (
+              <div
+                key={index}
+                className={`flex flex-col w-full md:w-[188px] items-center justify-between
               rounded-lg cursor-pointer py-4 px-3 bg-white shadow-lg border
-              ${p.stockQty > 0 ? "hover:border-green-500" : "hover:border-red-500"}
+              ${
+                p.stockQty > 0
+                  ? "hover:border-green-500"
+                  : "hover:border-red-500"
+              }
               hover:shadow-xl transition duration-300`}
-            onClick={() => {
-              handleProductVariationClick(p, selectedProduct);
-              setIsVariationSelectionMenuShow(false); // Hides the modal
-            }}
-          >
-            <div className="w-full text-xs text-gray-500 text-left mb-2">
-              <span className="font-semibold">SKU:</span> {p.sku || "N/A"}
-            </div>
+                onClick={() => {
+                  handleProductVariationClick(p, selectedProduct);
+                  setIsVariationSelectionMenuShow(false); // Hides the modal
+                }}
+              >
+                <div className="w-full text-xs text-gray-500 text-left mb-2">
+                  <span className="font-semibold">SKU:</span> {p.sku || "N/A"}
+                </div>
 
-            <div className="flex flex-col items-center mb-3">
-              <div className="flex gap-1 items-center justify-center">
-                {p.variationValues &&
-                  JSON.parse(p.variationValues).map((v, i) => (
-                    <span
-                      key={i}
-                      className="px-2 py-1 bg-gray-100 text-sm rounded-md text-gray-700"
-                    >
-                      {v}
-                    </span>
-                  ))}
+                <div className="flex flex-col items-center mb-3">
+                  <div className="flex gap-1 items-center justify-center">
+                    {p.variationValues &&
+                      JSON.parse(p.variationValues).map((v, i) => (
+                        <span
+                          key={i}
+                          className="px-2 py-1 bg-gray-100 text-sm rounded-md text-gray-700"
+                        >
+                          {v}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+
+                <p className="text-lg font-bold text-center text-gray-800">
+                  Rs {p.unitPrice}
+                </p>
+
+                <p
+                  className={`text-sm font-medium mt-2 ${
+                    p.stockQty > 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {p.stockQty > 0 ? `${p.stockQty} in stock` : "Out of stock"}
+                </p>
               </div>
+            ))
+          ) : (
+            <div className="text-gray-500 text-center w-full">
+              No items found
             </div>
-
-            <p className="text-lg font-bold text-center text-gray-800">
-              Rs {p.unitPrice}
-            </p>
-
-            <p
-              className={`text-sm font-medium mt-2 ${
-                p.stockQty > 0 ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {p.stockQty > 0 ? `${p.stockQty} in stock` : "Out of stock"}
-            </p>
-          </div>
-        ))
-      ) : (
-        <div className="text-gray-500 text-center w-full">No items found</div>
-      )}
-    </div>
-  </DialogModel>
-
+          )}
+        </div>
+      </DialogModel>
 
       <div className="px-4 pt-2 flex justify-between gap-5 m-0 p-0">
-
         <DaisyUIPaginator
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
@@ -276,19 +284,25 @@ console.log('pos menu',_result.data.results[0])
       </div>
 
       <div className="overflow-auto max-h-[80vh]">
-      <div className="flex flex-wrap gap-2 px-4 m-0 p-0">
-        {products.length > 0 ? (
-          products.map((p, index) => (
-            <ProductItem
-              key={index}
-              p={p}
-              handleProductClick={handleProductClick}
-            />
-          ))
+        {!productListLoading ? (
+          <div className="flex flex-wrap gap-2 px-4 m-0 p-0">
+            {products.length > 0 ? (
+              products.map((p, index) => (
+                <ProductItem
+                  key={index}
+                  p={p}
+                  handleProductClick={handleProductClick}
+                />
+              ))
+            ) : (
+              <div>No products found</div>
+            )}
+          </div>
         ) : (
-          <div>No products found</div>
+          <div className="flex justify-center items-center h-[80vh] text-lg font-semibold text-gray-600">
+         Please wait, loading products...
+        </div>
         )}
-      </div>
       </div>
     </div>
   );

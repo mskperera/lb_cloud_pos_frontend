@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { userLogin } from '../../functions/auth';
 import { parseJwt } from '../../utils/jwt';
 import { useNavigate } from 'react-router-dom';
+import { setUserAssignedStores } from '../../functions/store';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const Login = () => {
         return;
       }
 
+
       const accessToken = authRes.data.accessToken;
       localStorage.setItem('token', accessToken);
       const plaindata = parseJwt(accessToken);
@@ -35,6 +37,7 @@ const Login = () => {
       localStorage.setItem('userId', plaindata.userId);
       localStorage.setItem('stores', JSON.stringify(plaindata.stores));
       localStorage.setItem('user', JSON.stringify(plaindata));
+      await setUserAssignedStores(plaindata.userId);
 
       navigate('/home');
     } catch (error) {
@@ -47,7 +50,7 @@ const Login = () => {
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
       <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
         <h2 className="text-4xl font-bold text-center text-gray-800">
-          Welcome to VibePOS
+          Welcome to SkyCrown POS
         </h2>
         <p className="text-center text-gray-600 mt-2">
           Sign in to your account

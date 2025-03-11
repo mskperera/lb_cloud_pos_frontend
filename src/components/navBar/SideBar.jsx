@@ -1,4 +1,4 @@
-import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk, faCashRegister, faHomeAlt } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faStore, faChevronDown, faCog, faUsers, faTags, faChartBar, faPalette, faChartLine, faCalculator, faUserPlus, faFileAlt, faTable, faList, faPlusCircle, faAsterisk, faCashRegister, faHomeAlt, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -64,6 +64,10 @@ import './sidebar.css';
   
 
 const Sidebar = () => {
+
+
+  const assignedTerminals=JSON.parse(localStorage.getItem('assignedTerminals'));
+
     return (
       <div className="sidebar bg-[#f8fafd] w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
       <div className="mb-8 flex items-center justify-center">
@@ -82,7 +86,7 @@ const Sidebar = () => {
             to= "/dashboard"
           />
   
-          <SidebarMenu
+          {/* <SidebarMenu
             label="Registers"
             iconName={faCashRegister}
             submenuItems={[
@@ -90,7 +94,19 @@ const Sidebar = () => {
               { label: "Terminal 2", to: "/register/2", icon: faCashRegister },
       
             ]}
-          />
+          /> */}
+
+<SidebarMenu
+  label="Registers"
+  iconName={faCashRegister}
+  submenuItems={assignedTerminals?.map((t) => ({
+    label: t.displayName,
+    to: `/register/${t.id}`,
+    icon: faCashRegister,
+  }))}
+/>
+
+
           <SidebarMenu
             label="Contacts"
             iconName={faUsers}
@@ -142,6 +158,7 @@ const Sidebar = () => {
               },
               { label: "General Settings", to: "/settings/general", icon: faCog },
               { label: "Permissions", to: "/settings/permissions", icon: faCog },
+              { label: "About", to: "/about", icon: faInfoCircle },
             ]}
           />
         </div>

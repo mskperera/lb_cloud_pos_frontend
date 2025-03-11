@@ -35,10 +35,14 @@ export default function TopMenubar() {
 
   const loadPrintdeskByTerminalId=async()=>{
 
-    const terminalId=JSON.parse(localStorage.getItem('terminalId'));
+    const terminalId_l=localStorage.getItem('terminalId');
+
+    if(terminalId_l){
+    const terminalId=terminalId_l ? JSON.parse(terminalId_l):null;
     const result=await getFrontendIdByTerminalId(terminalId);
     localStorage.setItem("printdeskId",result.data.printdeskId);
     setPrintDeskInfo(result.data);
+    }
   }
   useEffect(() => {
     loadPrintdeskByTerminalId();
@@ -139,7 +143,7 @@ export default function TopMenubar() {
       <div className="flex justify-start gap-4">
         <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
-          <h3 className="text-xl font-bold">VibePOS</h3>
+          <h3 className="text-xl font-bold">SkyCrown POS</h3>
      
         </div>
 

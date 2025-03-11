@@ -158,27 +158,27 @@ function Dashboard() {
   
 
   const [lowStockProductsData,setLowStockProductsData] =useState([
-    {
-      sku: "12345",
-      productName: "Product A",
-      qty: 100,
-      expQty:0,
-      supplier: "Supplier A",
-    },
-    {
-      sku: "67890",
-      productName: "Product B",
-      qty: 50,
-      expQty: 0,
-      supplier: "Supplier B",
-    },
-    {
-      sku: "11223",
-      productName: "Product C",
-      qty: 200,
-      expQty: 2,
-      supplier: "Supplier C",
-    },
+    // {
+    //   sku: "12345",
+    //   productName: "Product A",
+    //   qty: 100,
+    //   expQty:0,
+    //   supplier: "Supplier A",
+    // },
+    // {
+    //   sku: "67890",
+    //   productName: "Product B",
+    //   qty: 50,
+    //   expQty: 0,
+    //   supplier: "Supplier B",
+    // },
+    // {
+    //   sku: "11223",
+    //   productName: "Product C",
+    //   qty: 200,
+    //   expQty: 2,
+    //   supplier: "Supplier C",
+    // },
   ]);
 
   const lowStockProductsColumns = [
@@ -193,30 +193,30 @@ function Dashboard() {
   // Data for products nearing expiration
 
   const [productsExpirationData,setProductsExpirationData] = useState([
-    {
-      sku: "12345",
-      productName: "Product A",
-      batchNo: "B123",
-      expDate: "2025-12-31",
-      qty: 100,
-      supplier: "Supplier A",
-    },
-    {
-      sku: "67890",
-      productName: "Product B",
-      batchNo: "B456",
-      expDate: "2025-11-30",
-      qty: 50,
-      supplier: "Supplier B",
-    },
-    {
-      sku: "11223",
-      productName: "Product C",
-      batchNo: "B789",
-      expDate: "2025-10-15",
-      qty: 200,
-      supplier: "Supplier C",
-    },
+    // {
+    //   sku: "12345",
+    //   productName: "Product A",
+    //   batchNo: "B123",
+    //   expDate: "2025-12-31",
+    //   qty: 100,
+    //   supplier: "Supplier A",
+    // },
+    // {
+    //   sku: "67890",
+    //   productName: "Product B",
+    //   batchNo: "B456",
+    //   expDate: "2025-11-30",
+    //   qty: 50,
+    //   supplier: "Supplier B",
+    // },
+    // {
+    //   sku: "11223",
+    //   productName: "Product C",
+    //   batchNo: "B789",
+    //   expDate: "2025-10-15",
+    //   qty: 200,
+    //   supplier: "Supplier C",
+    // },
   ]);
 
 // Column definitions
@@ -238,8 +238,14 @@ const productsExpirationColumns = [
 
     // Load session data
     const loadDrpStore= async () => {
-      const objArr = await getStoresDrp();
-      setStoreOptions(objArr.data.results[0]);
+     // const objArr = await getStoresDrp();
+      const stores = JSON.parse(localStorage.getItem('stores'));
+      const storesDrpArr=[];
+      stores.map(s=>{
+        storesDrpArr.push({id:s.storeId,displayName:s.storeName});
+      })
+      console.log('storesoooo',storesDrpArr)
+      setStoreOptions(storesDrpArr);
     };
 
   // Load store from localStorage

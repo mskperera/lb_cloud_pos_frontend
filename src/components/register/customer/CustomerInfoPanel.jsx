@@ -70,7 +70,11 @@ const Customer = ({ }) => {
         <CustomerListPOS selectingMode={true} onselect={onCustomerSelectHandler} />
       </DialogModel>
 
-      <div className="flex items-center gap-4 px-4  bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+      <div className="flex m-0 gap-4 px-2 justify-between bg-gray-50
+       rounded-lg shadow-sm">
+
+
+<div className="flex gap-4 items-center">
 
         {imageUrl ? (
           <img
@@ -84,18 +88,21 @@ const Customer = ({ }) => {
           </div>
         )}
 
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col">
           <span className="text-sm font-medium text-gray-700">{label}</span>
           {customer && <span className="text-xs text-gray-500">Customer Info</span>}
         </div>
 
-        <div className="flex items-center">
+</div>
+
+
+        <div className="flex m-0 p-0 items-center">
           {customer ? (
             <GhostButton
               onClick={onRemoveCustomerHandler}
               iconClass="pi pi-user-minus"
               aria-label="Remove Customer"
-              tooltip="Remove Customer"
+             // tooltip="Remove Customer"
               color="text-red-500"
               hoverClass="hover:text-red-700 hover:bg-transparent"
             />
@@ -104,12 +111,14 @@ const Customer = ({ }) => {
               onClick={onAddCustomerHandler}
               iconClass="pi pi-user-plus"
               aria-label="Add Customer"
-              tooltip="Add Customer"
+            //  tooltip="Add Customer"
               color="text-sky-500"
               hoverClass="hover:text-blue-700 hover:bg-transparent"
             />
           )}
         </div>
+
+
       </div>
     </>
   );

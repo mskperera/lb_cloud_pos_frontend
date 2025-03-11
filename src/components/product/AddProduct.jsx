@@ -42,6 +42,7 @@ const CategoryItem = ({ onClick, category }) => {
 
 export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
   const store = JSON.parse(localStorage.getItem("stores"))[0];
+  const selectedStore = JSON.parse(localStorage.getItem("selectedStore"));
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoGenerateProductNo, setAutoGenerateProductNo] = useState(true);
@@ -358,7 +359,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
       productNo: null,
       productName: null,
       barcode: null,
-      storeId: 1,
+      storeId: selectedStore.storeId,
       productCategoryId: null,
       searchByKeyword: false,
       skip: 0,

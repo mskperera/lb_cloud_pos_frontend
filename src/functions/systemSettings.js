@@ -4,12 +4,14 @@ import customAxios from "../utils/axios";
 const tenantId=localStorage.getItem('tenantId');
 const token=localStorage.getItem('token');
 
-  
-  export const getTerminalDetailslByTerminalId = async (terminalId) => {
+
+
+
+  export const initializeSystemData = async (data) => {
     try {
   
       return await customAxios
-        .get(`terminal/getTerminalDetailslByTerminalId?terminalId=${terminalId}`, {
+        .post(`/initializeSystemData`, data, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -28,11 +30,13 @@ const token=localStorage.getItem('token');
   };
 
 
-  export const getFrontendIdByTerminalId = async (terminalId) => {
+  
+
+  export const isSystemDataExists = async () => {
     try {
   
       return await customAxios
-        .get(`terminal/getFrontendIdByTerminalId?terminalId=${terminalId}`, {
+        .get(`/isSystemDataExists`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -49,4 +53,7 @@ const token=localStorage.getItem('token');
       return err;
     }
   };
+
+
+    
 
