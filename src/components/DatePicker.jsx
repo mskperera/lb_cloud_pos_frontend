@@ -1,15 +1,20 @@
-
 import React, { useState } from "react";
-import { Calendar } from 'primereact/calendar';
 
 export default function DatePicker() {
-    const [date, setDate] = useState(null);
+  const [date, setDate] = useState("");
 
-    return (
-        <div className="card flex justify-content-center w-full">
-            <Calendar className="w-full" value={date} onChange={(e) => setDate(e.value)} showButtonBar
-            dateFormat="dd M yy"
-            />
-        </div>
-    )
+  return (
+    <div className="flex flex-col items-center w-full">
+      <label htmlFor="datePicker" className="mb-2 font-semibold">
+        Select a Date
+      </label>
+      <input
+        type="date"
+        id="datePicker"
+        className="input input-bordered w-full max-w-xs"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+      />
+    </div>
+  );
 }

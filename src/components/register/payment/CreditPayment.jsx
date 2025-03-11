@@ -1,5 +1,4 @@
-import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
+
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import Customer from "../customerInfoPanel/CustomerInfoPanel";
@@ -80,7 +79,7 @@ const CreditPayment=()=>{
 
           <div className="col-4 col-offset-4 flex align-items-end">
             <div className="flex w-full">
-              <Button
+              <button
                 className="p-3"
                 aria-label="Pay"
                 severity="primary"
@@ -90,7 +89,7 @@ const CreditPayment=()=>{
                 rounded
               >
                 <span className="px-2">Tender</span>
-              </Button>
+              </button>
             </div>
           </div>
         </div>

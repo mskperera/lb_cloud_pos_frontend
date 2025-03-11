@@ -1,99 +1,124 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import './login.css';
+import React, { useState } from 'react';
 import { userLogin } from '../../functions/auth';
-import FormElementMessage from '../../components/messges/FormElementMessage';
 import { parseJwt } from '../../utils/jwt';
 import { useNavigate } from 'react-router-dom';
+import { setUserAssignedStores } from '../../functions/store';
 
 const Login = () => {
-  useEffect(() => {
-    // dispatch(setTitle(null))
-  }, []);
-
-  const navigate=useNavigate();
-
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const signIn=async()=>{
-    try{
-    setIsLoading(true);
-    setErrorMessage('');
-    const payload = { 
-      userName: email,
-       password: password 
-    };
-   const authRes=await userLogin(payload);
-   console.log(authRes);
-   setIsLoading(false);
+  const signIn = async () => {
+    try {
+      localStorage.clear();
+      setIsLoading(true);
+      setErrorMessage('');
+      const payload = {
+        userName: email,
+        password: password,
+      };
+      const authRes = await userLogin(payload);
 
-   const accessToken=authRes.data.accessToken;
-   localStorage.setItem('token',accessToken);
+      if (authRes.status === 422 || authRes.status === 401) {
+        setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
+        setIsLoading(false);
+        return;
+      }
 
-   const plaindata=parseJwt(accessToken);
-   console.log('plaindata',plaindata);
-   localStorage.setItem('tenantId',plaindata.tenantId);
-   navigate('/home')
-if(authRes.data.exception){
 
-  setErrorMessage(authRes.data.exception.message);
-  return;
-}
-}
-catch(error){
-  setErrorMessage(error);
-  setIsLoading(false);
-}
+      const accessToken = authRes.data.accessToken;
+      localStorage.setItem('token', accessToken);
+      const plaindata = parseJwt(accessToken);
+      console.log('plaindata',plaindata)
+      localStorage.setItem('tenantId', plaindata.tenantId);
+      localStorage.setItem('userId', plaindata.userId);
+      localStorage.setItem('stores', JSON.stringify(plaindata.stores));
+      localStorage.setItem('user', JSON.stringify(plaindata));
+      await setUserAssignedStores(plaindata.userId);
 
-  }
+      navigate('/home');
+    } catch (error) {
+      setErrorMessage('An error occurred. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="login-container">
-      <div className="login-screen">
-        <div className="login-header">
-          <h2>Welcome to Legendbyte POS</h2>
-          <p>Sign in to your Account</p>
-        </div>
-        <div className="login-form">
-          <div className="input-fields">
-            <div className="input-field">
-              <div className="input-label">Email</div>
-              <div >
-                <InputText className="input-text" type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%' }} />
-              </div>
-            </div>
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
+        <h2 className="text-4xl font-bold text-center text-gray-800">
+          Welcome to SkyCrown POS
+        </h2>
+        <p className="text-center text-gray-600 mt-2">
+          Sign in to your account
+        </p>
 
-            <div className="input-field">
-              <div className="input-label">Password</div>
-              <div >
-                <InputText className="input-text" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%' }} />
-              </div>
-            </div>
+        <div className="mt-8">
+          <div className="mb-6">
+            <label
+              htmlFor="email"
+              className="block text-md font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="text"
+              id="email"
+              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+          </div>
+          <div className="mb-6">
+            <label
+              htmlFor="password"
+              className="block text-md font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+            />
           </div>
 
-          <div className="button-container">
-            <Button onClick={signIn} text rounded>
-              <div className="login-button">
-              {isLoading ? (
-                <i className="pi pi-spin pi-spinner" />
-              ) : (
-                <i className="pi pi-calculator" />
-              )}
-                <div>Login</div>
-              </div>
-            </Button>
+          {errorMessage && (
+            <div className="mb-4 text-red-500 text-center text-sm">
+              {errorMessage}
+            </div>
+          )}
+   
+            <button
+              onClick={signIn}
+              className={`w-full py-3 px-6 text-white font-medium rounded-full shadow-lg bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 transition duration-200 ${
+                isLoading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing In...' : 'Login'}
+            </button>
           </div>
-         {errorMessage && <FormElementMessage
-         
-              className="mt-2 w-full"
-              severity="error"
-              text={`${errorMessage}`}
-            />}
-        </div>
+     
 
+        <div className="mt-6 text-center text-gray-600">
+          <p>
+            Need help?{' '}
+            <a
+              href="#"
+              className="text-sky-600 hover:underline focus:underline"
+            >
+              Contact Support
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

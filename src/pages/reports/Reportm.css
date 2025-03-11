@@ -1,0 +1,71 @@
+
+
+/* Global Styles for Printing */
+@media print {
+    body {
+      margin: 10px;
+      padding: 0;
+    }
+    
+    .App, .p-6, .max-w-5xl, .mx-auto {
+      padding: 0;
+      max-width: none;
+    }
+    
+    .bg-white {
+      background: white !important;
+    }
+  
+    .shadow-lg {
+      box-shadow: none !important;
+    }
+  
+    .rounded-lg {
+      border-radius: 0 !important;
+    }
+  
+    .table-auto {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  
+    table, th, td {
+      border: 1px solid black;
+    }
+  
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+    }
+  
+    .font-bold {
+      font-weight: bold !important;
+    }
+  
+    .bg-gray-200, .text-gray-700 {
+      background-color: #f3f4f6 !important;
+      color: #374151 !important;
+    }
+  
+    .hover\:bg-gray-100:hover {
+      background-color: #f9fafb !important;
+    }
+  }
+  
+  
+  @media print {
+    .remove-column-button {
+      display: none !important;
+    }
+  }
+
+  @media print {
+    .new-page {
+      page-break-before: always;
+    }
+  
+    .new-page * {
+      break-inside: avoid;
+    }
+  }
+  

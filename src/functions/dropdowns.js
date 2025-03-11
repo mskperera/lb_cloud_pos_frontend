@@ -1,14 +1,17 @@
 import customAxios from "../utils/axios";
+import { getTenantId, getToken } from "./authService";
 
-const tenantId=localStorage.getItem('tenantId');
+// const tenantId=localStorage.getItem('tenantId');
+// const token=localStorage.getItem('token');
 //const API = 'http://localhost:8000/api';
-const token=localStorage.getItem('token');
+
 
   export const getDrpdownCategory = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
-        .get(`/dropdown/getCategories`, {
+        .get(`/categories/dropdown`, {
           headers: {
             'Content-Type': 'application/json',
            "authorization":`Bearer ${token}`,
@@ -28,9 +31,10 @@ const token=localStorage.getItem('token');
   
   export const getDropdownMeasurementUnit = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
-        .get(`/dropdown/getMeasurementUnits`, {
+        .get(`/measurementUnits/dropdown`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -51,7 +55,8 @@ const token=localStorage.getItem('token');
 
   export const getDropdownDepartments = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .get(`/dropdown/getDepartments`, {
           headers: {
@@ -71,9 +76,33 @@ const token=localStorage.getItem('token');
     }
   };
 
+  export const getDropdownBrands = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getBrands`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
   export const getDrpdownOrderVoidingReason = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
         .get(`/dropdown/getOrderVoidingReason_dropdown`, {
           headers: {
@@ -93,12 +122,12 @@ const token=localStorage.getItem('token');
     }
   };
 
-
-  export const getDrpSession = async () => {
+  export const getDrpdownStockEntryVoidingReason = async () => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
       return await customAxios
-        .get(`/dropdown/getDrpSession`, {
+        .get(`/dropdown/getDrpdownStockEntryVoidingReason`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,
@@ -115,3 +144,335 @@ const token=localStorage.getItem('token');
       return err;
     }
   };
+  
+
+  export const getDrpSession = async (descOrder='asc',storeId=null) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getDrpSession?descOrder=${descOrder}&storeId=${storeId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getTeminallByUserId = async (userId) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getTeminallByUserId?userId=${userId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+  export const getProductTypesDrp = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/productTypes`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getVariationTypesDrp = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getVariationTypes`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+
+  export const getStoresDrp = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getStores`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+  export const getContactTypes = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getContactTypes`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+  export const getSuppliers = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/suppliers`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getCustomers = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/customers`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+  export const getAdjustmentReasons = async (adjustmentTypeId) => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/getAdjustmentReasons?adjustmentTypeId=${adjustmentTypeId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };
+
+
+  export const getDrpUserRoles = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/userRoles`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+
+
+
+  export const getCurrencies = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/currencies`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+
+  export const getTimezones = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/timezones`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+
+
+  export const getCountries = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/countries`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+  export const getLanguages = async () => {
+    try {
+      const tenantId = getTenantId();
+      const token = getToken();
+      return await customAxios
+        .get(`/dropdown/languages`, {
+          headers: {
+            'Content-Type': 'application/json',
+           "authorization":`Bearer ${token}`,
+           'tenantid':tenantId
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  }; 
+  

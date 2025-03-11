@@ -1,29 +1,18 @@
-.productOrderContainer{
-    /* background-color: rgb(61, 28, 28); */
-overflow-y: auto;
-max-height: 400px;
-
-}
-
-
-.orderlist-datatable th {
-    background-color: var(--bg);
+.orderList {
+    /* scrollbar-width: thin;
+    scrollbar-color: transparent transparent; */
   }
-
-  .orderlist-datatable .p-datatable-tbody tr {
-    background-color: var(--softBg) !important;
-  }
-
-  .orderlist-datatable .p-datatable-emptymessage {
-    display: none;
-  }
-
-
-  .orderlist-qty-button{
-    /* background-color: var(--primaryColor); */
-    color: var(--primaryColor);
-
-    padding: 10px !important;
-    margin: 0 !important;
   
+  .orderList::-webkit-scrollbar {
+    width: 6px; /* Width of the scrollbar */
   }
+  
+  .orderList::-webkit-scrollbar-track {
+    background: transparent; /* Track color */
+  }
+  
+  .orderList::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners of the thumb */
+  }
+  

@@ -1,28 +1,28 @@
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+
 import React, { useState, useEffect, useRef } from "react";
-import { json, useNavigate } from "react-router-dom";
-import { addCustomer, getCustomers, updateCustomer } from "../../functions/customer";
+import { useNavigate } from "react-router-dom";
+import { addContact, updateCustomer,getContacts } from "../../functions/contacts";
 import { validate } from "../../utils/formValidation";
 import FormElementMessage from "../messges/FormElementMessage";
 import { useToast } from "../useToast";
-import { SAVE_TYPE } from "../../utils/constants";
+import { CONTACT_TYPE, SAVE_TYPE } from "../../utils/constants";
+import { getContactTypes } from "../../functions/dropdowns";
 
-export default function AddCustomer({saveType,id}) {
+export default function AddCustomer({saveType,id=0}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const showToast = useToast();
 
-  const [customerCode, setCustomerCode] = useState({
-    label: "Customer code",
+  const [contactCode, setCustomerCode] = useState({
+    label: "Contact code",
     value: "",
     isTouched: false,
     isValid: false,
     rules: { required: false, dataType: "string"  },
   });
 
-  const [customerName, setCustomerName] = useState({
-    label: "Customer Name",
+  const [contactName, setCustomerName] = useState({
+    label: "Contact Name",
     value: "",
     isTouched: false,
     isValid: false,
@@ -53,14 +53,6 @@ export default function AddCustomer({saveType,id}) {
     rules: { required: false, dataType: "string" },
   });
 
-  const [whatsappNumber, setWhatsappNo] = useState({
-    label: "WhatsappNo",
-    value: "",
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "string" },
-  });
-
   const [remark, setRemark] = useState({
     label: "Remark",
     value: "",
@@ -69,6 +61,30 @@ export default function AddCustomer({saveType,id}) {
     rules: { required: false, dataType: "string"  },
   });
 
+
+    const [contactType, setContactType] = useState({
+      label: "Contact Type",
+      value: CONTACT_TYPE.CUSTOMER,
+      isTouched: false,
+      isValid: false,
+      rules: { required: false, dataType: "integer" },
+    });
+
+
+  const [contactTypeOptions, setContactTypeOptions] = useState([]);
+
+
+
+  useEffect(() => {
+    loadDrpProductTypes();
+    console.log('EditCustomer id oooooo',id)
+  }, []);
+
+
+  const loadDrpProductTypes = async () => {
+    const objArr = await getContactTypes();
+    setContactTypeOptions(objArr.data.results[0]);
+  };
 
 
 
@@ -110,38 +126,37 @@ export default function AddCustomer({saveType,id}) {
 
 
   const loadValuesForUpdate=async()=>{
-  const ress=await  getCustomers({
-    customerId:id,
-    customerCode: null,
-    customerName: null,
+  const ress=await  getContacts({
+    contactId:id,
+    contactTypeIds:[1,2,3],
+    contactCode: null,
+    contactName: null,
     email:null,
     mobile:null,
     tel:null,
-    whatsappNumber:null,
     searchByKeyword:false
     });
 
-
+    console.log("loadValuesForUpdate", ress);
 
     const {customerId,
-      customerCode,
-      customerName,
+      contactCode,
+      contactName,
       email,
       mobile,
       tel,
-      whatsappNumber,
       remark,
+      contactTypeId,
       createdDate_UTC,
       modifiedDate_UTC
     }=ress.data.results[0][0];
 
-    setCustomerCode(p=>({...p,value:customerCode}));
-      setCustomerName(p=>({...p,value:customerName}));
+    setCustomerCode(p=>({...p,value:contactCode}));
+      setCustomerName(p=>({...p,value:contactName}));
       setEmail(p=>({...p,value:email}));
       setMobile(p=>({...p,value:mobile}));
       setTel(p=>({...p,value:tel}));
-      setWhatsappNo(p=>({...p,value:whatsappNumber}));
-      
+      setContactType(p=>({...p,value:contactTypeId}));
       setRemark(p=>({...p,value:remark}));
     console.log('customer',ress.data.results[0][0])
 
@@ -150,7 +165,7 @@ export default function AddCustomer({saveType,id}) {
     if(saveType===SAVE_TYPE.UPDATE){
       loadValuesForUpdate();
     }
-  },[saveType]);
+  },[saveType,contactTypeOptions]);
 
 
 
@@ -163,29 +178,30 @@ useEffect(()=>{
 
     const payLoad={   
       tableId:null,
-      customerName:customerName.value,
+      contactTypeId:contactType.value,
+      contactName:contactName.value,
       email:email.value,
       mobile:mobile.value,
       tel:tel.value,
-      whatsappNumber:whatsappNumber.value,
       remark:remark.value,
     }
 
     if(saveType===SAVE_TYPE.ADD){
-    const res = await addCustomer(payLoad);
+    const res = await addContact(payLoad);
     if (res.data.error) {
       setIsSubmitting(false);
       const { error } = res.data;
-      showToast("error", "Exception", error.message);
+      showToast("danger", "Exception", error.message);
+      return;
     }
 
-    const { customerCode, outputMessage, responseStatus } = res.data.outputValues;
+    const { outputMessage, responseStatus } = res.data.outputValues;
     if(responseStatus==="failed"){
       showToast("warning", "Exception",outputMessage);
     }
     setIsSubmitting(false);
     
-    navigate(`/customers`)
+    navigate(`/customers/list`)
     showToast("success", "Success", outputMessage);
   }
   else if(saveType===SAVE_TYPE.UPDATE){
@@ -193,158 +209,168 @@ useEffect(()=>{
     if (res.data.error) {
       setIsSubmitting(false);
       const { error } = res.data;
-      showToast("error", "Exception", error.message);
+      showToast("danger", "Exception", error.message);
+      return;
     }
-
-    const { customerCode, outputMessage, responseStatus } = res.data.outputValues;
+    console.log('outputValues',res)
+    const { outputMessage, responseStatus } = res.data.outputValues;
     if(responseStatus==="failed"){
       showToast("warning", "Exception",outputMessage);
     }
-    console.log("customerCode", customerCode);
+
     setIsSubmitting(false);
     
-    navigate(`/customers`)
+    navigate(`/customers/list`)
     showToast("success", "Success", outputMessage);
   }
   }
   return (
-    <>
-     {saveType===SAVE_TYPE.ADD && <h2 className="text-center">Add Customer</h2>}
-     {saveType===SAVE_TYPE.UPDATE && <h2 className="text-center">Update Customer</h2>}
-      <div className="grid px-4">
-        <div className="col-12">
-          <div className="grid mt-4">
-            <div className="col-3">
-              <div className="flex flex-column gap-2">
-               
-                <label htmlFor="customerCode">{customerCode.label}</label>
-                <InputText
-                  id="customerCode"
-                  readOnly={true}
-                  value={customerCode.value}
-                  onChange={(e) => {
-                    console.log("customerCode", e.target.value);
-                    handleInputChange(setCustomerCode, customerCode, e.target.value); // Ensure 'discount' state has 'rules'
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(customerCode)}
-              </div>
-            </div>
-    
-          </div>{" "}
+    <div className="flex justify-center">
+         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 ml-5 w-[70%] py-5">
+      <div className="flex justify-center lg:col-span-3">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold">
+            {saveType === SAVE_TYPE.ADD ? "Add Contact" : "Update Contact"}
+          </h2>
         </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="customerName">{customerName.label}</label>
-            <InputText
-                  id="customerName"
-                  value={customerName.value}
-                  onChange={(e) => {
-                    console.log("customerName", e.target.value);
-                    handleInputChange(setCustomerName, customerName, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(customerName)}
-          </div>
-        </div>
-    
-       
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="email">{email.label}</label>
-            <InputText
-                  id="email"
-                  value={email.value}
-                  onChange={(e) => {
-                    console.log("email", e.target.value);
-                    handleInputChange(setEmail, email, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(email)}
-          </div>
-        </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="email">{mobile.label}</label>
-            <InputText
-                  id="taxRate"
-                  value={mobile.value}
-                  onChange={(e) => {
-                    handleInputChange(setMobile, mobile, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(mobile)}
-          </div>
-        </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="tel">{tel.label}</label>
-            <InputText
-                  id="tel"
-                  value={tel.value}
-                  onChange={(e) => {
-                    console.log("tel", e.target.value);
-                    handleInputChange(setTel, tel, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(tel)}
-          </div>
-        </div>
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="whatsappNumber">{whatsappNumber.label}</label>
-            <InputText
-                  id="whatsappNumber"
-                  value={whatsappNumber.value}
-                  onChange={(e) => {
-                    console.log("whatsappNumber", e.target.value);
-                    handleInputChange(setWhatsappNo, whatsappNumber, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(whatsappNumber)}
-
-          </div>
-        </div>
-
-        <div className="col-12 lg:col-3 p-2">
-          <div className="flex flex-column gap-2">
-            <label htmlFor="remark">{remark.label}</label>
-            <InputText
-                  id="remark"
-                  value={remark.value}
-                  onChange={(e) => {
-                    console.log("remark", e.target.value);
-                    handleInputChange(setRemark, remark, e.target.value);
-                  }}
-                  className="p-inputtext w-full"
-                />
-                {validationMessages(remark)}
-
-          </div>
-        </div>
-
       </div>
 
-      <div className="grid mt-4 px-4">
-        <div className="col-12 p-2 flex justify-content-center">
-          <Button
-            label={isSubmitting ? "Submitting..." : saveType===SAVE_TYPE.UPDATE ? "Update":"Add"}
-            aria-label="Tender"
-            className="p-button-rounded p-button-lg p-button-primary"
-             onClick={onSubmit}
-            style={{ width: "20%" }}
+  <div className="flex flex-col">
+            <label className="label">
+              <span className="label-text">{contactType.label}</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={contactType.value}
+              onChange={(e) =>
+                handleInputChange(setContactType, contactType, e.target.value)
+              }
+            >
+              {contactTypeOptions.map((option) => (
+                <option key={option.id} value={option.id} className="text-lg">
+                  {option.displayName}
+                </option>
+              ))}
+            </select>
+            {validationMessages(contactType)}
+          </div>
+   
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{contactCode.label}</span>
+        </label>
+        <div className="flex items-center">
+          <input
+            type="text"
+            className="input input-bordered flex-1"
+            readOnly={true}
+            value={contactCode.value}
+            onChange={(e) =>
+              handleInputChange(setCustomerCode, contactCode, e.target.value)
+            }
           />
+   
         </div>
+        {validationMessages(contactCode)}
       </div>
-    </>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{contactName.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={contactName.value}
+          onChange={(e) =>
+            handleInputChange(setCustomerName, contactName, e.target.value)
+          }
+        />
+        {validationMessages(contactName)}
+      </div>
+
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{email.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={email.value}
+          onChange={(e) =>
+            handleInputChange(setEmail, email, e.target.value)
+          }
+        />
+        {validationMessages(email)}
+      </div>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{mobile.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={mobile.value}
+          onChange={(e) =>
+            handleInputChange(setMobile, mobile, e.target.value)
+          }
+        />
+        {validationMessages(mobile)}
+      </div>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{tel.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={tel.value}
+          onChange={(e) =>
+            handleInputChange(setTel, tel, e.target.value)
+          }
+        />
+        {validationMessages(tel)}
+      </div>
+
+
+      <div className="flex flex-col">
+        <label className="label">
+          <span className="label-text">{remark.label}</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          value={remark.value}
+          onChange={(e) =>
+            handleInputChange(setRemark, remark, e.target.value)
+          }
+        />
+        {validationMessages(remark)}
+      </div>
+         
+<div className="flex justify-center mt-20 col-span-full">
+        <button
+          className={`btn btn-primary w-56 ${isSubmitting ? "loading" : ""}`}
+          onClick={onSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? "Submitting..."
+            : saveType === SAVE_TYPE.UPDATE
+            ? "Update"
+            : "Add"}
+        </button>
+      </div>
+ 
+    </div>
+    </div>
+
   );
 }
