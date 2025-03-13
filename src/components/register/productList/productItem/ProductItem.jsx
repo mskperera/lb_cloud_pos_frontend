@@ -1,3 +1,5 @@
+import { formatCurrency } from "../../../../utils/format";
+
 const ProductItem = ({ p, handleProductClick }) => {
   const hasImage = Boolean(p.imageUrl);
   const stockClass = p.stockQty > 0 ? "text-green-600" : "text-red-600";
@@ -31,7 +33,7 @@ const ProductItem = ({ p, handleProductClick }) => {
             {stockText}
           </p>
           <p className="text-sm text-gray-600 font-medium">
-            Rs {p.unitPrice}
+           {formatCurrency(p.unitPrice,true)}
           </p>
         </div>
       </div>

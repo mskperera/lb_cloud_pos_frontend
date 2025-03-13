@@ -26,12 +26,6 @@ const CashPaymentMulti = ({onAddPayment}) => {
 
   const {paymentList,orderSummary} = useSelector((state) => state.orderList);
 
-  const [cashDenominations,setCashDenominations]=useState([{currency:'Rs',amount:10},
-  {currency:'Rs',amount:20},
-  {currency:'Rs',amount:50},
-  {currency:'Rs',amount:100},{currency:'Rs',amount:500},
-  {currency:'Rs',amount:1000},{currency:'Rs',amount:5000},
-]);
 
 
 const [amountReceived,setAmountReceived] = useState({
@@ -133,24 +127,6 @@ console.log('run validation',validation)
           </div>
 
           <div className="flex flex-col gap-4 items-center">
-            {/* <div className='grid grid-cols-3 gap-2'>
-                  {[1, 2, 5, 10, 20, 50, 100, 500, 1000, 5000].map((amount) => (
-                    <button
-                      key={amount}
-                      onClick={() => {
-                        handleInputChange(
-                          setAmountReceived,
-                          amountReceived,
-                          amount
-                        );
-                      }}
-          
-                      className='btn  bg-primaryColor hover:bg-primaryColorHover text-white rounded-full'
-                    >
-                      Rs {amount}
-                    </button>
-                  ))}
-                </div> */}
             <div className="flex justify-center items-center gap-2">
               <div className="">Pay amount</div>
               <input

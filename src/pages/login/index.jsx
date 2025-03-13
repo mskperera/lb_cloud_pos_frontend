@@ -3,6 +3,7 @@ import { userLogin } from '../../functions/auth';
 import { parseJwt } from '../../utils/jwt';
 import { useNavigate } from 'react-router-dom';
 import { setUserAssignedStores } from '../../functions/store';
+import { loadSystemInfoToLocalStorage } from '../../functions/systemSettings';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(plaindata));
       await setUserAssignedStores(plaindata.userId);
 
+      await loadSystemInfoToLocalStorage();
       navigate('/home');
     } catch (error) {
       setErrorMessage('An error occurred. Please try again.');

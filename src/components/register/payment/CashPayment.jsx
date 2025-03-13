@@ -5,6 +5,7 @@ import FormElementMessage from "../../messges/FormElementMessage";
 import { useDispatch, useSelector } from "react-redux";
 import { addMultiPayment, addSinglePayment, calculateBalance } from "../../../state/orderList/orderListSlice";
 import { PAYMENT_METHODS } from "../../../utils/constants";
+import { formatCurrency } from "../../../utils/format";
 
 
 
@@ -151,7 +152,7 @@ console.log('run validation',validation)
           
                       className='btn  bg-primaryColor hover:bg-primaryColorHover text-white rounded-full'
                     >
-                      Rs {amount}
+                     {formatCurrency(amount,true)}
                     </button>
                   ))}
                 </div>

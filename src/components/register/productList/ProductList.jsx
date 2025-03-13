@@ -11,6 +11,7 @@ import { addOrder } from "../../../state/orderList/orderListSlice";
 import ProductItem from "./productItem/ProductItem";
 import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
 import DialogModel from "../../model/DialogModel";
+import { formatCurrency } from "../../../utils/format";
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -239,7 +240,7 @@ const ProductList = () => {
                 </div>
 
                 <p className="text-lg font-bold text-center text-gray-800">
-                  Rs {p.unitPrice}
+                  {formatCurrency(p.unitPrice,true)}
                 </p>
 
                 <p

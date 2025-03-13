@@ -5,7 +5,8 @@ import {
   removeOrder,
   increaseQty,
 } from "../../../state/orderList/orderListSlice";
-import { DISCOUNT_TYPES } from "../../../utils/constants";
+import { DISCOUNT_TYPES,CURRENCY_DISPLAY_TYPE } from "../../../utils/constants";
+import {getCurrency} from '../../../utils/format';
 import GhostButton from "../../iconButtons/GhostButton";
 import './productOrderList.css';
 
@@ -121,7 +122,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
                       {`Discount: ${product.discount.discountValue} ${
                         product.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE
                           ? "%"
-                          : "Rs"
+                          : `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)}`
                       } | ${product.discount.reasonName}`}
                     </td>
                     <td className="py-2 px-4 text-right">

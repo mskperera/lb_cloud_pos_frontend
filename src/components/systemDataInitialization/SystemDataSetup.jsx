@@ -3,7 +3,7 @@ import InputField from "../inputField/InputField";
 import DropdownField from "../inputField/DropdownField";
 import { getCountries, getCurrencies, getLanguages, getTimezones } from "../../functions/dropdowns";
 import { useToast } from "../useToast";
-import { initializeSystemData } from "../../functions/systemSettings";
+import { getSystemInfo, initializeSystemData, loadSystemInfoToLocalStorage } from "../../functions/systemSettings";
 import { useNavigate } from "react-router-dom";
 import { setUserAssignedStores } from "../../functions/store";
 import { faBuilding, faCashRegister, faGlobe} from "@fortawesome/free-solid-svg-icons";
@@ -202,10 +202,9 @@ const SystemDataSetup = () => {
       const userinfo=JSON.parse(localStorage.getItem('user'));
 
 
-
        const onSubmit = async (e) => {
          e.preventDefault();
-     
+        
 const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value));
 
          try {
@@ -252,7 +251,8 @@ const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value))
                // navigate(`/products/add?saveType=add`);
              }
             
-     
+             loadSystemInfoToLocalStorage();
+             
            setIsSubmitting(false);
          } catch (error) {
            setIsSubmitting(false);
