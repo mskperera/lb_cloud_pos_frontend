@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './dayend.css'; // Assuming custom styles if needed
 import { endSession, getSessionEnd } from "../../functions/session";
-import { formatCurrency } from "../../utils/format";
+import { formatCurrency, getCurrency } from "../../utils/format";
 import { useToast } from "../../components/useToast";
+import { CURRENCY_DISPLAY_TYPE } from "../../utils/constants";
 
 const Detail = ({ label, value, bold }) => (
   <div className="flex justify-between py-1 sm:py-2">
@@ -53,16 +54,16 @@ const DayEnd = () => {
   };
 
   const [cashDenominations, setCashDenominations] = useState([
-    { label: "Rs 5000", qty: 5000, amount: 0, value: 0 },
-    { label: "Rs 1000", qty: 1000, amount: 0, value: 0 },
-    { label: "Rs 500", qty: 500, amount: 0, value: 0 },
-    { label: "Rs 100", qty: 100, amount: 0, value: 0 },
-    { label: "Rs 50", qty: 50, amount: 0, value: 0 },
-    { label: "Rs 20", qty: 20, amount: 0, value: 0 },
-    { label: "Rs 10", qty: 10, amount: 0, value: 0 },
-    { label: "Rs 5", qty: 5, amount: 0, value: 0 },
-    { label: "Rs 2", qty: 2, amount: 0, value: 0 },
-    { label: "Rs 1", qty: 1, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 5000`, qty: 5000, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 1000`, qty: 1000, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 500`,qty: 500, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 100`, qty: 100, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 50`, qty: 50, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 20`, qty: 20, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 10`, qty: 10, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 5`, qty: 5, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 2`, qty: 2, amount: 0, value: 0 },
+    { label: `${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)} 1`, qty: 1, amount: 0, value: 0 },
   ]);
 
   const [cashDenominationTotal, setCashDenominationTotal] = useState(0);

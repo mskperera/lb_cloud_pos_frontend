@@ -3,21 +3,25 @@
   //   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'LKR' }).format(value);
 
 import moment from "moment";
+import { CURRENCY_DISPLAY_TYPE } from "./constants";
+import { getSystemInfoFromLocalStorage } from "../functions/systemSettings";
 
   // };
   export const formatCurrency = (value,showSymbol=true) => {
+    const {symbol,currencyCode}=getSystemInfoFromLocalStorage();
     const formattedNumber = new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(value);
-    return  showSymbol ? `Rs. ${formattedNumber}` : formattedNumber;
+    return  showSymbol ? `${symbol}. ${formattedNumber}` : formattedNumber;
   };
 
-  // export const formatUtcToLocal = (value) => {
-  //   const utcOffSet= moment().utcOffset();
-  //   const localFormattedDate = moment(value).add(utcOffSet,'minutes').format('YYYY-MMM-DD hh:mm:ss A');
-  //   return localFormattedDate;
-  // };
+  export const getCurrency = (displayType) => {
+
+    const {symbol,currencyCode}=getSystemInfoFromLocalStorage();
+    console.log('ssssss',symbol)
+    return  displayType===CURRENCY_DISPLAY_TYPE.SYMBOL? symbol:currencyCode;
+  };
 
 export const formatUtcToLocal = (value, dateOnly = false) => {
   const utcOffSet = moment().utcOffset();
