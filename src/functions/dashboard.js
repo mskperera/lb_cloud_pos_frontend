@@ -1,12 +1,10 @@
 import customAxios from "../utils/axios";
-
-//const tenantId='00001';
-const tenantId=localStorage.getItem('tenantId');
-const token=localStorage.getItem('token');
-
+import { getTenantId, getToken } from "./authService";
   
 export const getDashboardDetails = async (payload) => {
   try {
+     const tenantId = getTenantId();
+      const token = getToken();
 
     return await customAxios
       .post(`dashboard`,payload, {

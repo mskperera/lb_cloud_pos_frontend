@@ -7,10 +7,10 @@ const About = () => {
       <div className="max-w-4xl bg-white shadow-lg rounded-xl p-8 md:p-12 mx-4">
         {/* Header */}
         <h1 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-6 animate-fade-in">
-          About SkyCrown POS
+          About Legend POS
         </h1>
         <p className="text-lg text-gray-600 text-center mb-4 leading-relaxed">
-          Welcome to <span className="font-semibold text-blue-600">SkyCrown POS</span>—a{" "}
+          Welcome to <span className="font-semibold text-blue-600">Legend POS</span>—a{" "}
           <span className="italic">cloud-based Point of Sale system</span> crafted to make your business life easier and
           more affordable. We’re here to help you manage sales, inventory, and customers with a{" "}
           <span className="font-semibold text-blue-600">simple subscription</span> that fits your budget.
@@ -21,7 +21,7 @@ const About = () => {
 
         {/* Why Choose Section */}
         <div className="mt-10">
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-6">Why SkyCrown POS?</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-6">Why Legend POS?</h2>
           <div className="space-y-4">
             {[
               "🌐 Cloud-Based Efficiency – Access your data anywhere, anytime.",
@@ -69,7 +69,7 @@ const About = () => {
         <div className="mt-10">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-6">Our Mission</h2>
           <p className="text-lg text-gray-600 leading-relaxed">
-            At <span className="font-semibold text-blue-600">SkyCrown POS</span>, we’re passionate about empowering
+            At <span className="font-semibold text-blue-600">Legend POS</span>, we’re passionate about empowering
             businesses with{" "}
             <span className="italic text-blue-600">smart, cloud-based tools</span>. Our goal? To deliver a{" "}
             <span className="font-semibold">cost-effective POS solution</span> that helps you grow—without the stress or
@@ -95,7 +95,7 @@ const About = () => {
         {/* Call to Action */}
         <div className="mt-12 text-center">
           <button className="btn bg-blue-600 text-white btn-lg px-8 py-3 text-lg font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300">
-            Start with SkyCrown POS Today
+            Start with Legend POS Today
           </button>
         </div>
       </div>

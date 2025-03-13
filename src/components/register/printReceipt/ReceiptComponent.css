@@ -1,139 +1,272 @@
-/* ReceiptComponent.css */
-
 .receipt {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 12px;
-    width: 300px;
-    margin: auto;
-    padding: 10px;
-    border: 1px solid #000;
-    background-color: #fff;
-    color: #000;
-  }
-  
-  .text-center {
-    text-align: center;
-  }
-  
-  .address, .email {
-    margin-bottom: 2px;
-  }
-  
-  .details p, .footer p {
-    margin: 2px 0;
-  }
-  
-  /* Add styles for the header */
-.item-header {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #000;
-    margin-bottom: 10px;
-  }
-  
-  .item-header > div {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 10px;
-  }
-
-  .items .item-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-  }
-  
-  .items .line, .items .description, .items .quantity, .items .price {
-    padding: 0 2px;
-  }
-  
-  .items .quantity {
-    text-align: left;
-    flex: 1;
-  }
-  
-  .items .price {
-    text-align: right;
-    flex: 1;
-  }
-  
-
-  .item-row {
-    border-bottom: 1px solid #eee; /* Optional: adds a separator line */
-    padding-bottom: 5px; /* Optional: adds some space below each item */
-    margin-bottom: 5px; /* Optional: adds some space below each item */
-  }
-  
-  .description {
-    font-weight: bold; /* Optional: makes the description stand out */
-    word-wrap: break-word; 
-    max-width: 200px; /* Set a maximum width for the description */
+  font-family: Arial, sans-serif; /* Matches C# Arial font */
+  width: 300px; /* Approx 80mm at 96dpi */
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #fff;
+  color: #000;
+  text-align: left;
 }
-  
-  .line-qty-price {
-    display: flex;
-    justify-content: space-between;
-   
-  }
-  
-  .line {
-    flex-basis: 10%; /* Adjust the width as needed */
-  }
-  .quantity-price {
-    display: block; /* Stack the quantity and price vertically */
-  }
-  
-  .quantity, .price {
-    flex-basis: 45%; /* Adjust the width as needed */
-    text-align: left;
-  }
+
+.company-name {
+  font-size: 14px; /* Matches C# headingFont */
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+.store-name {
+  font-size: 11px; /* Matches C# printFont2 */
+  text-align: center;
+  margin: 5px 0;
+}
+
+.address, .tel, .email {
+  font-size: 11px; /* Matches C# printFont2 */
+  text-align: center;
+  margin: 0px 0;
+}
+
+.thick-border {
+  border: 0;
+  border-top: 2px solid #000; /* Matches C# borderPen2 */
+  margin: 10px 0;
+}
+
+.thin-border {
+  border: 0;
+  border-top: 1px solid #000; /* Matches C# borderPen */
+  margin: 5px 0;
+}
+
+.invoice-label {
+  font-size: 13px; /* Matches C# invoiceFont */
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+.details p {
+  font-size: 12px; /* Matches C# printFont */
+  margin: 5px 0;
+}
+
+.voided-indicator {
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.item-header {
+  display: flex;
+  font-size: 10px; /* Matches C# boldFont */
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.item-header span {
+  display: inline-block;
+}
+
+.item-header span:nth-child(1) { width: 20px; } /* # */
+.item-header span:nth-child(2) { width: 120px; } /* Description */
+.item-header span:nth-child(3) { width: 60px; } /* Qty */
+.item-header span:nth-child(4) { width: 50px; text-align: right; } /* Price */
+.item-header span:nth-child(5) { width: 50px; text-align: right; } /* Total */
+
+.items .item-row {
+  display: flex;
+  font-size: 10px; /* Matches C# printFont */
+  margin: 5px 0;
+}
+
+.item-row span {
+  display: inline-block;
+}
+
+.item-row span:nth-child(1) { width: 20px; } /* # */
+.item-row span:nth-child(2) { width: 120px; word-wrap: break-word; } /* Description */
+.item-row span:nth-child(3) { width: 60px; } /* Qty */
+.item-row span:nth-child(4) { width: 50px; text-align: right; } /* Price */
+.item-row span:nth-child(5) { width: 50px; text-align: right; } /* Total */
+
+.totals {
+  font-size: 11px; /* Matches C# printFont2 */
+  text-align: right;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.grand-total {
+  font-weight: bold;
+  font-size: 11px; /* Matches C# boldOrderSummaryFont */
+}
+
+.payments {
+  font-size: 10px; /* Matches C# printFont */
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.card-details, .cash-details {
+  font-size: 12px;
+  margin-left: 10px;
+  text-align: right;
+}
 
 
 
-  .footer {
-    border-top: 1px dashed #000;
-    padding-top: 5px;
-  }
-  
-  .totals {
-    border-top: 1px dashed #000;
-    padding-top: 0px;
-    font-weight: bold;
+.thank-you {
+  font-weight: bold;
+}
+
+.ad-text {
+  white-space: pre-wrap; /* Preserves newlines from C# */
+  margin: 10px 0;
+}
+
+
+
+
+
+.item-number {
+  width: 20px;
+  display: inline-block;
+}
+
+.item-description {
+  width: 120px;
+  display: inline-block;
+  word-wrap: break-word;
+}
+
+.item-details {
+  display: flex;
+  margin-left: 20px; /* Aligns with item-number width */
+}
+
+.item-qty {
+  width: 60px;
+  display: inline-block;
+}
+
+.item-price {
+  width: 50px;
+  text-align: right;
+  display: inline-block;
+}
+
+.item-total {
+  width: 50px;
+  text-align: right;
+  display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+.receipt-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-header-full,
+.item-details {
+  width: 100%;
+  display: flex;
+  justify-content: start;
+}
+
+/* .item-header-full span {
+  flex: 1;
+} */
+
+.item-number {
+  text-align: left;
+
+}
+
+.item-description {
+  text-align: left;
+  flex: 1;
+}
+
+.item-details span {
+  flex: 1;
+  text-align:left;
+}
+
+
+
+.item-header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-header-row {
+  width: 100%;
+  display: flex;
+  justify-content: start;
+}
+
+.item-header-row2 {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 20px;
+}
+
+
+.receipt-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers content horizontally */
+  text-align: center; /* Ensures text is centered */
+  gap: 10px;
+  justify-content: center;
+}
+
+
+
+
+
+@media print {
+  @page {
+    size: 80mm auto; /* Matches 80mm thermal printer width */
+    margin: 0;
   }
 
-  .totals .total-row{
-    display:flex;
-    justify-content: space-between;
+  body * {
+    visibility: hidden;
   }
 
-  .total-row p {
-    margin: 5px 0px 5px 0px; /* This removes any default margin */
-
+  .receipt, .receipt * {
+    visibility: visible;
   }
-  
 
-  @media print {
-    @page {
-      size: 88mm auto; /* width of 88mm and automatic height */
-      margin: 10mm;
-    }
-  
-    body * {
-      visibility: hidden; /* Hides everything in the body */
-    }
-  
-    .receipt, .receipt * {
-      visibility: visible; /* Makes only receipt and its children visible */
-    }
-  
-    .receipt {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 88mm; /* Set the width to match the print page width */
-      margin: 0;
-      border: none; /* Optional: remove the border in print */
-    }
+  .receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    margin: 0;
+    border: none;
   }
+}

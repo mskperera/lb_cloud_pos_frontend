@@ -13,9 +13,9 @@ import { getTenantId, getToken } from "./authService";
       return await customAxios
         .get(`/categories/dropdown`, {
           headers: {
-            'Content-Type': 'application/json',
-           "authorization":`Bearer ${token}`,
-           'tenantid':tenantId
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+            tenantid: tenantId,
           },
         })
         .then((res) => {

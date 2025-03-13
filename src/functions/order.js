@@ -1,12 +1,6 @@
 import customAxios from "../utils/axios";
 import { getTenantId, getToken } from "./authService";
 
-// const tenantId=localStorage.getItem('tenantId');
-// const token=localStorage.getItem('token');
-
-
-  
-
   export const getOrders = async (data) => {
     try {
       const tenantId = getTenantId();

@@ -1,12 +1,10 @@
 import customAxios from "../utils/axios";
-
-//const tenantId='00001';
-const tenantId=localStorage.getItem('tenantId');
-const token=localStorage.getItem('token');
-
+import { getTenantId, getToken } from "./authService";
   
 export const getCategories = async (payload) => {
   try {
+    const tenantId = getTenantId();
+    const token = getToken();
 
     return await customAxios
       .post(`categories/get`,payload, {
@@ -29,7 +27,9 @@ export const getCategories = async (payload) => {
 
   export const addCategory = async (payload) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
+
       return await customAxios
         .post(`categories`,payload, {
           headers: {
@@ -51,7 +51,9 @@ export const getCategories = async (payload) => {
 
   export const updateCategory = async (categoryId,payload) => {
     try {
-  
+   const tenantId = getTenantId();
+      const token = getToken();
+
       return await customAxios
         .put(`categories/${categoryId}`,payload, {
           headers: {
@@ -73,7 +75,9 @@ export const getCategories = async (payload) => {
 
   export const deleteCategory = async (categoryId) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
+
       return await customAxios
         .delete(`categories/${categoryId}`, {
           headers: {
@@ -95,13 +99,15 @@ export const getCategories = async (payload) => {
 
   export const getFrontendIdByTerminalId = async (terminalId) => {
     try {
-  
+      const tenantId = getTenantId();
+      const token = getToken();
+
       return await customAxios
         .get(`terminal/getFrontendIdByTerminalId?terminalId=${terminalId}`, {
           headers: {
-            'Content-Type': 'application/json',
-            "authorization":`Bearer ${token}`,
-           'tenantid':tenantId
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+            tenantid: tenantId,
           },
         })
         .then((res) => {
