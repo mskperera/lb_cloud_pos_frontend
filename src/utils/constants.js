@@ -36,6 +36,10 @@ export const USER_ROLE= {
   CASHIER: 3
 };
 
+export const CURRENCY_DISPLAY_TYPE= {
+  SYMBOL: "symbol",
+  CODE: "code"
+};
 
 // dropdown related constants
 export const DROPDOWN_NOT_SELECTED_ID = 0;

@@ -3,6 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import Customer from "../customerInfoPanel/CustomerInfoPanel";
 import DatePicker from "../../DatePicker";
+import { formatCurrency } from "../../../utils/format";
 
 
 
@@ -25,7 +26,7 @@ const CreditPayment=()=>{
                     {" "}
                     Grand Total
                   </label>
-                  <span className="text-xl font-normal">Rs 00.00</span>
+                  <span className="text-xl font-normal">  {formatCurrency(0,true)}</span>
                 </div>
               </div>
             </div>
