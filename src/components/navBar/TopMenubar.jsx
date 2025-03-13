@@ -143,7 +143,7 @@ export default function TopMenubar() {
       <div className="flex justify-start gap-4">
         <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
-          <h3 className="text-xl font-bold">SkyCrown POS</h3>
+          <h3 className="text-xl font-bold">Legend POS</h3>
      
         </div>
 

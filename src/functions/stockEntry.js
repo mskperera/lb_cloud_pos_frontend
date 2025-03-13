@@ -11,7 +11,7 @@ export const stockAdd = async (data) => {
       .post(`/stock/stockAdd`, data, {
         headers: {
           'Content-Type': 'application/json',
-         // "authorization":`Bearer ${token}`
+          "authorization":`Bearer ${token}`,
          'tenantid':tenantId
         },
       })

@@ -1,11 +1,6 @@
 
 import customAxios from "../utils/axios";
-
-//const tenantId='00001';
-const tenantId=localStorage.getItem('tenantId');
-const token=localStorage.getItem('token');
-
-
+import { getTenantId, getToken } from "./authService";
 
 export const getSelectedStore = () => {
   try {
@@ -30,6 +25,9 @@ export const setUserAssignedStores=async(userId)=>{
 
  const getUserAssignedStores = async (userId) => {
   try {
+ 
+    const tenantId = getTenantId();
+       const token = getToken();
 
     return await customAxios
       .get(`/stores/getUserAssignedStores?userId=${userId}`, {

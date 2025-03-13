@@ -54,11 +54,11 @@ function PaymentConfirm() {
      //setOrderDetails2(orderDetails);
      const orderDetals=[];
      od.map(o=>{
-      const descr=`${o.productNo} | ${o.productName}`
+      const descr=`${o.sku} | ${o.productName}`
       const netAmount = parseFloat(o.netAmount) || 0;
       const qty = parseFloat(o.qty) || 0;
       const measurementUnitName=o.measurementUnitName;
-      const  obj ={ line: o.orderDetailId,unitPrice:o.unitPrice, description:descr,productName:descr, qty:qty, netAmount:netAmount,measurementUnitName }
+      const  obj ={o, line: o.orderDetailId,unitPrice:o.unitPrice, description:descr,productName:descr, qty:qty, netAmount:netAmount,measurementUnitName }
       orderDetals.push(obj);
      })
      setOrderDetails(orderDetals);
