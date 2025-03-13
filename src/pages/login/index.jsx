@@ -50,7 +50,7 @@ const Login = () => {
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
       <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
         <h2 className="text-4xl font-bold text-center text-gray-800">
-          Welcome to SkyCrown POS
+          Welcome to Legend POS
         </h2>
         <p className="text-center text-gray-600 mt-2">
           Sign in to your account

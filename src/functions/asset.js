@@ -1,8 +1,8 @@
 
 import axios from 'axios';
-const tenantId=localStorage.getItem('tenantId');
+import { getTenantId, getToken } from './authService';
 
-const productImageFolderPath=`${tenantId}/productImages`;
+
 export const uploadImage = async (file) => {
   try {
     const formData = new FormData();
@@ -29,6 +29,12 @@ export const uploadImage = async (file) => {
 
 export const uploadImageResized = async (file) => {
   try {
+
+   const tenantId = getTenantId();
+      const token = getToken();
+
+ const productImageFolderPath=`${tenantId}/productImages`;
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('folderPath', productImageFolderPath);  

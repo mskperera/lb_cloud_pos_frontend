@@ -5,3 +5,4 @@ export const getTenantId = () => {
   export const getToken = () => {
     return localStorage.getItem('token');
   };
+  
