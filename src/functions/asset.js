@@ -56,28 +56,46 @@ export const uploadImageResized = async (file) => {
   }
 };
 
+export const commitFile = async (fileHash) => {
+  try {
+   
+    return await axios
+      .post(`${process.env.REACT_APP_API_CDN}/imageUpload/commitFile`, {fileHash}, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error('Error uploading image:', err);
+        return err.response;
+      });
+  } catch (err) {
+    console.error('Unexpected error in uploadImage:', err);
+    return err;
+  }
+};
 
-// export const uploadImageResized = async (file) => {
-//     try {
-//       const formData = new FormData();
-//       formData.append('file', file);
-  
-//       return await axios
-//         .post(`${process.env.REACT_APP_API_CDN}/upload-image`, formData, {
-//           headers: {
-//             'Content-Type': 'multipart/form-data',
-//           },
-//         })
-//         .then((res) => res.data)
-//         .catch((err) => {
-//           console.error('Error uploading image:', err);
-//           return err.response;
-//         });
-//     } catch (err) {
-//       console.error('Unexpected error in uploadImage:', err);
-//       return err;
-//     }
-//   };
+
+export const markFileAsTobeDeleted = async (fileHash) => {
+  try {
+
+    return await axios
+      .post(`${process.env.REACT_APP_API_CDN}/imageUpload/markFileAsTobeDeleted`, {fileHash}, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error('Error uploading image:', err);
+        return err.response;
+      });
+  } catch (err) {
+    console.error('Unexpected error in uploadImage:', err);
+    return err;
+  }
+};
 
 
 export const viewImage = async (imageHash) => {
@@ -99,28 +117,26 @@ export const viewImage = async (imageHash) => {
     }
   };
 
-  
-  export const resizeImage = async (imageHash, width, height, quality) => {
+
+  export const deleteFile = async (fileHash) => {
     try {
-      const queryParams = new URLSearchParams({ width, height, quality }).toString();
+  
       return await axios
-        .get(`http://localhost:8000/api/${imageHash}?${queryParams}`, {
-          responseType: 'blob', // To handle image response
+        .delete(`${process.env.REACT_APP_API_CDN}/imageUpload/deleteFile?fileHash=${fileHash}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
         })
-        .then((res) => {
-          return URL.createObjectURL(res.data); // Generate object URL to use in `src` attribute
-        })
+        .then((res) => res.data)
         .catch((err) => {
-          console.error('Error resizing image:', err);
+          console.error( err);
           return err.response;
         });
     } catch (err) {
-      console.error('Unexpected error in resizeImage:', err);
+      console.error( err);
       return err;
     }
   };
-  
-
 
 
 //   // Upload an image
