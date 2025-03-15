@@ -22,7 +22,12 @@ import FormElementMessage from "../messges/FormElementMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StoresComponent from "../storeComponent/StoreComponent";
-import { uploadImageResized } from "../../functions/asset";
+import {
+  commitFile,
+  deleteFile,
+  markFileAsTobeDeleted,
+  uploadImageResized,
+} from "../../functions/asset";
 import InputField from "../inputField/InputField";
 import DialogModel from "../model/DialogModel";
 import GhostButton from "../iconButtons/GhostButton";
@@ -297,20 +302,22 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     }));
   };
 
-  const [selectedImage, setSelectedImage] = useState(null); // Store selected image
+  const [isFileSelectLoading, setIsFileSelectLoading] = useState(false); // Store selected image
   const [previewUrl, setPreviewUrl] = useState(null); // Store image preview URL
   const [uploadResponse, setUploadResponse] = useState(null); // Store response from the upload API
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      // setSelectedImage(file);
+      setIsFileSelectLoading(true);
       const response = await uploadImageResized(file); // Call the upload function
       console.log("setPreviewUrl", response);
       setUploadResponse(response);
       setPreviewUrl(
         `${process.env.REACT_APP_API_CDN}/${response.hash}?width=200&height=200&quality=80`
       ); // Generate preview URL
+
+      setIsFileSelectLoading(false);
     }
   };
 
@@ -562,9 +569,9 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
         isStockTracked: isStockTracked,
         isProductItem: isProductItem,
         brandId: brand.value,
-        unitCost:isNumeric(unitCost.value) ? unitCost.value : null,
+        unitCost: isNumeric(unitCost.value) ? unitCost.value : null,
         unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
-        taxPerc:isNumeric(taxRatePerc.value) ? taxRatePerc.value : null,
+        taxPerc: isNumeric(taxRatePerc.value) ? taxRatePerc.value : null,
         sku: sku.value,
         barcode: barcode.value,
         reorderLevel: reorderLevel.value,
@@ -590,6 +597,10 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
           showToast("warning", "Exception", outputMessage);
           setIsSubmitting(false);
         } else {
+          console.log("uploadResponse", uploadResponse);
+          if (uploadResponse) {
+            await commitFile(uploadResponse.hash);
+          }
           showToast("success", "Success", outputMessage);
           // navigate(`/products/add?saveType=add`);
           resetValues();
@@ -607,6 +618,16 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
           showToast("warning", "Exception", outputMessage);
           setIsSubmitting(false);
         } else {
+          console.log("uploadResponse", uploadResponse);
+          if (imageUrl) {
+            await markFileAsTobeDeleted(imageUrl);
+          }
+
+          if (uploadResponse) {
+            await commitFile(uploadResponse.hash);
+          }
+
+          await loadValuesForUpdate();
           showToast("success", "Success", outputMessage);
           //navigate(`/products`);
         }
@@ -623,8 +644,6 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
-
-
 
   const handleNewAddVariation = () => {
     // Get the last variation to copy its variationDetails structure
@@ -779,7 +798,8 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
             </h2>
           </div>
         </div>
-
+        {JSON.stringify({ imageUrl })}
+        {JSON.stringify({ previewUrl })}
         <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {/* Product Number with Auto Generate Checkbox */}
           {/* <div className="flex flex-col">
@@ -902,29 +922,27 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                       </option>
                     ))}
                   </select>
-          
-                     <GhostButton
-                           onClick={() => {
-                            if (
-                              selectedCategory &&
-                              !selectedCategories.includes(selectedCategory)
-                            ) {
-                              setSelectedCategories([
-                                ...selectedCategories,
-                                parseInt(selectedCategory),
-                              ]);
-                              setSelectedCategory("");
-                            }
-                          }}
-                          
-                          disabled={selectedCategory===""}
-                          iconClass="pi pi-plus-circle text-lg"
-                            labelClass="text-md font-normal"
-                            label="Add"
-                          color="text-blue-500"
-                          hoverClass="hover:text-blue-700 hover:bg-transparent"
-                        />
-              
+
+                  <GhostButton
+                    onClick={() => {
+                      if (
+                        selectedCategory &&
+                        !selectedCategories.includes(selectedCategory)
+                      ) {
+                        setSelectedCategories([
+                          ...selectedCategories,
+                          parseInt(selectedCategory),
+                        ]);
+                        setSelectedCategory("");
+                      }
+                    }}
+                    disabled={selectedCategory === ""}
+                    iconClass="pi pi-plus-circle text-lg"
+                    labelClass="text-md font-normal"
+                    label="Add"
+                    color="text-blue-500"
+                    hoverClass="hover:text-blue-700 hover:bg-transparent"
+                  />
                 </div>
               </div>
 
@@ -958,8 +976,6 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
             </div>
           </div>
 
-       
-
           {/* Reorder Level */}
           <InputField
             label={reorderLevel.label}
@@ -970,83 +986,79 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
             validationMessages={validationMessages(reorderLevel)}
             placeholder="Enter Reorder Level"
           />
-      
 
           <div className="grid grid-cols-3 col-span-3 gap-10">
-       
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-5 items-center">
-                  <input
-                    type="checkbox"
-                    id="autoDeductInventory"
-                    className="checkbox checkbox-primary"
-                    onChange={(e) => setIsProductItem(e.target.checked)}
-                    checked={isProductItem}
-                  />
-                  <label htmlFor="autoDeductInventory">Product Item</label>
-                </div>
-                <p className="text-gray-500">
-                  {getInstruction("isProductItem")}
-                </p>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-5 items-center">
+                <input
+                  type="checkbox"
+                  id="autoDeductInventory"
+                  className="checkbox checkbox-primary"
+                  onChange={(e) => setIsProductItem(e.target.checked)}
+                  checked={isProductItem}
+                />
+                <label htmlFor="autoDeductInventory">Product Item</label>
               </div>
+              <p className="text-gray-500">{getInstruction("isProductItem")}</p>
+            </div>
 
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-5 items-center">
-                  <input
-                    type="checkbox"
-                    id="isNotForSelling"
-                    className="checkbox checkbox-primary"
-                    onChange={(e) => setIsNotForSelling(e.target.checked)}
-                    checked={isNotForSelling}
-                  />
-                  <label htmlFor="isNotForSelling">Not For Selling</label>
-                </div>
-                <p className="text-gray-500">
-                  {getInstruction("isNotForSelling")}
-                </p>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-5 items-center">
+                <input
+                  type="checkbox"
+                  id="isNotForSelling"
+                  className="checkbox checkbox-primary"
+                  onChange={(e) => setIsNotForSelling(e.target.checked)}
+                  checked={isNotForSelling}
+                />
+                <label htmlFor="isNotForSelling">Not For Selling</label>
               </div>
+              <p className="text-gray-500">
+                {getInstruction("isNotForSelling")}
+              </p>
+            </div>
 
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-5 items-center">
-                  <input
-                    type="checkbox"
-                    id="isUnique"
-                    className="checkbox checkbox-primary"
-                    onChange={(e) => setIsUnique(e.target.checked)}
-                    checked={isUnique}
-                  />
-                  <label htmlFor="isUnique">Unique</label>
-                </div>
-                <p className="text-gray-500">{getInstruction("isUnique")}</p>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-5 items-center">
+                <input
+                  type="checkbox"
+                  id="isUnique"
+                  className="checkbox checkbox-primary"
+                  onChange={(e) => setIsUnique(e.target.checked)}
+                  checked={isUnique}
+                />
+                <label htmlFor="isUnique">Unique</label>
               </div>
+              <p className="text-gray-500">{getInstruction("isUnique")}</p>
+            </div>
 
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-5 items-center">
-                  <input
-                    type="checkbox"
-                    id="isStockTracked"
-                    className="checkbox checkbox-primary"
-                    onChange={(e) => setIsStockTracked(e.target.checked)}
-                    checked={isStockTracked}
-                    disabled={!isProductItem}
-                  />
-                  <label htmlFor="isStockTracked">Stock Tracked</label>
-                </div>
-                <p className="text-gray-500">
-                  {getInstruction("isStockTracked")}
-                </p>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-5 items-center">
+                <input
+                  type="checkbox"
+                  id="isStockTracked"
+                  className="checkbox checkbox-primary"
+                  onChange={(e) => setIsStockTracked(e.target.checked)}
+                  checked={isStockTracked}
+                  disabled={!isProductItem}
+                />
+                <label htmlFor="isStockTracked">Stock Tracked</label>
               </div>
-         
-              <div className="flex gap-5 items-center mt-10 justify-center">
-            <input
-              type="checkbox"
-              id="isExpiringProduct"
-              className="checkbox checkbox-primary"
-              onChange={(e) => setIsExpiringProduct(e.target.checked)}
-              checked={isExpiringProduct}
-            />
-            <label htmlFor="isExpiringProduct">Expiring Product</label>
-          </div>
+              <p className="text-gray-500">
+                {getInstruction("isStockTracked")}
+              </p>
+            </div>
+
+            <div className="flex gap-5 items-center mt-10 justify-center">
+              <input
+                type="checkbox"
+                id="isExpiringProduct"
+                className="checkbox checkbox-primary"
+                onChange={(e) => setIsExpiringProduct(e.target.checked)}
+                checked={isExpiringProduct}
+              />
+              <label htmlFor="isExpiringProduct">Expiring Product</label>
+            </div>
           </div>
 
           <div className="flex flex-col">
@@ -1070,8 +1082,6 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
             {validationMessages(productType)}
           </div>
 
-    
-  
           <div className="flex flex-col col-span-2 bg-red">
             <StoresComponent stores={stores} setStores={setStoresHandler} />
           </div>
@@ -1095,7 +1105,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 validationMessages={validationMessages(barcode)}
                 placeholder="Enter Barcode"
               />
-  <InputField
+              <InputField
                 label={unitCost.label}
                 value={unitCost.value}
                 onChange={(e) =>
@@ -1115,16 +1125,16 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 placeholder="Enter UnitPrice"
               />
 
-                 {/* Tax Rate */}
-          <InputField
-            label={taxRatePerc.label}
-            value={taxRatePerc.value}
-            onChange={(e) =>
-              handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
-            }
-            validationMessages={validationMessages(taxRatePerc)}
-            placeholder="Enter Tax Perc"
-          />
+              {/* Tax Rate */}
+              <InputField
+                label={taxRatePerc.label}
+                value={taxRatePerc.value}
+                onChange={(e) =>
+                  handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
+                }
+                validationMessages={validationMessages(taxRatePerc)}
+                placeholder="Enter Tax Perc"
+              />
             </>
           )}
 
@@ -1365,7 +1375,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 validationMessages={validationMessages(barcode)}
                 placeholder="Enter Barcode"
               />
-  <InputField
+              <InputField
                 label={unitCost.label}
                 value={unitCost.value}
                 onChange={(e) =>
@@ -1374,7 +1384,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 validationMessages={validationMessages(unitCost)}
                 placeholder="Enter unitCost"
               />
-              
+
               <InputField
                 label={unitPrice.label}
                 value={unitPrice.value}
@@ -1385,16 +1395,16 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 placeholder="Enter Unit Price"
               />
 
-                 {/* Tax Rate */}
-          <InputField
-            label={taxRatePerc.label}
-            value={taxRatePerc.value}
-            onChange={(e) =>
-              handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
-            }
-            validationMessages={validationMessages(taxRatePerc)}
-            placeholder="Enter Tax Perc"
-          />
+              {/* Tax Rate */}
+              <InputField
+                label={taxRatePerc.label}
+                value={taxRatePerc.value}
+                onChange={(e) =>
+                  handleInputChange(setTaxRatePerc, taxRatePerc, e.target.value)
+                }
+                validationMessages={validationMessages(taxRatePerc)}
+                placeholder="Enter Tax Perc"
+              />
 
               <div className="col-span-2 mt-4">
                 <h3 className="text-center font-bold">Combo Ingredients</h3>
@@ -1581,17 +1591,24 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
               </div>
             </label>
 
-            {/* Image Preview */}
-            {previewUrl && (
+            {isFileSelectLoading ? (
               <div className="w-full max-w-md text-center">
-                <div className="relative overflow-hidden rounded-lg ">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="object-contain w-full max-h-32 rounded-lg"
-                  />
+                <div className="relative overflow-hidden rounded-lg">
+                  <span className="loading loading-spinner loading-lg text-info"></span>
                 </div>
               </div>
+            ) : (
+              previewUrl && (
+                <div className="w-full max-w-md text-center">
+                  <div className="relative overflow-hidden rounded-lg">
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="object-contain w-full max-h-32 rounded-lg"
+                    />
+                  </div>
+                </div>
+              )
             )}
           </div>
 
