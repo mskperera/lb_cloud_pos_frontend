@@ -51,6 +51,7 @@ export default function TopMenubar() {
 
   useEffect(() => {
     const newSocket = io(process.env.REACT_APP_SOCKET_IO_URL, {
+      path: "/socket.io/",
       transports: ["websocket"],
     });
 
