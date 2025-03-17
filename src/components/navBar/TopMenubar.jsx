@@ -40,6 +40,7 @@ export default function TopMenubar() {
     if(terminalId_l){
     const terminalId=terminalId_l ? JSON.parse(terminalId_l):null;
     const result=await getFrontendIdByTerminalId(terminalId);
+    console.log("getFrontendIdByTerminalId:", result);
     localStorage.setItem("printdeskId",result.data.printdeskId);
     setPrintDeskInfo(result.data);
     }
@@ -49,7 +50,7 @@ export default function TopMenubar() {
   },[]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5112", {
+    const newSocket = io(process.env.REACT_APP_SOCKET_IO_URL, {
       transports: ["websocket"],
     });
 
