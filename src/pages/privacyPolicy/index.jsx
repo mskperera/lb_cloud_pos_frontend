@@ -31,7 +31,7 @@ const PrivacyPolicy = () => {
             <div>
                 {/* Header */}
         <h1 className="text-4xl font-bold text-center mb-8">
-          Privacy Policy for SkyCrown Cloud POS System
+          Privacy Policy for Legend Cloud POS System
         </h1>
               {/* Introduction */}
               <p className="text-lg mb-6">
@@ -152,7 +152,7 @@ const PrivacyPolicy = () => {
             <div>
                 {/* Header */}
         <h1 className="text-4xl font-bold text-center mb-8">
-        SkyCrown Cloud POS පද්ධතිය සඳහා රහස්‍යතා ප්‍රතිපත්තිය
+        Legend Cloud POS පද්ධතිය සඳහා රහස්‍යතා ප්‍රතිපත්තිය
         </h1>
               {/* Introduction */}
               <p className="text-lg mb-6">

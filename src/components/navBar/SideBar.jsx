@@ -158,9 +158,15 @@ const Sidebar = () => {
               },
               { label: "General Settings", to: "/settings/general", icon: faCog },
               { label: "Permissions", to: "/settings/permissions", icon: faCog },
-              { label: "About", to: "/about", icon: faInfoCircle },
             ]}
           />
+
+
+<SidebarMenu
+    label="About"
+    iconName={faInfoCircle}
+    to="/about"
+  />
         </div>
       </div>
     );
