@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ProfileMenu from '../ProfileMenu';
 import Syncing from '../Syncing';
 import Alert from '../Alert';
@@ -21,6 +21,9 @@ const Store=({store})=>(
 export default function TopMenubar() {
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const { id } = useParams(); 
+
   const dispatch = useDispatch();
 
 
@@ -28,15 +31,15 @@ export default function TopMenubar() {
   //onst [printerList, setPrinterList] = useState([]);
   const [printDeskInfo, setPrintDeskInfo] = useState(null); // Example ID
 
+  const [leftTerminal,setLeftTerminal]=useState(false);
   // 3jkfsjl
 
   const { selectedStore } = useSelector((state) => state.store);
   const [socket, setSocket] = useState(null);
+  const terminalId_l=localStorage.getItem('terminalId');
 
   const loadPrintdeskByTerminalId=async()=>{
-
-    const terminalId_l=localStorage.getItem('terminalId');
-
+    console.log("terminalId_l",terminalId_l);
     if(terminalId_l){
     const terminalId=terminalId_l ? JSON.parse(terminalId_l):null;
     const result=await getFrontendIdByTerminalId(terminalId);
@@ -47,9 +50,24 @@ export default function TopMenubar() {
   }
   useEffect(() => {
     loadPrintdeskByTerminalId();
-  },[]);
+  },[terminalId_l]);
+
+
 
   useEffect(() => {
+    return () => {
+      if (location.pathname.startsWith("/register/")) {
+        console.log(`Leaving register page with ID: ${id}`);
+      localStorage.removeItem('terminalId');
+      if(!terminalId_l)
+      connectSocket();
+      }
+    };
+  }, [location.pathname, id,terminalId_l]);
+
+
+  const connectSocket=async()=>{
+    console.log('llllllllllloooooooooooooooo')
     const newSocket = io(process.env.REACT_APP_SOCKET_IO_URL, {
       path: "/socket.io/",
       transports: ["websocket"],
@@ -96,7 +114,12 @@ export default function TopMenubar() {
     return () => {
       newSocket.disconnect();
     };
-  }, [printDeskInfo]);
+  }
+
+  useEffect(() => {
+    connectSocket();
+   
+  }, [printDeskInfo,terminalId_l,leftTerminal]);
 
   const connectFrontend = (socketInstance) => {
     console.log("Attempting to emit connectFrontendToTheService");
