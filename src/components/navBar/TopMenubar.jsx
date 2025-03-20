@@ -58,7 +58,7 @@ export default function TopMenubar() {
     return () => {
       if (location.pathname.startsWith("/register/")) {
         console.log(`Leaving register page with ID: ${id}`);
-      localStorage.removeItem('terminalId');
+     // localStorage.removeItem('terminalId');
       if(!terminalId_l)
       connectSocket();
       }
