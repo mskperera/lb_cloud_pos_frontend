@@ -585,7 +585,7 @@ const generateSKU = () => {
         unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
         taxPerc: isNumeric(taxRatePerc.value) ? taxRatePerc.value : null,
         sku: sku.value,
-        barcode: barcode.value,
+        barcode: barcode.value==''? null : barcode.value,
         reorderLevel: reorderLevel.value,
         isExpiringProduct: isExpiringProduct,
       };
