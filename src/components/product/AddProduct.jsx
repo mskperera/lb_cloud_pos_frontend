@@ -351,6 +351,18 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     variationDetails: [],
   });
 
+const generateSKU = () => {
+  if (!productName.value) {
+    showToast("warning", "Warning", "Please enter a product name first.");
+    return;
+  }
+  const prefix = productName.value.replace(/\s+/g, '').slice(0, 5).toUpperCase();
+  const randomNum = Math.floor(10 + Math.random() * 90); // 2-digit number (10–99)
+  const newSKU = `${prefix}${randomNum}`; // No hyphen
+  handleInputChange(setSku, sku, newSKU);
+};
+
+  
   const loadDrpStores = async () => {
     const objArr = await getStoresDrp();
     setStoresOptions([...objArr.data.results[0]]);
@@ -573,7 +585,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
         unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
         taxPerc: isNumeric(taxRatePerc.value) ? taxRatePerc.value : null,
         sku: sku.value,
-        barcode: barcode.value,
+        barcode: barcode.value==''? null : barcode.value,
         reorderLevel: reorderLevel.value,
         isExpiringProduct: isExpiringProduct,
       };
@@ -1086,15 +1098,34 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
             <StoresComponent stores={stores} setStores={setStoresHandler} />
           </div>
 
-          {productType.value == "1" && (
+      
+
+           {productType.value == "1" && (
             <>
-              <InputField
-                label={sku.label}
-                value={sku.value}
-                onChange={(e) => handleInputChange(setSku, sku, e.target.value)}
-                validationMessages={validationMessages(sku)}
-                placeholder="Enter SKU"
-              />
+              <div className="flex flex-col">
+                <label className="label">
+                  <span className="label-text text-lg">{sku.label}</span>
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    className="input input-bordered flex-1"
+                    value={sku.value}
+                    onChange={(e) =>
+                      handleInputChange(setSku, sku, e.target.value)
+                    }
+                    placeholder="Enter SKU"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={generateSKU}
+                  >
+                    Generate SKU
+                  </button>
+                </div>
+                {validationMessages(sku)}
+              </div>
 
               <InputField
                 label={barcode.label}
@@ -1125,7 +1156,6 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 placeholder="Enter UnitPrice"
               />
 
-              {/* Tax Rate */}
               <InputField
                 label={taxRatePerc.label}
                 value={taxRatePerc.value}
@@ -1138,6 +1168,222 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
             </>
           )}
 
+          {productType.value == "2" && (
+            <div className="flex flex-col col-span-3">
+              <div className="bg-[#ffffff] p-6 rounded-md">
+                <h3 className="text-center font-bold pb-5">Variations</h3>
+
+                <div className="grid grid-cols-6 gap-6 mb-4">
+                  <div className="col-span-3 flex">
+                    <button
+                      type="button"
+                      className="btn btn-primary self-end"
+                      onClick={handleNewAddVariation}
+                    >
+                      Add Variation
+                    </button>
+                  </div>
+
+                  <div className="flex-col items-center"></div>
+                  <div className="col-span-2 flex items-center gap-4">
+                    <div className="flex flex-col space-y-2 w-full">
+                      <label className="text-[1rem]">Variation Type</label>
+                      <select
+                        className="select select-bordered w-full"
+                        value={variationType.value}
+                        onChange={(e) =>
+                          handleInputChange(
+                            setVariationType,
+                            variationType,
+                            e.target.value
+                          )
+                        }
+                      >
+                        {variationTypeOptions.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.displayName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-primary self-end"
+                      onClick={async () => {
+                        handleAddVariation();
+                      }}
+                    >
+                      Add Variation Type
+                    </button>
+                  </div>
+                </div>
+
+                <table className="table border-collapse w-full">
+                  <thead className="sticky top-0 bg-base-100 z-10 text-sm border-b">
+                    <tr>
+                      <th className="px-4 py-2">SKU</th>
+                      <th className="px-4 py-2">Barcode</th>
+                      <th className="px-4 py-2">Unit Cost</th>
+                      <th className="px-4 py-2">Unit Price</th>
+                      <th className="px-4 py-2">Tax(%)</th>
+                      {variations[0]?.variationDetails &&
+                        variations[0].variationDetails.map((c) => (
+                          <th key={c.variationTypeId} className="px-4 py-2">
+                            <span>{c.variationTypeName}</span>
+                            <button
+                              type="button"
+                              className="btn text-error btn-xs ml-2"
+                              onClick={() =>
+                                handleRemoveVariationType(c.variationTypeId)
+                              }
+                              aria-label="Remove Variation Type"
+                              title="Remove Variation Type"
+                            >
+                              <FontAwesomeIcon icon={faClose} />
+                            </button>
+                          </th>
+                        ))}
+                      <th className="px-4 py-2"></th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {variations.map((variation, index) => (
+                      <tr key={variation.variationProductId}>
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.sku}
+                            onChange={(e) => {
+                              const updatedSku = e.target.value;
+                              setVariations((prevVariations) =>
+                                prevVariations.map((item, i) =>
+                                  i === index
+                                    ? { ...item, sku: updatedSku }
+                                    : item
+                                )
+                              );
+                            }}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.barcode}
+                            onChange={(e) => {
+                              const updatedBarcode = e.target.value;
+                              setVariations((prevVariations) =>
+                                prevVariations.map((item, i) =>
+                                  i === index
+                                    ? { ...item, barcode: updatedBarcode }
+                                    : item
+                                )
+                              );
+                            }}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.unitCost}
+                            onChange={(e) => {
+                              const updatedUnitCost = e.target.value;
+                              setVariations((prevVariations) =>
+                                prevVariations.map((item, i) =>
+                                  i === index
+                                    ? { ...item, unitCost: updatedUnitCost }
+                                    : item
+                                )
+                              );
+                            }}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.unitPrice}
+                            onChange={(e) => {
+                              const updatedUnitPrice = e.target.value;
+                              setVariations((prevVariations) =>
+                                prevVariations.map((item, i) =>
+                                  i === index
+                                    ? { ...item, unitPrice: updatedUnitPrice }
+                                    : item
+                                )
+                              );
+                            }}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            className="input input-bordered w-full text-sm"
+                            value={variation.taxPerc}
+                            onChange={(e) => {
+                              const updatedTaxPerc = e.target.value;
+                              setVariations((prevVariations) =>
+                                prevVariations.map((item, i) =>
+                                  i === index
+                                    ? { ...item, taxPerc: updatedTaxPerc }
+                                    : item
+                                )
+                              );
+                            }}
+                          />
+                        </td>
+
+                        {variation.variationDetails &&
+                          variation.variationDetails.map((detail) => (
+                            <td
+                              key={detail.variationTypeId}
+                              className="px-4 py-2"
+                            >
+                              <input
+                                type="text"
+                                className="input input-bordered w-full text-sm"
+                                value={detail.variationValue}
+                                onChange={(e) => {
+                                  const updatedValue = e.target.value;
+                                  handleVariationChange(
+                                    updatedValue,
+                                    index,
+                                    detail.variationTypeId
+                                  );
+                                }}
+                              />
+                            </td>
+                          ))}
+
+                        <td className="px-4 py-2">
+                          <button
+                            type="button"
+                            className="btn text-error btn-xs"
+                            onClick={() =>
+                              handleRemoveVariation(
+                                variation.variationProductId,
+                                index
+                              )
+                            }
+                            aria-label="Remove Variation Row"
+                            title="Remove Variation Row"
+                          >
+                            <FontAwesomeIcon icon={faClose} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          
           {productType.value == "2" && (
             <div className="flex flex-col col-span-3">
               <div className="bg-[#ffffff] p-6 rounded-md">
@@ -1355,16 +1601,33 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
               </div>
             </div>
           )}
-
+          
           {productType.value == "3" && (
             <>
-              <InputField
-                label={sku.label}
-                value={sku.value}
-                onChange={(e) => handleInputChange(setSku, sku, e.target.value)}
-                validationMessages={validationMessages(sku)}
-                placeholder="Enter SKU"
-              />
+              <div className="flex flex-col">
+                <label className="label">
+                  <span className="label-text text-lg">{sku.label}</span>
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    className="input input-bordered flex-1"
+                    value={sku.value}
+                    onChange={(e) =>
+                      handleInputChange(setSku, sku, e.target.value)
+                    }
+                    placeholder="Enter SKU"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={generateSKU}
+                  >
+                    Generate SKU
+                  </button>
+                </div>
+                {validationMessages(sku)}
+              </div>
 
               <InputField
                 label={barcode.label}
@@ -1395,7 +1658,6 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 placeholder="Enter Unit Price"
               />
 
-              {/* Tax Rate */}
               <InputField
                 label={taxRatePerc.label}
                 value={taxRatePerc.value}
@@ -1459,20 +1721,21 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                         const filteredData = {
                           productId: null,
                           productNo: null,
-                          productName: null,
+                          productName: "",
                           sku: comboIngrednentSku.value,
                           barcode: null,
-                          brandId: null, //1-none
-                          storeId: 1,
-                          productTypeIds: [],
-                          productCategoryId: null,
-                          measurementUnitId: null,
+                          brandId: null,
+                          storeId: selectedStore.storeId,
+                          productTypeIds: null,
+                          categoryId: -1,
+                          measurementUnitId: -1,
                           searchByKeyword: false,
                           skip: 0,
                           limit: 1,
                         };
 
                         const _result = await getProducts(filteredData);
+                        console.log("getProducts result ", _result);
                         const product = _result.data.results[0][0];
                         if (!product) {
                           showToast(
@@ -1522,10 +1785,9 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                 </div>
 
                 <div className="mt-2">
-                  <table className="table  border-collapse">
+                  <table className="table border-collapse">
                     <thead className="sticky top-0 bg-base-100 z-10 text-[1rem] border-b border-gray-300">
                       <tr>
-                        {/* <th>Product ID (Mat)</th> */}
                         <th className="px-4 py-2">Product Name</th>
                         <th className="px-4 py-2">Product Type</th>
                         <th className="px-4 py-2">SKU</th>
@@ -1533,13 +1795,11 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* {JSON.stringify(comboIngredients)} */}
                       {comboIngredients.map((item) => (
                         <tr
                           key={item.productId}
-                          className={` hover:bg-gray-100 text-[1rem]`}
+                          className={`hover:bg-gray-100 text-[1rem]`}
                         >
-                          {/* <td>{item.productId}</td> */}
                           <td className="px-4 py-2">{item.productName}</td>
                           <td className="px-4 py-2">{item.productTypeName}</td>
                           <td className="px-4 py-2">{item.sku}</td>
@@ -1550,7 +1810,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                           <td className="px-4 py-2">
                             <div className="flex space-x-2">
                               <button
-                                className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
+                                className="btn btn-error btn-xs bg-[#f87171] text-base-100"
                                 onClick={async () => {
                                   const updatedExtraDetails =
                                     comboIngredients.filter(
@@ -1573,6 +1833,9 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
               </div>
             </>
           )}
+
+
+        
 
           <div className="flex items-center gap-4 p-4 border-dashed shadow-sm">
             {/* File Input */}

@@ -72,6 +72,17 @@ label,option,span{
   color:var(--defalutTextColor);
 }
 
+input:-webkit-autofill {
+  background-color: white;
+  color: black;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+
+input {
+  background-color: white(70, 6, 6);
+  color: black;
+}
+
 
 /* 
 * {
