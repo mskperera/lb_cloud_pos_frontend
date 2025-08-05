@@ -9,20 +9,20 @@
 }
 
 .company-name {
-  font-size: 14px; /* Matches C# headingFont */
+  font-size: 20px; /* Matches C# headingFont */
   font-weight: bold;
   text-align: center;
   margin: 0;
 }
 
 .store-name {
-  font-size: 11px; /* Matches C# printFont2 */
+  font-size: 14px; /* Matches C# printFont2 */
   text-align: center;
   margin: 5px 0;
 }
 
 .address, .tel, .email {
-  font-size: 11px; /* Matches C# printFont2 */
+  font-size: 14px; /* Matches C# printFont2 */
   text-align: center;
   margin: 0px 0;
 }
@@ -92,7 +92,7 @@
 .item-row span:nth-child(5) { width: 50px; text-align: right; } /* Total */
 
 .totals {
-  font-size: 11px; /* Matches C# printFont2 */
+  font-size: 12px; /* Matches C# printFont2 */
   text-align: right;
 }
 
@@ -104,7 +104,7 @@
 
 .grand-total {
   font-weight: bold;
-  font-size: 11px; /* Matches C# boldOrderSummaryFont */
+  font-size: 12px; /* Matches C# boldOrderSummaryFont */
 }
 
 .payments {

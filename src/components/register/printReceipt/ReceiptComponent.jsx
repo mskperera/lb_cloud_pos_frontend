@@ -35,7 +35,7 @@ const ReceiptComponent = ({
       <p className="tel">Tel: {orderHeader?.tel1}</p>
       <p className="email">{orderHeader?.emailAddress}</p>
       {/* <hr className="thick-border" /> */}
-      <h3 className="invoice-label">Invoice</h3>
+      {/* <h3 className="invoice-label">Invoice</h3> */}
       {/* <hr className="thick-border" /> */}
 
       {/* Order Metadata */}

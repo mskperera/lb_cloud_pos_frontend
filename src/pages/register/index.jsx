@@ -68,13 +68,13 @@ const Register = () => {
 
 
   
-        <div className="flex items-start justify-between gap-2 py-2">
+        <div className="flex items-start justify-between gap-2 py-2 bg-slate-50">
           {showPayment ? (
             <PaymentScreen />
           ) : (
             <div className="grid grid-cols-12 w-full">
  
-              <div className="flex gap-1 col-span-6">
+              <div className="flex gap-1 col-span-6 m-0 p-0">
                 <div className="p-1">
                   <Rightsidebar
                     setIsReturnOrderPopupVisible={setIsReturnOrderPopupVisible}
@@ -85,9 +85,7 @@ const Register = () => {
               </div>
 
               <div className=" col-span-6">
-            
-              <ProductList />
-         
+                <ProductList />
               </div>
             </div>
           )}

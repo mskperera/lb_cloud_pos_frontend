@@ -8,18 +8,17 @@ const TextAreaField = ({
   placeholder = "",
   isDisabled = false,
   isReadOnly = false,
-  required = false, // Default to optional
+  required = false,
 }) => {
   return (
     <div className="flex flex-col">
-      <label className="label">
-        <span className="label-text text-lg">
-          {label}{" "}
-          {required && <span className="text-red-500">*</span>} {/* Star for required */}
-        </span>
+      <label className="text-sm font-medium text-gray-700 mb-1">
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
       <textarea
-        className="textarea textarea-bordered w-full"
+        className={`w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200 ${
+          isDisabled ? "bg-gray-100 cursor-not-allowed" : ""
+        }`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}

@@ -39,11 +39,11 @@ const loadSystemData=async()=>{
 
   
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       <TopMenubar />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 pt-16 ml-60">
+        <main className="flex-1 mt-16 ml-60">
           <Outlet />
         </main>
       </div>

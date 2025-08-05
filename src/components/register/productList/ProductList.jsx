@@ -261,30 +261,30 @@ const ProductList = () => {
       </DialogModel>
 
       <div className="px-4 pt-2 flex justify-between gap-5 m-0 p-0">
-        <DaisyUIPaginator
+   <DaisyUIPaginator
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
           totalRecords={totalRecords}
           onPageChange={onPageChange}
           rowsPerPageOptions={[10, 20, 30, 50, 100]}
         />
-        <select
-          value={selectedCategoryId}
-          style={{ margin: 0 }}
-          onChange={handleCategorySelect}
-          className="select select-bordered w-full max-w-xs"
-        >
-          <option value="-1">All Categories</option>
-          {categories.length > 0 &&
-            categories.map((c) => (
-              <option key={c.categoryId} value={c.categoryId}>
-                {c.categoryName}
-              </option>
-            ))}
-        </select>
+      <select
+  value={selectedCategoryId}
+  style={{ margin: 0 }}
+  onChange={handleCategorySelect}
+  className="w-full max-w-xs px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+>
+  <option value="-1">All Categories</option>
+  {categories.length > 0 &&
+    categories.map((c) => (
+      <option key={c.categoryId} value={c.categoryId}>
+        {c.categoryName}
+      </option>
+    ))}
+</select>
       </div>
 
-      <div className="overflow-auto max-h-[80vh]">
+      <div className="overflow-auto max-h-[70vh] m-0 p-2 bg-sky-200 rounded-lg">
         {!productListLoading ? (
           <div className="flex flex-wrap gap-2 px-4 m-0 p-0">
             {products.length > 0 ? (

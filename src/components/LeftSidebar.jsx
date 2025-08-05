@@ -23,17 +23,17 @@ const Rightsidebar = ({
 
   const LeftSidebarMenu = ({ onClick, label, icon,iconColor,bgColor,textColor }) => {
     return (
-      <button className={`flex items-center flex-col gap-1   hover:bg-slate-200 py-3 shadow-sm `} onClick={onClick}>    
-         <FontAwesomeIcon icon={icon} className={`text-lg ${iconColor ? iconColor: "text-gray-700"}`} />
-       <span className={` ${textColor ? textColor: "text-gray-700 text-md"}`}>{label}</span> 
+      <button className={`flex items-center flex-col gap-1  hover:bg-sky-600 py-3 shadow-sm `} onClick={onClick}>    
+         <FontAwesomeIcon icon={icon} className={`text-lg ${iconColor ? iconColor: "text-white"}`} />
+       <span className={` ${textColor ? textColor: "text-white text-md"}`}>{label}</span> 
       </button>
     );
   };
 
 
   return (
-    <div className=''>
-          <div className="flex flex-col gap-2 bg-white w-[6rem]">
+    <div className='rounded-lg p-2'>
+          <div className="flex flex-col gap-2 bg-sky-500 w-[6rem] shadow-lg">
           <LeftSidebarMenu
             label="Home"
             icon={faHomeAlt}
