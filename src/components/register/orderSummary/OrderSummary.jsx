@@ -23,7 +23,7 @@ const OrderSummary=({totalItems})=> {
       }, [orderList]);
 
   return (
-    <div className="px-4">
+    <div className="px-4 bg-white rounded-lg shadow-sm border">
   <div className="flex justify-between gap-10">
     <div className="flex flex-col w-full gap-2">
       <div className="flex justify-between items-center">
@@ -44,10 +44,10 @@ const OrderSummary=({totalItems})=> {
   
     </div>
 
-    <div className="flex flex-col w-full justify-start">
+    <div className="flex flex-col w-full justify-between ">
       <div className="flex justify-between">
-        <div className="flex justify-between items-center p-2 bg-slate-200 border border-slate-100 rounded-lg mb-4">
-          <div className="font-medium text-sm text-gray-600">
+        <div className="flex justify-between items-center p-2 mb-4">
+          <div className="font-medium ">
             {`Total Qty : ${totalItems}`}
           </div>
         </div>
@@ -60,8 +60,8 @@ const OrderSummary=({totalItems})=> {
       </div>
 
       <div className="flex justify-between items-center">
-        <span className="font-semibold m-1 text-lg">Grand Total</span>
-        <span className="font-semibold text-2xl">{formatCurrency(orderSummary.grandTotal)}</span>
+        <span className="font-semibold m-1 text-xl">Grand Total</span>
+        <span className="font-semibold text-xl">{formatCurrency(orderSummary.grandTotal)}</span>
       </div>
 
     </div>

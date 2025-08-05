@@ -150,7 +150,7 @@ console.log('run validation',validation)
                         );
                       }}
           
-                      className='btn  bg-primaryColor hover:bg-primaryColorHover text-white rounded-full'
+                      className='btn p-2  bg-primaryColor hover:bg-primaryColorHover text-white rounded-full'
                     >
                      {formatCurrency(amount,true)}
                     </button>

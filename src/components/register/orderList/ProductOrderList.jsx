@@ -78,8 +78,8 @@ export default function ProductOrderList({ showDiscountPopup }) {
 
   const descriptionBodyTemplate = (product) => (
     <div className="flex flex-col gap-1">
-      <span className="font-semibold text-[1rem] text-gray-800">{product.sku}</span>
-      <span className="text-gray-600 text-sm">{product.description}</span>
+      <span className="text-gray-600 text-sm ">{product.sku}</span>
+      <span className="text-gray-800">{product.description}</span>
     </div>
   );
 
@@ -90,8 +90,8 @@ export default function ProductOrderList({ showDiscountPopup }) {
   return (
     <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="orderList">
       <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
-        <thead className="bg-gray-200 sticky top-0 z-10">
-          <tr className="text-sm text-gray-700">
+        <thead className="bg-gray-50 sticky top-0 z-10">
+          <tr className="">
             <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
             <th className="py-3 px-4 text-center">Qty</th>
             <th className="py-3 px-4 text-right">Amount</th>

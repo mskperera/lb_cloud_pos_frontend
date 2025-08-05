@@ -14,7 +14,7 @@ module.exports = {
   plugins: [
   //  require('@tailwindcss/forms'), // Example of adding a Tailwind plugin
  //   require('@tailwindcss/typography'), // Another example
-    require('daisyui'), // Include DaisyUI if you're using it
+   // require('daisyui'), // Include DaisyUI if you're using it
   ],
   
 }

@@ -3,7 +3,7 @@ import TopMenubar from "../components/navBar/TopMenubar";
 
 const TopbarLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col ">
       <TopMenubar />
       <main className="flex-1 pt-16">
         <Outlet />

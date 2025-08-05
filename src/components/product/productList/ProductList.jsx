@@ -562,6 +562,7 @@ export default function ProductOrderList({ }) {
   const productNameBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : <span>{rowData.productName}</span>
   );
+  
 
   const unitPriceBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.unitPrice)}</span>
@@ -925,7 +926,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                   
                   <td className="px-4 py-2">{productNoBodyTemplate(item)}</td>
                   <td className="px-4 py-2">{barcodeBodyTemplate(item)}</td>
-                  <td className="px-4 py-2">{productNameBodyTemplate(item)}</td>
+                  <td className="px-4 py-2">{item.productDescription}</td>
 
                   <td className="px-4 py-2">{brandBodyTemplate(item)}</td>
                   <td className="px-4 py-2">{costPriceBodyTemplate(item)}</td>

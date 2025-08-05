@@ -3,23 +3,22 @@ import { formatCurrency } from "../../../../utils/format";
 const ProductItem = ({ p, handleProductClick }) => {
   const hasImage = Boolean(p.imageUrl);
   const stockClass = p.stockQty > 0 ? "text-green-600" : "text-red-600";
-  const stockText = p.stockQty > 0 ? `${p.stockQty} ${p.measurementUnitName}` : "Out of stock";
+  const stockText =!!p.isStockTracked &&( p.stockQty > 0 ? `${p.stockQty} ${p.measurementUnitName}` : "Out of stock");
 
   const isNewStock = p.hasUnreleasedStock; // Assuming `isNewStock` is a flag for newly released stock
   
   // Determine if the card should be disabled
-  const isDisabled = p.stockQty == 0;
+  const isDisabled =false; //p.stockQty == 0;
 
   return (
     <div
     className={`flex flex-col w-full md:w-[220px] items-center justify-between
       rounded-lg cursor-pointer py-2 px-0 bg-white shadow-sm border border-[#dddddd]
-      ${p.stockQty > 0 ? "hover:border-green-500" : "hover:border-red-500"}
+      ${!!p.isStockTracked && (p.stockQty > 0 ? "hover:border-green-500" : "hover:border-red-500") }
       hover:shadow-xl transition duration-300 
        ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}
       onClick={() => !isDisabled && handleProductClick(p)} // Prevent click if disabled
   >
-
       <div className="flex items-center gap-3">
         {hasImage && (
           <img
@@ -44,7 +43,7 @@ const ProductItem = ({ p, handleProductClick }) => {
 
 
       {/* Display message for new stock if available */}
-      {isNewStock ? (
+      {!!p.isStockTracked && isNewStock ? (
         <p className="text-sm text-yellow-600 mt-2">
           New unreleased stock available!
         </p>

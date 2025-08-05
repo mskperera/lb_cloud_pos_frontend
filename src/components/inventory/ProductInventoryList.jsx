@@ -301,6 +301,7 @@ export default function ProductInventoryList({}) {
 
       const filteredData = {
         productId: null,
+        sku:selectedFilterBy.value === 6 ? searchValue.value : null,
         productNo: selectedFilterBy.value === 1 ? searchValue.value : null,
         productName: selectedFilterBy.value === 2 ? searchValue.value : null,
         barcode: selectedFilterBy.value === 3 ? searchValue.value : null,
@@ -341,14 +342,14 @@ export default function ProductInventoryList({}) {
     rowsPerPage,
   ]);
 
-  useEffect(() => {
-    if (isSearchValueEntered) {
-      const delayedLoadProducts = setTimeout(() => {
-        loadProducts();
-      }, 1000);
-      return () => clearTimeout(delayedLoadProducts);
-    }
-  }, [searchValue.value]);
+  // useEffect(() => {
+  //   if (isSearchValueEntered) {
+  //     const delayedLoadProducts = setTimeout(() => {
+  //       loadProducts();
+  //     }, 1000);
+  //     return () => clearTimeout(delayedLoadProducts);
+  //   }
+  // }, [searchValue.value]);
 
   useEffect(() => {
     if ([1, 2, 3].includes(selectedFilterBy.value)) {
@@ -369,6 +370,7 @@ export default function ProductInventoryList({}) {
     { id: 3, displayName: "Barcode" },
     { id: 4, displayName: "Category" },
     { id: 5, displayName: "Measurement Unit" },
+       { id: 6, displayName: "SKU" },
   ]);
 
   const [categoryOptions, setCategoryOptions] = useState([]);
@@ -626,138 +628,249 @@ export default function ProductInventoryList({}) {
       <div className="pt-4">
         <h3 className="text-center font-bold text-xl">Product Inventory</h3>
       </div>
-      <div className="flex justify-between py-4 gap-2 items-end">
-        <div className="flex space-x-4 w-full">
-          <div className="flex flex-col">
-            <label className="text-[1rem] font-normal">Product Type</label>
-            <div className="flex flex-row gap-4 mt-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="singleProduct"
-                  checked={isSingleProductChecked}
-                  onChange={(e) => setIsSingleProductChecked(e.target.checked)}
-                />
-                <label htmlFor="singleProduct" className="font-semibold">
-                  Single
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="variationProduct"
-                  checked={isVariationProductChecked}
-                  onChange={(e) =>
-                    setIsVariationProductChecked(e.target.checked)
-                  }
-                />
-                <label htmlFor="variationProduct" className="font-semibold">
-                  Variation
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="comboProduct"
-                  checked={isComboProductChecked}
-                  onChange={(e) => setIsComboProductChecked(e.target.checked)}
-                />
-                <label htmlFor="comboProduct" className="font-semibold">
-                  Combo
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col space-y-2 w-1/5">
-            <label className="text-[1rem]">Store</label>
-            <select
-              value={selectedStoreId}
-              onChange={(e) => setSelectedStoreId(parseInt(e.target.value))}
-              className="select select-bordered w-full"
-            >
-              {storesOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col space-y-2 w-1/5">
-            <label className="text-[1rem]">Filter By</label>
-            <select
-              value={selectedFilterBy.value}
-              onChange={(e) =>
-                handleInputChange(
-                  setSelectedFilterBy,
-                  selectedFilterBy,
-                  parseInt(e.target.value)
-                )
-              }
-              className="select select-bordered w-full"
-            >
-              {filterByOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {[1, 2, 3].includes(selectedFilterBy.value) && (
-            <div className="flex flex-col space-y-2 w-[35%]">
-              <label className="text-[1rem]">Search Value</label>
-              <input
-                type="text"
-                value={searchValue.value}
-                onChange={(e) =>
-                  handleInputChange(setSearchValue, searchValue, e.target.value)
-                }
-                className="input input-bordered w-full"
-              />
-            </div>
-          )}
-
-          {selectedFilterBy.value === 4 && (
-            <div className="flex flex-col space-y-2 w-1/5">
-              <label className="text-[1rem]">Category</label>
-              <select
-                value={selectedCategoryId}
-                onChange={(e) =>
-                  setSelectedCategoryId(parseInt(e.target.value))
-                }
-                className="select select-bordered w-full"
-              >
-                {categoryOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.displayName}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {selectedFilterBy.value === 5 && (
-            <div className="flex flex-col space-y-2 w-1/5">
-              <label className="text-[1rem]">Measurement Unit</label>
-              <select
-                value={selectedMeasurementUnitId}
-                onChange={(e) =>
-                  setSelectedMeasurementUnitId(parseInt(e.target.value))
-                }
-                className="select select-bordered w-full"
-              >
-                {measurementUnitOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.displayName}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+    <div className="flex flex-col md:flex-row justify-between items-end py-4 gap-4 bg-white rounded-xl border p-6 mt-4">
+  {/* <div className="flex flex-col md:flex-row w-full gap-6">
+    <div className="flex flex-col w-full md:w-1/3">
+      <label className="text-sm font-medium text-gray-700 mb-2">Product Type</label>
+      <div className="flex flex-row gap-4">
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="singleProduct"
+            checked={isSingleProductChecked}
+            onChange={(e) => setIsSingleProductChecked(e.target.checked)}
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+          />
+          <label htmlFor="singleProduct" className="text-sm font-semibold text-gray-800">Single</label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="variationProduct"
+            checked={isVariationProductChecked}
+            onChange={(e) => setIsVariationProductChecked(e.target.checked)}
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+          />
+          <label htmlFor="variationProduct" className="text-sm font-semibold text-gray-800">Variation</label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="comboProduct"
+            checked={isComboProductChecked}
+            onChange={(e) => setIsComboProductChecked(e.target.checked)}
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+          />
+          <label htmlFor="comboProduct" className="text-sm font-semibold text-gray-800">Combo</label>
         </div>
       </div>
+    </div>
+
+    <div className="flex flex-col w-full md:w-1/5">
+      <label className="text-sm font-medium text-gray-700 mb-2">Store</label>
+      <select
+        value={selectedStoreId}
+        onChange={(e) => setSelectedStoreId(parseInt(e.target.value))}
+        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+      >
+        <option value="" disabled>Select Store</option>
+        {storesOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.displayName}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="flex flex-col w-full md:w-1/5">
+      <label className="text-sm font-medium text-gray-700 mb-2">Filter By</label>
+      <select
+        value={selectedFilterBy.value}
+        onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
+        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+      >
+        <option value="" disabled>Select Filter</option>
+        {filterByOptions.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.displayName}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {[1, 2, 3].includes(selectedFilterBy.value) && (
+      <div className="flex flex-col w-full md:w-1/3">
+        <label className="text-sm font-medium text-gray-700 mb-2">Search Value</label>
+        <input
+          type="text"
+          value={searchValue.value}
+          onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+          placeholder="Enter search value"
+        />
+      </div>
+    )}
+
+    {selectedFilterBy.value === 4 && (
+      <div className="flex flex-col w-full md:w-1/5">
+        <label className="text-sm font-medium text-gray-700 mb-2">Category</label>
+        <select
+          value={selectedCategoryId}
+          onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+        >
+          <option value="" disabled>Select Category</option>
+          {categoryOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.displayName}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+
+    {selectedFilterBy.value === 5 && (
+      <div className="flex flex-col w-full md:w-1/5">
+        <label className="text-sm font-medium text-gray-700 mb-2">Measurement Unit</label>
+        <select
+          value={selectedMeasurementUnitId}
+          onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+        >
+          <option value="" disabled>Select Measurement Unit</option>
+          {measurementUnitOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.displayName}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+  </div> */}
+       <div className="flex flex-col md:flex-row w-full gap-6">
+            <div className="flex flex-col w-full md:w-1/3">
+              <label className="text-sm font-medium text-gray-700 mb-2">Product Type</label>
+              <div className="flex flex-row gap-4">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="singleProduct"
+                    checked={isSingleProductChecked}
+                    onChange={(e) => setIsSingleProductChecked(e.target.checked)}
+                    className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-2 focus:ring-sky-500"
+                  />
+                  <label htmlFor="singleProduct" className="text-sm font-medium text-gray-800">Single</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="variationProduct"
+                    checked={isVariationProductChecked}
+                    onChange={(e) => setIsVariationProductChecked(e.target.checked)}
+                    className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-2 focus:ring-sky-500"
+                  />
+                  <label htmlFor="variationProduct" className="text-sm font-medium text-gray-800">Variation</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="comboProduct"
+                    checked={isComboProductChecked}
+                    onChange={(e) => setIsComboProductChecked(e.target.checked)}
+                    className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-2 focus:ring-sky-500"
+                  />
+                  <label htmlFor="comboProduct" className="text-sm font-medium text-gray-800">Combo</label>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col w-full md:w-1/5">
+              <label className="text-sm font-medium text-gray-700 mb-2">Store</label>
+              <select
+                value={selectedStoreId}
+                onChange={(e) => setSelectedStoreId(parseInt(e.target.value))}
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              >
+                <option value="" disabled>Select Store</option>
+                {storesOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col w-full md:w-1/5">
+              <label className="text-sm font-medium text-gray-700 mb-2">Filter By</label>
+              <select
+                value={selectedFilterBy.value}
+                onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              >
+                <option value="" disabled>Select Filter</option>
+                {filterByOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {[1, 2, 3, 6].includes(selectedFilterBy.value) && (
+              <div className="flex flex-col w-full md:w-1/3">
+                <label className="text-sm font-medium text-gray-700 mb-2">Search Value</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={searchValue.value}
+                    onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
+                    className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                    placeholder="Enter search value"
+                  />
+                  <button
+                    type="button"
+                    onClick={loadProducts}
+                    className="px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+            )}
+            {selectedFilterBy.value === 4 && (
+              <div className="flex flex-col w-full md:w-1/5">
+                <label className="text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  value={selectedCategoryId}
+                  onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                >
+                  <option value="" disabled>Select Category</option>
+                  {categoryOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.displayName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {selectedFilterBy.value === 5 && (
+              <div className="flex flex-col w-full md:w-1/5">
+                <label className="text-sm font-medium text-gray-700 mb-2">Measurement Unit</label>
+                <select
+                  value={selectedMeasurementUnitId}
+                  onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                >
+                  <option value="" disabled>Select Measurement Unit</option>
+                  {measurementUnitOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.displayName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        
+</div>
       <div className="flex justify-between w-full items-center">
         <div className="pl-3">
           <span className=" text-gray-500">{totalRecords} items found</span>
@@ -773,77 +886,80 @@ export default function ProductInventoryList({}) {
       </div>
       <div className="flex flex-col h-[65vh] overflow-hidden">
       <div className="flex-1 overflow-y-auto bg-white">
-        <table className="table w-full border-collapse">
-        <thead className="sticky top-0 bg-gray-200 z-10 text-[1rem] border-b border-gray-300">
+       <table className="w-full border-collapse">
+  <thead className="sticky top-0 bg-gray-50 text-sm font-medium text-gray-700 border-b border-gray-200 z-10">
+    <tr>
+      <th className="px-4 py-3 text-left"></th>
+      <th className="px-4 py-3 text-left">Product No</th>
+      <th className="px-4 py-3 text-left">SKU</th>
+      <th className="px-4 py-3 text-left">Product Description</th>
+      <th className="px-4 py-3 text-left">Brand</th>
+      <th className="px-4 py-3 text-left">Cost Price</th>
+      <th className="px-4 py-3 text-left">Unit Price</th>
+      <th className="px-4 py-3 text-left">Tax (%)</th>
+      <th className="px-4 py-3 text-left">Stock Qty</th>
+      <th className="px-4 py-3 text-left">Product Type</th>
+      <th className="px-4 py-3 text-left">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {isTableDataLoading ? (
+      <tr>
+        <td colSpan="11" className="px-4 py-4 text-center text-gray-500">
+          <div className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading...
+          </div>
+        </td>
+      </tr>
+    ) : (
+      products.map((item, index) => (
+        <React.Fragment key={index}>
+          <tr
+            className={`border-b border-gray-200 text-sm ${
+              expandedRowId === index
+                ? "bg-blue-100 hover:bg-blue-200"
+                : "hover:bg-gray-50"
+            } transition-colors duration-150`}
+          >
+            <td
+              className="px-4 py-2 cursor-pointer"
+              onClick={() => handleRowExpand(index, item)}
+            >
+              <FontAwesomeIcon
+                icon={expandedRowId === index ? faAngleDown : faAngleRight}
+                className="text-gray-600"
+              />
+            </td>
+            <td className="px-4 py-2">{item.productNo}</td>
+            <td className="px-4 py-2">{item.sku}</td>
+            <td className="px-4 py-2">{item.productDescription}</td>
+            <td className="px-4 py-2">{item.brandName}</td>
+            <td className="px-4 py-2">{item.unitCost}</td>
+            <td className="px-4 py-2">{item.unitPrice}</td>
+            <td className="px-4 py-2">{item.taxPerc}</td>
+            <td className="px-4 py-2">{item.stockQty}</td>
+            <td className="px-4 py-2">{item.productTypeName}</td>
+            <td className="px-4 py-2">{actionButtons(index, item)}</td>
+          </tr>
+          {expandedRowId === index && (
             <tr>
-              {/* <th className="px-4 py-2">Product Id</th> */}
-              <th className=""></th>
-              <th className="px-4 py-2">Product No</th>
-              <th className="px-4 py-2">SKU</th>
-              <th className="px-4 py-2">Product Name</th>
-
-              <th className="px-4 py-2">Brand</th>
-              <th className="px-4 py-2">Cost Price</th>
-              <th className="px-4 py-2">Unit Price</th>
-              <th className="px-4 py-2">Tax(%)</th>
-              <th className="px-4 py-2">Stock Qty</th>
-              <th className="px-4 py-2">Product Type</th>
-
-
-              <th className="px-4 py-2">Actions</th>
+              <td colSpan="11" className="bg-gray-50 p-4">
+                <ProductDetails
+                  selectedProduct={item}
+                  confirmDelete={confirmDelete}
+                />
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {/* {JSON.stringify(products)} */}
-            {products.map((item, index) => (
-              <React.Fragment key={index}>
-                <tr
-                  // onClick={() => handleRowSelect(index, item)}
-                  className={`border-b  border-gray-200 text-[1rem] 
-                    ${
-                      expandedRowId === index
-                        ? "bg-sky-300 text-white hover:bg-sky-400 "
-                        : "bg-transparent hover:bg-gray-100"
-                    }
-                    `}
-                >
-                  <td
-                    className=" cursor-pointer"
-                    onClick={() => handleRowExpand(index, item)}
-                  >
-                    {expandedRowId === index ? (
-                      <FontAwesomeIcon icon={faAngleDown} />
-                    ) : (
-                      <FontAwesomeIcon icon={faAngleRight} />
-                    )}
-                  </td>
-                  <td className="px-4 py-2">{item.productNo}</td>
-                  <td className="px-4 py-2">{item.sku}</td>
-                  <td className="px-4 py-2">{item.productName}</td>
-                  <td className="px-4 py-2">{item.brandName}</td>
-                  <td className="px-4 py-2">{item.unitCost}</td>
-                  <td className="px-4 py-2">{item.unitPrice}</td>
-                  <td className="px-4 py-2">{item.taxPerc} </td>
-
-                  <td className="px-4 py-2">{item.stockQty}</td>
-                  <td className="px-4 py-2">{item.productTypeName}</td>
-
-                  <td className="px-4 py-2">{actionButtons(index, item)}</td>
-                </tr>
-                {expandedRowId === index && (
-                  <tr>
-                    <td colSpan="12" className="bg-slate-50">
-                      <ProductDetails
-                        selectedProduct={item}
-                        confirmDelete={confirmDelete}
-                      />
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+          )}
+        </React.Fragment>
+      ))
+    )}
+  </tbody>
+</table>
       </div>
       </div>
     </div>
