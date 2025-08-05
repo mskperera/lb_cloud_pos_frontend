@@ -5,11 +5,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { addOrder, cancelOverallDiscount, clearOrderList, setCustomer } from "../../state/orderList/orderListSlice";
-import { DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/constants";
+import { CONTACT_TYPE, DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/constants";
 import ProductOrderList from "../register/orderList/ProductOrderList";
 import ApplyDiscount from "../register/ApplyDiscount";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import ProductSearch from "../productSearch/ProductSearch";
+import { FaEdit, FaShoppingCart } from 'react-icons/fa';
 
 const OrderListAll = () => {
   const navigate = useNavigate();
@@ -82,6 +83,29 @@ const OrderListAll = () => {
       navigate(`/register/${terminalId}`);
     
   }
+
+  const handleCustomItem = async () => {
+ 
+  
+
+    const order = {
+      productNo: 'custom',
+      sku:'',
+      description: `item test`,
+      productId: 0,
+      productTypeId:1,
+      unitPrice: '1000',
+      lineTaxRate: '0',
+      qty:1,
+      measurementUnitName:'custom',
+    };
+  
+    console.log("handleProductVariationClick", order);
+
+    dispatch(addOrder(order));
+  };
+
+
   const overallDiscountData = [
     {
       type: orderSummary.overallDiscountTypeId === DISCOUNT_TYPES.PERCENTAGE ? "Percentage" : "Fixed Amount",
@@ -108,8 +132,9 @@ const OrderListAll = () => {
       />
 
       <div className="flex flex-col gap-2 mr-4">
-        <div className="">
+        <div className="flex justify-between items-center gap-5">
           <ProductSearch onProductSelect={handleProductClick} onBarcodeEnter={handleBarcodeEnter} />
+
         </div>
 
         <div className="">
@@ -141,27 +166,34 @@ const OrderListAll = () => {
         
           <OrderSummary totalItems={totalItems} />
 
-          <div className="flex gap-3 justify-end items-center px-4">
-           
-           
+          <div className="flex gap-3 justify-end">
+
+               {/* <button
+              onClick={newOrderHandler}
+              className="btn bg-white shadow-sm border-gray-200 btn-lg h-auto py-4 px-5 rounded-full"
+            >
+              <span className="px-2">Add Service</span>
+            </button> */}
+
+           <div className="flex gap-3 justify-between items-center px-4">
             <button
               onClick={newOrderHandler}
               className="btn bg-white shadow-sm border-gray-200 btn-lg h-auto py-4 px-5 rounded-full"
             >
               <span className="px-2">New Order</span>
             </button>
-            <button
-              onClick={() => {
-                navigate("/payment");
-              }}
-              disabled={list.length === 0}
-              className="btn flex justify-center text-white hover:bg-sky-600 bg-sky-500 shadow-sm btn-lg h-auto py-4 px-5 rounded-full"
-              >
-              <i
-                className="pi text-xl pi-shopping-cart"
-              ></i>
-              <span className="">Proceed to Payment</span>
-            </button>
+       <button
+  onClick={() => {
+    navigate("/payment");
+  }}
+  disabled={list.length === 0}
+  className="btn flex justify-center items-center gap-2 text-white hover:bg-sky-600 bg-sky-500 shadow-sm btn-lg h-auto py-4 px-5 rounded-full"
+>
+  <FaShoppingCart className="text-xl" />
+  <span>Proceed to Payment</span>
+</button>
+
+            </div>
           </div>
         </div>
       </div>

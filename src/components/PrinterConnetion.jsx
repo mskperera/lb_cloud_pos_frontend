@@ -21,7 +21,7 @@ const PrinterConnection = ({ status }) => {
     default: {
       icon: 'pi pi-question', // Default icon
       tooltip: 'Unknown status',
-      color: 'text-gray-500', // Default gray
+      color: 'text-white', // Default gray
     },
   };
 

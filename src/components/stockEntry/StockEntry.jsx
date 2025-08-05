@@ -16,14 +16,10 @@ import { validate } from "../../utils/formValidation";
 const StockEntry = () => {
   const navigate = useNavigate();
   const store = JSON.parse(localStorage.getItem("stores"))[0];
-
+  const showToast = useToast();
   const [stockEntryList, setStockEntryList] = useState([]);
   const [stockEntry, setStockEntry] = useState(null);
-
-  const showToast = useToast();
-
   const [grnNo, setGrnNo] = useState("[New]");
-
   const [supplierBillNo, setSupplierBillNo] = useState({
     label: "Supplier Bill No",
     value: "",
@@ -31,7 +27,6 @@ const StockEntry = () => {
     isValid: false,
     rules: { required: true, dataType: "string" },
   });
-
   const [supplier, setSupplier] = useState({
     label: "Supplier",
     value: "",
@@ -39,17 +34,14 @@ const StockEntry = () => {
     isValid: false,
     rules: { required: true, dataType: "integer" },
   });
-
   const [supplierOptions, setSupplierOptions] = useState([]);
-
   const [grnDate, setGrnDate] = useState({
     label: "GRN Date",
-    value: moment().format("YYYY-MM-DD"), // Format the date for default display in the date input
+    value: moment().format("YYYY-MM-DD"),
     isTouched: false,
     isValid: false,
     rules: { required: true, dataType: "date" },
   });
-
   const [amountPaid, setAmountPaid] = useState({
     label: "Amount Paid",
     value: "",
@@ -57,7 +49,6 @@ const StockEntry = () => {
     isValid: false,
     rules: { required: true, dataType: "string" },
   });
-
   const [remark, setRemark] = useState({
     label: "Remark",
     value: "",
@@ -65,8 +56,8 @@ const StockEntry = () => {
     isValid: false,
     rules: { required: false, dataType: "string" },
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExpiringProductChecked, setIsExpiringProductChecked] = useState(false);
 
   useEffect(() => {
     loadDrpSupplier();
@@ -97,7 +88,7 @@ const StockEntry = () => {
     return (
       !state.isValid &&
       state.isTouched && (
-        <div>
+        <div className="mt-1">
           {state.validationMessages.map((message, index) => (
             <FormElementMessage key={index} severity="error" text={message} />
           ))}
@@ -114,42 +105,9 @@ const StockEntry = () => {
       return;
     }
 
-    // const payLoad = {
-    //   supplierId: supplier.value,
-    //   storeId: store.storeId,
-    //   stockReceivedDate: grnDate.value,
-    //   amountPaid: amountPaid.value,
-    //   remark: remark.value,
-    //   orderList: [
-    //     {
-    //       productId: 160,
-    //       unitPrice: "200",
-    //       unitCost: "100",
-    //       qty: 1,
-    //       productTypeId: 2,
-    //     },
-    //     {
-    //       productId: 161,
-    //       unitPrice: "200",
-    //       unitCost: "150",
-    //       qty: 1,
-    //       productTypeId: 2,
-    //     },
-    //     {
-    //       productId: 245,
-    //       unitPrice: "200",
-    //       unitCost: "150",
-    //       qty: 1,
-    //       productTypeId: 1,
-    //     },
-    //   ],
-    //   isConfirm: true,
-    // };
-
     const orderList = stockEntryList.map((entry) => ({
-      allProductId:entry.allProductId,
-      productId:
-        entry.productTypeId === 2 ? entry.variationProductId : entry.productId,
+      allProductId: entry.allProductId,
+      productId: entry.productTypeId === 2 ? entry.variationProductId : entry.productId,
       unitPrice: entry.unitPrice,
       unitCost: entry.unitCost,
       qty: entry.qty,
@@ -165,11 +123,13 @@ const StockEntry = () => {
       amountPaid: amountPaid.value,
       remark: remark.value,
       supplierBillNo: supplierBillNo.value,
-      orderList, // Use the dynamically created orderList
+      orderList,
       isConfirm: true,
     };
 
+    setIsSubmitting(true);
     const res = await stockAdd(payLoad);
+    setIsSubmitting(false);
 
     if (res.data.error) {
       showToast("danger", "Exception", res.data.error.message);
@@ -178,7 +138,7 @@ const StockEntry = () => {
 
     const responseStatus = res.data.outputValues.responseStatus;
 
-    if (responseStatus === "falied") {
+    if (responseStatus === "failed") {
       showToast("danger", "Exception", "Fill all required fields.");
       return;
     }
@@ -188,7 +148,6 @@ const StockEntry = () => {
     setSupplierBillNo({ ...supplierBillNo, value: "" });
     setSupplier({ ...supplier, value: "" });
     setAmountPaid({ ...amountPaid, value: "" });
-
     setStockEntryList([]);
   };
 
@@ -210,19 +169,18 @@ const StockEntry = () => {
       showToast(
         "danger",
         "Exception",
-        "Expirationdate and production date is required."
+        "Expiration date and production date are required."
       );
       return;
     }
     setStockEntryList((prev) => [...prev, stockEntry]);
-    setStockEntry(null); // Clear current stock entry
+    setStockEntry(null);
     showToast("success", "Success", "Product added to the list.");
   };
 
   const handleProductClick = (p) => {
     console.log("unitPrice", p);
     const order = { ...p };
-
     setStockEntry(order);
   };
 
@@ -231,331 +189,857 @@ const StockEntry = () => {
     0
   );
 
-  const [isExpiringProductChecked, setIsExpiringProductChecked] =
-    useState(false);
-
   return (
-    <>
-      <div className="container mx-auto p-6">
-        <form>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* Combo Ingredients Section */}
-            <div className="col-span-2">
-              <h3 className="text-center font-bold text-xl">Stock Entry</h3>
-            </div>
-            <div className="col-span-2">
-              <button
-                className="flex items-center btn btn-ghost text-gray-600 p-0 m-0 hover:bg-transparent hover:text-primaryColorHover text-right"
-                onClick={() => navigate("/stockEntryList")}
-              >
-                <i className="pi pi-book text-xl"></i>
-                <span className="">Stock Entries</span>
-              </button>
+    <div className="min-h-screen bg-sky-50 p-4 sm:p-6 lg:p-8">
+      <div className="container mx-auto max-w-7xl">
+        <form onSubmit={onSubmit}>
+          <div className="space-y-6">
+            {/* Header Section */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900">Stock Entry</h3>
+              <div className="flex justify-end mt-2">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-sky-600 transition duration-200"
+                  onClick={() => navigate("/stockEntryList")}
+                >
+                  <i className="pi pi-book text-lg"></i>
+                  <span>View Stock Entries</span>
+                </button>
+              </div>
             </div>
 
-            <div className="col-span-2">
-              <div className="grid grid-cols-4 gap-4">
-                <InputField
-                  label={"GRN No"}
-                  value={grnNo}
-                  required={supplierBillNo.rules.required}
-                  isReadOnly={true}
-                  placeholder="Enter GRN No"
-                />
-
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-xl border  p-6">
+              <InputField
+                label="GRN No"
+                value={grnNo}
+                required={false}
+                isReadOnly={true}
+                placeholder="Enter GRN No"
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg"
+              />
+              <div className="flex flex-col">
                 <InputField
                   label={supplierBillNo.label}
                   value={supplierBillNo.value}
                   required={supplierBillNo.rules.required}
-                  onChange={(e) =>
-                    handleInputChange(
-                      setSupplierBillNo,
-                      supplierBillNo,
-                      e.target.value
-                    )
-                  }
-                
+                  onChange={(e) => handleInputChange(setSupplierBillNo, supplierBillNo, e.target.value)}
                   validationMessages={validationMessages(supplierBillNo)}
-                  placeholder="Enter supplier Bill No"
+                  placeholder="Enter Supplier Bill No"
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
                 />
-
-                <div className="flex flex-col">
-                  <label className="label">
-                    <span className="label-text text-lg">{supplier.label}</span>
-                  </label>
-                  <select
-                    className="select select-bordered w-full"
-                    value={supplier.value}
-                    onChange={(e) =>
-                      handleInputChange(setSupplier, supplier, e.target.value)
-                    }
-                  >
-                    <option value="" disabled>
-                      Select Supplier
+              </div>
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 mb-1">{supplier.label}</label>
+                <select
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                  value={supplier.value}
+                  onChange={(e) => handleInputChange(setSupplier, supplier, e.target.value)}
+                >
+                  <option value="" disabled>
+                    Select Supplier
+                  </option>
+                  {supplierOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.displayName}
                     </option>
-                    {supplierOptions.map((option) => (
-                      <option
-                        key={option.id}
-                        value={option.id}
-                        className="text-lg"
-                      >
-                        {option.displayName}
-                      </option>
-                    ))}
-                  </select>
-                  {validationMessages(supplier)}
-                </div>
-
-                <InputField
-                  label={grnDate.label}
-                  value={grnDate.value}
-                  required={supplierBillNo.rules.required}
-                  onChange={(e) =>
-                    handleInputChange(setGrnDate, grnDate, e.target.value)
-                  }
-                  validationMessages={validationMessages(grnDate)}
-                  placeholder=""
-                  type="date"
-                />
-
-                <div className="flex flex-col"></div>
-
-                <div className="col-span-2 pt-10">
-                  <ProductSearch onProductSelect={handleProductClick} />
-                </div>
+                  ))}
+                </select>
+                {validationMessages(supplier)}
               </div>
-
-              {stockEntry && (
-                <div className="grid grid-cols-1 sm:grid-cols-5 gap-6 mt-5 mb-5 bg-slate-50 p-4 round-lg">
-                  <>
-                    <InputField
-                      label="Product No"
-                      isReadOnly={true}
-                      value={stockEntry.productNo}
-                    />
-                    <div className="col-span-2">
-                    <InputField
-                      label="Product Name"
-                      isReadOnly={true}
-                      value={stockEntry.productName}
-                    />
-                    </div>
-                 
-                    <InputField
-                      label="Product Type"
-                      isReadOnly={true}
-                      value={stockEntry.productTypeName}
-                    />
-
-                    <InputField
-                      label="Unit Price"
-                      isReadOnly={true}
-                      type="number"
-                      value={stockEntry.unitPrice}
-                      onChange={(e) =>
-                        setStockEntry({
-                          ...stockEntry,
-                          unitPrice: e.target.value,
-                        })
-                      }
-                    />
-                    <InputField
-                      label="Unit Cost"
-                      type="number"
-                      required={true}
-                      value={stockEntry.unitCost}
-                      onChange={(e) =>
-                        setStockEntry({
-                          ...stockEntry,
-                          unitCost: e.target.value,
-                        })
-                      }
-                      placeholder="Enter Unit Cost"
-                    />
-                    <div className="flex gap-2">
-                      <InputField
-                        label="Qty"
-                        type="number"
-                        required={true}
-                        value={stockEntry.qty}
-                        onChange={(e) =>
-                          setStockEntry({ ...stockEntry, qty: e.target.value })
-                        }
-                        placeholder="Enter Qty"
-                      />
-                      <span className="mt-auto mb-3">
-                        {stockEntry.measurementUnitName}
-                      </span>
-                    </div>
-
-
-
-                    <InputField
-                      label="Production Date"
-                      value={stockEntry.productionDate}
-                      onChange={(e) =>
-                        setStockEntry({
-                          ...stockEntry,
-                          productionDate: e.target.value,
-                        })
-                      }
-                      placeholder=""
-                      type="date"
-                      isDisabled={!stockEntry.isExpiringProduct}
-                    />
-
-                    <InputField
-                      label="Expiration Date"
-                      value={stockEntry.expirationDate}
-                      onChange={(e) =>
-                        setStockEntry({
-                          ...stockEntry,
-                          expirationDate: e.target.value,
-                        })
-                      }
-                      placeholder=""
-                      type="date"
-                      isDisabled={!stockEntry.isExpiringProduct}
-                    />
-  <button
-                      type="button"
-                      className="btn btn-primary w-[50%] mt-auto"
-                      onClick={addProductHandler}
-                      disabled={stockEntry.isStockTracked=="0"}
-                    >
-                      Add
-                    </button>
-                {stockEntry.isStockTracked=="0" &&     <div className="col-span-5">
-                      <div className="bg-red-500 p-4 rounded-lg flex justify-center">
-                      <span className="text-white"> This product is not stock-tracked. If you want to add this product to stock, you need to enable stock tracking for it.</span>
-                      </div>
-                      </div>}
-
-                  
-                  </>
-                </div>
-              )}
-
-              <div className="mt-5">
-                {stockEntryList.length > 0 ? (
-                  <table className="table border-collapse w-full">
-                    <thead className="sticky top-0 bg-base-100 z-10 text-sm border-b border-gray-300">
-                      <tr>
-                        <th className="px-4 py-2">Product Name</th>
-                        <th className="px-4 py-2">Product Type</th>
-                        <th className="px-4 py-2">SKU</th>
-                        <th className="px-4 py-2">Qty</th>
-                        <th className="px-4 py-2">
-                          Production and Expiration Date
-                        </th>
-                        <th className="px-4 py-2">Unit Cost</th>
-                        <th className="px-4 py-2">Unit Price</th>
-                        <th className="px-4 py-2">Total Cost</th>{" "}
-                        {/* New Column */}
-                        <th className="px-4 py-2">Actions</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {stockEntryList.map((item, index) => (
-                        <tr
-                          key={index}
-                          className="border-b border-gray-200 hover:bg-gray-100 bg-slate-50 text-[1rem]"
-                        >
-                          <td className="px-4 py-2">{item.productName}</td>
-                          <td className="px-4 py-2">{item.productTypeName}</td>
-                          <td className="px-4 py-2">{item.sku}</td>
-                          <td className="px-4 py-2">
-                            {item.qty} {item.measurementUnitName}
-                          </td>
-                          <td className="px-4 py-2">
-                            {item.productionDate} - {item.expirationDate}
-                          </td>
-                          <td className="px-4 py-2">{item.unitCost}</td>
-                          <td className="px-4 py-2">{item.unitPrice}</td>
-
-                          <td className="px-4 py-2">
-                            {/* Calculate and display total cost */}
-                            {(item.qty * item.unitCost).toFixed(2)}{" "}
-                            {/* Display Total Cost */}
-                          </td>
-                          <td className="px-4 py-2">
-                            <FontAwesomeIcon
-                              icon={faTrash}
-                              className="text-red-500 hover:text-red-700 cursor-pointer"
-                              onClick={() =>
-                                setStockEntryList(
-                                  stockEntryList.filter((_, i) => i !== index)
-                                )
-                              }
-                              title="Remove Item"
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div className="flex justify-center h-20 items-center rounded-lg text-gray-400 bg-slate-50">
-                    {" "}
-                    No items in the stock entry list.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-20 mt-5 mb-5  p-4 rounded-lg">
-            <div className="col-span-2">
-              <TextAreaField
-                label={remark.label}
-                value={remark.value}
-                onChange={(e) => setRemark(e.target.value)}
-                placeholder="Enter Remark"
-                rows={5}
+              <InputField
+                label={grnDate.label}
+                value={grnDate.value}
+                required={grnDate.rules.required}
+                onChange={(e) => handleInputChange(setGrnDate, grnDate, e.target.value)}
+                validationMessages={validationMessages(grnDate)}
+                type="date"
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <div className="mt-4 flex justify-between">
-                <span className="font-semibold text-lg">Total Cost</span>
-                <span className="font-semibold text-lg">
-                  {formatCurrency(totalCost)}
-                </span>
-              </div>
+            {/* Product Search */}
+            <div className="bg-white rounded-xl border  p-6">
+              <ProductSearch onProductSelect={handleProductClick} />
+            </div>
 
-              <div className="flex justify-between">
-                <span className="font-semibold text-lg mt-auto mb-3">
-                  Amount Paid
-                </span>
+            {/* Selected Product Details */}
+            {stockEntry && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 bg-gray-50 rounded-xl p-6 shadow-sm">
                 <InputField
-                  // label={amountPaid.label}
-                  value={amountPaid.value}
+                  label="Product No"
+                  isReadOnly={true}
+                  value={stockEntry.productNo}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg"
+                />
+                <div className="sm:col-span-2">
+                  <InputField
+                    label="Product Name"
+                    isReadOnly={true}
+                    value={stockEntry.productName}
+                    className="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <InputField
+                  label="Product Type"
+                  isReadOnly={true}
+                  value={stockEntry.productTypeName}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg"
+                />
+                <InputField
+                  label="Unit Price"
+                  isReadOnly={true}
                   type="number"
-                  onChange={(e) =>
-                    handleInputChange(setAmountPaid, amountPaid, e.target.value)
-                  }
-                  validationMessages={validationMessages(amountPaid)}
-                  placeholder="Enter Paid Amount"
+                  value={stockEntry.unitPrice}
+                  onChange={(e) => setStockEntry({ ...stockEntry, unitPrice: e.target.value })}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg"
+                />
+                <InputField
+                  label="Unit Cost"
+                  type="number"
+                  required={true}
+                  value={stockEntry.unitCost}
+                  onChange={(e) => setStockEntry({ ...stockEntry, unitCost: e.target.value })}
+                  placeholder="Enter Unit Cost"
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                />
+                <div className="flex items-end gap-2">
+                  <InputField
+                    label="Qty"
+                    type="number"
+                    required={true}
+                    value={stockEntry.qty}
+                    onChange={(e) => setStockEntry({ ...stockEntry, qty: e.target.value })}
+                    placeholder="Enter Qty"
+                    className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                  />
+                  <span className="text-sm text-gray-600 mb-2">{stockEntry.measurementUnitName}</span>
+                </div>
+                <InputField
+                  label="Production Date"
+                  value={stockEntry.productionDate}
+                  onChange={(e) => setStockEntry({ ...stockEntry, productionDate: e.target.value })}
+                  type="date"
+                  isDisabled={!stockEntry.isExpiringProduct}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200 disabled:bg-gray-100"
+                />
+                <InputField
+                  label="Expiration Date"
+                  value={stockEntry.expirationDate}
+                  onChange={(e) => setStockEntry({ ...stockEntry, expirationDate: e.target.value })}
+                  type="date"
+                  isDisabled={!stockEntry.isExpiringProduct}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200 disabled:bg-gray-100"
+                />
+                <div className="flex items-end">
+                  <button
+                    type="button"
+                    className={`w-full sm:w-1/2 px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200 ${
+                      stockEntry.isStockTracked === "0" ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={addProductHandler}
+                    disabled={stockEntry.isStockTracked === "0"}
+                  >
+                    Add
+                  </button>
+                </div>
+                {stockEntry.isStockTracked === "0" && (
+                  <div className="col-span-5 bg-red-100 p-4 rounded-lg flex justify-center">
+                    <span className="text-sm text-red-700">
+                      This product is not stock-tracked. Enable stock tracking to add it to stock.
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Stock Entry List Table */}
+            <div className="bg-white rounded-xl border p-6 mt-6">
+              {stockEntryList.length > 0 ? (
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-gray-100 text-sm font-semibold text-gray-700 border-b border-gray-300">
+                    <tr>
+                      <th className="px-4 py-3 text-left">Product Name</th>
+                      <th className="px-4 py-3 text-left">Product Type</th>
+                      <th className="px-4 py-3 text-left">SKU</th>
+                      <th className="px-4 py-3 text-left">Qty</th>
+                      <th className="px-4 py-3 text-left">Production & Expiration Date</th>
+                      <th className="px-4 py-3 text-left">Unit Cost</th>
+                      <th className="px-4 py-3 text-left">Unit Price</th>
+                      <th className="px-4 py-3 text-left">Total Cost</th>
+                      <th className="px-4 py-3 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stockEntryList.map((item, index) => (
+                      <tr
+                        key={index}
+                        className="border-b border-gray-200 hover:bg-gray-50 text-sm text-gray-700"
+                      >
+                        <td className="px-4 py-3">{item.productName}</td>
+                        <td className="px-4 py-3">{item.productTypeName}</td>
+                        <td className="px-4 py-3">{item.sku}</td>
+                        <td className="px-4 py-3">{item.qty} {item.measurementUnitName}</td>
+                        <td className="px-4 py-3">{item.productionDate} - {item.expirationDate}</td>
+                        <td className="px-4 py-3">{item.unitCost}</td>
+                        <td className="px-4 py-3">{item.unitPrice}</td>
+                        <td className="px-4 py-3">{(item.qty * item.unitCost).toFixed(2)}</td>
+                        <td className="px-4 py-3">
+                          <FontAwesomeIcon
+                            icon={faTrash}
+                            className="text-red-500 hover:text-red-700 cursor-pointer"
+                            onClick={() => setStockEntryList(stockEntryList.filter((_, i) => i !== index))}
+                            title="Remove Item"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="flex justify-center items-center h-20 text-gray-500 bg-gray-50 rounded-lg">
+                  No items in the stock entry list.
+                </div>
+              )}
+            </div>
+
+            {/* Remark and Total Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white rounded-xl border  p-6">
+              <div className="sm:col-span-2">
+                <TextAreaField
+                  label={remark.label}
+                  value={remark.value}
+                  onChange={(e) => setRemark({ ...remark, value: e.target.value })}
+                  placeholder="Enter Remark"
+                  rows={5}
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
                 />
               </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-between">
+                  <span className="text-sm font-semibold text-gray-700">Total Cost</span>
+                  <span className="text-sm font-semibold text-gray-900">{formatCurrency(totalCost)}</span>
+                </div>
+                <div className="flex flex-col">
+                  <InputField
+                    label="Amount Paid"
+                    value={amountPaid.value}
+                    type="number"
+                    onChange={(e) => handleInputChange(setAmountPaid, amountPaid, e.target.value)}
+                    validationMessages={validationMessages(amountPaid)}
+                    placeholder="Enter Paid Amount"
+                    className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="flex justify-center mt-6">
-            <button
-              className={`btn btn-primary w-56 ${
-                isSubmitting ? "loading" : ""
-              }`}
-              onClick={onSubmit}
-            >
-              {isSubmitting ? "Submitting..." : "Submit Stock Entry"}
-            </button>
+            {/* Submit Button */}
+            <div className="flex justify-center mt-6">
+              <button
+                type="submit"
+                className={`w-full sm:w-56 px-6 py-3 text-sm font-semibold text-white bg-sky-600 rounded-lg border  hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200 ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"
+                      ></path>
+                    </svg>
+                    Submitting...
+                  </span>
+                ) : (
+                  "Submit Stock Entry"
+                )}
+              </button>
+            </div>
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 
 export default StockEntry;
+
+// import React, { useEffect, useState } from "react";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faTrash } from "@fortawesome/free-solid-svg-icons";
+// import moment from "moment";
+// import FormElementMessage from "../messges/FormElementMessage";
+// import InputField from "../inputField/InputField";
+// import ProductSearch from "../productSearch/ProductSearch";
+// import { useToast } from "../useToast";
+// import { getSuppliers } from "../../functions/dropdowns";
+// import TextAreaField from "../inputField/TextAreaField";
+// import { formatCurrency } from "../../utils/format";
+// import { stockAdd } from "../../functions/stockEntry";
+// import { useNavigate } from "react-router-dom";
+// import { validate } from "../../utils/formValidation";
+
+// const StockEntry = () => {
+//   const navigate = useNavigate();
+//   const store = JSON.parse(localStorage.getItem("stores"))[0];
+
+//   const [stockEntryList, setStockEntryList] = useState([]);
+//   const [stockEntry, setStockEntry] = useState(null);
+
+//   const showToast = useToast();
+
+//   const [grnNo, setGrnNo] = useState("[New]");
+
+//   const [supplierBillNo, setSupplierBillNo] = useState({
+//     label: "Supplier Bill No",
+//     value: "",
+//     isTouched: false,
+//     isValid: false,
+//     rules: { required: true, dataType: "string" },
+//   });
+
+//   const [supplier, setSupplier] = useState({
+//     label: "Supplier",
+//     value: "",
+//     isTouched: false,
+//     isValid: false,
+//     rules: { required: true, dataType: "integer" },
+//   });
+
+//   const [supplierOptions, setSupplierOptions] = useState([]);
+
+//   const [grnDate, setGrnDate] = useState({
+//     label: "GRN Date",
+//     value: moment().format("YYYY-MM-DD"), // Format the date for default display in the date input
+//     isTouched: false,
+//     isValid: false,
+//     rules: { required: true, dataType: "date" },
+//   });
+
+//   const [amountPaid, setAmountPaid] = useState({
+//     label: "Amount Paid",
+//     value: "",
+//     isTouched: false,
+//     isValid: false,
+//     rules: { required: true, dataType: "string" },
+//   });
+
+//   const [remark, setRemark] = useState({
+//     label: "Remark",
+//     value: "",
+//     isTouched: false,
+//     isValid: false,
+//     rules: { required: false, dataType: "string" },
+//   });
+
+//   const [isSubmitting, setIsSubmitting] = useState(false);
+
+//   useEffect(() => {
+//     loadDrpSupplier();
+//   }, []);
+
+//   const loadDrpSupplier = async () => {
+//     const objArr = await getSuppliers();
+//     console.log("objArr", objArr.data.results[0]);
+//     setSupplierOptions(objArr.data.results[0]);
+//   };
+
+//   const handleInputChange = (setState, state, value) => {
+//     if (!state.rules) {
+//       console.error("No rules defined for validation in the state", state);
+//       return;
+//     }
+//     const validation = validate(value, state);
+//     setState({
+//       ...state,
+//       value: value,
+//       isValid: validation.isValid,
+//       isTouched: true,
+//       validationMessages: validation.messages,
+//     });
+//   };
+
+//   const validationMessages = (state) => {
+//     return (
+//       !state.isValid &&
+//       state.isTouched && (
+//         <div>
+//           {state.validationMessages.map((message, index) => (
+//             <FormElementMessage key={index} severity="error" text={message} />
+//           ))}
+//         </div>
+//       )
+//     );
+//   };
+
+//   const onSubmit = async (e) => {
+//     e.preventDefault();
+
+//     if (!supplierBillNo.value || !supplier.value || !amountPaid.value) {
+//       showToast("danger", "Exception", "Fill all required fields.");
+//       return;
+//     }
+
+//     // const payLoad = {
+//     //   supplierId: supplier.value,
+//     //   storeId: store.storeId,
+//     //   stockReceivedDate: grnDate.value,
+//     //   amountPaid: amountPaid.value,
+//     //   remark: remark.value,
+//     //   orderList: [
+//     //     {
+//     //       productId: 160,
+//     //       unitPrice: "200",
+//     //       unitCost: "100",
+//     //       qty: 1,
+//     //       productTypeId: 2,
+//     //     },
+//     //     {
+//     //       productId: 161,
+//     //       unitPrice: "200",
+//     //       unitCost: "150",
+//     //       qty: 1,
+//     //       productTypeId: 2,
+//     //     },
+//     //     {
+//     //       productId: 245,
+//     //       unitPrice: "200",
+//     //       unitCost: "150",
+//     //       qty: 1,
+//     //       productTypeId: 1,
+//     //     },
+//     //   ],
+//     //   isConfirm: true,
+//     // };
+
+//     const orderList = stockEntryList.map((entry) => ({
+//       allProductId:entry.allProductId,
+//       productId:
+//         entry.productTypeId === 2 ? entry.variationProductId : entry.productId,
+//       unitPrice: entry.unitPrice,
+//       unitCost: entry.unitCost,
+//       qty: entry.qty,
+//       productTypeId: entry.productTypeId,
+//       productionDate: entry.productionDate,
+//       expirationDate: entry.expirationDate,
+//     }));
+
+//     const payLoad = {
+//       supplierId: supplier.value,
+//       storeId: store.storeId,
+//       stockReceivedDate: grnDate.value,
+//       amountPaid: amountPaid.value,
+//       remark: remark.value,
+//       supplierBillNo: supplierBillNo.value,
+//       orderList, // Use the dynamically created orderList
+//       isConfirm: true,
+//     };
+
+//     const res = await stockAdd(payLoad);
+
+//     if (res.data.error) {
+//       showToast("danger", "Exception", res.data.error.message);
+//       return;
+//     }
+
+//     const responseStatus = res.data.outputValues.responseStatus;
+
+//     if (responseStatus === "falied") {
+//       showToast("danger", "Exception", "Fill all required fields.");
+//       return;
+//     }
+
+//     showToast("success", "Success", res.data.outputValues.outputMessage);
+
+//     setSupplierBillNo({ ...supplierBillNo, value: "" });
+//     setSupplier({ ...supplier, value: "" });
+//     setAmountPaid({ ...amountPaid, value: "" });
+
+//     setStockEntryList([]);
+//   };
+
+//   const addProductHandler = () => {
+//     if (
+//       !stockEntry ||
+//       !stockEntry.unitPrice ||
+//       !stockEntry.unitCost ||
+//       !stockEntry.qty
+//     ) {
+//       showToast("danger", "Exception", "Fill all required fields.");
+//       return;
+//     }
+
+//     if (
+//       stockEntry.isExpiringProduct === 1 &&
+//       (!stockEntry.productionDate || !stockEntry.expirationDate)
+//     ) {
+//       showToast(
+//         "danger",
+//         "Exception",
+//         "Expirationdate and production date is required."
+//       );
+//       return;
+//     }
+//     setStockEntryList((prev) => [...prev, stockEntry]);
+//     setStockEntry(null); // Clear current stock entry
+//     showToast("success", "Success", "Product added to the list.");
+//   };
+
+//   const handleProductClick = (p) => {
+//     console.log("unitPrice", p);
+//     const order = { ...p };
+
+//     setStockEntry(order);
+//   };
+
+//   const totalCost = stockEntryList.reduce(
+//     (acc, item) => acc + item.qty * item.unitCost,
+//     0
+//   );
+
+//   const [isExpiringProductChecked, setIsExpiringProductChecked] =
+//     useState(false);
+
+//   return (
+//     <>
+//       <div className="container mx-auto p-6">
+//         <form>
+//           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+//             {/* Combo Ingredients Section */}
+//             <div className="col-span-2">
+//               <h3 className="text-center font-bold text-xl">Stock Entry</h3>
+//             </div>
+//             <div className="col-span-2">
+//               <button
+//                 className="flex items-center btn btn-ghost text-gray-600 p-0 m-0 hover:bg-transparent hover:text-primaryColorHover text-right"
+//                 onClick={() => navigate("/stockEntryList")}
+//               >
+//                 <i className="pi pi-book text-xl"></i>
+//                 <span className="">Stock Entries</span>
+//               </button>
+//             </div>
+
+//             <div className="col-span-2">
+//               <div className="grid grid-cols-4 gap-4">
+//                 <InputField
+//                   label={"GRN No"}
+//                   value={grnNo}
+//                   required={supplierBillNo.rules.required}
+//                   isReadOnly={true}
+//                   placeholder="Enter GRN No"
+//                 />
+
+//                 <InputField
+//                   label={supplierBillNo.label}
+//                   value={supplierBillNo.value}
+//                   required={supplierBillNo.rules.required}
+//                   onChange={(e) =>
+//                     handleInputChange(
+//                       setSupplierBillNo,
+//                       supplierBillNo,
+//                       e.target.value
+//                     )
+//                   }
+                
+//                   validationMessages={validationMessages(supplierBillNo)}
+//                   placeholder="Enter supplier Bill No"
+//                 />
+
+//                 <div className="flex flex-col">
+//                   <label className="label">
+//                     <span className="label-text text-lg">{supplier.label}</span>
+//                   </label>
+//                   <select
+//                     className="select select-bordered w-full"
+//                     value={supplier.value}
+//                     onChange={(e) =>
+//                       handleInputChange(setSupplier, supplier, e.target.value)
+//                     }
+//                   >
+//                     <option value="" disabled>
+//                       Select Supplier
+//                     </option>
+//                     {supplierOptions.map((option) => (
+//                       <option
+//                         key={option.id}
+//                         value={option.id}
+//                         className="text-lg"
+//                       >
+//                         {option.displayName}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   {validationMessages(supplier)}
+//                 </div>
+
+//                 <InputField
+//                   label={grnDate.label}
+//                   value={grnDate.value}
+//                   required={supplierBillNo.rules.required}
+//                   onChange={(e) =>
+//                     handleInputChange(setGrnDate, grnDate, e.target.value)
+//                   }
+//                   validationMessages={validationMessages(grnDate)}
+//                   placeholder=""
+//                   type="date"
+//                 />
+
+//                 <div className="flex flex-col"></div>
+
+//                 <div className="col-span-2 pt-10">
+//                   <ProductSearch onProductSelect={handleProductClick} />
+//                 </div>
+//               </div>
+
+//               {stockEntry && (
+//                 <div className="grid grid-cols-1 sm:grid-cols-5 gap-6 mt-5 mb-5 bg-slate-50 p-4 round-lg">
+//                   <>
+//                     <InputField
+//                       label="Product No"
+//                       isReadOnly={true}
+//                       value={stockEntry.productNo}
+//                     />
+//                     <div className="col-span-2">
+//                     <InputField
+//                       label="Product Name"
+//                       isReadOnly={true}
+//                       value={stockEntry.productName}
+//                     />
+//                     </div>
+                 
+//                     <InputField
+//                       label="Product Type"
+//                       isReadOnly={true}
+//                       value={stockEntry.productTypeName}
+//                     />
+
+//                     <InputField
+//                       label="Unit Price"
+//                       isReadOnly={true}
+//                       type="number"
+//                       value={stockEntry.unitPrice}
+//                       onChange={(e) =>
+//                         setStockEntry({
+//                           ...stockEntry,
+//                           unitPrice: e.target.value,
+//                         })
+//                       }
+//                     />
+//                     <InputField
+//                       label="Unit Cost"
+//                       type="number"
+//                       required={true}
+//                       value={stockEntry.unitCost}
+//                       onChange={(e) =>
+//                         setStockEntry({
+//                           ...stockEntry,
+//                           unitCost: e.target.value,
+//                         })
+//                       }
+//                       placeholder="Enter Unit Cost"
+//                     />
+//                     <div className="flex gap-2">
+//                       <InputField
+//                         label="Qty"
+//                         type="number"
+//                         required={true}
+//                         value={stockEntry.qty}
+//                         onChange={(e) =>
+//                           setStockEntry({ ...stockEntry, qty: e.target.value })
+//                         }
+//                         placeholder="Enter Qty"
+//                       />
+//                       <span className="mt-auto mb-3">
+//                         {stockEntry.measurementUnitName}
+//                       </span>
+//                     </div>
+
+
+
+//                     <InputField
+//                       label="Production Date"
+//                       value={stockEntry.productionDate}
+//                       onChange={(e) =>
+//                         setStockEntry({
+//                           ...stockEntry,
+//                           productionDate: e.target.value,
+//                         })
+//                       }
+//                       placeholder=""
+//                       type="date"
+//                       isDisabled={!stockEntry.isExpiringProduct}
+//                     />
+
+//                     <InputField
+//                       label="Expiration Date"
+//                       value={stockEntry.expirationDate}
+//                       onChange={(e) =>
+//                         setStockEntry({
+//                           ...stockEntry,
+//                           expirationDate: e.target.value,
+//                         })
+//                       }
+//                       placeholder=""
+//                       type="date"
+//                       isDisabled={!stockEntry.isExpiringProduct}
+//                     />
+//   <button
+//                       type="button"
+//                       className="btn btn-primary w-[50%] mt-auto"
+//                       onClick={addProductHandler}
+//                       disabled={stockEntry.isStockTracked=="0"}
+//                     >
+//                       Add
+//                     </button>
+//                 {stockEntry.isStockTracked=="0" &&     <div className="col-span-5">
+//                       <div className="bg-red-500 p-4 rounded-lg flex justify-center">
+//                       <span className="text-white"> This product is not stock-tracked. If you want to add this product to stock, you need to enable stock tracking for it.</span>
+//                       </div>
+//                       </div>}
+
+                  
+//                   </>
+//                 </div>
+//               )}
+
+//               <div className="mt-5">
+//                 {stockEntryList.length > 0 ? (
+//                   <table className="table border-collapse w-full">
+//                     <thead className="sticky top-0 bg-base-100 z-10 text-sm border-b border-gray-300">
+//                       <tr>
+//                         <th className="px-4 py-2">Product Name</th>
+//                         <th className="px-4 py-2">Product Type</th>
+//                         <th className="px-4 py-2">SKU</th>
+//                         <th className="px-4 py-2">Qty</th>
+//                         <th className="px-4 py-2">
+//                           Production and Expiration Date
+//                         </th>
+//                         <th className="px-4 py-2">Unit Cost</th>
+//                         <th className="px-4 py-2">Unit Price</th>
+//                         <th className="px-4 py-2">Total Cost</th>{" "}
+//                         {/* New Column */}
+//                         <th className="px-4 py-2">Actions</th>
+//                       </tr>
+//                     </thead>
+
+//                     <tbody>
+//                       {stockEntryList.map((item, index) => (
+//                         <tr
+//                           key={index}
+//                           className="border-b border-gray-200 hover:bg-gray-100 bg-slate-50 text-[1rem]"
+//                         >
+//                           <td className="px-4 py-2">{item.productName}</td>
+//                           <td className="px-4 py-2">{item.productTypeName}</td>
+//                           <td className="px-4 py-2">{item.sku}</td>
+//                           <td className="px-4 py-2">
+//                             {item.qty} {item.measurementUnitName}
+//                           </td>
+//                           <td className="px-4 py-2">
+//                             {item.productionDate} - {item.expirationDate}
+//                           </td>
+//                           <td className="px-4 py-2">{item.unitCost}</td>
+//                           <td className="px-4 py-2">{item.unitPrice}</td>
+
+//                           <td className="px-4 py-2">
+//                             {/* Calculate and display total cost */}
+//                             {(item.qty * item.unitCost).toFixed(2)}{" "}
+//                             {/* Display Total Cost */}
+//                           </td>
+//                           <td className="px-4 py-2">
+//                             <FontAwesomeIcon
+//                               icon={faTrash}
+//                               className="text-red-500 hover:text-red-700 cursor-pointer"
+//                               onClick={() =>
+//                                 setStockEntryList(
+//                                   stockEntryList.filter((_, i) => i !== index)
+//                                 )
+//                               }
+//                               title="Remove Item"
+//                             />
+//                           </td>
+//                         </tr>
+//                       ))}
+//                     </tbody>
+//                   </table>
+//                 ) : (
+//                   <div className="flex justify-center h-20 items-center rounded-lg text-gray-400 bg-slate-50">
+//                     {" "}
+//                     No items in the stock entry list.
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="grid grid-cols-1 sm:grid-cols-3 gap-20 mt-5 mb-5  p-4 rounded-lg">
+//             <div className="col-span-2">
+//               <TextAreaField
+//                 label={remark.label}
+//                 value={remark.value}
+//                 onChange={(e) => setRemark(e.target.value)}
+//                 placeholder="Enter Remark"
+//                 rows={5}
+//               />
+//             </div>
+
+//             <div className="flex flex-col gap-2">
+//               <div className="mt-4 flex justify-between">
+//                 <span className="font-semibold text-lg">Total Cost</span>
+//                 <span className="font-semibold text-lg">
+//                   {formatCurrency(totalCost)}
+//                 </span>
+//               </div>
+
+//               <div className="flex justify-between">
+//                 <span className="font-semibold text-lg mt-auto mb-3">
+//                   Amount Paid
+//                 </span>
+//                 <InputField
+//                   // label={amountPaid.label}
+//                   value={amountPaid.value}
+//                   type="number"
+//                   onChange={(e) =>
+//                     handleInputChange(setAmountPaid, amountPaid, e.target.value)
+//                   }
+//                   validationMessages={validationMessages(amountPaid)}
+//                   placeholder="Enter Paid Amount"
+//                 />
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="flex justify-center mt-6">
+//             <button
+//               className={`btn btn-primary w-56 ${
+//                 isSubmitting ? "loading" : ""
+//               }`}
+//               onClick={onSubmit}
+//             >
+//               {isSubmitting ? "Submitting..." : "Submit Stock Entry"}
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default StockEntry;

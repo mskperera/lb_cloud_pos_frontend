@@ -85,24 +85,24 @@ const DayOpen = () => {
 
 
 
-const validationMessages = (state) => {
-  // Ensure that the function returns JSX or null
-  return (
-    !state.isValid &&
-    state.isTouched && (
-      <div>
-        {state.validationMessages.map((message, index) => (
-          <FormElementMessage
-            key={index}
-            className="mt-2 w-full"
-            severity="error"
-            text={`${message}`}
-          />
-        ))}
-      </div>
-    )
-  );
-};
+  const ValidationMessages = ({ state }) => {
+    return (
+      !state.isValid &&
+      state.isTouched && (
+        <div className="w-full">
+          {state.validationMessages.map((message, index) => (
+            <FormElementMessage
+              key={index}
+              className="w-full mt-2"
+              severity="error"
+              text={`${message}`}
+            />
+          ))}
+        </div>
+      )
+    );
+  };
+  
 
 const validateAll = () => {
   const states = [sessionName,openingAmount];
@@ -162,112 +162,91 @@ const dayStartHandler=async()=>{
 
 
 
-  return (
-    <div className="flex flex-col p-8 justify-center items-center gap-5 lg:p-4">
-      <div className="text-center mb-4 pt-5">
-        <h2 className="text-2xl font-bold">Day Start</h2>
-      </div>
-      <div className="flex flex-col gap-12 w-[20%] mb-12">
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:gap-20 lg:items-start sm:flex-col">
-          <div className="flex-1 mt-4 lg:mt-0">
-            <div className="flex flex-col gap-4">
+  
+return (
+  <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
+    <div className="w-full max-w-2xl p-6 bg-white shadow-md rounded-lg mx-auto flex flex-col items-center">
+      <h2 className="text-2xl font-bold text-center mb-6">Day Start</h2>
 
-                <div>
-                  <label htmlFor="terminal" className="block text-lg font-bold">
-                    Terminal
-                  </label>
-                  <input
-                    id="terminal"
-                    type="text"
-                    className="w-full p-2 border-2 rounded-md"
-                    placeholder="Terminal"
-                    value={terminalDetails?.terminalName}
-                    readOnly
-                    disabled
-                  />
-                </div>
-            
-
-              <div>
-                <label
-                  htmlFor="openingAmount"
-                  className="block text-lg font-bold"
-                >
-                  Session Name
-                </label>
-                <input
-                  id="openingAmount"
-                  type="text"
-                  className="w-full p-2 border-2 rounded-md"
-                  placeholder="Enter Session Name"
-                  value={sessionName.value}
-                  onChange={(e) => {
-                    handleInputChange(
-                      setSessionName,
-                      sessionName,
-                      e.target.value
-                    );
-                  }}
-                />
-                   {validationMessages(sessionName)}
-              </div>
-              <div>
-                <label
-                  htmlFor="openingAmount"
-                  className="block text-lg font-bold"
-                >
-                  Opening Cash Amount
-                </label>
-                <input
-                  id="openingAmount"
-                  type="number"
-                  className="w-full p-2 border-2 rounded-md"
-                  placeholder="Enter opening amount"
-                  value={openingAmount.value}
-                  onChange={(e) => {
-                    handleInputChange(
-                      setOpeningAmount,
-                      openingAmount,
-                      e.target.value
-                    );
-                  }}
-                />
-                {validationMessages(openingAmount)}
-              </div>
-              <div>
-                <label htmlFor="notes" className="block text-lg font-bold">
-                  Notes
-                </label>
-                <textarea
-                  id="notes"
-                  className="w-full p-2 border-2 rounded-md"
-                  placeholder="Any remarks for the day start"
-                  value={notes.value}
-                  onChange={(e) => {
-                    handleInputChange(
-                      setNotes,
-                      notes,
-                      e.target.value
-                    );
-                  }}
-                />
-                   {validationMessages(notes)}
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 gap-6 w-full max-w-md">
+        {/* Terminal Name */}
+        <div>
+          <label htmlFor="terminal" className="block text-lg font-bold">
+            Terminal
+          </label>
+          <input
+            id="terminal"
+            type="text"
+            className="w-full p-2 border rounded-md bg-gray-100"
+            value={terminalDetails?.terminalName}
+            readOnly
+            disabled
+          />
         </div>
-      </div>
 
-      <div className="text-center pb-8">
+        {/* Session Name */}
+        <div>
+          <label htmlFor="sessionName" className="block text-lg font-bold">
+            Session Name
+          </label>
+          <input
+            id="sessionName"
+            type="text"
+            className="w-full p-2 border rounded-md"
+            placeholder="Enter Session Name"
+            value={sessionName.value}
+            onChange={(e) =>
+              handleInputChange(setSessionName, sessionName, e.target.value)
+            }
+          />
+          <ValidationMessages state={sessionName} />
+        </div>
+
+        {/* Opening Amount */}
+        <div>
+          <label htmlFor="openingAmount" className="block text-lg font-bold">
+            Opening Cash Amount
+          </label>
+          <input
+            id="openingAmount"
+            type="number"
+            className="w-full p-2 border rounded-md"
+            placeholder="Enter opening amount"
+            value={openingAmount.value}
+            onChange={(e) =>
+              handleInputChange(setOpeningAmount, openingAmount, e.target.value)
+            }
+          />
+          <ValidationMessages state={openingAmount} />
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label htmlFor="notes" className="block text-lg font-bold">
+            Notes
+          </label>
+          <textarea
+            id="notes"
+            className="w-full p-2 border rounded-md"
+            placeholder="Any remarks for the day start"
+            value={notes.value}
+            onChange={(e) => handleInputChange(setNotes, notes, e.target.value)}
+          />
+          <ValidationMessages state={notes} />
+        </div>
+
+        {/* Button */}
         <button
-          className="w-full md:w-auto block md:inline-block mt-4 md:mt-0 btn btn-lg btn-primary text-base-100 bg-primaryColor"
+          className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           onClick={dayStartHandler}
+          disabled={isLoading}
         >
-          Start Day
+          {isLoading ? "Starting..." : "Start Day"}
         </button>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DayOpen;

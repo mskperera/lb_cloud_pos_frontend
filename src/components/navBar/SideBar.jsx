@@ -22,7 +22,7 @@ import './sidebar.css';
     return (
       <div className="sidebar-menu w-full">
         <button
-          className={`flex w-full items-center gap-2 py-3 px-4 text-lg text-gray-700 hover:bg-gray-200 rounded-md ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+          className={`flex w-full items-center gap-2 py-3 px-4 text-lg text-white hover:bg-sky-600 rounded-md ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
           onClick={handleClick} // Use the handleClick function to handle both submenu toggle and navigation
         >
           <FontAwesomeIcon icon={iconName} className="text-xl" />
@@ -48,7 +48,7 @@ import './sidebar.css';
                 ) : (
                   <Link
                     to={item.to}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-300 rounded-md"
+                    className="flex items-center gap-2 px-4 py-2 text-white hover:bg-sky-600 rounded-md"
                   >
                     <FontAwesomeIcon icon={item.icon} className="text-lg" />
                     {item.label}
@@ -69,9 +69,9 @@ const Sidebar = () => {
   const assignedTerminals=JSON.parse(localStorage.getItem('assignedTerminals'));
 
     return (
-      <div className="sidebar bg-[#f8fafd] w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
+      <div className="sidebar bg-sky-500 w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
       <div className="mb-8 flex items-center justify-center">
-        <FontAwesomeIcon icon={faHome} className="text-4xl text-primaryColor" />
+        <FontAwesomeIcon icon={faHome} className="text-4xl text-white" />
       </div>
   
         <div className="space-y-4">
@@ -158,9 +158,15 @@ const Sidebar = () => {
               },
               { label: "General Settings", to: "/settings/general", icon: faCog },
               { label: "Permissions", to: "/settings/permissions", icon: faCog },
-              { label: "About", to: "/about", icon: faInfoCircle },
             ]}
           />
+
+
+<SidebarMenu
+    label="About"
+    iconName={faInfoCircle}
+    to="/about"
+  />
         </div>
       </div>
     );

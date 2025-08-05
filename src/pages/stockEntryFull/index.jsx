@@ -4,7 +4,7 @@ import { getStockEntryFull } from "../../functions/stockEntry";
 import { useLocation } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "daisyui/dist/full.css"; // Import daisyUI styles
+//import "daisyui/dist/full.css"; // Import daisyUI styles
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 
 const StockEntryFull = () => {

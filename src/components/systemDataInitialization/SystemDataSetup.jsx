@@ -285,16 +285,8 @@ const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value))
                   validationMessages={validationMessages(companyName)}
                 />
     
-                <InputField
-                  label={storeName.label}
-                  value={storeName.value}
-                  required={storeName.rules.required}
-                  onChange={(e) => handleInputChange(setStoreName, storeName, e.target.value)}
-                  type="text"
-                  placeholder="Enter Branch/Store Name"
-                  validationMessages={validationMessages(storeName)}
-                />
-    
+       
+    <div className="col-span-2">
                 <InputField
                   label={address.label}
                   value={address.value}
@@ -303,6 +295,17 @@ const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value))
                   type="text"
                   placeholder="Enter Address"
                   validationMessages={validationMessages(address)}
+                />
+    </div>
+
+    <InputField
+                  label={storeName.label}
+                  value={storeName.value}
+                  required={storeName.rules.required}
+                  onChange={(e) => handleInputChange(setStoreName, storeName, e.target.value)}
+                  type="text"
+                  placeholder="Enter Branch/Store Name"
+                  validationMessages={validationMessages(storeName)}
                 />
     
                 <InputField

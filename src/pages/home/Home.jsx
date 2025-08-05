@@ -1,46 +1,85 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStore, faChevronDown,faCashRegister } from "@fortawesome/free-solid-svg-icons";
-import { formatDate } from "../../utils/format";
+import { faCashRegister } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
-import { setSelectedStore } from "../../state/store/storeSlice";
 import Sidebar from "../../components/navBar/SideBar";
 import { getTeminallByUserId } from "../../functions/dropdowns";
+import moment from "moment";
 
+const safeParse = (item) => {
+  const value = localStorage.getItem(item);
+  if (!value || value === "undefined") return null;
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    console.error(`Failed to parse ${item} from localStorage:`, e);
+    return null;
+  }
+};
 
 const UserInfo = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const userinfo=JSON.parse(localStorage.getItem('user'));
+  const [currentTime, setCurrentTime] = useState(moment.utc());
+  const [timezone, setTimezone] = useState(null);
 
-  const [timezone, setTimezone] = useState(
-    Intl.DateTimeFormat().resolvedOptions().timeZone
-  );
+  const userinfo = safeParse("user");
+  const systemInfo = safeParse("systemInfo");
+  const utcOffset = systemInfo?.utcOffset || 0;
+
+  const getTimeZoneFromOffset = (utcOffset) => {
+    const hours = Math.floor(Math.abs(utcOffset) / 60);
+    const minutes = Math.abs(utcOffset) % 60;
+    const sign = utcOffset >= 0 ? "+" : "-";
+    return `GMT${sign}${hours}${minutes > 0 ? `:${minutes.toString().padStart(2, "0")}` : ""}`;
+  };
+
+  const loadTimeZone = () => {
+    if (!systemInfo) {
+      setTimezone("Unknown Timezone");
+      return;
+    }
+    const timeZne = getTimeZoneFromOffset(utcOffset);
+    setTimezone(timeZne);
+  };
+
+  const loadTime = () => {
+    const adjustedTime = moment.utc().add(utcOffset, "minutes");
+    setCurrentTime(adjustedTime);
+  };
+
+  useEffect(() => {
+    loadTimeZone();
+    loadTime();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
+      const adjustedTime = moment.utc().add(utcOffset, "minutes");
+      setCurrentTime(adjustedTime);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [utcOffset]);
 
-  const formattedTime = currentTime.toLocaleTimeString();
-  const formattedDate =formatDate(currentTime,true);
+  const formattedTime = currentTime ? currentTime.format("h:mm:ss A") : "Loading...";
+  const formattedDate = currentTime
+    ? currentTime.format("MMMM D, YYYY")
+    : "Loading...";
 
   return (
     <div className="flex flex-col items-right justify-center p-6 w-full">
       <div className="text-2xl font-semibold text-gray-700 mb-4 ml-3">
-        Hi, {userinfo.displayName}!
+        Hi, {userinfo?.displayName || "Guest"}!
       </div>
-      <div className="text-5xl text-gray-600 mb-2">
-       {formattedTime}
-      </div>
+      <div className="text-5xl text-gray-600 mb-2">{formattedTime}</div>
       <div className="text-xl text-gray-500 mb-2 ml-2">Date: {formattedDate}</div>
-      <div className="text-lg text-gray-400 ml-2">Timezone: {timezone}</div>
+      <div className="text-lg text-gray-400 ml-2">Timezone: {timezone || "Loading..."}</div>
     </div>
   );
 };
+
+
+
 const HomeMenuButton = ({
   to,
   label,

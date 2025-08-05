@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ProfileMenu from '../ProfileMenu';
 import Syncing from '../Syncing';
 import Alert from '../Alert';
@@ -11,15 +11,19 @@ import io from "socket.io-client";
 import PrinterConnection from '../PrinterConnetion';
 import { getFrontendIdByTerminalId, getPrintdeskByTerminalId } from '../../functions/terminal';
 import { setPrinterList } from '../../state/printer/printerSlice';
+import { FaTh } from 'react-icons/fa';
 
 const Store=({store})=>(
-  <div className='flex justify-start gap-1 items-center mb-1 hover:bg-slate-100 rounded-lg px-2 cursor-pointer'>
+  <div className='flex justify-start gap-1 items-center mb-1 text-white hover:text-sky-700 rounded-lg px-2 cursor-pointer'>
 <FontAwesomeIcon icon={faStore} style={{ fontSize: '1.5rem' }} />
  {store && <div className='mt-1'>{`${store.storeName}`}</div>}
  </div>
 )
 export default function TopMenubar() {
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const { id } = useParams(); 
 
   const dispatch = useDispatch();
 
@@ -28,28 +32,45 @@ export default function TopMenubar() {
   //onst [printerList, setPrinterList] = useState([]);
   const [printDeskInfo, setPrintDeskInfo] = useState(null); // Example ID
 
+  const [leftTerminal,setLeftTerminal]=useState(false);
   // 3jkfsjl
 
   const { selectedStore } = useSelector((state) => state.store);
   const [socket, setSocket] = useState(null);
+  const terminalId_l=localStorage.getItem('terminalId');
 
   const loadPrintdeskByTerminalId=async()=>{
-
-    const terminalId_l=localStorage.getItem('terminalId');
-
+    console.log("terminalId_l",terminalId_l);
     if(terminalId_l){
     const terminalId=terminalId_l ? JSON.parse(terminalId_l):null;
     const result=await getFrontendIdByTerminalId(terminalId);
+    console.log("getFrontendIdByTerminalId:", result);
     localStorage.setItem("printdeskId",result.data.printdeskId);
     setPrintDeskInfo(result.data);
     }
   }
   useEffect(() => {
     loadPrintdeskByTerminalId();
-  },[]);
+  },[terminalId_l]);
+
+
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5112", {
+    return () => {
+      if (location.pathname.startsWith("/register/")) {
+        console.log(`Leaving register page with ID: ${id}`);
+     // localStorage.removeItem('terminalId');
+      if(!terminalId_l)
+      connectSocket();
+      }
+    };
+  }, [location.pathname, id,terminalId_l]);
+
+
+  const connectSocket=async()=>{
+    console.log('llllllllllloooooooooooooooo')
+    const newSocket = io(process.env.REACT_APP_SOCKET_IO_URL, {
+      path: "/socket.io/",
       transports: ["websocket"],
     });
 
@@ -94,7 +115,12 @@ export default function TopMenubar() {
     return () => {
       newSocket.disconnect();
     };
-  }, [printDeskInfo]);
+  }
+
+  useEffect(() => {
+    connectSocket();
+   
+  }, [printDeskInfo,terminalId_l,leftTerminal]);
 
   const connectFrontend = (socketInstance) => {
     console.log("Attempting to emit connectFrontendToTheService");
@@ -138,25 +164,28 @@ export default function TopMenubar() {
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full bg-[#f8fafd] px-10 gap-2 m-0 p-0  h-16 z-50">
+    <nav className="navbar fixed top-0 left-0 w-full bg-sky-500 px-10 gap-2 pt-3  h-16 z-50">
       <div className="flex justify-between items-center w-full m-0 p-0">
       <div className="flex justify-start gap-4">
         <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
-          <h3 className="text-xl font-bold">Legend POS</h3>
+          <h3 className="text-xl text-white font-bold">Legend POS</h3>
      
         </div>
 
       
           </div>
         <div className="flex items-center gap-4 m-0 p-0">
-        <button
-            className=" flex items-center ml-0 btn btn-ghost text-gray-600 p-0 m-0 hover:bg-transparent hover:text-primaryColorHover"
-            onClick={() => navigate('/home')}
-          >
-            <i className="pi pi-th-large text-xl"></i>
-            <span className="">Home</span>
-          </button>
+
+    <button
+      className="flex items-center ml-0 p-0 m-0 text-white hover:bg-transparent hover:text-sky-700"
+      onClick={() => navigate('/home')}
+    >
+      <FaTh className="text-xl" />
+      <span className="pl-1">Home</span>
+    </button>
+
+
      {/* {JSON.stringify(printDeskInfo)} */}
 
           <div className="flex items-center gap-5 m-0 p-0">

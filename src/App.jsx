@@ -74,7 +74,7 @@ function AppContent() {
             <Route path="/systemDataInitialization" element={<SystemDataSetup />} />
             <Route path="/selectStore" element={<SelectStore />} />
 
-              <Route path="/paymentConfirm" element={<PaymentConfirm />} />
+     
             {/* <Route path="/" element={<Login />} /> */}
             <Route element={<MainLayout />}>
               <Route path="/home" element={<Home />} />
@@ -146,7 +146,6 @@ function AppContent() {
               <Route path="/daystart/:terminalId" element={<DayOpen />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/ordersCompleted" element={<OrdersCompleted />} />
-
               <Route path="/paymentConfirm" element={<PaymentConfirm />} />
             </Route>
 
