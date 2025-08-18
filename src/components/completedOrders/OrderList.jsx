@@ -6,6 +6,8 @@ import { getDrpSession } from "../../functions/dropdowns";
 import OrderVoidRemark from "../register/OrderVoidRemark";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 import GhostButton from "../iconButtons/GhostButton";
+import DialogModel from "../model/DialogModel";
+import PaymentConfirm from "../../pages/paymentConfirm";
 
 const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsPerPageOptions = [] }) => {
   const totalPages = Math.ceil(totalRecords / rowsPerPage);
@@ -81,6 +83,9 @@ export default function OrderList({ selectingMode }) {
   const [selectedOrderId, setSelectedOrderId] = useState("");
 
   const totalPages = Math.ceil(totalRecords / rowsPerPage);
+
+    const [isPaymentConfirmShow,setIsPaymentConfirmShow]=useState(false);
+
 
   const onPageChange = (event) => {
     setCurrentPage(event.page);
@@ -161,7 +166,9 @@ export default function OrderList({ selectingMode }) {
     <div className="flex space-x-2">
       <GhostButton
         onClick={() => {
-          window.open(`/paymentConfirm?orderId=${o.orderId}`, "_blank");
+setIsPaymentConfirmShow(true);
+setSelectedOrderId(o.orderId);
+         // window.open(`/paymentConfirm?orderId=${o.orderId}`, "_blank");
         }}
         iconClass="pi pi-copy"
         color="text-blue-500"
@@ -258,6 +265,16 @@ export default function OrderList({ selectingMode }) {
         orderId={selectedOrderId}
         onUpdateOrderList={updateOrderListHandler}
       />
+  <DialogModel
+        header={"Payment Receipt"}
+        visible={isPaymentConfirmShow}
+        onHide={() => setIsPaymentConfirmShow(false)}
+        fullWidth={true}
+  fullHeight={true}
+      >
+  
+  <PaymentConfirm orderId={selectedOrderId} />
+      </DialogModel>
 
       <div className="flex flex-col p-6 gap-4 bg-gray-50 rounded-lg shadow-sm">
         <div>

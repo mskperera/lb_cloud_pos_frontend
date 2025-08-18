@@ -29,7 +29,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
             key={index}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition duration-200 ${
               index === currentPage
-                ? 'bg-sky-500 text-white'
+                ? 'bg-sky-600 text-white'
                 : 'text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800'
             }`}
             onClick={() => handlePageChange(index)}

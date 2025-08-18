@@ -33,7 +33,7 @@ const Rightsidebar = ({
 
   return (
     <div className='rounded-lg p-2'>
-          <div className="flex flex-col gap-2 bg-sky-500 w-[6rem] shadow-lg">
+          <div className="flex flex-col gap-2 bg-sky-600 w-[6rem] shadow-lg">
           <LeftSidebarMenu
             label="Home"
             icon={faHomeAlt}

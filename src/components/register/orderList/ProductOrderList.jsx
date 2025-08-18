@@ -90,7 +90,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
   return (
     <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="orderList">
       <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
-        <thead className="bg-gray-50 sticky top-0 z-10">
+        <thead className="bg-white sticky top-0 z-10 border-b">
           <tr className="">
             <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
             <th className="py-3 px-4 text-center">Qty</th>

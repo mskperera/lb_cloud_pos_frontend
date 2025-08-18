@@ -131,7 +131,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
             }}
             className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg border transition duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 ${
               barcodeMode
-                ? 'bg-sky-500 text-white border-sky-500 hover:bg-sky-600'
+                ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600'
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'
             }`}
           >
@@ -145,7 +145,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
             }}
             className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg border transition duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 ${
               !barcodeMode
-                ? 'bg-sky-500 text-white border-sky-500 hover:bg-sky-600'
+                ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600'
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'
             }`}
           >
@@ -337,7 +337,7 @@ export default ProductSearch;
 //     setSearchTerm('');
 //   }} // Set barcode mode directly
 //   className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all border focus:outline-none focus:ring
-//     ${barcodeMode ? 'bg-sky-500 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
+//     ${barcodeMode ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
 // >
 //   <span className="pi pi-qrcode text-lg"></span>
 // </button>
@@ -349,7 +349,7 @@ export default ProductSearch;
 //     setSearchTerm('');
 //   }} // Set SKU/product details mode directly
 //   className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all border focus:outline-none focus:ring
-//     ${!barcodeMode ? 'bg-sky-500 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
+//     ${!barcodeMode ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
 // >
 //   <span className="pi pi-search text-lg"></span>
 // </button>

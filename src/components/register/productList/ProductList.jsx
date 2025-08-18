@@ -284,9 +284,9 @@ const ProductList = () => {
 </select>
       </div>
 
-      <div className="overflow-auto max-h-[70vh] m-0 p-2 bg-sky-200 rounded-lg">
+      <div className="overflow-auto max-h-[70vh] m-0 p-2  rounded-lg">
         {!productListLoading ? (
-          <div className="flex flex-wrap gap-2 px-4 m-0 p-0">
+          <div className="grid grid-cols-4 md:grid-cols-3 gap-2 px-4 m-0 p-0 sm:grid-cols-2">
             {products.length > 0 ? (
               products.map((p, index) => (
                 <ProductItem

@@ -68,7 +68,7 @@ const Register = () => {
 
 
   
-        <div className="flex items-start justify-between gap-2 py-2 bg-slate-50">
+        <div className="flex items-start justify-between gap-2 py-2 ">
           {showPayment ? (
             <PaymentScreen />
           ) : (

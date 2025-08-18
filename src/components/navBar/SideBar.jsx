@@ -69,7 +69,7 @@ const Sidebar = () => {
   const assignedTerminals=JSON.parse(localStorage.getItem('assignedTerminals'));
 
     return (
-      <div className="sidebar bg-sky-500 w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
+      <div className="sidebar bg-sky-600 w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
       <div className="mb-8 flex items-center justify-center">
         <FontAwesomeIcon icon={faHome} className="text-4xl text-white" />
       </div>
