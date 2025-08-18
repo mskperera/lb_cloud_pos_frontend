@@ -19,12 +19,10 @@ import { validate } from "../../../utils/formValidation";
 import { addOrder } from "../../../functions/register";
 import { useToast } from "../../useToast";
 import { formatCurrency } from "../../../utils/format";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import ConfirmDialog from "../../dialog/ConfirmDialog";
-import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
-const Payment = ({}) => {
+const Payment = ({showPaymentConfirm,setOrderId}) => {
   const showToast = useToast();
   const terminalId = JSON.parse(localStorage.getItem('terminalId'));
   const sessionDetails = JSON.parse(localStorage.getItem('sessionDetails'));
@@ -36,6 +34,7 @@ const Payment = ({}) => {
   );
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
 
   useEffect(() => {
     console.log('orderSummary', orderSummary);
@@ -227,7 +226,12 @@ const Payment = ({}) => {
     const { orderId, outputMessage, responseStatus } = res.data.outputValues;
     console.log("addOrder", orderId);
     dispatch(clearOrderList({}));
-    navigate(`/paymentConfirm?orderId=${orderId}`);
+
+    
+    showPaymentConfirm(true);
+    setOrderId(orderId);
+   // navigate(`/paymentConfirm?orderId=${orderId}`);
+
     showToast("success", "Success", outputMessage);
     setIsSubmitting(false);
   };
@@ -279,7 +283,10 @@ const Payment = ({}) => {
           severity="info"
         />
       )}
-      <div className="flex flex-col gap-4 items-center py-10 px-4 max-w-4xl mx-auto">
+
+     
+
+      <div className="flex flex-col gap-4 items-center px-4 max-w-4xl mx-auto">
         <div className="flex justify-center gap-2 w-full">
           <button
             onClick={() => setSelectedTab("Single")}
@@ -302,8 +309,8 @@ const Payment = ({}) => {
             Split
           </button>
         </div>
-        <div className="w-full bg-sky-600 text-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between">
+        <div className="w-full bg-sky-600 text-white rounded-lg p-6">
+          {/* <div className="flex items-center justify-between">
             <button
               className="flex items-center gap-2 px-4 py-2 rounded-full bg-sky-700 hover:bg-sky-800 text-white font-semibold transition-colors"
               onClick={() => navigate(-1)}
@@ -312,7 +319,7 @@ const Payment = ({}) => {
             </button>
             <h2 className="text-2xl font-bold ml-4">Payment</h2>
             <div className="flex-1"></div>
-          </div>
+          </div> */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
             <div className="flex flex-col items-center gap-2">
               <p className="font-semibold">Amount Due</p>
@@ -334,7 +341,7 @@ const Payment = ({}) => {
             </div>
           </div>
         </div>
-        <div className="w-full bg-white shadow-md rounded-lg border-t border-gray-200 p-6">
+        <div className="w-full bg-white rounded-lg border-t border-gray-200 p-6">
           {selectedTab === "Single" && (
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex flex-col gap-2 md:w-1/4">
@@ -396,7 +403,16 @@ const Payment = ({}) => {
               </div>
             </div>
           )}
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-end mt-6 gap-4">
+             <button
+              className={`py-4 px-10 rounded-lg font-bold text-gray-700 transition-colors ${
+                isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-gray-200 hover:bg-gray-300"
+              }`}
+              onClick={handleCancel}
+            >
+            Cancel
+            </button>
+
             <button
               className={`py-4 px-10 rounded-lg font-bold text-white transition-colors ${
                 isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-sky-600 hover:bg-sky-700"
@@ -404,8 +420,12 @@ const Payment = ({}) => {
               onClick={() => onSubmit(false)}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Submitting..." : "Tender"}
+         
+             {isSubmitting ? "Submitting..." : "Tender"}
             </button>
+
+
+             
           </div>
         </div>
       </div>

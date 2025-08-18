@@ -9,13 +9,13 @@ import { exPrintReceipt } from '../../functions/exPrint';
 import { getTenantId } from '../../functions/authService';
 import { getOrderReceipt } from '../../functions/register';
 
-function PaymentConfirm() {
+function PaymentConfirm({orderId}) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const terminalId = JSON.parse(localStorage.getItem('terminalId'));
   let location = useLocation();
   let searchParams = new URLSearchParams(location.search);
-  let orderId = searchParams.get('orderId');
+ // let orderId = searchParams.get('orderId');
 
   const [printOption, setPrintOption] = useState('printdesk');
   const [selectedPrinter, setSelectedPrinter] = useState('');
@@ -31,7 +31,9 @@ function PaymentConfirm() {
   const [currency, setCurrency] = useState(null);
 
   useEffect(() => {
+    if(orderId){
     loadOrderReceipt();
+    }
     console.log('ReceiptComponent', orderId);
   }, [orderId]);
 
@@ -96,9 +98,9 @@ function PaymentConfirm() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen p-4 ">
-      <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="md:w-1/2 p-6 bg-gray-50">
+    
+      <div className="grid grid-cols-2  bg-white rounded-lg">
+        <div className=" p-6 bg-gray-50">
           <ReceiptComponent
             orderHeader={orderHeader}
             orderDetails={orderDetails}
@@ -107,7 +109,7 @@ function PaymentConfirm() {
             setCashPaymentChage={setCashPaymentChangeHandler}
           />
         </div>
-        <div className="md:w-1/2 p-8 flex flex-col justify-center bg-white">
+        <div className=" p-8 flex flex-col justify-center bg-white">
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Change</h2>
           <div className="text-center text-4xl font-semibold text-green-600 mb-6">
             {change && formatCurrency(change)}
@@ -169,7 +171,7 @@ function PaymentConfirm() {
           </div>
         </div>
       </div>
-    </div>
+
   );
 }
 

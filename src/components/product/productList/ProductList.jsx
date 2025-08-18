@@ -908,7 +908,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                   onClick={() => handleRowSelect(index, item)}
                   className={`border-b  border-gray-200 text-[1rem] ${
                     selectedRowIndex === index
-                      ? "bg-sky-500 text-white hover:bg-sky-600 "
+                      ? "bg-sky-600 text-white hover:bg-sky-600 "
                       : "bg-slate-50 hover:bg-gray-100"
                   }`}
                 >

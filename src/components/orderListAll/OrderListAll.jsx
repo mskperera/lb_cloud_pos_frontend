@@ -11,6 +11,9 @@ import ApplyDiscount from "../register/ApplyDiscount";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import ProductSearch from "../productSearch/ProductSearch";
 import { FaEdit, FaShoppingCart } from 'react-icons/fa';
+import DialogModel from "../model/DialogModel";
+import Payment from "../register/payment/Payment";
+import PaymentConfirm from "../../pages/paymentConfirm";
 
 const OrderListAll = () => {
   const navigate = useNavigate();
@@ -23,10 +26,12 @@ const OrderListAll = () => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isDiscountPopupVisible, setIsDiscountPopupVisible] = useState(false);
   const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(false);
+  const [orderId, setOrderId] = useState('');
+
 
   const { list, orderSummary } = useSelector((state) => state.orderList);
-
-
+  const [isPaymentConfirmShow,setIsPaymentConfirmShow]=useState(false);
+const[isPaymentShow,setIsPaymentShow] = useState(false);
 
   const showDiscountPopupHandler = (orderListId) => {
     setLoadCount(loadCount + 1);
@@ -131,6 +136,30 @@ const OrderListAll = () => {
         loadCount={loadCount}
       />
 
+ <DialogModel
+        header={"Payment"}
+        visible={isPaymentShow}
+        onHide={() => setIsPaymentShow(false)}
+      >
+  
+  <Payment showPaymentConfirm={()=>{
+    setIsPaymentShow(false);
+    setIsPaymentConfirmShow(true);
+  }}
+      setOrderId={setOrderId}
+  />
+      </DialogModel>
+  <DialogModel
+        header={"Payment Confirm"}
+        visible={isPaymentConfirmShow}
+        onHide={() => setIsPaymentConfirmShow(false)}
+        fullWidth={true}
+  fullHeight={true}
+      >
+  
+  <PaymentConfirm orderId={orderId} />
+      </DialogModel>
+
       <div className="flex flex-col gap-2 mr-4">
         <div className="flex justify-between items-center gap-5">
           <ProductSearch onProductSelect={handleProductClick} onBarcodeEnter={handleBarcodeEnter} />
@@ -182,12 +211,14 @@ const OrderListAll = () => {
             >
               <span className="px-2">New Order</span>
             </button>
+            
        <button
   onClick={() => {
-    navigate("/payment");
+    setIsPaymentShow(true);
+   // navigate("/payment");
   }}
   disabled={list.length === 0}
-  className="btn flex justify-center items-center gap-2 text-white hover:bg-sky-600 bg-sky-500 shadow-sm btn-lg h-auto py-4 px-5 rounded-full"
+  className="btn flex justify-center items-center gap-2 text-white hover:bg-sky-600 bg-sky-600 shadow-sm btn-lg h-auto py-4 px-5 rounded-full"
 >
   <FaShoppingCart className="text-xl" />
   <span>Proceed to Payment</span>

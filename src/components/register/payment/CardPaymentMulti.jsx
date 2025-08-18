@@ -282,8 +282,8 @@ const CardPaymentMulti = ({ onAddPayment }) => {
 
 <div className="flex justify-center col-span-2">
             <button
-              className="btn w-[40%] bg-primaryColor hover:bg-primaryColorHover text-white"
-              onClick={splitPaymentHandler}
+           className="w-full md:w-1/2 py-2 px-4 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors"
+             onClick={splitPaymentHandler}
             >
               Add Payment
             </button>

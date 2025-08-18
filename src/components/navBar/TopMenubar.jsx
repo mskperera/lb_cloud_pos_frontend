@@ -164,7 +164,7 @@ export default function TopMenubar() {
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full bg-sky-500 px-10 gap-2 pt-3  h-16 z-50">
+    <nav className="navbar fixed top-0 left-0 w-full bg-sky-600 px-10 gap-2 pt-3  h-16 z-50">
       <div className="flex justify-between items-center w-full m-0 p-0">
       <div className="flex justify-start gap-4">
         <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">
@@ -178,7 +178,7 @@ export default function TopMenubar() {
         <div className="flex items-center gap-4 m-0 p-0">
 
     <button
-      className="flex items-center ml-0 p-0 m-0 text-white hover:bg-transparent hover:text-sky-700"
+      className="flex items-center ml-0 p-0 m-0 text-white hover:bg-transparent hover:text-sky-400"
       onClick={() => navigate('/home')}
     >
       <FaTh className="text-xl" />

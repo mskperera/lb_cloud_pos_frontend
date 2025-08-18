@@ -12,40 +12,52 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const signIn = async () => {
-    try {
-      localStorage.clear();
-      setIsLoading(true);
-      setErrorMessage('');
-      const payload = {
-        userName: email,
-        password: password,
-      };
-      const authRes = await userLogin(payload);
+const signIn = async () => {
+  try {
+    localStorage.clear();
+    setIsLoading(true);
+    setErrorMessage('');
+    const payload = {
+      userName: email,
+      password: password,
+    };
+    const authRes = await userLogin(payload);
 
-      if (authRes.status === 422 || authRes.status === 401) {
-        setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
-        setIsLoading(false);
-        return;
-      }
-
-      const accessToken = authRes.data.accessToken;
-      localStorage.setItem('token', accessToken);
-      const plaindata = parseJwt(accessToken);
-      console.log('plaindata', plaindata);
-      localStorage.setItem('tenantId', plaindata.tenantId);
-      localStorage.setItem('userId', plaindata.userId);
-      localStorage.setItem('stores', JSON.stringify(plaindata.stores));
-      localStorage.setItem('user', JSON.stringify(plaindata));
-      await setUserAssignedStores(plaindata.userId);
-
-      await loadSystemInfoToLocalStorage();
-      navigate('/home');
-    } catch (error) {
-      setErrorMessage('An error occurred. Please try again.');
+    if (authRes.status === 422 || authRes.status === 401) {
+      setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
       setIsLoading(false);
+      return;
     }
-  };
+
+    const accessToken = authRes.data.accessToken;
+    localStorage.setItem('token', accessToken);
+    const plaindata = parseJwt(accessToken);
+    localStorage.setItem('tenantId', plaindata.tenantId);
+    localStorage.setItem('userId', plaindata.userId);
+    localStorage.setItem('stores', JSON.stringify(plaindata.stores));
+    localStorage.setItem('user', JSON.stringify(plaindata));
+    await setUserAssignedStores(plaindata.userId);
+
+    await loadSystemInfoToLocalStorage();
+
+    // 👉 Try fullscreen
+    const el = document.documentElement; // whole page
+    const req =
+      el.requestFullscreen ||
+      el.webkitRequestFullscreen ||
+      el.mozRequestFullScreen ||
+      el.msRequestFullscreen;
+    if (req) {
+      await req.call(el);
+    }
+
+    navigate('/home');
+  } catch (error) {
+    setErrorMessage('An error occurred. Please try again.');
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-100 via-sky-50 to-sky-100 flex items-center justify-center p-4">
