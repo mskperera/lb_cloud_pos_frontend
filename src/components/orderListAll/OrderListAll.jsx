@@ -157,7 +157,7 @@ const[isPaymentShow,setIsPaymentShow] = useState(false);
   fullHeight={true}
       >
   
-  <PaymentConfirm orderId={orderId} />
+  <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
       </DialogModel>
 
       <div className="flex flex-col gap-2 mr-4">

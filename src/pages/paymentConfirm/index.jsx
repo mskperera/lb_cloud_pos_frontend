@@ -9,7 +9,7 @@ import { exPrintReceipt } from '../../functions/exPrint';
 import { getTenantId } from '../../functions/authService';
 import { getOrderReceipt } from '../../functions/register';
 
-function PaymentConfirm({orderId}) {
+function PaymentConfirm({orderId,setIsPaymentConfirmShow}) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const terminalId = JSON.parse(localStorage.getItem('terminalId'));
@@ -156,7 +156,8 @@ function PaymentConfirm({orderId}) {
                 className="py-3 px-6 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-semibold"
                 onClick={() => {
                   dispatch(clearOrderList({}));
-                  navigate(`/register/${terminalId}`);
+setIsPaymentConfirmShow(false);
+                  //navigate(`/register/${terminalId}`);
                 }}
               >
                 New Order
