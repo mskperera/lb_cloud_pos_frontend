@@ -85,7 +85,7 @@ const[isPaymentShow,setIsPaymentShow] = useState(false);
   
       dispatch(clearOrderList({}));
       dispatch(setCustomer({ customer: null }));
-      navigate(`/register/${terminalId}`);
+     // navigate(`/register/${terminalId}`);
     
   }
 
@@ -157,7 +157,7 @@ const[isPaymentShow,setIsPaymentShow] = useState(false);
   fullHeight={true}
       >
   
-  <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
+  <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow}  />
       </DialogModel>
 
       <div className="flex flex-col gap-2 mr-4">

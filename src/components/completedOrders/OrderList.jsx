@@ -272,8 +272,7 @@ setSelectedOrderId(o.orderId);
         fullWidth={true}
   fullHeight={true}
       >
-  
-  <PaymentConfirm orderId={selectedOrderId} />
+    <PaymentConfirm orderId={selectedOrderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} openBy="SalesHistory" />
       </DialogModel>
 
       <div className="flex flex-col p-6 gap-4 bg-gray-50 rounded-lg shadow-sm">

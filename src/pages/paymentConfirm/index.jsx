@@ -9,7 +9,7 @@ import { exPrintReceipt } from '../../functions/exPrint';
 import { getTenantId } from '../../functions/authService';
 import { getOrderReceipt } from '../../functions/register';
 
-function PaymentConfirm({orderId,setIsPaymentConfirmShow}) {
+function PaymentConfirm({orderId,setIsPaymentConfirmShow,openBy}) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const terminalId = JSON.parse(localStorage.getItem('terminalId'));
@@ -152,7 +152,8 @@ function PaymentConfirm({orderId,setIsPaymentConfirmShow}) {
               </div>
             )}
             <div className="flex flex-col md:flex-row justify-center gap-4 mt-8">
-              <button
+         
+           {openBy!=='SalesHistory' &&   <button
                 className="py-3 px-6 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-semibold"
                 onClick={() => {
                   dispatch(clearOrderList({}));
@@ -161,7 +162,16 @@ setIsPaymentConfirmShow(false);
                 }}
               >
                 New Order
-              </button>
+              </button>}
+       {openBy==='SalesHistory' &&   <button
+                className="py-3 px-6 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-semibold"
+                onClick={() => {
+setIsPaymentConfirmShow(false);
+                  //navigate(`/register/${terminalId}`);
+                }}
+              >
+              Close
+              </button>}
               <button
                 className="py-3 px-6 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors font-semibold"
                 onClick={onSubmit}
