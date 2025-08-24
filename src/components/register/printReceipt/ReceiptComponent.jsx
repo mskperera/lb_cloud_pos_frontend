@@ -68,8 +68,9 @@ const ReceiptComponent = ({
 
       {/* Items Header */}
       <div className="item-header">
+   
         <div className="item-header-row">
-          <span>#</span>
+                  <span>#</span> 
           <span>Description</span>
         </div>
         <div className="item-header-row2">
@@ -86,12 +87,20 @@ const ReceiptComponent = ({
           {orderDetails?.map((item, index) => (
             <div key={index} className="item-row">
               <div className="receipt-item">
-                <div className="item-header-full">
-                  <span className="item-number">{index + 1}</span>
-                  <span className="item-description">
-                    {item.productName || item.description}
+                 <div className="item-header-full">
+                  <span className="item-number">{index + 1}.</span>
+                {item.sku ? <span className="sku">
+                    {item.sku}
+                  </span>:  <span className="item-description">
+                    {item.productDescription}
                   </span>
+                  }
                 </div>
+               {item.sku && <div className="item-header-full">
+                  <span className="item-description">
+                    {item.productDescription}
+                  </span>
+                </div>}
                 <div className="item-details">
                   <span className="item-qty">
                     {item.qty} {item.measurementUnitName}

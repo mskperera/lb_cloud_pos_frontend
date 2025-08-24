@@ -22,7 +22,7 @@ import { formatCurrency } from "../../../utils/format";
 
 import ConfirmDialog from "../../dialog/ConfirmDialog";
 
-const Payment = ({showPaymentConfirm,setOrderId}) => {
+const Payment = ({showPaymentConfirm,setOrderId,handlePaymentClose}) => {
   const showToast = useToast();
   const terminalId = JSON.parse(localStorage.getItem('terminalId'));
   const sessionDetails = JSON.parse(localStorage.getItem('sessionDetails'));
@@ -408,7 +408,7 @@ const Payment = ({showPaymentConfirm,setOrderId}) => {
               className={`py-4 px-10 rounded-lg font-bold text-gray-700 transition-colors ${
                 isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-gray-200 hover:bg-gray-300"
               }`}
-              onClick={handleCancel}
+              onClick={handlePaymentClose}
             >
             Cancel
             </button>

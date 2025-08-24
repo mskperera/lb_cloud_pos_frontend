@@ -10,15 +10,12 @@ import StockEntryVoid from "./StockEntryVoid";
 import { validate } from "../../utils/formValidation";
 
 export default function StockEntryList({ selectingMode }) {
-
   const store = JSON.parse(localStorage.getItem("stores"))[0];
 
   const [orders, setOrders] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
-
   const [currentPage, setCurrentPage] = useState(0);
-
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [totalRecords, setTotalRecords] = useState(10);
   const [isVoidRemarkShow, setIsVoidRemarkShow] = useState(false);
@@ -52,10 +49,9 @@ export default function StockEntryList({ selectingMode }) {
       const skip = currentPage * rowsPerPage;
       const limit = rowsPerPage;
 
-      // const _searchValue=searchValue.value===''?null:searchValue.value;
       const filteredData = {
         stockEntryId: null,
-        storeId:store.storeId,
+        storeId: store.storeId,
         stockEntryRefNo: selectedFilterBy.value === 1 ? _searchValue : null,
         supplierCode: selectedFilterBy.value === 2 ? _searchValue : null,
         suppliertName: selectedFilterBy.value === 3 ? _searchValue : null,
@@ -69,7 +65,6 @@ export default function StockEntryList({ selectingMode }) {
       console.log("ppppp", _result);
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
-
 
       setOrders(_result.data.results[0]);
       setIsTableDataLoading(false);
@@ -105,14 +100,12 @@ export default function StockEntryList({ selectingMode }) {
   const actionButtons = (o) => (
     <div className="flex space-x-2">
       <button
-        className="btn btn-primary btn-xs bg-primaryColor border-none text-base-100 "
+        className="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-sky-600 border-none rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-600 transition duration-200"
         onClick={() => {
           window.open(`/inventory/stockEntryFull?stockEntryId=${o.stockEntryId}`, "_blank");
-          // navigate(`/paymentConfirm?orderNo=${o.orderNo}`);
-          // onselect(customer.customerId);
         }}
-        tooltip="View Receipt"
-        aria-label="Delete"
+        title="View Receipt"
+        aria-label="View"
       >
         <FontAwesomeIcon icon={faEye} />
       </button>
@@ -123,30 +116,26 @@ export default function StockEntryList({ selectingMode }) {
             setSelectedOrderId(o.stockEntryId);
             setIsVoidRemarkShow(true);
           }}
-          className="btn btn-warning btn-xs bg-[#f87171] border-none text-base-100"
-          aria-label="Select"
-          tooltip="Void Stock Entry"
+          className="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-500 border-none rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200"
+          aria-label="Void"
+          title="Void Stock Entry"
         >
           <FontAwesomeIcon icon={faStop} />
         </button>
       ) : (
-        <div>Voided</div>
+        <div className="text-sm text-gray-700">Voided</div>
       )}
     </div>
   );
 
   const modifiedDateBodyTemplate = (item) => {
-    const localFormattedDate =formatUtcToLocal(item.CreatedDate_UTC);
+    const localFormattedDate = formatUtcToLocal(item.CreatedDate_UTC);
     return isTableDataLoading ? <span>Loading...</span> : <span>{item.CreatedDate_UTC ? localFormattedDate : ''}</span>;
   };
 
   const stockReceivedDateBodyTemplate = (item) => {
-    const localFormattedDate =formatUtcToLocal(item.stockReceivedDate);
-    return  <span>{item.stockReceivedDate ? localFormattedDate : ''}</span>;
-  };
-
-  const customer = (customer) => {
-    return <span>{`${customer.customerCode} | ${customer.customerName}`}</span>;
+    const localFormattedDate = formatUtcToLocal(item.stockReceivedDate);
+    return <span>{item.stockReceivedDate ? localFormattedDate : ''}</span>;
   };
 
   const handleInputChange = (setState, state, value) => {
@@ -178,7 +167,6 @@ export default function StockEntryList({ selectingMode }) {
 
   return (
     <>
-   
       <StockEntryVoid
         visible={isVoidRemarkShow}
         onClose={() => {
@@ -188,13 +176,13 @@ export default function StockEntryList({ selectingMode }) {
         onUpdateOrderList={updateOrderListHandler}
       />
 
-      <div className="flex flex-col justify-between  p-5 gap-2">
-      <div className="col-span-2">
-<h3 className="text-center font-bold text-xl">Stock Entry List</h3>       
-</div>
+      <div className="flex flex-col justify-between p-5 gap-2 px-10">
+        <div className="col-span-2">
+          <h3 className="text-center font-bold text-xl">Stock Entry List</h3>
+        </div>
         <div className="flex space-x-4 w-full">
           <div className="flex flex-col space-y-2 w-1/5">
-            <label className="text-[1rem]">Filter By</label>
+            <label className="text-sm font-medium text-gray-700">Filter By</label>
             <select
               value={selectedFilterBy.value}
               onChange={(e) => {
@@ -204,7 +192,7 @@ export default function StockEntryList({ selectingMode }) {
                   parseInt(e.target.value)
                 );
               }}
-              className="select select-bordered w-full"
+              className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 focus:border-sky-600 transition duration-200"
             >
               {filterByOptions.map((option) => (
                 <option key={option.id} value={option.id}>
@@ -216,81 +204,76 @@ export default function StockEntryList({ selectingMode }) {
 
           {[1, 2, 3].includes(selectedFilterBy.value) && (
             <div className="flex flex-col space-y-2 w-[35%]">
-              <label className="text-[1rem]">Search Value</label>
+              <label className="text-sm font-medium text-gray-700">Search Value</label>
               <input
                 type="text"
                 value={searchValue.value}
                 onChange={(e) =>
                   handleInputChange(setSearchValue, searchValue, e.target.value)
                 }
-                className="input input-bordered w-full"
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 focus:border-sky-600 transition duration-200"
               />
             </div>
           )}
 
           {selectedFilterBy.value === 5 && (
-            <>
-              {/* {JSON.stringify(searchFromDate)} */}
-              <div className="flex gap-4">
-                <input
-                  type="date"
-                  value={
-                    searchFromDate
-                      ? moment(searchFromDate).format("YYYY-MM-DD")
-                      : ""
-                  }
-                  className="input input-bordered w-full"
-                  placeholder="From"
-                  onChange={(e) => {
-                    console.log("from date", e.target.value);
-                    setSearchFromDate(
-                      e.target.value ? new Date(e.target.value) : ""
-                    );
-                  }}
-                />
+            <div className="flex gap-4">
+              <input
+                type="date"
+                value={
+                  searchFromDate
+                    ? moment(searchFromDate).format("YYYY-MM-DD")
+                    : ""
+                }
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 focus:border-sky-600 transition duration-200"
+                placeholder="From"
+                onChange={(e) => {
+                  console.log("from date", e.target.value);
+                  setSearchFromDate(
+                    e.target.value ? new Date(e.target.value) : ""
+                  );
+                }}
+              />
 
-                <input
-                  type="date"
-                  value={
-                    searchToDate
-                      ? moment(searchToDate).format("YYYY-MM-DD")
-                      : ""
-                  }
-                  className="input input-bordered w-full"
-                  placeholder="To"
-                  onChange={(e) => {
-                    setSearchToDate(
-                      e.target.value ? new Date(e.target.value) : ""
-                    );
-                  }}
-                />
-              </div>
-            </>
-          )}
-
-          {/* Clear Search Button */}
-          {(searchValue.value || searchFromDate || searchToDate) && (
-                 <div className="flex items-center mt-7">
-          <button
-              title="Clear Search"
-              className="btn btn-ghost btn-sm ml-3"
-              onClick={() => {
-                setSearchValue({ ...searchValue, value: "" });
-                setSearchFromDate("");
-                setSearchToDate("");
-                loadOrders(null, null, null);
-              }}
-            >
-            <i className="pi pi-times"></i> Clear Search 
-            </button>
+              <input
+                type="date"
+                value={
+                  searchToDate
+                    ? moment(searchToDate).format("YYYY-MM-DD")
+                    : ""
+                }
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 focus:border-sky-600 transition duration-200"
+                placeholder="To"
+                onChange={(e) => {
+                  setSearchToDate(
+                    e.target.value ? new Date(e.target.value) : ""
+                  );
+                }}
+              />
             </div>
           )}
 
-          {/* View Button */}
+          {(searchValue.value || searchFromDate || searchToDate) && (
+            <div className="flex items-center mt-7">
+              <button
+                title="Clear Search"
+                className="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-600 bg-transparent hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 transition duration-200 ml-3"
+                onClick={() => {
+                  setSearchValue({ ...searchValue, value: "" });
+                  setSearchFromDate("");
+                  setSearchToDate("");
+                  loadOrders(null, null, null);
+                }}
+              >
+                <i className="pi pi-times mr-1"></i> Clear Search
+              </button>
+            </div>
+          )}
+
           <div className="flex-1 flex items-center gap-4 mt-7">
             <button
               title="Click here to view"
-              className="btn btn-primary"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-600 transition duration-200"
               onClick={() => {
                 loadOrders(
                   searchValue.value,
@@ -299,85 +282,54 @@ export default function StockEntryList({ selectingMode }) {
                 );
               }}
             >
-              <i className="pi pi-search"></i> View
+              <i className="pi pi-search mr-2"></i> View
             </button>
           </div>
-
-          {/* Select Order Button */}
-          {/* <div className="flex items-end gap-4">
-            <button
-              title="Select Order"
-              className={`btn btn-success btn-sm ${
-                !selectedCustomer ? "btn-disabled" : ""
-              }`}
-              onClick={() => {
-                if (selectedCustomer) onselect(selectedCustomer.customerId);
-              }}
-            >
-              <i className="pi pi-play"></i>
-            </button>
-          </div> */}
         </div>
+
         {isTableDataLoading ? (
           <div className="flex justify-between">
-            <p className="text-lg">Loading...</p>
+            <p className="text-lg text-gray-700">Loading...</p>
           </div>
         ) : (
           <>
-          <div className="flex flex-col h-[65vh] overflow-hidden">
-            <div className="flex-1 overflow-y-auto">
-              <table className="table w-full border-collapse">
-                <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
-                  <tr>
-                    {/* <th className="px-4 py-2">stockEntryId</th> */}
-                    <th className="px-4 py-2">GRN No</th>
-                    <th className="px-4 py-2">Supplier Bill No</th>
-                    <th className="px-4 py-2">Supplier</th>
-                    <th className="px-4 py-2">Total</th>
-                    <th className="px-4 py-2">Stock Received Date</th>
-                    <th className="px-4 py-2">Created Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((item) => (
-                    <tr
-                      key={item.orderId}
-                      className="border-b border-gray-200 hover:bg-gray-100 bg-slate-50 text-[1rem]"
-                    >
-                      {/* {JSON.stringify(item.stockReceivedDate)} */}
-                      {/* <td className="px-4 py-2">{item.productId}</td> */}
-                      <td className="px-4 py-2">
-                      {item.stockEntryRefNo}
-                      </td>
-                      <td className="px-4 py-2">
-                      {item.supplierBillNo}
-                      </td>
-                      <td className="px-4 py-2">
-                      {item.SupplierCode} | {item.supplierName}
-                      </td>
-                      <td className="px-4 py-2">
-                      {item.total}
-                      </td>
-                      <td className="px-4 py-2">
-                      {stockReceivedDateBodyTemplate(item)}
-                      </td>
-<td>{modifiedDateBodyTemplate(item)}</td>
-                      <td className="px-4 py-2">{actionButtons(item)}</td>
+            <div className="flex flex-col h-[65vh] overflow-hidden">
+              <div className="flex-1 overflow-y-auto">
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-gray-50 z-10 text-sm font-semibold text-gray-700 border-b border-gray-300">
+                    <tr>
+                      <th className="px-4 py-2 text-left">GRN No</th>
+                      <th className="px-4 py-2 text-left">Supplier Bill No</th>
+                      <th className="px-4 py-2 text-left">Supplier</th>
+                      <th className="px-4 py-2 text-left">Total</th>
+                      <th className="px-4 py-2 text-left">Stock Received Date</th>
+                      <th className="px-4 py-2 text-left">Created Date</th>
+                      <th className="px-4 py-2 text-left">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-    
- 
-            </div>
-          </div>
-              <div className="flex justify-between w-full  p-4">
-              {/* Items count display */}
-              <div className="pl-3">
-                <span className=" text-gray-500">{totalRecords} items found</span>
+                  </thead>
+                  <tbody>
+                    {orders.map((item) => (
+                      <tr
+                        key={item.orderId}
+                        className="border-b border-gray-200 hover:bg-gray-100 bg-gray-50 text-sm text-gray-700"
+                      >
+                        <td className="px-4 py-2">{item.stockEntryRefNo}</td>
+                        <td className="px-4 py-2">{item.supplierBillNo}</td>
+                        <td className="px-4 py-2">{`${item.SupplierCode} | ${item.supplierName}`}</td>
+                        <td className="px-4 py-2">{item.total}</td>
+                        <td className="px-4 py-2">{stockReceivedDateBodyTemplate(item)}</td>
+                        <td className="px-4 py-2">{modifiedDateBodyTemplate(item)}</td>
+                        <td className="px-4 py-2">{actionButtons(item)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-      
-              {/* DaisyUIPaginator component */}
+            </div>
+            <div className="flex justify-between w-full p-4">
+              <div className="pl-3">
+                <span className="text-sm text-gray-500">{totalRecords} items found</span>
+              </div>
               <DaisyUIPaginator
                 currentPage={currentPage}
                 rowsPerPage={rowsPerPage}
@@ -385,10 +337,10 @@ export default function StockEntryList({ selectingMode }) {
                 onPageChange={onPageChange}
                 rowsPerPageOptions={[10, 30, 50, 100]}
               />
+        
             </div>
-            </>
+          </>
         )}
-
       </div>
     </>
   );

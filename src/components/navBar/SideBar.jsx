@@ -115,26 +115,33 @@ const Sidebar = () => {
               { label: "Add Contact", to: "/customers/add", icon: faUserPlus },
             ]}
           />
-          <SidebarMenu
-            label="Products"
-            iconName={faTags}
-            submenuItems={[
-              { label: "Add Product", to: "/products/add", icon: faPlusCircle },
-            ]}
-          />
+    
           <SidebarMenu
             label="Inventory"
             iconName={faChartBar}
             submenuItems={[
+                  { label: "Add Product", to: "/products/add", icon: faPlusCircle },
               { label: "Product Inventory", to: "/inventory/list", icon: faChartBar },
-              {
-                label: "Stock",
-                icon: faTable,
-                submenuItems: [
-                  { label: "Stock Entry", to: "/inventory/stockentry/add", icon: faPlusCircle },
+                   { label: "Categories", to: "/categories", icon: faList },
+                  { label: "Measurement Units", to: "/measurementUnits", icon: faList },
+             
+              // {
+              //   label: "Stock",
+              //   icon: faTable,
+              //   submenuItems: [
+              //     { label: "Stock Entry", to: "/inventory/stockentry/add", icon: faPlusCircle },
+              //     { label: "Stock Entries", to: "/inventory/stockentry/list", icon: faList },
+              //   ],
+              // },
+            ]}
+          />
+
+          <SidebarMenu
+            label="Stock"
+            iconName={faChartBar}
+            submenuItems={[
+                    { label: "Stock Entry", to: "/inventory/stockentry/add", icon: faPlusCircle },
                   { label: "Stock Entries", to: "/inventory/stockentry/list", icon: faList },
-                ],
-              },
             ]}
           />
   
@@ -148,14 +155,7 @@ const Sidebar = () => {
             label="Settings"
             iconName={faCog}
             submenuItems={[
-              {
-                label: "Master Data",
-                icon: faAsterisk,
-                submenuItems: [
-                  { label: "Categories", to: "/categories", icon: faList },
-                  { label: "Measurement Units", to: "/measurementUnits", icon: faList },
-                ],
-              },
+          
               { label: "General Settings", to: "/settings/general", icon: faCog },
               { label: "Permissions", to: "/settings/permissions", icon: faCog },
             ]}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   getCategoryMenu,
   getProductExtraDetails,
@@ -75,7 +75,9 @@ const ProductList = () => {
   };
 
   useEffect(() => {
+    if(selectedCategoryId && products.length===0){
     loadProducts(selectedCategoryId, currentPage, rowsPerPage);
+    }
   }, [selectedCategoryId, currentPage, rowsPerPage]);
 
   const loadCategories = async () => {

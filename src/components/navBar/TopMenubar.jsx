@@ -11,7 +11,7 @@ import io from "socket.io-client";
 import PrinterConnection from '../PrinterConnetion';
 import { getFrontendIdByTerminalId, getPrintdeskByTerminalId } from '../../functions/terminal';
 import { setPrinterList } from '../../state/printer/printerSlice';
-import { FaTh } from 'react-icons/fa';
+import { FaCompress, FaExpand, FaTh } from 'react-icons/fa';
 
 const Store=({store})=>(
   <div className='flex justify-start gap-1 items-center mb-1 text-white hover:text-sky-700 rounded-lg px-2 cursor-pointer'>
@@ -34,6 +34,44 @@ export default function TopMenubar() {
 
   const [leftTerminal,setLeftTerminal]=useState(false);
   // 3jkfsjl
+
+
+
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error enabling fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen().catch(err => {
+        console.error(`Error exiting fullscreen: ${err.message}`);
+      });
+    }
+  };
+
+  useEffect(() => {
+    // Sync state when Fullscreen API is used
+    const handleChange = () => setIsFullScreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handleChange);
+
+    // Detect F11 fullscreen by comparing window & screen height
+    const checkF11 = () => {
+      if (window.innerHeight === window.screen.height) {
+        setIsFullScreen(true); // Browser fullscreen (F11)
+      } else if (!document.fullscreenElement) {
+        setIsFullScreen(false); // Normal mode
+      }
+    };
+    window.addEventListener("resize", checkF11);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleChange);
+      window.removeEventListener("resize", checkF11);
+    };
+  }, []);
+
 
   const { selectedStore } = useSelector((state) => state.store);
   const [socket, setSocket] = useState(null);
@@ -177,6 +215,23 @@ export default function TopMenubar() {
           </div>
         <div className="flex items-center gap-4 m-0 p-0">
 
+      <button
+      className="flex items-center ml-0 p-0 m-0 text-white hover:bg-transparent hover:text-sky-400"
+      onClick={toggleFullScreen}
+    >
+      {isFullScreen ? (
+        <>
+          <FaCompress className="text-xl" />
+          <span className="pl-1">Exit Full Screen</span>
+        </>
+      ) : (
+        <>
+          <FaExpand className="text-xl" />
+          <span className="pl-1">Full Screen</span>
+        </>
+      )}
+    </button>
+
     <button
       className="flex items-center ml-0 p-0 m-0 text-white hover:bg-transparent hover:text-sky-400"
       onClick={() => navigate('/home')}
@@ -189,9 +244,7 @@ export default function TopMenubar() {
      {/* {JSON.stringify(printDeskInfo)} */}
 
           <div className="flex items-center gap-5 m-0 p-0">
-         
- 
-        
+             
           {selectedStore &&  <Store store={selectedStore}/>}
 <PrinterConnection status={messages.status} />
 
