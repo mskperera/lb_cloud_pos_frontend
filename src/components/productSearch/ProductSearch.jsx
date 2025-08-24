@@ -1,402 +1,152 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { debounce } from 'lodash';
 import { getProductsAllVariations } from '../../functions/register';
-import { useNavigate } from 'react-router-dom';
+import { useToast } from '../useToast';
+import AdvancedProductSearch from '../AdvancedProductSearch';
+import DialogModel from '../model/DialogModel';
 
 const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [barcodeMode, setBarcodeMode] = useState(false);
+  const [barcodeMode, setBarcodeMode] = useState(true);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const store = JSON.parse(localStorage.getItem('selectedStore'));
-  const navigate = useNavigate();
   const searchRef = useRef(null);
+  const showToast = useToast();
 
-  const fetchProducts = async (searchTerm, page, limit) => {
-    if (searchTerm.length < 2 && !barcodeMode) {
-      setSearchResults([]);
-      setShowResults(false);
+  const fetchProducts = async (searchTerm) => {
+    if (!store?.storeId) {
+      showToast("danger", "Error", "No store selected");
+      return;
+    }
+
+    if (!barcodeMode && searchTerm.length < 2) {
+      showToast("danger", "Error", "SKU must be at least 2 characters");
       return;
     }
 
     const filteredData = {
-      productId: null,
-      productNo: null,
-      productName: null,
-      sku: null,
+      sku: barcodeMode ? null : searchTerm,
       barcode: barcodeMode ? searchTerm : null,
-      allSearchableFields: barcodeMode ? null : searchTerm,
-      categoryId: null,
       storeId: store.storeId,
-      skip: page * limit,
-      limit: limit,
     };
 
-    setLoading(true);
-    setTimeout(async () => {
-      try {
-        const result = await getProductsAllVariations(filteredData, null);
-        setSearchResults(result.data.results[0] || []);
-        setShowResults(true);
-        setTotalRecords(result.data.outputValues.totalRows);
-      } catch (error) {
-        console.error('Error fetching search results:', error);
-        setSearchResults([]);
-        setShowResults(false);
-      } finally {
-        setLoading(false);
+    try {
+      const result = await getProductsAllVariations(filteredData, null);
+      const results = result.data.results[0] || [];
+      if (results.length > 0) {
+        if (barcodeMode) {
+          onBarcodeEnter({ sku: searchTerm, productName: searchTerm, unitPrice: 0 });
+        } else {
+          onProductSelect(results[0]);
+        }
+      } else {
+        showToast("danger", "Error", `No product found for ${barcodeMode ? 'barcode' : 'SKU'}: ${searchTerm}`);
       }
-    }, 0);
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      showToast("danger", "Error", `Failed to fetch product for ${barcodeMode ? 'barcode' : 'SKU'}: ${searchTerm}`);
+    }
   };
 
   const debouncedFetchProducts = useCallback(
-    debounce((searchTerm, page, limit) => {
-      fetchProducts(searchTerm, page, limit);
-    }, 1000),
-    [barcodeMode]
+    debounce((searchTerm) => {
+      fetchProducts(searchTerm);
+    }, 500),
+    [barcodeMode, store]
   );
-
-  useEffect(() => {
-    debouncedFetchProducts(searchTerm, currentPage, rowsPerPage);
-
-    return () => {
-      debouncedFetchProducts.cancel();
-    };
-  }, [searchTerm, currentPage, rowsPerPage, debouncedFetchProducts]);
 
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleProductClick = (product) => {
-    onProductSelect(product);
-    setShowResults(false);
-    setSearchTerm(product.sku);
-  };
-
-  const onPageChange = ({ page, rows }) => {
-    setCurrentPage(page);
-    setRowsPerPage(rows);
-  };
-
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      fetchProducts(searchTerm, currentPage, rowsPerPage);
+    if (e.key === 'Enter' && searchTerm) {
+      debouncedFetchProducts.cancel(); // Cancel any pending debounced calls
+      fetchProducts(searchTerm);
+      setSearchTerm(''); // Clear input after Enter
     }
   };
 
-  const toggleBarcodeMode = () => {
+  const handleClearSearch = () => {
+    setSearchTerm('');
+  };
+
+  const toggleSearchMode = () => {
     setBarcodeMode((prev) => !prev);
     setSearchTerm('');
   };
 
-  const handleClickOutside = (event) => {
-    if (searchRef.current && !searchRef.current.contains(event.target)) {
-      setShowResults(false);
-    }
-  };
-
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && (event.key === 'f' || event.key === 'F')) {
+        event.preventDefault();
+        setShowAdvancedSearch(true);
+      }
     };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
     <div ref={searchRef} className="relative w-full">
       <div className="flex items-center gap-3 w-full">
-        <div className="relative flex items-center w-full bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
-          <i className="pi pi-search text-gray-500 text-lg absolute left-3"></i>
+        <div className="relative flex items-center w-full bg-white border border-gray-200 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
+          <i className="pi pi-search text-gray-600 text-lg absolute left-3"></i>
           <input
             type="text"
-            className="w-full py-3 pl-10 pr-4 text-sm bg-transparent border-none focus:outline-none placeholder-gray-400"
-            placeholder={barcodeMode ? 'Scan Barcode' : 'SKU / Product Details'}
+            className="w-full py-3 pl-10 pr-10 text-base bg-transparent border-none focus:outline-none placeholder-gray-400"
+            placeholder={barcodeMode ? 'Scan Barcode' : 'Enter SKU'}
             value={searchTerm}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
           />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              setBarcodeMode(true);
-              setSearchTerm('');
-            }}
-            className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg border transition duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 ${
-              barcodeMode
-                ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <span className="pi pi-qrcode text-base"></span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setBarcodeMode(false);
-              setSearchTerm('');
-            }}
-            className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg border transition duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 ${
-              !barcodeMode
-                ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <span className="pi pi-search text-base"></span>
-          </button>
-        </div>
-      </div>
-
-      {showResults && (
-        <div className="absolute z-20 bg-white shadow-lg rounded-lg mt-2 w-full max-h-80 overflow-auto border border-gray-200">
-          {loading ? (
-            <div className="text-center text-gray-500 py-4 text-sm">Searching...</div>
-          ) : searchResults.length > 0 ? (
-            <table className="w-full border-collapse">
-              <thead className="sticky top-0 bg-gray-100 text-sm font-semibold text-gray-700 border-b border-gray-300">
-                <tr>
-                  <th className="px-4 py-3 text-left">SKU</th>
-                  <th className="px-4 py-3 text-left">Product Name</th>
-                  <th className="px-4 py-3 text-left">Unit Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {searchResults.map((product, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition duration-150"
-                    onClick={() => handleProductClick(product)}
-                  >
-                    <td className="px-4 py-3 text-sm text-gray-700">{product.sku}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{product.productName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{product.unitPrice}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="text-center text-gray-500 py-4 text-sm">Items not found</div>
+          {searchTerm && (
+            <button
+              className="absolute right-3 text-gray-500 hover:text-gray-700"
+              onClick={handleClearSearch}
+              aria-label="Clear search"
+            >
+              <i className="pi pi-times text-base"></i>
+            </button>
           )}
         </div>
+      
+        {/* <button
+          type="button"
+          onClick={toggleSearchMode}
+          className="flex items-center px-4 py-2 text-sm font-semibold rounded-lg border border-gray-200 shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+        >
+          <span className={`pi ${barcodeMode ? 'pi-qrcode' : 'pi-search'} text-base`}></span>
+          <span className="ml-2">{barcodeMode ? 'Barcode Mode' : 'SKU Search'}</span>
+        </button> */}
+        <button
+          type="button"
+          onClick={() => setShowAdvancedSearch(true)}
+          className="flex items-center px-4 py-2 text-sm  rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+        >
+          <span className="pi pi-filter text-base"></span>
+          <span className="ml-2">Item Lookup</span>
+        </button>
+      </div>
+      {showAdvancedSearch && (
+        <DialogModel
+          header="Advanced Product Search"
+          visible={showAdvancedSearch}
+          onHide={() => setShowAdvancedSearch(false)}
+        >
+          <AdvancedProductSearch
+            visible={showAdvancedSearch}
+            onHide={() => setShowAdvancedSearch(false)}
+            onProductSelect={(product) => {
+              onProductSelect(product);
+              setShowAdvancedSearch(false);
+            }}
+          />
+        </DialogModel>
       )}
     </div>
   );
 };
 
 export default ProductSearch;
-
-// import React, { useState, useEffect, useCallback, useRef } from 'react';
-// import { debounce } from 'lodash';
-// import { getProductsAllVariations } from '../../functions/register';
-// import { useNavigate } from 'react-router-dom';
-
-// const ProductSearch = ({ onProductSelect,onBarcodeEnter}) => {
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [searchResults, setSearchResults] = useState([]);
-//   const [showResults, setShowResults] = useState(false);
-//   const [currentPage, setCurrentPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(10);
-//   const [totalRecords, setTotalRecords] = useState(0);
-//   const [loading, setLoading] = useState(false);
-//   const [barcodeMode, setBarcodeMode] = useState(false);
-//   const store = JSON.parse(localStorage.getItem('selectedStore'));
-//   const navigate = useNavigate();
-//   const searchRef = useRef(null); // Reference for the search container
-
-//   const fetchProducts = async (searchTerm, page, limit) => {
-//     if (searchTerm.length < 2 && !barcodeMode) {
-//       setSearchResults([]);
-//       setShowResults(false);
-//       return;
-//     }
-
-//     const filteredData = {
-//       productId: null,
-//       productNo: null,
-//       productName: null,
-//       sku: null,
-//       barcode: barcodeMode ? searchTerm : null,
-//       allSearchableFields: barcodeMode ? null : searchTerm,
-//       categoryId: null,
-//       searchByKeyword: !barcodeMode,
-//       storeId: store.storeId,
-//       skip: page * limit,
-//       limit: limit,
-//     };
-
-//     setLoading(true);
-//     setTimeout(async () => {
-//       try {
-//         const result = await getProductsAllVariations(filteredData, null);
-//         setSearchResults(result.data.results[0] || []);
-//         setShowResults(true);
-//         setTotalRecords(result.data.outputValues.totalRows);
-//       } catch (error) {
-//         console.error('Error fetching search results:', error);
-//         setSearchResults([]);
-//         setShowResults(false);
-//       } finally {
-//         setLoading(false);
-//       }
-//     }, 0);
-//   };
-
-//   const debouncedFetchProducts = useCallback(
-//     debounce((searchTerm, page, limit) => {
-//       fetchProducts(searchTerm, page, limit);
-//     }, 1000),
-//     [barcodeMode]
-//   );
-
-//   useEffect(() => {
-//     debouncedFetchProducts(searchTerm, currentPage, rowsPerPage);
-
-//     return () => {
-//       debouncedFetchProducts.cancel();
-//     };
-//   }, [searchTerm, currentPage, rowsPerPage, debouncedFetchProducts]);
-
-//   const handleInputChange = (e) => {
-//     setSearchTerm(e.target.value);
-//   };
-
-
- 
-
-//   const handleProductClick = (product) => {
-//     onProductSelect(product);
-//     setShowResults(false);
-//     setSearchTerm(product.sku);
-//   };
-
-//   const onPageChange = ({ page, rows }) => {
-//     setCurrentPage(page);
-//     setRowsPerPage(rows);
-//   };
-
-//   const handleKeyDown = (e) => {
-//     if (e.key === 'Enter') {
-//       fetchProducts(searchTerm, currentPage, rowsPerPage);
-//     }
-//   };
-
-//   const toggleBarcodeMode = () => {
-//     setBarcodeMode((prev) => !prev);
-//     setSearchTerm('');
-//   };
-
-//   const handleClickOutside = (event) => {
-//     if (searchRef.current && !searchRef.current.contains(event.target)) {
-//       setShowResults(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     document.addEventListener('mousedown', handleClickOutside);
-//     return () => {
-//       document.removeEventListener('mousedown', handleClickOutside);
-//     };
-//   }, []);
-
-//   return (
-//     <div ref={searchRef} className="relative w-full m-0 p-0">
-//       <div className="flex gap-2 w-full">
-//         <div
-//           className="relative flex items-center border border-gray-200 rounded-lg focus-within:ring-2
-//         focus-within:ring-sky-500 focus-within:border-sky-500 m-0 p-0 w-full bg-white"
-//         >
-//           <i className="pi pi-search text-gray-500 text-lg absolute left-3"></i>
-//           <input
-//             type="text"
-//             style={{ margin: 0, marginLeft: '22px' }}
-//             className="w-full py-3 pl-10 pr-4 text-sm bg-white border-none rounded-lg focus:outline-none"
-//             placeholder={barcodeMode ? 'Scan Barcode' : 'SKU / Product Details'}
-//             value={searchTerm}
-//             onChange={handleInputChange}
-//             onKeyDown={handleKeyDown}
-//           />
-
-
-
-//         </div>
-
-//         <div
-//           className="flex gap-2 items-center "
-//         >
-// <button
-//   type="button"
-//   onClick={() => {
-//     setBarcodeMode(true);
-//     setSearchTerm('');
-//   }} // Set barcode mode directly
-//   className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all border focus:outline-none focus:ring
-//     ${barcodeMode ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
-// >
-//   <span className="pi pi-qrcode text-lg"></span>
-// </button>
-
-// <button
-//   type="button"
-//   onClick={() => {
-//     setBarcodeMode(false);
-//     setSearchTerm('');
-//   }} // Set SKU/product details mode directly
-//   className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all border focus:outline-none focus:ring
-//     ${!barcodeMode ? 'bg-sky-600 text-white border-sky-500 hover:bg-sky-600' : 'bg-white border-gray-300 hover:bg-gray-100'}`}
-// >
-//   <span className="pi pi-search text-lg"></span>
-// </button>
-
-
-
-// </div>
-
-//       </div>
-
-//       {showResults && (
-//       <div className="absolute z-20 bg-white shadow-md rounded-md left-0 right-0 mt-2 max-h-60 overflow-auto">
-//   {searchResults.length > 0 ? (
-//             <div className="table-container">
-//               <table className="table table-compact w-full">
-//                 <thead>
-//                   <tr>
-//                     <th>SKU</th>
-//                     <th>Product Name</th>
-//                     <th>Unit Price</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {searchResults.map((product, index) => (
-//                     <tr
-//                       key={index}
-//                       className="hover cursor-pointer"
-//                       onClick={() => handleProductClick(product)}
-//                     >
-//                       <td>{product.sku}</td>
-//                       <td>{product.productName}</td>
-//                       <td>{product.unitPrice}</td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
-//           ) : (
-//             <div className="text-center text-gray-500 py-4">Items not found</div>
-//           )}
-//           {loading && (
-//             <div className="text-center text-gray-500 py-4">Searching...</div>
-//           )}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default ProductSearch;

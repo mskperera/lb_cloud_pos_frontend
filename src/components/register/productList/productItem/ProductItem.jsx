@@ -13,7 +13,7 @@ const ProductItem = ({ p, handleProductClick }) => {
   return (
     <div
     className={`flex flex-col w-full items-center justify-between
-      rounded-lg cursor-pointer py-2 px-0 bg-white shadow-sm border border-[#dddddd]
+      rounded-lg cursor-pointer py-2 px-0 bg-white shadow-sm border 
       ${!!p.isStockTracked && (p.stockQty > 0 ? "hover:border-green-500" : "hover:border-red-500") }
       hover:shadow-xl transition duration-300 
        ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useToast } from "../useToast";
-import ConfirmDialog from "../dialog/ConfirmDialog";
 import { voidStockEntry } from "../../functions/stockEntry";
 import { getDrpdownStockEntryVoidingReason } from "../../functions/dropdowns";
-
 
 export default function StockEntryVoid({ visible, onClose, stockEntryId, onUpdateOrderList }) {
   const [value, setValue] = useState("");
@@ -11,7 +9,6 @@ export default function StockEntryVoid({ visible, onClose, stockEntryId, onUpdat
   const [selectedReasonId, setSelectedReasonId] = useState(null);
   const [voidingReasonOptions, setVoidingReasonOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
 
   const showToast = useToast();
 
@@ -33,49 +30,7 @@ export default function StockEntryVoid({ visible, onClose, stockEntryId, onUpdat
   }, [visible]);
 
   // Void order API call
-  const _voidStockEntry = async (stockEntryId, reasonId, remark) => {
-    try {
-    
-      const result = await voidStockEntry(stockEntryId, reasonId, remark);
-      return result;
-    } catch (err) {
-      console.error("Error in _voidStockEntry:", err);
-      throw err;
-    }
-  };
-
-  const voidAcceptHandler = async () => {
-    try {
-      const result = await _voidStockEntry(stockEntryId, selectedReasonId, value);
-      const { data } = result;
-
-      if (data.error) {
-        showToast("error", "Exception", data.error.message);
-      } else {
-        showToast("success", "Successful", data.outputValues.outputMessage);
-        onUpdateOrderList(stockEntryId);
-      }
-    } catch (err) {
-      showToast("error", "Exception", "Failed to void the stock entry.");
-    } finally {
-      setIsSubmitting(false);
-      setShowDialog(false);
-      onClose();
-    }
-  };
-
-  const voidCancelHandler = () => {
-    setShowDialog(false);
-    setIsSubmitting(false);
-    setSelectedReasonId(null);
-    setValue("");
-  };
-
-  const confirmVoid = () => {
-    setShowDialog(true);
-  };
-
-  const voidOrderHandler = async (e) => {
+  const voidStockEntryHandler = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -85,83 +40,91 @@ export default function StockEntryVoid({ visible, onClose, stockEntryId, onUpdat
       return;
     }
 
-    confirmVoid();
+    try {
+      const result = await voidStockEntry(stockEntryId, selectedReasonId, value);
+      const { data } = result;
+
+      if (data.error) {
+        showToast("error", "Exception", data.error.message);
+      } else {
+        showToast("success", "Successful", data.outputValues.outputMessage);
+        onUpdateOrderList(stockEntryId);
+        onClose();
+      }
+    } catch (err) {
+      console.error("Error in voidStockEntry:", err);
+      showToast("error", "Exception", "Failed to void the stock entry.");
+    } finally {
+      setIsSubmitting(false);
+      setSelectedReasonId(null);
+      setValue("");
+    }
   };
 
   return (
     visible && (
       <div className="fixed inset-0 flex items-center justify-center z-50">
-        {showDialog && (
-          <ConfirmDialog
-            isVisible={true}
-            message="Are you sure you want to void this stock entry?"
-            onConfirm={voidAcceptHandler}
-            onCancel={voidCancelHandler}
-            title="Confirm Void"
-            severity="danger"
-          />
-        )}
-        <div className="modal modal-open">
-          <div className="modal-box relative">
-            <h3 className="text-lg font-bold">Void Stock Entry</h3>
-            <form onSubmit={voidOrderHandler}>
-              <div className="form-control mb-4">
-                <label htmlFor="void-reason" className="label">
-                  Why do you want to void this stock entry?
-                </label>
-                <select
-                  id="void-reason"
-                  className="select select-bordered w-full"
-                  value={selectedReasonId || ""}
-                  onChange={(e) => {
-                    const selectedId = e.target.value;
-                    setSelectedReasonId(selectedId);
-                    setIsShowRemark(selectedId !== "1"); // Show remark if not "None"
-                  }}
-                >
-                  <option value="" disabled>
-                    Select the reason
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40" ></div>
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative z-50">
+          <h3 className="text-lg font-bold text-gray-700">Void Stock Entry</h3>
+          <form onSubmit={voidStockEntryHandler}>
+            <div className="flex flex-col gap-2 mb-4">
+              <label htmlFor="void-reason" className="text-sm font-medium text-gray-700">
+                Why do you want to void this stock entry?
+              </label>
+              <select
+                id="void-reason"
+                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                value={selectedReasonId || ""}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  setSelectedReasonId(selectedId);
+                  setIsShowRemark(selectedId !== "1");
+                }}
+              >
+                <option value="" disabled>
+                  Select the reason
+                </option>
+                {voidingReasonOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.displayName}
                   </option>
-                  {voidingReasonOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.displayName}
-                    </option>
-                  ))}
-                </select>
+                ))}
+              </select>
+            </div>
+            {isShowRemark && (
+              <div className="flex flex-col gap-2 mb-4">
+                <label htmlFor="remark" className="text-sm font-medium text-gray-700">
+                  Enter additional details
+                </label>
+                <textarea
+                  id="remark"
+                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                  placeholder="Enter remarks (if required)"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  rows={5}
+                ></textarea>
               </div>
-              {isShowRemark && (
-                <div className="form-control mb-4">
-                  <label htmlFor="remark" className="label">Enter additional details</label>
-                  <textarea
-                    id="remark"
-                    className="textarea textarea-bordered w-full"
-                    placeholder="Enter remarks (if required)"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    rows={5}
-                  ></textarea>
-                </div>
-              )}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={onClose}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Processing..." : "Void Entry"}
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="modal-backdrop" onClick={onClose}></div>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Processing..." : "Void Entry"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     )

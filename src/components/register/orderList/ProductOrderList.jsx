@@ -5,8 +5,8 @@ import {
   removeOrder,
   increaseQty,
 } from "../../../state/orderList/orderListSlice";
-import { DISCOUNT_TYPES,CURRENCY_DISPLAY_TYPE } from "../../../utils/constants";
-import {getCurrency} from '../../../utils/format';
+import { DISCOUNT_TYPES, CURRENCY_DISPLAY_TYPE } from "../../../utils/constants";
+import { getCurrency } from '../../../utils/format';
 import GhostButton from "../../iconButtons/GhostButton";
 import './productOrderList.css';
 
@@ -29,14 +29,14 @@ export default function ProductOrderList({ showDiscountPopup }) {
         onClick={() => showDiscountPopup(product.orderListId)}
         iconClass="pi pi-percentage"
         color="text-sky-500"
-        hoverClass="hover:text-sky-700 hover:bg-transparent"
+        hoverClass="hover:text-sky-700 hover:bg-gray-100"
         aria-label="Discount"
       />
       <GhostButton
         onClick={() => dispatch(removeOrder({ orderListId: product.orderListId }))}
         iconClass="pi pi-trash"
         color="text-red-500"
-        hoverClass="hover:text-red-700 hover:bg-transparent"
+        hoverClass="hover:text-red-600 hover:bg-gray-100"
         aria-label="Remove item"
       />
     </div>
@@ -61,63 +61,61 @@ export default function ProductOrderList({ showDiscountPopup }) {
           type="number"
           value={product.qty}
           onChange={handleChangeQty}
-          className="input input-bordered text-center w-20 rounded-md "
+          className="w-20 py-2 px-3 text-center text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
           step="1"
-          inputMode="decimal" // Suggests decimal input to mobile keyboards
+          inputMode="decimal"
         />
-        <span className="text-sm text-gray-500">{product.measurementUnitName}</span>
+        <span className="text-sm text-gray-600">{product.measurementUnitName}</span>
       </div>
     );
   };
 
   const netAmount = (product) => (
-    <div className="text-right text-sm font-medium text-gray-700">
+    <div className="text-right text-md font-medium text-gray-800">
       {product.netAmount.toFixed(2)}
     </div>
   );
 
   const descriptionBodyTemplate = (product) => (
     <div className="flex flex-col gap-1">
-      <span className="text-gray-600 text-sm ">{product.sku}</span>
-      <span className="text-gray-800">{product.description}</span>
+      <span className="text-sm text-gray-600">{product.sku}</span>
+      <span className="text-base font-medium text-gray-800">{product.description}</span>
     </div>
   );
 
-  const handleCancelDiscount = (orderListId) => {
-    dispatch(cancelDiscount({ orderListId }));
+  const handleCancelDiscount = (product) => {
+    dispatch(cancelDiscount({ orderListId: product.orderListId }));
   };
 
   return (
-    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="orderList">
-      <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
-        <thead className="bg-white sticky top-0 z-10 border-b">
-          <tr className="">
-            <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
+    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+    <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
+        <thead className="bg-white sticky top-0 z-10 border-b border-gray-200">
+          <tr className="text-gray-700">
+      <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
             <th className="py-3 px-4 text-center">Qty</th>
             <th className="py-3 px-4 text-right">Amount</th>
             <th className="py-3 px-4 text-right"></th>
           </tr>
         </thead>
-        <tbody className={`${products.length !== 0 ? 'bg-white': ''}  `}>
+        <tbody className="bg-white">
           {products.length === 0 ? (
             <tr>
-               <td colSpan="4" className="py-4 text-center pt-24 text-gray-500">
+              <td colSpan="4" className="py-8 text-center text-gray-500 text-base">
                 No products added to the order list.
               </td>
             </tr>
           ) : (
             products.map((product) => (
               <React.Fragment key={product.orderListId}>
-                <tr
-                  className={`${product?.discount ? "bg-gray-100" : ""} border-b last:border-none`}
-                >
-                  <td className="py-3 px-4">{descriptionBodyTemplate(product)}</td>
-                  <td className="py-3 px-4 text-center">{qty(product)}</td>
-                  <td className="py-3 px-4">{netAmount(product)}</td>
-                  <td className="py-3 px-4 text-right">{orderListItemMenu(product)}</td>
+                <tr className={`${product?.discount ? "bg-teal-50" : "bg-white"} border-b border-gray-200 hover:bg-gray-50 transition duration-150`}>
+                  <td className="py-4 px-4">{descriptionBodyTemplate(product)}</td>
+                  <td className="py-4 px-4 text-center">{qty(product)}</td>
+                  <td className="py-4 px-4">{netAmount(product)}</td>
+                  <td className="py-4 px-4">{orderListItemMenu(product)}</td>
                 </tr>
                 {product?.discount && (
-                  <tr className="bg-gray-50 text-sm text-gray-600 border-b last:border-none">
+                  <tr className="bg-teal-100 text-gray-700 border-b border-gray-200">
                     <td colSpan={3} className="py-2 px-4">
                       {`Discount: ${product.discount.discountValue} ${
                         product.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE
@@ -127,8 +125,8 @@ export default function ProductOrderList({ showDiscountPopup }) {
                     </td>
                     <td className="py-2 px-4 text-right">
                       <button
-                        className="text-red-400 hover:text-red-500"
-                        onClick={() => handleCancelDiscount(product.orderListId)}
+                        className="text-red-500 hover:text-red-600 hover:bg-gray-100 p-2 rounded-full transition duration-200"
+                        onClick={() => handleCancelDiscount(product)}
                         aria-label="Cancel Discount"
                       >
                         <i className="pi pi-times text-sm"></i>

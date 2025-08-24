@@ -201,7 +201,7 @@ const StockEntry = () => {
                 <button
                   type="button"
                   className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-sky-600 transition duration-200"
-                  onClick={() => navigate("/stockEntryList")}
+                  onClick={() => navigate("/inventory/stockentry/list")}
                 >
                   <i className="pi pi-book text-lg"></i>
                   <span>View Stock Entries</span>
@@ -275,9 +275,9 @@ const StockEntry = () => {
                 />
                 <div className="sm:col-span-2">
                   <InputField
-                    label="Product Name"
+                    label="Product Description"
                     isReadOnly={true}
-                    value={stockEntry.productName}
+                    value={stockEntry.productDescription}
                     className="w-full px-3 py-2 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg"
                   />
                 </div>
@@ -360,9 +360,10 @@ const StockEntry = () => {
                 <table className="w-full border-collapse">
                   <thead className="sticky top-0 bg-gray-100 text-sm font-semibold text-gray-700 border-b border-gray-300">
                     <tr>
+                                         <th className="px-4 py-3 text-left">SKU</th>
                       <th className="px-4 py-3 text-left">Product Name</th>
                       <th className="px-4 py-3 text-left">Product Type</th>
-                      <th className="px-4 py-3 text-left">SKU</th>
+   
                       <th className="px-4 py-3 text-left">Qty</th>
                       <th className="px-4 py-3 text-left">Production & Expiration Date</th>
                       <th className="px-4 py-3 text-left">Unit Cost</th>
@@ -377,9 +378,10 @@ const StockEntry = () => {
                         key={index}
                         className="border-b border-gray-200 hover:bg-gray-50 text-sm text-gray-700"
                       >
-                        <td className="px-4 py-3">{item.productName}</td>
+                               <td className="px-4 py-3">{item.sku}</td>
+                        <td className="px-4 py-3">{item.productDescription}</td>
                         <td className="px-4 py-3">{item.productTypeName}</td>
-                        <td className="px-4 py-3">{item.sku}</td>
+                 
                         <td className="px-4 py-3">{item.qty} {item.measurementUnitName}</td>
                         <td className="px-4 py-3">{item.productionDate} - {item.expirationDate}</td>
                         <td className="px-4 py-3">{item.unitCost}</td>

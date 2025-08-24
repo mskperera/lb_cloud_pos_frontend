@@ -46,7 +46,8 @@ function PaymentConfirm({orderId,setIsPaymentConfirmShow,openBy}) {
     console.log('oooo', od);
     const orderDetals = [];
     od.map(o => {
-      const descr = `${o.sku} | ${o.productName}`;
+      const sku=o.sku ? `${o.sku}`:'';
+
       const netAmount = parseFloat(o.netAmount) || 0;
       const qty = parseFloat(o.qty) || 0;
       const measurementUnitName = o.measurementUnitName;
@@ -54,8 +55,9 @@ function PaymentConfirm({orderId,setIsPaymentConfirmShow,openBy}) {
         o,
         line: o.orderDetailId,
         unitPrice: o.unitPrice,
-        description: descr,
-        productName: descr,
+        sku:sku,
+        productDescription: o.productDescription,
+        productName: o.productName,
         qty: qty,
         netAmount: netAmount,
         measurementUnitName,

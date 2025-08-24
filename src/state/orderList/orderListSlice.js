@@ -26,6 +26,8 @@ const initialState = {
         remainingPaymentAmount:0,
         cashBalanceException:'',
         isRecevedAmountTouched:false,
+        amountReceivedCash:'',
+        amountReceivedCard:''
     },
     isMultiPayment:null,
     paymentList:[],
@@ -64,12 +66,16 @@ const orderListSlice = createSlice({
             shortfall: 0,
             remainingPaymentAmount: 0,
             cashBalanceException: '',
-            isRecevedAmountTouched: false
+            isRecevedAmountTouched: false,
+               amountReceivedCash:'',
+        amountReceivedCard:''
         };
         state.isMultiPayment = null;
         state.paymentList = [];
         state.customer = null;
-    },    
+
+    },   
+
         increaseQty: (state, action) => {
             const { orderListId, increment } = action.payload;
             const order = state.list.find(order => order.orderListId === orderListId);
@@ -495,16 +501,20 @@ const orderListSlice = createSlice({
             let errorMessage = "";
             let balanceAmount = new Decimal(0); 
             console.log(' receivedAmountCash reduceer',receivedAmountCash.toNumber())
-
+          
+            state.orderSummary.amountReceivedCash=receivedAmountCash;
+            state.orderSummary.amountReceivedCard=receivedAmountCard;
         
             if (receivedAmountCard.plus(receivedAmountCash).lessThan(grandTotal)) {
                 const shortfall = grandTotal.minus(receivedAmountCard.plus(receivedAmountCash));
                 state.orderSummary.shortfall=shortfall.toNumber();
+     
                 errorMessage = `Insufficient payment. An additional [currency] ${shortfall} is needed`;
                 state.orderSummary.cashBalance = 0;
             } else if (receivedAmountCard.greaterThan(grandTotal)) {
                 state.orderSummary.cashBalance = 0;
                 state.orderSummary.shortfall='';
+        
                 errorMessage = 'Overpayment. Card payment exceeds the total amount.'+'grnd:'+ grandTotal.toNumber()+', rec Am:'+receivedAmountCard.toNumber();
             } else if (receivedAmountCash.greaterThan(grandTotal.minus(receivedAmountCard))) {
                 console.log('calculae blance reduceer',balanceAmount.toNumber())
