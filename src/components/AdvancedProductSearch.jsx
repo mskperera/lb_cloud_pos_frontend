@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { validate } from "../utils/formValidation";
 import { formatCurrency } from "../utils/format";
 import { getProducts } from "../functions/register";
 import { getDropdownMeasurementUnit, getDrpdownCategory, getStoresDrp } from "../functions/dropdowns";
-import DialogModel from "./model/DialogModel";
 import DaisyUIPaginator from './DaisyUIPaginator';
 import { useToast } from "./useToast";
 
-const AdvancedProductSearch = ({ visible, onHide, onProductSelect }) => {
+const AdvancedProductSearch = ({ visible, onHide, onProductSelect,showOnlyProductItems }) => {
   const [products, setProducts] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState(false);
-  const navigate = useNavigate();
   const showToast = useToast();
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [selectedMeasurementUnitId, setSelectedMeasurementUnitId] = useState(-1);
@@ -119,6 +116,7 @@ if(visible){
         barcode: selectedFilterBy.value === 3 ? normalizedSearchValue : null,
         categoryId: selectedCategoryId === -1 ? null : selectedCategoryId,
         measurementUnitId: selectedMeasurementUnitId === -1 ? null : selectedMeasurementUnitId,
+        isProductItem:showOnlyProductItems,
         storeId: selectedStoreId,
         productTypeIds: productTypeIds.length > 0 ? productTypeIds : null,
         searchByKeyword: false,

@@ -261,7 +261,7 @@ const StockEntry = () => {
 
             {/* Product Search */}
             <div className="bg-white rounded-xl border  p-6">
-              <ProductSearch onProductSelect={handleProductClick} />
+              <ProductSearch onProductSelect={handleProductClick} showOnlyProductItems={true} />
             </div>
 
             {/* Selected Product Details */}
