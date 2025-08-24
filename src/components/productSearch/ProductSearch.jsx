@@ -5,7 +5,7 @@ import { useToast } from '../useToast';
 import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
+const ProductSearch = ({ onProductSelect, onBarcodeEnter,showOnlyProductItems }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -142,6 +142,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
               onProductSelect(product);
               setShowAdvancedSearch(false);
             }}
+            showOnlyProductItems={showOnlyProductItems}
           />
         </DialogModel>
       )}
