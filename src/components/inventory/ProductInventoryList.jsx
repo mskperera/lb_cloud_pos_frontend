@@ -271,7 +271,7 @@ export default function ProductInventoryList({}) {
 
   const [selectedFilterBy, setSelectedFilterBy] = useState({
     label: "Filter by",
-    value: 1,
+    value: 7,
     isTouched: false,
     isValid: false,
     rules: { required: false, dataType: "integer" },
@@ -304,6 +304,7 @@ export default function ProductInventoryList({}) {
         sku:selectedFilterBy.value === 6 ? searchValue.value : null,
         productNo: selectedFilterBy.value === 1 ? searchValue.value : null,
         productName: selectedFilterBy.value === 2 ? searchValue.value : null,
+            productDescription: selectedFilterBy.value === 7 ? searchValue.value : null,
         barcode: selectedFilterBy.value === 3 ? searchValue.value : null,
         categoryId: selectedCategoryId,
         measurementUnitId: selectedMeasurementUnitId,
@@ -367,6 +368,7 @@ export default function ProductInventoryList({}) {
   const [filterByOptions, setFilterByOptions] = useState([
     { id: 1, displayName: "Product No" },
     { id: 2, displayName: "Product Name" },
+      { id: 7, displayName: "Product Description" },
     { id: 3, displayName: "Barcode" },
     { id: 4, displayName: "Category" },
     { id: 5, displayName: "Measurement Unit" },
@@ -813,7 +815,7 @@ export default function ProductInventoryList({}) {
                 ))}
               </select>
             </div>
-            {[1, 2, 3, 6].includes(selectedFilterBy.value) && (
+            {[1, 2, 3, 6,7].includes(selectedFilterBy.value) && (
               <div className="flex flex-col w-full md:w-1/3">
                 <label className="text-sm font-medium text-gray-700 mb-2">Search Value</label>
                 <div className="flex gap-2">

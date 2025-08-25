@@ -519,7 +519,9 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     }
     setVariations((prevIngredients) =>
       prevIngredients.map((ingredient) => {
-        const existingVariationType = ingredient.variationDetails.find(
+
+        console.log('variation details set variation ',ingredient.variationDetails);
+        const existingVariationType = ingredient.variationDetails?.find(
           (detail) => detail.variationTypeId === variationType.value
         );
         if (existingVariationType) {
@@ -761,7 +763,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
           {/* Category Section */}
           <div className="p-4">
             <h3 className="text-lg font-semibold text-gray-700 mb-4">Categories</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="flex flex-col">
                 <label className=" font-medium text-gray-700 mb-1">{productCategory.label}</label>
                 <div className="flex gap-2">
@@ -806,9 +808,23 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                     })}
                 </div>
               </div>
+
+ <div className="">
+{productType.value != "3" &&  <InputField
+                  label={reorderLevel.label}
+                  value={reorderLevel.value}
+                  isDisabled={reorderLevel.isDisabled}
+                  onChange={(e) => handleInputChange(setReorderLevel, reorderLevel, e.target.value)}
+                  validationMessages={validationMessages(reorderLevel)}
+                  placeholder="Enter Reorder Level"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500"
+                />
+}
             </div>
           </div>
+</div>
 
+  
           {/* Product Details Section (for Product Type 1 and 3) */}
           {(productType.value == "1" || productType.value == "3") && (
             <div className="bg-gray-50 p-4 rounded-md shadow-sm">
@@ -866,15 +882,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                   placeholder="Enter Tax Rate (%)"
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500"
                 />
-                <InputField
-                  label={reorderLevel.label}
-                  value={reorderLevel.value}
-                  isDisabled={reorderLevel.isDisabled}
-                  onChange={(e) => handleInputChange(setReorderLevel, reorderLevel, e.target.value)}
-                  validationMessages={validationMessages(reorderLevel)}
-                  placeholder="Enter Reorder Level"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500"
-                />
+            
               </div>
             </div>
           )}
