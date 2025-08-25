@@ -237,7 +237,7 @@ return (
 
         {/* Button */}
         <button
-          className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="w-full px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition"
           onClick={dayStartHandler}
           disabled={isLoading}
         >
