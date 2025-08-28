@@ -88,9 +88,9 @@ export default function ProductOrderList({ showDiscountPopup }) {
   };
 
   return (
-    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="bg-[#f0faff] rounded-lg shadow-md border border-gray-200 overflow-hidden">
     <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
-        <thead className="bg-white sticky top-0 z-10 border-b border-gray-200">
+        <thead className="bg-[#f0faff] sticky top-0 z-10 border-b border-gray-200">
           <tr className="text-gray-700">
       <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
             <th className="py-3 px-4 text-center">Qty</th>
@@ -98,7 +98,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
             <th className="py-3 px-4 text-right"></th>
           </tr>
         </thead>
-        <tbody className="bg-white">
+        <tbody className="bg-[#f0faff]">
           {products.length === 0 ? (
             <tr>
               <td colSpan="4" className="py-8 text-center text-gray-500 text-base">

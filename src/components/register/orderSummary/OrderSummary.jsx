@@ -19,7 +19,7 @@ const OrderSummary = ({ totalItems }) => {
   }, [orderList]);
 
   return (  
-    <div className="px-6 py-4 bg-white rounded-lg shadow-sm border ">
+    <div className="px-6 py-4 bg-[#f0faff] rounded-lg shadow-sm border ">
       <div className="flex flex-col md:flex-row justify-between gap-6">
         <div className="flex flex-col w-full gap-3">
           <div className="flex justify-between items-center">

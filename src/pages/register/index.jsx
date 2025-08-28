@@ -3,7 +3,7 @@ import Rightsidebar from "../../components/LeftSidebar";
 import { useEffect, useState } from "react";
 import ProductList from "../../components/register/productList/ProductList";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import Payment from "../../components/register/payment/Payment";
 import {
   addReturnedProduct,
@@ -13,14 +13,12 @@ import DialogModel from "../../components/model/DialogModel";
 import ReturnOrder from "../../components/returnOrder/ReturnOrderComp";
 import HOCSession from "../../hocComponents/WrapperSession";
 import OrderListAll from "../../components/orderListAll/OrderListAll";
-import TopbarRegister from "./TopbarRegister";
 
 const Register = () => {
   const navigate = useNavigate();
   let { terminalId } = useParams();
 
   const dispatch = useDispatch();
-  const { voidOrderVisible } = useSelector((state) => state.popup);
 
 
   useEffect(()=>{

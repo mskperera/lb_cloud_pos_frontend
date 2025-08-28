@@ -14,8 +14,9 @@ import DropdownField from "../inputField/DropdownField";
 import { useToast } from "../useToast";
 import ConfirmDialog from "../dialog/ConfirmDialog";
 import InventoryTransactionHistory from "./InventoryTransactionHistory";
+import { getProductDetailsByInventoryId } from "../../functions/register";
 
-const StockAdjustmentList = ({ inventoryId, product }) => {
+const StockAdjustmentList = ({ inventoryId }) => {
   const [loading, setLoading] = useState(true);
   const [stockInfo, setStockInfo] = useState([]);
   const [showAdjustmentPanel, setShowAdjustmentPanel] = useState(false);
@@ -35,12 +36,21 @@ const StockAdjustmentList = ({ inventoryId, product }) => {
   const [changeReason, setChangeReason] = useState("");
   const [showPriceChangePanel, setShowPriceChangePanel] = useState(false);
   const [showZeroStockQtyData, setShowZeroStockQtyData] = useState(false);  // State for checkbox toggle
-   
+     const [product, setProduct] = useState(null);
+  
   const showToast = useToast();
 
   useEffect(() => {
     loadDrpAdjustmentReasons();
+    loadDrpVariationTypes();
   }, [adjustmentType]);
+
+
+  
+    const loadDrpVariationTypes = async () => {
+      const result = await getProductDetailsByInventoryId(inventoryId);
+      setProduct(result.data);
+    };
 
   const loadDrpAdjustmentReasons = async () => {
     const adustmentTypeId = adjustmentType === "add" ? 1 : 2;
@@ -509,7 +519,7 @@ const [stockBatchInfoToRelaseConfirm, setStockBatchInfoToRelaseConfirm] = useSta
   };
 
   const ProductInfo = ({ product }) => {
-    const { productName, measurementUnitName, sku, productNo, qty } = product;
+    const { productName,sku} = product;
 
     return (
       <div className="p-4 ">
@@ -518,20 +528,12 @@ const [stockBatchInfoToRelaseConfirm, setStockBatchInfoToRelaseConfirm] = useSta
             <span className="font-bold mb-2">Product Name</span>
             <span className="text-gray-800">{productName}</span>
           </div>
-          <div className="flex flex-col justify-between items-start">
-            <span className="font-bold mb-2">Stock Qty</span>
-            <span className="text-gray-800">
-              {qty} {measurementUnitName}
-            </span>
-          </div>
+     
           <div className="flex flex-col justify-between items-start">
             <span className="font-bold mb-2">SKU</span>
             <span className="text-gray-800">{sku}</span>
           </div>
-          <div className="flex flex-col justify-between items-start">
-            <span className="font-bold mb-2">Product No</span>
-            <span className="text-gray-800">{productNo}</span>
-          </div>
+      
         </div>
       </div>
     );
@@ -650,7 +652,7 @@ const [stockBatchInfoToRelaseConfirm, setStockBatchInfoToRelaseConfirm] = useSta
                 severity={stockBatchInfoToRelaseConfirm.isStopRelease ? "warning" : "info"}
               />
             )}
-      <ProductInfo product={product} />
+     {product && <ProductInfo product={product} />}
       {renderStockInfo()}
       {renderAdjustmentPanel()}
       {renderPriceChangePanel()}

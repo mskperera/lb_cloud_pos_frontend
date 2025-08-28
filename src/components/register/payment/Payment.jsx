@@ -223,7 +223,17 @@ const Payment = ({showPaymentConfirm,setOrderId,handlePaymentClose}) => {
       showToast("danger", "Exception", error.message);
       return;
     }
-    const { orderId, outputMessage, responseStatus } = res.data.outputValues;
+
+       const { orderId, outputMessage, responseStatus } = res.data.outputValues;
+
+ if (responseStatus==="failed") {
+      setIsSubmitting(false);
+      showToast("warning", "Exception", outputMessage);
+      return;
+    }
+
+
+ 
     console.log("addOrder", orderId);
     dispatch(clearOrderList({}));
 
