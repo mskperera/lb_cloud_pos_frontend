@@ -50,7 +50,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
       {/* Rows per Page Dropdown */}
       {rowsPerPageOptions.length > 0 && (
         <div className="flex items-center space-x-3">
-          <span className="text-sm font-medium text-gray-700">Items</span>
+          <span className="text-sm font-medium text-gray-700"></span>
           <select
             value={rowsPerPage}
             onChange={handleRowsPerPageChange}

@@ -12,12 +12,16 @@ const ProductItem = ({ p, handleProductClick }) => {
 
   return (
     <div
-    className={`flex flex-col w-full items-center justify-between
-      rounded-lg cursor-pointer py-2 px-0 bg-white shadow-sm border 
-      ${!!p.isStockTracked && (p.stockQty > 0 ? "hover:border-green-500" : "hover:border-red-500") }
-      hover:shadow-xl transition duration-300 
-       ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}
+  className={`
+        flex flex-col w-full items-center justify-between
+        rounded-lg cursor-pointer py-2 px-0 bg-[#f0faff] shadow-sm border
+         hover:border-[#0dadff]
+        hover:shadow-xl transition duration-300
+        ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
+        active:scale-95 active:shadow-inner active:border-gray-400
+      `}
       onClick={() => !isDisabled && handleProductClick(p)} // Prevent click if disabled
+    
   >
       <div className="flex items-center gap-3">
         {hasImage && (

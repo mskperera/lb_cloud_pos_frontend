@@ -91,7 +91,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter,showOnlyProductItems })
   return (
     <div ref={searchRef} className="relative w-full">
       <div className="flex items-center gap-3 w-full">
-        <div className="relative flex items-center w-full bg-white border border-gray-200 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
+        <div className="relative flex items-center w-full bg-[#f0faff] border border-gray-200 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
           <i className="pi pi-search text-gray-600 text-lg absolute left-3"></i>
           <input
             type="text"

@@ -94,6 +94,32 @@ export const getProducts = async (data) => {
   }
 };
 
+
+export const getProductDetailsByInventoryId = async (inventoryId) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .get(`/product/productDetailsByInventoryId?inventoryId=${inventoryId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
 export const getProductsPosMenu = async (data) => {
   try {
     const tenantId = getTenantId();

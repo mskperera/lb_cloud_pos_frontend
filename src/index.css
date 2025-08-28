@@ -10,8 +10,8 @@
 @tailwind utilities; 
 
 html, body,:root {
-background-color: #fbfcff;
- /* #bae6fd */
+background-color: #b1cfe3;
+ /* #bae6fd fbfcff */
     /* @apply bg-slate-500; */
     /* @apply bg-[#f8fafc]; */
 

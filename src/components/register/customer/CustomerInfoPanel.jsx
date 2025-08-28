@@ -68,7 +68,7 @@ const Customer = () => {
       </DialogModel>
 
   
-      <div className="flex justify-between items-center gap-4 px-4 py-3 bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="flex justify-between items-center gap-4 px-4 py-3 bg-[#f0faff] rounded-lg shadow-sm border border-gray-200">
         <div className="flex gap-4 items-center">
           {imageUrl ? (
             <img
