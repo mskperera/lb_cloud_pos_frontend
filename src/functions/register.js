@@ -212,6 +212,30 @@ export const getProductExtraDetails = async (productId) => {
   }
 };
 
+
+export const getSubProductList = async (allProductId) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .get(`/product/sub-products?allProductId=${allProductId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
 export const getProductAvailaleStores = async (payload) => {
   try {
     const tenantId = getTenantId();

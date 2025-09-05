@@ -14,15 +14,16 @@ const ProductItem = ({ p, handleProductClick }) => {
     <div
   className={`
         flex flex-col w-full items-center justify-between
-        rounded-lg cursor-pointer py-2 px-0 bg-[#f0faff] shadow-sm border
-         hover:border-[#0dadff]
-        hover:shadow-xl transition duration-300
+        rounded-lg cursor-pointer py-2 px-0 shadow-sm border
+      ${p.isProductItem ? 'bg-[#f0faff] hover:border-[#0dadff]':'bg-[#ffff9f] hover:border-[#d9ff32]'} 
+        hover:shadow-xl transition duration-300 
         ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
         active:scale-95 active:shadow-inner active:border-gray-400
       `}
       onClick={() => !isDisabled && handleProductClick(p)} // Prevent click if disabled
     
   >
+  
       <div className="flex items-center gap-3">
         {hasImage && (
           <img
@@ -33,25 +34,25 @@ const ProductItem = ({ p, handleProductClick }) => {
         )}
         <div className="flex flex-col">
           <p className={`text-sm ${stockClass} mb-1`}>
-            {stockText}
+            {p.productTypeId != 2 && stockText}
           </p>
-          <p className="text-sm text-gray-600 font-medium">
+            {p.productTypeId != 2 &&   <p className="text-sm text-gray-600 font-medium">
            {formatCurrency(p.unitPrice,true)}
-          </p>
+          </p>}
         </div>
       </div>
       <div className="text-[1rem] font-semibold text-gray-800 truncate group-hover:overflow-visible group-hover:text-ellipsis group-hover:whitespace-normal">
         {p.productName}
       </div>
-      {p.producttypeId != 2 && <p className="text-sm text-gray-600">SKU: {p.sku}</p>}
-
+      {p.productTypeId != 2 && <p className="text-sm text-gray-600">SKU: {p.sku}</p>}
+{/* {JSON.stringify(p)} */}
 
       {/* Display message for new stock if available */}
-      {!!p.isStockTracked && isNewStock ? (
+      {/* {!!p.isStockTracked && isNewStock ? (
         <p className="text-sm text-yellow-600 mt-2">
           New unreleased stock available!
         </p>
-      ):''}
+      ):''} */}
       
     </div>
   );

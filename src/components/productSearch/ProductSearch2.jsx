@@ -5,7 +5,7 @@ import { useToast } from '../useToast';
 import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems }) => {
+const ProductSearch2 = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -118,7 +118,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems }
           className="flex items-center px-4 py-2 text-sm rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
         >
           <span className="pi pi-filter text-base"></span>
-          <span className="ml-2">Item Lookup</span>
+          <span className="ml-2">Select Item</span>
         </button>
       </div>
 
@@ -144,4 +144,4 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems }
   );
 };
 
-export default ProductSearch;
+export default ProductSearch2;
