@@ -174,7 +174,7 @@ const ReceiptComponent = ({
                 </div>
                 <div>
                 <span>
-                  Change: {currency} {parseFloat(p.balanceAmount)}
+                  Balance: {currency} {parseFloat(p.balanceAmount)}
                 </span>
                 </div>
               </div>
