@@ -250,7 +250,8 @@ console.log('products',p);
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
     const v = JSON.parse(p.variationValues)
-      .map((v) => `${v.variationTypeName}: ${v.variationValue}`)
+      // .map((v) => `${v.variationTypeName}: ${v.variationValue}`)
+        .map((v) => ` ${v.variationValue}`)
       .join(" | ");
     const order = {
       productNo: selectedProduct.productNo,
