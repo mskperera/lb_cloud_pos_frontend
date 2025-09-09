@@ -541,11 +541,19 @@ export default function ProductInventoryList({}) {
     try {
       setProductIdToDelete("");
       const result = await deleteProduct(allProductId, true);
+
+      console.log('mmmmmm',result)
       const { data } = result;
       if (data.error) {
         showToast("danger", "Exception", data.error.message);
         return;
       }
+
+      const { outputMessage, responseStatus } = result.data.outputValues;
+        if (responseStatus === "failed") {
+          showToast("danger", "Exception", outputMessage);
+        } 
+
       setProducts(products.filter((p) => p.allProductId !== allProductId));
       setTotalRecords(totalRecords - 1);
       showToast("success", "Successful", data.outputValues.outputMessage);

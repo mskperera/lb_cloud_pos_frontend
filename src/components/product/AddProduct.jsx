@@ -570,35 +570,73 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     setVariations((prevVariations) => [...prevVariations, newVariation]);
   };
 
+  // const handleAddVariation = () => {
+  //   if (!variationType.value) {
+  //     alert("Please select a valid variation type");
+  //     return;
+  //   }
+  //   setVariations((prevIngredients) =>
+  //     prevIngredients.map((ingredient) => {
+  //       const existingVariationType = ingredient.variationDetails?.find(
+  //         (detail) => detail.variationTypeId === variationType.value
+  //       );
+  //       if (existingVariationType) {
+  //         return ingredient;
+  //       }
+  //       return {
+  //         ...ingredient,
+  //         variationDetails: [
+  //           ...ingredient.variationDetails,
+  //           {
+  //             variationTypeId: variationType.value,
+  //             variationTypeName: variationTypeOptions.find(
+  //               (o) => o.id == variationType.value
+  //             )?.displayName,
+  //             variationValue: "",
+  //           },
+  //         ],
+  //       };
+  //     })
+  //   );
+  // };
+
   const handleAddVariation = () => {
-    if (!variationType.value) {
-      alert("Please select a valid variation type");
-      return;
-    }
-    setVariations((prevIngredients) =>
-      prevIngredients.map((ingredient) => {
-        const existingVariationType = ingredient.variationDetails?.find(
-          (detail) => detail.variationTypeId === variationType.value
-        );
-        if (existingVariationType) {
-          return ingredient;
-        }
-        return {
-          ...ingredient,
-          variationDetails: [
-            ...ingredient.variationDetails,
-            {
-              variationTypeId: variationType.value,
-              variationTypeName: variationTypeOptions.find(
-                (o) => o.id == variationType.value
-              )?.displayName,
-              variationValue: "",
-            },
-          ],
-        };
-      })
-    );
-  };
+  if (!variationType.value) {
+    alert("Please select a valid variation type");
+    return;
+  }
+
+  setVariations((prevIngredients) =>
+    prevIngredients.map((ingredient) => {
+      // Ensure variationDetails is always an array
+      const variationDetails = ingredient.variationDetails || [];
+
+      // Check if the variation type already exists
+      const existingVariationType = variationDetails.find(
+        (detail) => detail.variationTypeId === variationType.value
+      );
+
+      if (existingVariationType) {
+        return ingredient; // no duplicate variation type
+      }
+
+      return {
+        ...ingredient,
+        variationDetails: [
+          ...variationDetails, // safe now
+          {
+            variationTypeId: variationType.value,
+            variationTypeName: variationTypeOptions.find(
+              (o) => o.id == variationType.value
+            )?.displayName,
+            variationValue: "",
+          },
+        ],
+      };
+    })
+  );
+};
+
 
   const handleRemoveVariation = (variationProductId, index) => {
     setVariations((prevVariations) => prevVariations.filter((_, i) => i !== index));
