@@ -13,6 +13,7 @@ import DialogModel from "../../components/model/DialogModel";
 import ReturnOrder from "../../components/returnOrder/ReturnOrderComp";
 import HOCSession from "../../hocComponents/WrapperSession";
 import OrderListAll from "../../components/orderListAll/OrderListAll";
+import OrderList from "../../components/completedOrders/OrderList";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,8 +30,10 @@ const Register = () => {
   },[])
  
 
-  const [isReturnOrderPopupVisible, setIsReturnOrderPopupVisible] =
-    useState(false);
+  const [isReturnOrderPopupVisible, setIsReturnOrderPopupVisible] = useState(false);
+
+  const [isSalesHistoryPopupVisible, setIsSalesHistoryPopupVisible] = useState(false);
+    
 
   const [showPayment, setShowPayment] = useState(false);
 
@@ -65,7 +68,17 @@ const Register = () => {
       </DialogModel>
 
 
-  
+      <DialogModel
+        header="Sales History"
+        visible={isSalesHistoryPopupVisible}
+        maximizable
+        maximized={true}
+        style={{ width: "50vw" }}
+        onHide={() => setIsSalesHistoryPopupVisible(false)}
+      >
+               <OrderList selectingMode={false}  />
+      </DialogModel>
+
         <div className="flex items-start justify-between gap-2 py-2 ">
           {showPayment ? (
             <PaymentScreen />
@@ -76,6 +89,7 @@ const Register = () => {
                 <div className="p-1">
                   <Rightsidebar
                     setIsReturnOrderPopupVisible={setIsReturnOrderPopupVisible}
+                    setIsSalesHistoryPopupVisible={setIsSalesHistoryPopupVisible}
                   />
                 </div>
              

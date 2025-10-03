@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import moment from "moment";
 import { getDrpSession } from "../../functions/dropdowns";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faStop } from "@fortawesome/free-solid-svg-icons";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 import DaisyUIPaginator from "../../components/DaisyUIPaginator";
 import { getStockEntries } from "../../functions/stockEntry";
 import StockEntryVoid from "./StockEntryVoid";
 import { validate } from "../../utils/formValidation";
+import { FaEye, FaStop } from "react-icons/fa";
 
 export default function StockEntryList({ selectingMode }) {
   const store = JSON.parse(localStorage.getItem("stores"))[0];
@@ -107,7 +106,8 @@ export default function StockEntryList({ selectingMode }) {
         title="View Receipt"
         aria-label="View"
       >
-        <FontAwesomeIcon icon={faEye} />
+          <FaEye className=""  />
+        {/* <FontAwesomeIcon icon={faEye} /> */}
       </button>
 
       {!o.isVoided ? (
@@ -116,11 +116,13 @@ export default function StockEntryList({ selectingMode }) {
             setSelectedOrderId(o.stockEntryId);
             setIsVoidRemarkShow(true);
           }}
-          className="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-500 border-none rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200"
+          className="inline-flex items-center px-3 py-1 text-sm font-medium bg-red-600 rounded-md
+          "
           aria-label="Void"
           title="Void Stock Entry"
         >
-          <FontAwesomeIcon icon={faStop} />
+            <FaStop className="text-white" />
+          {/* <FontAwesomeIcon icon={faStop} /> */}
         </button>
       ) : (
         <div className="text-sm text-gray-700">Voided</div>

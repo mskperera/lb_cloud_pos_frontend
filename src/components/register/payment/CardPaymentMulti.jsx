@@ -4,10 +4,9 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { PAYMENT_METHODS } from "../../../utils/constants";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCreditCard, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 import ExpirationDateInput from "../../textInput/ExpirationDateInput";
 import CardType from "./CardType";
+import { FaCreditCard } from "react-icons/fa";
 
 
 const CardPaymentMulti = ({ onAddPayment }) => {
@@ -193,7 +192,8 @@ const CardPaymentMulti = ({ onAddPayment }) => {
     <>
         <div className="flex flex-col gap-4 border-2 p-5 rounded-md">
         <div className="flex justify-center gap-2 items-center">
-          <FontAwesomeIcon icon={faCreditCard} className="text-2xl" />
+          {/* <FontAwesomeIcon icon={faCreditCard} className="text-2xl" /> */}
+                   <FaCreditCard className="text-2xl" />
           <span className="text-md font-semibold">New Card Payment</span>
         </div>
 

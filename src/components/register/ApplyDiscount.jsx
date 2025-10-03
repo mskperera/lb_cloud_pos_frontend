@@ -10,11 +10,10 @@ import {
 } from "../../utils/constants";
 import { validate } from '../../utils/formValidation';
 import FormElementMessage from "../messges/FormElementMessage";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
- import { faPercent, faTags } from "@fortawesome/free-solid-svg-icons";
+import { FaPercent, FaTags } from "react-icons/fa";
 import DialogModel from "../model/DialogModel";
 
-const LineDiscountType = ({ title, isSelected, onClick, icon }) => {
+const LineDiscountType = ({ title, isSelected, onClick, icon: Icon }) => {
   return (
     <div
       className="p-2 cursor-pointer"
@@ -23,7 +22,7 @@ const LineDiscountType = ({ title, isSelected, onClick, icon }) => {
       <div
         className={`flex items-center space-x-2 p-4 rounded-lg border ${isSelected ? "bg-blue-600 text-white border-blue-700" : "bg-white border-gray-200 hover:bg-gray-50"} shadow-md transition-colors duration-200`}
       >
-        <FontAwesomeIcon icon={icon} className={`text-xl ${isSelected ? "text-white" : "text-blue-600"}`} />
+        <Icon className={`text-xl ${isSelected ? "text-white" : "text-blue-600"}`} />
         <span className="font-semibold text-center">{title}</span>
       </div>
     </div>
@@ -296,13 +295,13 @@ export default function ApplyDiscount({
               title="Percentage"
               isSelected={discountType.value === DISCOUNT_TYPES.PERCENTAGE}
               onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.PERCENTAGE)}
-              icon={faPercent}
+              icon={FaPercent}
             />
             <LineDiscountType
               title="Fixed Amount"
               isSelected={discountType.value === DISCOUNT_TYPES.FIXED_AMOUNT}
               onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.FIXED_AMOUNT)}
-              icon={faTags}
+              icon={FaTags}
             />
           </div>
           {validationMessages(discountType)}
@@ -389,32 +388,25 @@ export default function ApplyDiscount({
 // } from "../../utils/constants";
 // import { validate } from '../../utils/formValidation';
 // import FormElementMessage from "../messges/FormElementMessage";
-
-
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faPercent, faTags } from "@fortawesome/free-solid-svg-icons";
+//  import { faPercent, faTags } from "@fortawesome/free-solid-svg-icons";
 // import DialogModel from "../model/DialogModel";
 
-// const LineDiscountType = ({ title, isSelected, onClick,icon  }) => {
+// const LineDiscountType = ({ title, isSelected, onClick, icon }) => {
 //   return (
 //     <div
-//       className={` p-2 cursor-pointer`}
+//       className="p-2 cursor-pointer"
 //       onClick={onClick}
 //     >
 //       <div
-//         className={`card bordered shadow-md ${isSelected ? "bg-primary text-white" : "bg-base-100"} p-4`}
+//         className={`flex items-center space-x-2 p-4 rounded-lg border ${isSelected ? "bg-blue-600 text-white border-blue-700" : "bg-white border-gray-200 hover:bg-gray-50"} shadow-md transition-colors duration-200`}
 //       >
-//         <div className="flex items-center space-x-2">
-//           <FontAwesomeIcon  icon={icon} className={` text-xl ${isSelected ? "text-white" : "text-primaryColor"}`} />
-//           <span className="font-bold text-center">{title}</span>
-//         </div>
+//         <FontAwesomeIcon icon={icon} className={`text-xl ${isSelected ? "text-white" : "text-blue-600"}`} />
+//         <span className="font-semibold text-center">{title}</span>
 //       </div>
 //     </div>
 //   );
 // };
-
-
-
 
 // const handleInputChange = (setState, state, value) => {
 //   const validation = validate(value, state);
@@ -667,108 +659,98 @@ export default function ApplyDiscount({
 
 //   return (
 //     <DialogModel
-//     header={ 
-//       discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL
-//         ? "Apply Line Discount"
-//         : "Apply Overall Discount"}
-//         onHide={onHide}
-//     visible={visible}
- 
-//   >
-
-   
-//           <div className="relative w-full max-w-xl">
-
-
-
-        
-//             <form onSubmit={(e) => {
-//               e.preventDefault();
-//               handleApplyDiscount();
-//             }}>
-//               <div className="form-control mb-4">
-//                 <label htmlFor="void-reason" className="label">
-//                   Discount Reason
-//                 </label>
-//                 <select
-//                   id="void-reason"
-//                   className="select select-bordered w-full"
-//                   value={reason.value}
-//                   onChange={(e) => handleInputChange(setReason, reason, e.target.value)}
-//                 >
-//                   <option value="" disabled>Select the reason</option>
-//                   {reasonOptions.map(option => (
-//                     <option key={option.id} value={option.id}>
-//                       {option.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//                 {validationMessages(reason)}
-//               </div>
-
-//               <div className="form-control mb-4">
-//                 <label htmlFor="discount-perc" className="label">
-//                   Other Reason
-//                 </label>
-//                 <textarea
-//                   id="discount-perc"
-//                   className="textarea textarea-bordered w-full"
-//                   rows={3}
-//                   value={otherReasonRemark.value || ""}
-//                   onChange={(e) => handleInputChange(setOtherReasonRemark, otherReasonRemark, e.target.value)}
-//                 ></textarea>
-//                 {validationMessages(otherReasonRemark)}
-//               </div>
-
-//               <div className="flex flex-wrap gap-2 mb-4">
-//                 <LineDiscountType
-//                   title="Percentage"
-//                   isSelected={discountType.value === DISCOUNT_TYPES.PERCENTAGE}
-//                   onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.PERCENTAGE)}
-//                   icon={faPercent}
-//                 />
-//                 <LineDiscountType
-//                   title="Fixed Amount"
-//                   isSelected={discountType.value === DISCOUNT_TYPES.FIXED_AMOUNT}
-//                   onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.FIXED_AMOUNT)}
-//                   icon={faTags}
-//                 />
-//               </div>
-//               {validationMessages(discountType)}
-
-//               <div className="form-control mb-4">
-//                 <label htmlFor="discount-value" className="label">
-//                   {discountType.value === DISCOUNT_TYPES.PERCENTAGE ? "Percentage" : "Fixed Amount"}
-//                 </label>
-//                 <input
-//                   id="discount-value"
-//                   type="number"
-//                   className="input input-bordered w-full"
-//                   value={discount.value}
-//                   onChange={(e) => handleInputChange(setDiscount, discount, e.target.value)}
-//                 />
-//                 {validationMessages(discount)}
-//               </div>
-
-//               <div className="flex justify-between mt-4">
-//                 <button
-//                   type="button"
-//                   className="btn btn-outline btn-danger w-1/2 mr-2"
-//                   onClick={onHide}
-//                 >
-//                   Cancel
-//                 </button>
-//                 <button
-//                   type="submit"
-//                   className="btn btn-primary w-1/2"
-//                 >
-//                   Apply Discount
-//                 </button>
-//               </div>
-//             </form>
-        
+//       header={
+//         discountScope === DISCOUNT_SCOPE.PRODUCT_LEVEL
+//           ? "Apply Line Discount"
+//           : "Apply Overall Discount"
+//       }
+//       onHide={onHide}
+//       visible={visible}
+//     >
+//       <div className="relative w-full max-w-xl">
+//         <div className="space-y-6">
+//           <div className="flex flex-wrap gap-2 mb-4">
+//             <LineDiscountType
+//               title="Percentage"
+//               isSelected={discountType.value === DISCOUNT_TYPES.PERCENTAGE}
+//               onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.PERCENTAGE)}
+//               icon={faPercent}
+//             />
+//             <LineDiscountType
+//               title="Fixed Amount"
+//               isSelected={discountType.value === DISCOUNT_TYPES.FIXED_AMOUNT}
+//               onClick={() => handleInputChange(setDiscountType, discountType, DISCOUNT_TYPES.FIXED_AMOUNT)}
+//               icon={faTags}
+//             />
 //           </div>
-//        </DialogModel>
-    
+//           {validationMessages(discountType)}
+
+//           <div className="space-y-2">
+//             <label htmlFor="void-reason" className="block text-sm font-medium text-gray-700">
+//               Discount Reason
+//             </label>
+//             <select
+//               id="void-reason"
+//               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+//               value={reason.value}
+//               onChange={(e) => handleInputChange(setReason, reason, e.target.value)}
+//             >
+//               <option value="" disabled>Select the reason</option>
+//               {reasonOptions.map(option => (
+//                 <option key={option.id} value={option.id}>
+//                   {option.name}
+//                 </option>
+//               ))}
+//             </select>
+//             {validationMessages(reason)}
+//           </div>
+
+//           <div className="space-y-2">
+//             <label htmlFor="discount-perc" className="block text-sm font-medium text-gray-700">
+//               Other Reason
+//             </label>
+//             <textarea
+//               id="discount-perc"
+//               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+//               rows={3}
+//               value={otherReasonRemark.value || ""}
+//               onChange={(e) => handleInputChange(setOtherReasonRemark, otherReasonRemark, e.target.value)}
+//             ></textarea>
+//             {validationMessages(otherReasonRemark)}
+//           </div>
+
+//           <div className="space-y-2">
+//             <label htmlFor="discount-value" className="block text-sm font-medium text-gray-700">
+//               {discountType.value === DISCOUNT_TYPES.PERCENTAGE ? "Percentage" : "Fixed Amount"}
+//             </label>
+//             <input
+//               id="discount-value"
+//               type="number"
+//               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+//               value={discount.value}
+//               onChange={(e) => handleInputChange(setDiscount, discount, e.target.value)}
+//             />
+//             {validationMessages(discount)}
+//           </div>
+
+//           <div className="flex justify-between mt-6 space-x-2">
+//             <button
+//               type="button"
+//               className="w-1/2 py-2 px-4 border border-red-300 text-red-700 rounded-md hover:bg-red-50 focus:ring-2 focus:ring-red-500"
+//               onClick={onHide}
+//             >
+//               Cancel
+//             </button>
+//             <button
+//               type="button"
+//               className="w-1/2 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+//               onClick={handleApplyDiscount}
+//             >
+//               Apply Discount
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </DialogModel>
 //   );
 // }

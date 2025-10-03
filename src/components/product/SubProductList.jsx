@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useToast } from '../useToast';
 import { getProducts } from '../../functions/register';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import ProductSearch2 from '../productSearch/ProductSearch2';
 import InputField from '../inputField/InputField';
 import { validate } from '../../utils/formValidation';
 import FormElementMessage from '../messges/FormElementMessage';
+import { FaTrash } from 'react-icons/fa';
 
 const SubProductList = ({
   subProductsList,
@@ -238,7 +237,8 @@ const SubProductList = ({
                 aria-label="Delete Sub-Product"
                 title="Delete Sub-Product"
               >
-                <FontAwesomeIcon icon={faTrash} />
+                   <FaTrash />
+                {/* <FontAwesomeIcon icon={faTrash} /> */}
               </button>
             </td>
           </tr>

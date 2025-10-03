@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash, faSignIn, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { formatUtcToLocal } from '../../../utils/format';
 import { useToast } from '../../useToast';
@@ -10,6 +8,7 @@ import ConfirmDialog from '../../dialog/ConfirmDialog';
 import { validate } from '../../../utils/formValidation';
 import { CONTACT_TYPE, SAVE_TYPE } from '../../../utils/constants';
 import { deleteCustomer, getContacts } from '../../../functions/contacts';
+import { FaEdit, FaSignInAlt, FaTrash, FaUserPlus } from 'react-icons/fa';
 
 export default function CustomerListPOS({selectingMode,onselect }) {
   const [products, setCustomers] = useState([]);
@@ -215,7 +214,8 @@ const actionButtons = (item) => (
       }}
       aria-label="Select" title='Select Customer'
     >
-      <FontAwesomeIcon icon={faSignIn} />
+               <FaSignInAlt className="text-2xl text-sky-600" />
+      {/* <FontAwesomeIcon icon={faSignIn} /> */}
     </button>}
 
     <button
@@ -228,14 +228,16 @@ const actionButtons = (item) => (
       aria-label="Delete"
       title='Delete customer'
     >
-      <FontAwesomeIcon icon={faTrash} />
+               <FaTrash className="text-2xl text-sky-600" />
+      {/* <FontAwesomeIcon icon={faTrash} /> */}
     </button>
     <button
       className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
       onClick={() =>    navigate(`/customers/add?saveType=${SAVE_TYPE.UPDATE}&id=${item.contactId}`)}
       aria-label="Edit" title='Edit customer'
     >
-      <FontAwesomeIcon icon={faEdit} />
+            <FaEdit className="text-2xl text-sky-600" />
+      {/* <FontAwesomeIcon icon={faEdit} /> */}
     </button>
   </div>
 );
@@ -299,7 +301,8 @@ const actionButtons = (item) => (
             }
             title="Add Product"
           >
-            <FontAwesomeIcon className="text-xl" icon={faUserPlus} />
+            {/* <FontAwesomeIcon className="text-xl" icon={faUserPlus} /> */}
+                  <FaUserPlus className="text-2xl text-sky-600" />
             New Customer
           </button>
         </div>

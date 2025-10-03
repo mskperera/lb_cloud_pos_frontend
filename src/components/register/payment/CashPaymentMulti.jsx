@@ -1,9 +1,8 @@
 import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { useSelector } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { faMoneyBillAlt } from "@fortawesome/free-solid-svg-icons";
+import { FaMoneyBillAlt } from "react-icons/fa";
 
 const CashDemomination = ({ currency, amount, isSelected, onClick }) => {
   return (
@@ -89,7 +88,8 @@ const CashPaymentMulti = ({ onAddPayment }) => {
   return (
     <div className="flex flex-col gap-4 border-2 border-gray-200 p-6 rounded-lg bg-white shadow-sm">
       <div className="flex justify-center gap-2 items-center">
-        <FontAwesomeIcon icon={faMoneyBillAlt} className="text-2xl text-sky-600" />
+        {/* <FontAwesomeIcon icon={faMoneyBillAlt} className="text-2xl text-sky-600" /> */}
+          <FaMoneyBillAlt className="text-2xl text-sky-600" />
         <span className="text-lg font-semibold text-gray-700">New Cash Payment</span>
       </div>
       <div className="flex flex-col gap-4 items-center">

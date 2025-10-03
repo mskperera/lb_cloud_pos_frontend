@@ -225,7 +225,7 @@ setSelectedOrderId(o.orderId);
 
   const customerBodyTemplate = (rowData) => (
     isTableDataLoading ? <span>Loading...</span> : (
-      <>{rowData.customerCode ? <span>{`${rowData.customerCode} | ${rowData.customerName}`}</span> : 'walk-in customer'}</>
+      rowData.customerName
     )
   );
 
@@ -276,9 +276,9 @@ setSelectedOrderId(o.orderId);
       </DialogModel>
 
       <div className="flex flex-col p-6 gap-4 bg-gray-50 rounded-lg shadow-sm">
-        <div>
+        {/* <div>
           <h3 className="text-center text-2xl font-bold text-gray-900">Sales History</h3>
-        </div>
+        </div> */}
 
         <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-4 w-full">
           <div className="flex flex-col space-y-2 w-full sm:w-1/5">
@@ -301,6 +301,7 @@ setSelectedOrderId(o.orderId);
               ))}
             </select>
           </div>
+
 
           {[1, 2, 3].includes(selectedFilterBy.value) && (
             <div className="flex flex-col space-y-2 w-full sm:w-1/3 mt-4 sm:mt-0">

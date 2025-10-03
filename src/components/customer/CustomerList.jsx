@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignIn, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { deleteCustomer, getContacts } from "../../functions/contacts";
 import { formatUtcToLocal } from '../../utils/format';
@@ -11,6 +9,7 @@ import ConfirmDialog from '../dialog/ConfirmDialog';
 import { validate } from '../../utils/formValidation';
 import { CONTACT_TYPE, SAVE_TYPE } from '../../utils/constants';
 import GhostButton from "../iconButtons/GhostButton";
+import { FaSignInAlt, FaUserPlus } from 'react-icons/fa';
 
 export default function CustomerList({ selectingMode, onselect }) {
   const [products, setCustomers] = useState([]);
@@ -161,7 +160,8 @@ export default function CustomerList({ selectingMode, onselect }) {
           aria-label="Select"
           title="Select Customer"
         >
-          <FontAwesomeIcon icon={faSignIn} />
+          <FaSignInAlt />
+          {/* <FontAwesomeIcon icon={faSignIn} /> */}
         </button>
       )}
 
@@ -260,7 +260,7 @@ export default function CustomerList({ selectingMode, onselect }) {
             className="flex items-center gap-2 px-4 py-2 text-sky-600 hover:text-sky-800 font-semibold border border-sky-600 rounded"
             onClick={() => navigate(`/customers/add?saveType=${SAVE_TYPE.ADD}&id=0`)}
           >
-            <FontAwesomeIcon className="text-lg" icon={faUserPlus} /> New Customer
+            <FaUserPlus className="text-lg" /> New Customer
           </button>
         </div>
       </div>

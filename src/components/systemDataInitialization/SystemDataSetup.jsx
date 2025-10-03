@@ -6,8 +6,7 @@ import { useToast } from "../useToast";
 import { getSystemInfo, initializeSystemData, loadSystemInfoToLocalStorage } from "../../functions/systemSettings";
 import { useNavigate } from "react-router-dom";
 import { setUserAssignedStores } from "../../functions/store";
-import { faBuilding, faCashRegister, faGlobe} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaBuilding, FaCashRegister, FaGlobe } from "react-icons/fa";
 const SystemDataSetup = () => {
 
    const systemInit_SystemInfoData=localStorage.getItem('systemInit_SystemInfoData') && JSON.parse(localStorage.getItem('systemInit_SystemInfoData'));
@@ -272,7 +271,7 @@ const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value))
             {/* Company Details Section */}
             <div className="bg-white rounded-xl p-6 mb-8">
               <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-               <FontAwesomeIcon className="mr-2 text-sky-600" icon={faBuilding} /> Company Details
+                 <FaBuilding className="text-sky-600 text-3xl" /> Company Details
               </h3>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <InputField
@@ -363,7 +362,7 @@ const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value))
             {/* POS Terminal Details Section */}
             <div className="bg-white rounded-xl p-6 mb-8">
               <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-              <FontAwesomeIcon className="mr-2 text-sky-600" icon={faCashRegister} /> POS Terminal Details
+                <FaCashRegister className="text-sky-600 text-3xl" /> POS Terminal Details
               </h3>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <InputField
@@ -381,7 +380,8 @@ const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value))
             {/* Localization Settings Section */}
             <div className="bg-white rounded-xl p-6 mb-8">
               <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-              <FontAwesomeIcon className="mr-2 text-sky-600" icon={faGlobe} /> Localization Settings
+          <FaGlobe className="text-sky-600 text-3xl" /> Localization Settings
+       
               </h3>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <DropdownField

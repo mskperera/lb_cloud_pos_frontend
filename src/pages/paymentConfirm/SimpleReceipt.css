@@ -1,0 +1,37 @@
+/* lb_cloudpos_new/src/components/SimpleReceipt.css */
+/* .receipt {
+  font-family: monospace;
+  width: 58mm; 
+  padding: 5mm;
+  font-size: 3mm;
+  line-height: 4mm;
+  background: white;
+  color: black;
+}
+.company-name { text-align: center; font-size: 4mm; font-weight: bold; }
+.store-name { text-align: center; font-size: 3.5mm; }
+.address, .tel, .email { text-align: center; font-size: 2.5mm; }
+.details p { margin: 1mm 0; }
+.item-header { display: flex; justify-content: space-between; font-weight: bold; }
+.item-header-row { display: flex; width: 60%; }
+.item-header-row2 { display: flex; width: 40%; justify-content: space-between; }
+.item-row { margin: 1mm 0; }
+.receipt-item { display: flex; flex-direction: column; }
+.item-header-full { display: flex; }
+.item-number { width: 10%; }
+.item-description { width: 90%; }
+.item-details { display: flex; justify-content: space-between; }
+.item-qty { width: 20%; }
+.item-price { width: 20%; }
+.item-total { width: 20%; }
+.totals { margin-top: 2mm; }
+.total-row { display: flex; justify-content: space-between; }
+.grand-total { font-weight: bold; font-size: 4mm; }
+.payments { margin-top: 2mm; }
+.payment-row { display: flex; justify-content: space-between; }
+.cash-details { margin-left: 2mm; font-size: 2.5mm; }
+.receipt-footer { text-align: center; margin-top: 2mm; }
+.thank-you { font-weight: bold; }
+.print-date, .system-info { font-size: 2.5mm; }
+.thin-border { border: 0.2mm solid black; margin: 1mm 0; }
+.thick-border { border: 0.5mm solid black; margin: 2mm 0; } */

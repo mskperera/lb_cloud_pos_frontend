@@ -139,7 +139,7 @@ console.log('run validation',validation)
         <div className="flex flex-col gap-4 w-full">
         
         <div className='grid grid-cols-3 gap-2'>
-                  {[1, 2, 5, 10, 20, 50, 100, 500, 1000, 5000].map((amount) => (
+                  {[20, 50, 100, 500, 1000,2000, 5000].map((amount) => (
                     <button
                       key={amount}
                       onClick={() => {

@@ -9,20 +9,20 @@
 }
 
 .company-name {
-  font-size: 20px; /* Matches C# headingFont */
+  font-size: 22px; /* Matches C# headingFont */
   font-weight: bold;
   text-align: center;
   margin: 0;
 }
 
 .store-name {
-  font-size: 14px; /* Matches C# printFont2 */
+  font-size: 12px; /* Matches C# printFont2 */
   text-align: center;
   margin: 5px 0;
 }
 
 .address, .tel, .email {
-  font-size: 14px; /* Matches C# printFont2 */
+  font-size: 12px; /* Matches C# printFont2 */
   text-align: center;
   margin: 0px 0;
 }
@@ -40,10 +40,15 @@
 }
 
 .invoice-label {
-  font-size: 13px; /* Matches C# invoiceFont */
+  font-size: 12px; /* Matches C# invoiceFont */
   font-weight: bold;
   text-align: center;
   margin: 0;
+}
+
+.details  {
+display: flex;
+justify-content: space-between;
 }
 
 .details p {
@@ -60,7 +65,6 @@
 
 .item-header {
   display: flex;
-  font-size: 10px; /* Matches C# boldFont */
   font-weight: bold;
   margin-top: 10px;
 }
@@ -92,19 +96,20 @@
 .item-row span:nth-child(5) { width: 50px; text-align: right; } /* Total */
 
 .totals {
-  font-size: 12px; /* Matches C# printFont2 */
-  text-align: right;
+
+
 }
 
 .total-row {
   display: flex;
   justify-content: space-between;
   margin: 5px 0;
+    font-size: 12px;
 }
 
 .grand-total {
   font-weight: bold;
-  font-size: 12px; /* Matches C# boldOrderSummaryFont */
+  font-size: 14px; /* Matches C# boldOrderSummaryFont */
 }
 
 .payments {
@@ -113,22 +118,39 @@
 
 .payment-row {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: end;
   margin: 5px 0;
 }
 
 .card-details, .cash-details {
   font-size: 12px;
-  margin-left: 10px;
+margin-top: 2px;
   text-align: right;
 }
 
-
-
-.thank-you {
+.balance{
+  font-size: 14px;
   font-weight: bold;
 }
 
+.thank-you {
+  width:100%;
+  padding-bottom: 7px;
+  font-weight: bold;
+   font-size: 12px;
+   background-color: #000;
+   color: white;
+}
+
+
+.print-date{
+  font-size: 12px;
+}
+
+.system-info{
+    font-size: 12px;
+}
 .ad-text {
   white-space: pre-wrap; /* Preserves newlines from C# */
   margin: 10px 0;
@@ -141,34 +163,42 @@
 .item-number {
   width: 20px;
   display: inline-block;
+    font-size: 12px;
 }
 
 .item-description {
   width: 120px;
   display: inline-block;
   word-wrap: break-word;
+  font-size: 12px;
 }
 
 .item-details {
+ width: 100%;
   display: flex;
-  margin-left: 20px; /* Aligns with item-number width */
+  justify-content: space-between;
 }
 
 .item-qty {
-  width: 60px;
+  width: 80px;
   display: inline-block;
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: left;
 }
 
 .item-price {
   width: 50px;
   text-align: right;
   display: inline-block;
+    font-size: 12px;
 }
 
 .item-total {
   width: 50px;
   text-align: right;
   display: inline-block;
+    font-size: 12px;
 }
 
 
@@ -224,13 +254,13 @@
   width: 100%;
   display: flex;
   justify-content: start;
+
 }
 
 .item-header-row2 {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  margin-left: 20px;
 }
 
 

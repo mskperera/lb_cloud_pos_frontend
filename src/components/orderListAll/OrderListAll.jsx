@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import Customer from "../register/customer/CustomerInfoPanel";
 import OrderSummary from "../register/orderSummary/OrderSummary";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,9 +8,8 @@ import { addOrder, cancelOverallDiscount, clearOrderList, clearPayment, setCusto
 import { CONTACT_TYPE, DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/constants";
 import ProductOrderList from "../register/orderList/ProductOrderList";
 import ApplyDiscount from "../register/ApplyDiscount";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import ProductSearch from "../productSearch/ProductSearch";
-import { FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart, FaTimesCircle } from 'react-icons/fa';
 import DialogModel from "../model/DialogModel";
 import Payment from "../register/payment/Payment";
 import PaymentConfirm from "../../pages/paymentConfirm";
@@ -210,7 +209,8 @@ const OrderListAll = () => {
                 onClick={() => dispatch(cancelOverallDiscount())}
                 aria-label="Cancel Overall Discount"
               >
-                <FontAwesomeIcon icon={faTimesCircle} className="text-lg" />
+                <FaTimesCircle  className="text-lg" />
+                {/* <FontAwesomeIcon icon={faTimesCircle} className="text-lg" /> */}
               </button>
             </div>
           </div>

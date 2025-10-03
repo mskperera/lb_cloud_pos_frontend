@@ -8,8 +8,7 @@ import { validate } from '../../../utils/formValidation';
 import FormElementMessage from '../../messges/FormElementMessage';
 import DaisyUIPaginator from '../../DaisyUIPaginator';
 import ConfirmDialog from '../../dialog/ConfirmDialog';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash, faPlusSquare, faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { FaAngleDown, FaAngleRight, FaEdit, FaPlusSquare, FaTrash } from 'react-icons/fa';
 
 
 const ProductDetails = ({ selectedProduct }) => {
@@ -527,14 +526,16 @@ export default function ProductOrderList({ }) {
         aria-label="Delete"
         title='Delete Product'
       >
-        <FontAwesomeIcon icon={faTrash} />
+                  <FaTrash className="" />
+        {/* <FontAwesomeIcon icon={faTrash} /> */}
       </button>
       <button
         className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
         onClick={() => navigate(`/products/edit?saveType=update&id=${item.productId}`)}
         aria-label="Edit" title='Edit Product'
       >
-        <FontAwesomeIcon icon={faEdit} />
+         <FaEdit className="" />
+        {/* <FontAwesomeIcon icon={faEdit} /> */}
       </button>
     </div>
   );
@@ -859,7 +860,8 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
           onClick={() => navigate(`/products/add?saveType=add`)}
           title="Add Product"
         >
-          <FontAwesomeIcon className="text-xl" icon={faPlusSquare} />
+           <FaPlusSquare className="text-xl" />
+          {/* <FontAwesomeIcon className="text-xl" icon={faPlusSquare} /> */}
           Create New
         </button>
       </div>
@@ -921,9 +923,11 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
                       onClick={() => handleRowExpand(index, item)}
                     >
                       {expandedRowId === index ? (
-                        <FontAwesomeIcon icon={faAngleDown} />
+                        <FaAngleDown />
+                        // <FontAwesomeIcon icon={faAngleDown} />
                       ) : (
-                        <FontAwesomeIcon icon={faAngleRight} />
+                           <FaAngleRight />
+                        // <FontAwesomeIcon icon={faAngleRight} />
                       )}
                     </td>
                   

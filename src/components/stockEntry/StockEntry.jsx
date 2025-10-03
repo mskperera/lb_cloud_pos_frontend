@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import FormElementMessage from "../messges/FormElementMessage";
 import InputField from "../inputField/InputField";
@@ -12,6 +10,7 @@ import { formatCurrency } from "../../utils/format";
 import { stockAdd } from "../../functions/stockEntry";
 import { useNavigate } from "react-router-dom";
 import { validate } from "../../utils/formValidation";
+import { FaTrash } from "react-icons/fa";
 
 const StockEntry = () => {
   const navigate = useNavigate();
@@ -388,12 +387,12 @@ const StockEntry = () => {
                         <td className="px-4 py-3">{item.unitPrice}</td>
                         <td className="px-4 py-3">{(item.qty * item.unitCost).toFixed(2)}</td>
                         <td className="px-4 py-3">
-                          <FontAwesomeIcon
-                            icon={faTrash}
-                            className="text-red-500 hover:text-red-700 cursor-pointer"
+                          
+                                    <FaTrash   className="text-red-500 hover:text-red-700 cursor-pointer"
                             onClick={() => setStockEntryList(stockEntryList.filter((_, i) => i !== index))}
-                            title="Remove Item"
-                          />
+                            title="Remove Item" />
+
+             
                         </td>
                       </tr>
                     ))}

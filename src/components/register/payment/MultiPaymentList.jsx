@@ -1,13 +1,13 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { FaCreditCard, FaMoneyBillAlt, FaTimes } from "react-icons/fa";
 import { PAYMENT_METHODS } from "../../../utils/constants";
-import { faCreditCard, faMoneyBillAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 const PaymentMethodCard = ({ payment, onRemove }) => {
   let icon, title, details;
 
   switch (payment.methodId) {
     case PAYMENT_METHODS.CASH:
-      icon = <FontAwesomeIcon icon={faMoneyBillAlt} className="text-3xl text-sky-600" />;
+      icon = <FaMoneyBillAlt className="text-3xl text-sky-600" />;
       title = "Cash";
       details = (
         <div className="flex flex-col gap-2">
@@ -19,7 +19,7 @@ const PaymentMethodCard = ({ payment, onRemove }) => {
       );
       break;
     case PAYMENT_METHODS.CARD:
-      icon = <FontAwesomeIcon icon={faCreditCard} className="text-3xl text-sky-600" />;
+      icon = <FaCreditCard className="text-3xl text-sky-600" />;
       title = "Card";
       details = (
         <div className="flex flex-col gap-2">
@@ -53,7 +53,7 @@ const PaymentMethodCard = ({ payment, onRemove }) => {
           className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
           onClick={() => onRemove(payment.id)}
         >
-          <FontAwesomeIcon icon={faTimes} />
+          <FaTimes />
         </button>
       </div>
       {details}
@@ -76,6 +76,86 @@ const MultiPaymentList = ({ paymentList, onRemovePayment }) => {
 };
 
 export default MultiPaymentList;
+
+
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { PAYMENT_METHODS } from "../../../utils/constants";
+// import { faCreditCard, faMoneyBillAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
+
+// const PaymentMethodCard = ({ payment, onRemove }) => {
+//   let icon, title, details;
+
+//   switch (payment.methodId) {
+//     case PAYMENT_METHODS.CASH:
+//       icon = <FontAwesomeIcon icon={faMoneyBillAlt} className="text-3xl text-sky-600" />;
+//       title = "Cash";
+//       details = (
+//         <div className="flex flex-col gap-2">
+//           <div className="flex justify-between">
+//             <p className="font-semibold text-gray-700">Pay Amount:</p>
+//             <p className="text-gray-600">{payment.amountPaid}</p>
+//           </div>
+//         </div>
+//       );
+//       break;
+//     case PAYMENT_METHODS.CARD:
+//       icon = <FontAwesomeIcon icon={faCreditCard} className="text-3xl text-sky-600" />;
+//       title = "Card";
+//       details = (
+//         <div className="flex flex-col gap-2">
+//           <div className="flex justify-between">
+//             <p className="font-semibold text-gray-700">Card Type:</p>
+//             <p className="text-gray-600">{payment.cardPayment.cardTypeId}</p>
+//           </div>
+//           <div className="flex justify-between">
+//             <p className="font-semibold text-gray-700">Card Number:</p>
+//             <p className="text-gray-600">**** **** **** {payment.cardPayment.cardLastFourDigits}</p>
+//           </div>
+//           <div className="flex justify-between">
+//             <p className="font-semibold text-gray-700">Amount:</p>
+//             <p className="text-gray-600">{payment.amountPaid}</p>
+//           </div>
+//         </div>
+//       );
+//       break;
+//     default:
+//       return null;
+//   }
+
+//   return (
+//     <div className="flex flex-col bg-white rounded-lg shadow-sm p-4 hover:shadow-sm transition-shadow duration-300">
+//       <div className="flex items-center justify-between">
+//         <div className="flex items-center gap-2">
+//           {icon}
+//           <p className="text-lg font-semibold text-gray-700">{title}</p>
+//         </div>
+//         <button
+//           className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+//           onClick={() => onRemove(payment.id)}
+//         >
+//           <FontAwesomeIcon icon={faTimes} />
+//         </button>
+//       </div>
+//       {details}
+//     </div>
+//   );
+// };
+
+// const MultiPaymentList = ({ paymentList, onRemovePayment }) => {
+//   return (
+//     <div className="flex flex-col gap-4 mt-4">
+//       {paymentList.map((payment) => (
+//         <PaymentMethodCard
+//           key={payment.id}
+//           payment={payment}
+//           onRemove={onRemovePayment}
+//         />
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default MultiPaymentList;
 
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import {

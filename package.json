@@ -3,11 +3,14 @@
   "version": "2.0.0a",
   "private": true,
   "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "^6.4.2",
-    "@fortawesome/react-fontawesome": "^0.2.0",
     "@fullhuman/postcss-purgecss": "^6.0.0",
     "@headlessui/react": "^2.2.0",
+    "@manhnd/esc-pos-encoder": "^1.0.25",
+    "@point-of-sale/receipt-printer-encoder": "^3.0.3",
     "@reduxjs/toolkit": "^2.0.1",
+    "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/plugin-fs": "^2.4.2",
+    "@tauri-apps/plugin-sql": "^2.3.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -17,6 +20,7 @@
     "decimal.js": "^10.4.3",
     "dotenv": "^16.3.1",
     "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "moment": "^2.30.1",
@@ -38,6 +42,7 @@
     "react-tooltip": "^5.28.0",
     "socket.io-client": "^2.4.0",
     "tailwindcss": "^3.4.3",
+    "tauri-plugin-printer-v2": "^0.2.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

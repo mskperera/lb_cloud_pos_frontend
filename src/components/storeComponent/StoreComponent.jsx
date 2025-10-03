@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { getStoresDrp } from "../../functions/dropdowns";
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DialogModel from "../model/DialogModel";
 import GhostButton from "../iconButtons/GhostButton";
+import { FaTrash } from "react-icons/fa";
 
 
 
@@ -14,11 +13,13 @@ const StoreItem=({onClick,store})=>{
     className="flex justify-between items-center p-3 border rounded-full gap-2 bg-gray-50"
   >
     <span className="text-gray-800 font-medium">{store.storeName}</span>
-    <FontAwesomeIcon
+  <FaTrash className="text-red-500 hover:text-red-700 cursor-pointer" />
+
+    {/* <FontAwesomeIcon
       icon={faTrash}
       className="text-red-500 hover:text-red-700 cursor-pointer"
       onClick={onClick}
-    />
+    /> */}
   </div>
   
   )}

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatCurrency, formatUtcToLocal } from '../../utils/format';
-import { faEdit, faTrash, faPlusSquare, faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { getStockInfo } from '../../functions/stockEntry';
 
 

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStore } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { setSelectedStore } from "../../state/store/storeSlice";
 import { useNavigate } from "react-router-dom";
+import { FaStore } from "react-icons/fa";
 
 const SelectStore = () => {
   const navigate = useNavigate();
@@ -38,10 +37,10 @@ const SelectStore = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-        <div className="flex items-center gap-3 mb-6">
-          <FontAwesomeIcon icon={faStore} className="text-sky-600 text-3xl" />
-          <h2 className="text-2xl font-bold text-gray-800">Choose Your Store</h2>
-        </div>
+     <div className="flex items-center gap-3 mb-6">
+  <FaStore className="text-sky-600 text-3xl" />
+  <h2 className="text-2xl font-bold text-gray-800">Choose Your Store</h2>
+</div>
         <div className="flex flex-col gap-5">
           {assignedStores.length > 0 ? (
             <select

@@ -16,15 +16,11 @@ import { validate } from "../../utils/formValidation";
 import FormElementMessage from "../messges/FormElementMessage";
 import DaisyUIPaginator from "../DaisyUIPaginator";
 import ConfirmDialog from "../dialog/ConfirmDialog";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAngleDown,
-  faAngleRight,
-  faWrench,
-} from "@fortawesome/free-solid-svg-icons";
+
 import { getStockInfo } from "../../functions/stockEntry";
 import ProductVariationDetails from "./ProductVariationDetails";
 import GhostButton from "../iconButtons/GhostButton";
+import { FaAngleDown, FaAngleRight, FaWrench } from "react-icons/fa";
 
 const ProductDetails = ({ selectedProduct, confirmDelete }) => {
   const [stores, setStores] = useState([]);
@@ -176,10 +172,13 @@ const ProductDetails = ({ selectedProduct, confirmDelete }) => {
 
           {/* Manage Stock */}
           <GhostButton
-            onClick={() =>
-              navigate(
+            onClick={() =>{
+              console.log('selectedProduct.inventoryId',selectedProduct.inventoryId);
+                navigate(
                 `/inventory/stockAdjustment?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
               )
+            }
+            
             }
             iconClass="pi pi-cog"
             label="Manage Stock"
@@ -232,7 +231,8 @@ const ProductDetails = ({ selectedProduct, confirmDelete }) => {
   };
 
   <button>
-    <FontAwesomeIcon icon={faWrench} className="mr-2" />
+    <FaWrench className="mr-2" />
+    {/* <FontAwesomeIcon icon={faWrench} className="mr-2" /> */}
     Manage Stock
   </button>;
 
@@ -501,9 +501,33 @@ export default function ProductInventoryList({}) {
       />
 
 {item.inventoryId ? (
+
+
+//    // Call the function via the namespace to bypass the Webpack import issue
+//     const win = webviewWindow.WebviewWindow('stock-adjustment-window', {
+//       url: `/inventory/stockAdjustment?inventoryId=${item.inventoryId}`,
+//       width: 1000,
+//       height: 700,
+//       title: 'Stock Adjustment',
+//       resizable: true,
+//     });
+
+//     win.once('tauri://created', () => {
+//       console.log('webview window created');
+//     });
+//     win.once('tauri://error', (e) => {
+//       console.error('Failed to create webview window:', e);
+//     });
+
+// import * as webviewWindow from '@tauri-apps/api/webviewWindow';
+
+
   <GhostButton
     onClick={() =>
-      window.open(`/inventory/stockAdjustment?inventoryId=${item.inventoryId}`, '_blank')
+        navigate(
+              `/inventory/stockAdjustment?inventoryId=${item.inventoryId}`
+            )
+     // window.open(`/inventory/stockAdjustment?inventoryId=${item.inventoryId}`, '_blank')
     }
     iconClass="pi pi-cog text-lg"
     labelClass="text-md font-normal"
@@ -796,10 +820,11 @@ export default function ProductInventoryList({}) {
               className="px-4 py-2 cursor-pointer"
               onClick={() => handleRowExpand(index, item)}
             >
-              <FontAwesomeIcon
+              {expandedRowId === index ? <FaAngleDown />  : <FaAngleRight />}
+              {/* <FontAwesomeIcon
                 icon={expandedRowId === index ? faAngleDown : faAngleRight}
                 className="text-gray-600"
-              />
+              /> */}
             </td>
             <td className="px-4 py-2">{item.productNo}</td>
             <td className="px-4 py-2">{item.sku}</td>

@@ -1,6 +1,5 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FaTimes } from 'react-icons/fa';
 
 const Toast = ({ messages, removeToast }) => {
   const severityClasses = {
@@ -27,7 +26,8 @@ const Toast = ({ messages, removeToast }) => {
             className="p-1 rounded-full hover:bg-gray-200 hover:bg-opacity-50"
             onClick={() => removeToast(index)}
           >
-            <FontAwesomeIcon icon={faTimes} className="text-gray-600" />
+          
+            <FaTimes className="text-gray-600" />
           </button>
         </div>
       ))}

@@ -3,19 +3,18 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ProfileMenu from '../ProfileMenu';
 import Syncing from '../Syncing';
 import Alert from '../Alert';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStore } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedStore } from '../../state/store/storeSlice';
 import io from "socket.io-client";
 import PrinterConnection from '../PrinterConnetion';
 import { getFrontendIdByTerminalId, getPrintdeskByTerminalId } from '../../functions/terminal';
 import { setPrinterList } from '../../state/printer/printerSlice';
-import { FaCompress, FaExpand, FaTh } from 'react-icons/fa';
+import { FaCompress, FaExpand, FaStore, FaTh } from 'react-icons/fa';
 
 const Store=({store})=>(
-  <div className='flex justify-start gap-1 items-center mb-1 text-white hover:text-sky-700 rounded-lg px-2 cursor-pointer'>
-<FontAwesomeIcon icon={faStore} style={{ fontSize: '1.5rem' }} />
+  <div className='flex justify-start gap-1 items-center mb-1 text-white  rounded-lg px-2 cursor-pointer'>
+    <FaStore className='text-lg' />
+{/* <FontAwesomeIcon icon={faStore} style={{ fontSize: '1.5rem' }} /> */}
  {store && <div className='mt-1'>{`${store.storeName}`}</div>}
  </div>
 )
@@ -216,7 +215,7 @@ export default function TopMenubar() {
         <div className="flex items-center gap-4 m-0 p-0">
 
       <button
-      className="flex items-center ml-0 p-0 m-0 text-white hover:bg-transparent hover:text-sky-400"
+      className="flex items-center ml-0 p-2 m-0 rounded-md text-white  hover:bg-sky-700"
       onClick={toggleFullScreen}
     >
       {isFullScreen ? (
@@ -233,7 +232,7 @@ export default function TopMenubar() {
     </button>
 
     <button
-      className="flex items-center ml-0 p-0 m-0 text-white hover:bg-transparent hover:text-sky-400"
+      className="flex items-center ml-0 p-2 m-0 rounded-md text-white  hover:bg-sky-700"
       onClick={() => navigate('/home')}
     >
       <FaTh className="text-xl" />
