@@ -68,7 +68,7 @@ const Customer = () => {
       </DialogModel>
 
   
-      <div className="flex justify-between items-center gap-4 px-4 py-3 bg-[#f0faff] rounded-lg shadow-sm border border-gray-200">
+      <div className="flex justify-between items-center gap-4 px-4 py-3 bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="flex gap-4 items-center">
           {imageUrl ? (
             <img
@@ -82,7 +82,7 @@ const Customer = () => {
             </div>
           )}
           <div className="flex flex-col">
-            <span className="text-base font-semibold text-gray-800">{label}</span>
+            <span className="text-base  text-gray-800">{label}</span>
             {customer && <span className="text-sm text-gray-600">Customer Info</span>}
           </div>
         </div>

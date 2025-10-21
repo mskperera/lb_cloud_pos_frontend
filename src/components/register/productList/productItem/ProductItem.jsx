@@ -15,7 +15,7 @@ const ProductItem = ({ p, handleProductClick }) => {
   className={`
         flex flex-col w-full items-center justify-between
         rounded-lg cursor-pointer py-2 px-0 shadow-sm border
-      ${p.isProductItem ? 'bg-[#f0faff] hover:border-[#0dadff]':'bg-[#ffff9f] hover:border-[#d9ff32]'} 
+      ${p.sku ? 'bg-[#daf3ef]':'bg-[#39c08f] '} 
         hover:shadow-xl transition duration-300 
         ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
         active:scale-95 active:shadow-inner active:border-gray-400

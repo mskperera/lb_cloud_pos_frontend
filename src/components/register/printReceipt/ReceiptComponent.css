@@ -269,7 +269,7 @@ margin-top: 2px;
   flex-direction: column;
   align-items: center; /* Centers content horizontally */
   text-align: center; /* Ensures text is centered */
-  gap: 10px;
+  gap: 5px;
   justify-content: center;
 }
 

@@ -4,11 +4,12 @@ import { getProductsAllVariations } from '../../functions/register';
 import { useToast } from '../useToast';
 import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
+import { FaBarcode } from 'react-icons/fa';
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,hideSearchBox }) => {
+const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(true);
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+
   const store = JSON.parse(localStorage.getItem('selectedStore'));
   const searchRef = useRef(null);
   const showToast = useToast();
@@ -77,24 +78,15 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
     setSearchTerm('');
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.ctrlKey && (event.key === 'f' || event.key === 'F')) {
-        event.preventDefault();
-        setShowAdvancedSearch(true);
-      }
-    };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   return (
     <div ref={searchRef} className="relative w-full">
       <div className="flex items-center gap-3 w-full">
-     {!hideSearchBox ?
-        <div className="relative flex items-center w-full bg-[#f0faff] border border-gray-200 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
-          <i className="pi pi-search text-gray-600 text-lg absolute left-3"></i>
+
+        <div className="relative flex items-center w-full bg-white border border-gray-200 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
+          {/* <i className="pi pi-search text-gray-600 text-lg absolute left-3"></i> */}
+          <FaBarcode className='text-gray-600 text-2xl absolute left-3' />
           <input
             type="text"
             className="w-full py-3 pl-10 pr-10 text-base bg-transparent border-none focus:outline-none placeholder-gray-400"
@@ -112,35 +104,12 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
               <i className="pi pi-times text-base"></i>
             </button>
           )}
-        </div>:''}
-        <button
-          type="button"
-          onClick={() => setShowAdvancedSearch(true)}
-          className="flex items-center px-4 py-2 text-sm rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
-        >
-          <span className="pi pi-filter text-base"></span>
-          <span className="ml-2">Item Lookup</span>
-        </button>
+        </div>
+      
       </div>
 
 
-      {showAdvancedSearch && (
-        <DialogModel
-          header="Advanced Product Search"
-          visible={showAdvancedSearch}
-          onHide={() => setShowAdvancedSearch(false)}
-        >
-          <AdvancedProductSearch
-            visible={showAdvancedSearch}
-            onHide={() => setShowAdvancedSearch(false)}
-            onProductSelect={(product) => {
-              onProductSelect(product);
-              setShowAdvancedSearch(false);
-            }}
-            showOnlyProductItems={showOnlyProductItems}
-          />
-        </DialogModel>
-      )}
+
     </div>
   );
 };

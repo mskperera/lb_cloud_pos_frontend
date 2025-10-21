@@ -32,13 +32,13 @@ import GhostButton from "../iconButtons/GhostButton";
 import ProductSearch from "../productSearch/ProductSearch";
 import LoadingSpinner from "../LoadingSpinner";
 import SubProductList from "./SubProductList";
-import { FaCross, FaPlus, FaTrash } from "react-icons/fa";
+import { FaTrash, FaPlus } from "react-icons/fa";
 
 const CategoryItem = ({ onClick, category }) => {
   return (
     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
-      <span className="text-gray-800 font-medium">{category.displayName}</span>
-     <FaTrash  className="text-red-500 hover:text-red-700 cursor-pointer" />
+      <span className="text-gray-800 font-medium pr-1">{category.displayName} </span>
+     <FaTrash  className="text-red-500 hover:text-red-700 cursor-pointer"  onClick={onClick} />
       {/* <FontAwesomeIcon
         icon={faTrash}
         className="text-red-500 hover:text-red-700 cursor-pointer"
@@ -1086,7 +1086,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                                   aria-label={`Remove ${c.variationTypeName} Type`}
                                   title={`Remove ${c.variationTypeName} Type`}
                                 >
-                                  <FaCross className="text-sm"/>
+                                  <FaTrash className="text-sm"/>
                                   {/* <FontAwesomeIcon icon={faClose} size="sm" /> */}
                                 </button>
                               </div>
@@ -1208,7 +1208,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
                                 aria-label="Remove Variation Row"
                                 title="Remove Variation Row"
                               >
-                                <FaCross className="text-sm" />
+                                <FaTrash className="text-sm" />
                                 {/* <FontAwesomeIcon icon={faClose} size="sm" /> */}
                               </button>
                             </td>

@@ -144,9 +144,9 @@ function AppContent() {
               <Route path="/register/:terminalId" element={<Register />} />
               <Route path="/dayend" element={<DayEnd />} />
               <Route path="/daystart/:terminalId" element={<DayOpen />} />
-              <Route path="/payment" element={<Payment />} />
-              <Route path="/ordersCompleted" element={<OrdersCompleted />} />
-              <Route path="/paymentConfirm" element={<PaymentConfirm />} />
+              {/* <Route path="/payment" element={<Payment />} /> */}
+              {/* <Route path="/ordersCompleted" element={<OrdersCompleted />} />
+              <Route path="/paymentConfirm" element={<PaymentConfirm />} /> */}
             </Route>
 
             {/*Only Sidebar */}

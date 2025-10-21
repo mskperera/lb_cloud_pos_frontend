@@ -72,7 +72,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
   );
 };
 
-export default function OrderList({ selectingMode }) {
+export default function OrderList({ selectingMode,reload }) {
   const [orders, setOrders] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
@@ -142,7 +142,7 @@ export default function OrderList({ selectingMode }) {
   useEffect(() => {
     console.log("useEffect lo");
     loadOrders(null, null, null);
-  }, [currentPage, rowsPerPage]);
+  }, [currentPage, rowsPerPage,reload]);
 
   const [filterByOptions, setFilterByOptions] = useState([
     { id: 1, displayName: "Order Number" },

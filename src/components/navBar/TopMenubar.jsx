@@ -5,7 +5,7 @@ import Syncing from '../Syncing';
 import Alert from '../Alert';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedStore } from '../../state/store/storeSlice';
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import PrinterConnection from '../PrinterConnetion';
 import { getFrontendIdByTerminalId, getPrintdeskByTerminalId } from '../../functions/terminal';
 import { setPrinterList } from '../../state/printer/printerSlice';
@@ -76,97 +76,98 @@ export default function TopMenubar() {
   const [socket, setSocket] = useState(null);
   const terminalId_l=localStorage.getItem('terminalId');
 
-  const loadPrintdeskByTerminalId=async()=>{
-    console.log("terminalId_l",terminalId_l);
-    if(terminalId_l){
-    const terminalId=terminalId_l ? JSON.parse(terminalId_l):null;
-    const result=await getFrontendIdByTerminalId(terminalId);
-    console.log("getFrontendIdByTerminalId:", result);
-    localStorage.setItem("printdeskId",result.data.printdeskId);
-    setPrintDeskInfo(result.data);
-    }
-  }
-  useEffect(() => {
-    loadPrintdeskByTerminalId();
-  },[terminalId_l]);
+
+  // const loadPrintdeskByTerminalId=async()=>{
+  //   console.log("terminalId_l",terminalId_l);
+  //   if(terminalId_l){
+  //   const terminalId=terminalId_l ? JSON.parse(terminalId_l):null;
+  //   const result=await getFrontendIdByTerminalId(terminalId);
+  //   console.log("getFrontendIdByTerminalId:", result);
+  //   localStorage.setItem("printdeskId",result.data.printdeskId);
+  //   setPrintDeskInfo(result.data);
+  //   }
+  // }
+  // useEffect(() => {
+  //   loadPrintdeskByTerminalId();
+  // },[terminalId_l]);
 
 
 
-  useEffect(() => {
-    return () => {
-      if (location.pathname.startsWith("/register/")) {
-        console.log(`Leaving register page with ID: ${id}`);
-     // localStorage.removeItem('terminalId');
-      if(!terminalId_l)
-      connectSocket();
-      }
-    };
-  }, [location.pathname, id,terminalId_l]);
+  // useEffect(() => {
+  //   return () => {
+  //     if (location.pathname.startsWith("/register/")) {
+  //       console.log(`Leaving register page with ID: ${id}`);
+  //    // localStorage.removeItem('terminalId');
+  //     if(!terminalId_l)
+  //     connectSocket();
+  //     }
+  //   };
+  // }, [location.pathname, id,terminalId_l]);
 
 
-  const connectSocket=async()=>{
-    console.log('llllllllllloooooooooooooooo')
-    const newSocket = io(process.env.REACT_APP_SOCKET_IO_URL, {
-      path: "/socket.io/",
-      transports: ["websocket"],
-    });
+  // const connectSocket=async()=>{
+  //   console.log('llllllllllloooooooooooooooo')
+  //   const newSocket = io(process.env.REACT_APP_SOCKET_IO_URL, {
+  //     path: "/socket.io/",
+  //     transports: ["websocket"],
+  //   });
 
-    setSocket(newSocket);
+  //   setSocket(newSocket);
 
-    newSocket.on("connect", () => {
-      console.log("Socket connected:", newSocket.id);
+  //   newSocket.on("connect", () => {
+  //     console.log("Socket connected:", newSocket.id);
       
-      connectFrontend(newSocket);
-    });
+  //     connectFrontend(newSocket);
+  //   });
 
-      newSocket.on("printConnectionStatus", (data) => {
-        setMessages(data);
-      });
+  //     newSocket.on("printConnectionStatus", (data) => {
+  //       setMessages(data);
+  //     });
 
-      newSocket.on("loadPrinterListToFrontend", (data) => {
-       // setPrinterList(data.printerList);
+  //     newSocket.on("loadPrinterListToFrontend", (data) => {
+  //      // setPrinterList(data.printerList);
 
-        dispatch(setPrinterList({ printerList:data.printerList }));
+  //       dispatch(setPrinterList({ printerList:data.printerList }));
 
-      });
+  //     });
 
-      newSocket.on("error", (error) => {
-        console.error("Socket Error:", error);
-      });
-
-
-    newSocket.on("disconnect", () => {
-      console.log("Socket disconnected.");
-    });
-
-    newSocket.on("connect_error", (err) => {
-      console.error("Connection error:", err.message);
-    });
+  //     newSocket.on("error", (error) => {
+  //       console.error("Socket Error:", error);
+  //     });
 
 
-    newSocket.on("serverShutdown", ({ message }) => {
-      console.log(message);
-      setMessages({status:"serviceDisconnected"});
-    });
+  //   newSocket.on("disconnect", () => {
+  //     console.log("Socket disconnected.");
+  //   });
 
-    return () => {
-      newSocket.disconnect();
-    };
-  }
+  //   newSocket.on("connect_error", (err) => {
+  //     console.error("Connection error:", err.message);
+  //   });
 
-  useEffect(() => {
-    connectSocket();
+
+  //   newSocket.on("serverShutdown", ({ message }) => {
+  //     console.log(message);
+  //     setMessages({status:"serviceDisconnected"});
+  //   });
+
+  //   return () => {
+  //     newSocket.disconnect();
+  //   };
+  // }
+
+  // useEffect(() => {
+  //   connectSocket();
    
-  }, [printDeskInfo,terminalId_l,leftTerminal]);
+  // }, [printDeskInfo,terminalId_l,leftTerminal]);
 
-  const connectFrontend = (socketInstance) => {
-    console.log("Attempting to emit connectFrontendToTheService");
-    if (socketInstance && socketInstance.connected) {
-      socketInstance.emit("connectFrontendToTheService", { frontendId:printDeskInfo?.frontendId });
-    } else {
-      console.error("Socket is not connected!");
-    }
-  };
+  // const connectFrontend = (socketInstance) => {
+  //   console.log("Attempting to emit connectFrontendToTheService");
+  //   if (socketInstance && socketInstance.connected) {
+  //     socketInstance.emit("connectFrontendToTheService", { frontendId:printDeskInfo?.frontendId });
+  //   } else {
+  //     console.error("Socket is not connected!");
+  //   }
+  // };
 
 
 

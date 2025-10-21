@@ -31,7 +31,7 @@ const PrinterConnection = ({ status }) => {
   return (
     <div className="tooltip tooltip-bottom" data-tip={tooltip}>
       <i
-        className={`${icon} ${color}`}
+        className={`${icon} ${'text-gray-700'}`}
         style={{ fontSize: '1.5rem', cursor: 'pointer' }}
       ></i>
     </div>

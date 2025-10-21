@@ -13,7 +13,7 @@ const StoreItem=({onClick,store})=>{
     className="flex justify-between items-center p-3 border rounded-full gap-2 bg-gray-50"
   >
     <span className="text-gray-800 font-medium">{store.storeName}</span>
-  <FaTrash className="text-red-500 hover:text-red-700 cursor-pointer" />
+  <FaTrash className="text-red-500 hover:text-red-700 cursor-pointer"    onClick={onClick} />
 
     {/* <FontAwesomeIcon
       icon={faTrash}

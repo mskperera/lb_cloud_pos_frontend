@@ -90,38 +90,18 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
   }, []);
 
   return (
-    <div ref={searchRef} className="relative w-full">
-      <div className="flex items-center gap-3 w-full">
-     {!hideSearchBox ?
-        <div className="relative flex items-center w-full bg-[#f0faff] border border-gray-200 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
-          <i className="pi pi-search text-gray-600 text-lg absolute left-3"></i>
-          <input
-            type="text"
-            className="w-full py-3 pl-10 pr-10 text-base bg-transparent border-none focus:outline-none placeholder-gray-400"
-            placeholder={barcodeMode ? 'Scan Barcode' : 'Enter SKU'}
-            value={searchTerm}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-          />
-          {searchTerm && (
-            <button
-              className="absolute right-3 text-gray-500 hover:text-gray-700"
-              onClick={handleClearSearch}
-              aria-label="Clear search"
-            >
-              <i className="pi pi-times text-base"></i>
-            </button>
-          )}
-        </div>:''}
-        <button
+    <div ref={searchRef} className="">
+
+
+           <button
           type="button"
-          onClick={() => setShowAdvancedSearch(true)}
-          className="flex items-center px-4 py-2 text-sm rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+      onClick={() => setShowAdvancedSearch(true)}
+           className="flex items-center px-4 h-16 font-bold py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
         >
-          <span className="pi pi-filter text-base"></span>
-          <span className="ml-2">Item Lookup</span>
+             <span className="ml-2 font-bold">Item Lookup</span>
+     
         </button>
-      </div>
+
 
 
       {showAdvancedSearch && (

@@ -70,8 +70,8 @@ const ReceiptComponent = forwardRef(
           </div>
           <div className="item-header-row2">
             <span className="item-qty">Qty</span>
-            <span className="item-price">Price({currency})</span>
-            <span className="item-total">Total({currency})</span>
+            <span className="item-price">Price</span>
+            <span className="item-total">Total</span>
           </div>
         </div>
         <hr className="thin-border" />
@@ -166,7 +166,7 @@ const ReceiptComponent = forwardRef(
           <p className="print-date">
             Print Date: {moment().format('YYYY-MMM-DD hh:mm:ss A')}
           </p>
-          <p className="system-info">Powerd by Legendbyte - legendbyte.com</p>
+          <p className="system-info">System by legendbyte.com - 0771147484</p>
         </div>
       </div>
     );
