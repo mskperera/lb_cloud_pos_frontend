@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   getCategoryMenu,
   getProductExtraDetails,
@@ -11,6 +11,23 @@ import ProductItem from "./productItem/ProductItem";
 import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
 import DialogModel from "../../model/DialogModel";
 import { formatCurrency } from "../../../utils/format";
+import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
+
+
+
+const CategoryItem = ({ c, handleProductClick,selectedCategoryId }) => {
+
+  return (
+<div
+  className={`rounded-lg cursor-pointer
+   hover:bg-orange-100 p-2 border-2 border-gray-200 text-center flex  justify-center items-center ${c.categoryId===selectedCategoryId && 'border-orange-600 bg-orange-200'}`}
+  onClick={() => handleProductClick(c)}
+>
+  {c.categoryName}
+</div>
+
+  );
+};
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -18,7 +35,7 @@ const ProductList = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [totalRecords, setTotalRecords] = useState(10);
 
   const [selectedVariationProducts, setSelectedVariationProducts] = useState([]);
@@ -32,11 +49,13 @@ const ProductList = () => {
   const [isVariationSelectionMenuShow, setIsVariationSelectionMenuShow] = useState(false);
 
   const store = JSON.parse(localStorage.getItem("selectedStore"));
+  const terminalId = localStorage.getItem("terminalId");
+  
 
-  const handleCategorySelect = (e) => {
-    setSelectedCategoryId(e.target.value);
+  const handleCategorySelect = (c) => {
+    setSelectedCategoryId(c.categoryId);
     setCurrentPage(0);
-    loadProducts(e.target.value, 0, rowsPerPage);
+    loadProducts(c.categoryId, 0, rowsPerPage);
   };
 
   const onPageChange = ({ page, rows }) => {
@@ -44,6 +63,7 @@ const ProductList = () => {
     setRowsPerPage(rows);
     loadProducts(selectedCategoryId, page, rows);
   };
+
 
   const loadProducts = async (categoryId, page = 0, limit = rowsPerPage) => {
     const skip = page * limit;
@@ -54,9 +74,10 @@ const ProductList = () => {
       barcode: null,
       categoryId: categoryId,
       storeId: store.storeId,
+      terminalId:terminalId,
       searchByKeyword: false,
-      skip: skip,
-      limit: limit,
+       skip: skip,
+       limit: limit,
     };
 
     try {
@@ -137,8 +158,8 @@ console.log('produckkkkkkkkkkkkts');
       try {
         const details = await getVariationProductDetails(payload);
         const variations = details.data.results[0] || [];
-console.log('variations',variations);
-console.log('products',p);
+
+console.log('product000000',p);
         if (!variations[0].variationValues) {
           // If no variations or variations is not an array, add directly to order
           const order = {
@@ -152,6 +173,7 @@ console.log('products',p);
             qty,
             measurementUnitName: p.measurementUnitName,
             stockQty: p.isStockTracked ? p.stockQty : undefined,
+            imageUrl:p.imageUrl
           };
           dispatch(addOrder(order));
         } else {
@@ -179,6 +201,7 @@ console.log('products',p);
           qty,
           measurementUnitName: p.measurementUnitName,
           stockQty: p.isStockTracked ? p.stockQty : undefined,
+               imageUrl:p.imageUrl
         };
         dispatch(addOrder(order));
       }
@@ -194,6 +217,7 @@ console.log('products',p);
         qty,
         measurementUnitName: p.measurementUnitName,
         stockQty: p.isStockTracked ? p.stockQty : undefined,
+             imageUrl:p.imageUrl
       };
       dispatch(addOrder(order));
     }
@@ -264,131 +288,215 @@ console.log('products',p);
       qty,
       measurementUnitName: selectedProduct.measurementUnitName,
       stockQty: selectedProduct.isStockTracked ? p.stockQty : undefined,
+             imageUrl:selectedProduct.imageUrl
     };
     dispatch(addOrder(order));
     setIsVariationSelectionMenuShow(false);
   };
 
-  return (
-    <div className="flex flex-col gap-2">
-      <DialogModel
-        header={selectedProduct.productName}
-        visible={isVariationSelectionMenuShow}
-        onHide={() => setIsVariationSelectionMenuShow(false)}
-      >
-        <div className="flex flex-col gap-4 px-4 m-0 p-0 min-w-[50vw] min-h-[50vh] overflow-auto">
-          <div className="flex items-center gap-2 text-sm mb-4 text-gray-600">
-            <button
-              onClick={handleBack}
-              className="btn btn-sm btn-ghost text-sky-600 hover:bg-sky-100"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <span
-              className="cursor-pointer hover:text-sky-500"
-              onClick={() => {
-                setVariationLevel(0);
-                setVariationPath([]);
-                setCurrentVariations(
-                  getVariationValuesForType(
-                    selectedVariationProducts,
-                    getVariationTypes(selectedVariationProducts)[0],
-                    []
-                  )
-                );
-              }}
-            >
-              Home
-            </span>
-         
-            {variationPath.map((p, index) => (
-              <span key={index} className="flex items-center gap-2">
-                <span> / </span>
-                <span
-                  className="cursor-pointer hover:text-sky-500"
-                  onClick={() => handleBreadcrumbClick(index)}
-                >
-                  {p.type}: {p.value}
-                </span>
-              </span>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-4">
-            {currentVariations.length > 0 ? (
-              variationLevel < getVariationTypes(selectedVariationProducts).length - 1 ? (
-                currentVariations.map((value, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col w-full  md:w-[188px] items-center justify-between rounded-lg cursor-pointer py-4 px-3 bg-[#f0faff] border-gray-200 sky-500 shadow-md border hover:border-sky-500 hover:shadow-xl transition duration-300"
-                    onClick={() =>
-                      handleVariationSelect(
-                        value,
-                        getVariationTypes(selectedVariationProducts)[variationLevel]
-                      )
-                    }
-                  >
-                    <p className="font-medium text-gray-700">{value}</p>
-                  </div>
-                ))
-              ) : (
-                currentVariations.map((p, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col w-full md:w-[188px] items-center justify-between rounded-lg cursor-pointer py-4 px-3 bg-white shadow-lg border hover:border-sky-500 hover:shadow-xl transition duration-300"
-                    onClick={() => {
-                      handleProductVariationClick(p, selectedProduct);
-                    }}
-                  >
-                    <div className="w-full text-xs text-gray-500 text-left mb-2">
-                      <span className="font-semibold">SKU:</span> {p.sku || "N/A"}
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">
-                      {
-                        JSON.parse(p.variationValues).find(
-                          (v) => v.variationTypeName === getVariationTypes(selectedVariationProducts)[variationLevel]
-                        )?.variationValue
-                      }
-                    </p>
-                    <p className="text-lg font-bold text-center text-gray-800">
-                      {formatCurrency(p.unitPrice, true)}
-                    </p>
-                    {selectedProduct.isStockTracked ? (
-                      <p className="text-sm font-medium mt-2">
-                        {p.stockQty > 0 ? `${p.stockQty} in stock` : "Out of stock"}
-                      </p>
-                    ) : null}
-                  </div>
-                ))
-              )
-            ) : (
-              <div className="text-gray-500 text-center w-full">No items found</div>
-            )}
-          </div>
-       
-        </div>
-      </DialogModel>
+  function useContainerWidth(ref) {
+  const [width, setWidth] = useState(0);
 
-      <div className="px-4 pt-2 flex justify-between gap-5 m-0 p-0">
-        <DaisyUIPaginator
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setWidth(entry.contentRect.width);
+    });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return width;
+}
+
+  const containerRef = useRef();
+  const width = useContainerWidth(containerRef);
+
+  // You can define breakpoints however you like
+  let cols = 4;
+    if (width < 500) cols = 2;
+  if (width < 600) cols = 3;
+  else if (width < 900) cols = 4;
+  else cols = 4;
+  return (
+    <div className="flex flex-col">
+   
+   {totalRecords>rowsPerPage && <DaisyUIPaginator
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
           totalRecords={totalRecords}
           onPageChange={onPageChange}
           rowsPerPageOptions={[10, 20, 30, 50, 100]}
-        />
+        /> }
+
+    <div className="flex justify-between gap-2 w-full">
+    <DialogModel
+  header={
+    <div className="flex items-center gap-2">
+      <FaPalette className="h-5 w-5 text-white" />
+      <span className="font-semibold text-lg">{selectedProduct.productName}</span>
+    </div>
+  }
+  visible={isVariationSelectionMenuShow}
+  onHide={() => setIsVariationSelectionMenuShow(false)}
+  className="w-full max-w-4xl"
+>
+  <div className="p-6 bg-gradient-to-b from-gray-50 to-white rounded-xl">
+    {/* Breadcrumb Navigation */}
+    <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6 flex-wrap">
+      <button
+        onClick={handleBack}
+        className="p-1.5 rounded-full hover:bg-sky-100 transition-colors"
+        title="Back"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4 text-sky-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => {
+          setVariationLevel(0);
+          setVariationPath([]);
+          setCurrentVariations(
+            getVariationValuesForType(
+              selectedVariationProducts,
+              getVariationTypes(selectedVariationProducts)[0],
+              []
+            )
+          );
+        }}
+        className="px-2 py-1 rounded-md hover:bg-sky-100 hover:text-sky-600 transition-all font-medium"
+      >
+       {selectedProduct.productName}
+      </button>
+
+      {variationPath.map((p, index) => (
+        <React.Fragment key={index}>
+          <span className="text-gray-400">/</span>
+          <button
+            onClick={() => handleBreadcrumbClick(index)}
+            className="px-2 py-1 rounded-md hover:bg-sky-100 hover:text-sky-600 transition-all font-medium capitalize"
+          >
+            {p.value}
+          </button>
+        </React.Fragment>
+      ))}
+    </nav>
+
+    {/* Variation Grid */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {currentVariations.length > 0 ? (
+        variationLevel < getVariationTypes(selectedVariationProducts).length - 1 ? (
+          /* === Option Level (e.g., Size, Color) === */
+          currentVariations.map((value, index) => (
+            <div
+              key={index}
+              onClick={() =>
+                handleVariationSelect(
+                  value,
+                  getVariationTypes(selectedVariationProducts)[variationLevel]
+                )
+              }
+              className={`
+                group relative overflow-hidden
+                bg-white/70 backdrop-blur-sm
+                rounded-xl p-5 cursor-pointer
+                border border-gray-200
+                transition-all duration-300 ease-out
+                hover:scale-105 hover:shadow-lg hover:border-sky-400
+                hover:bg-gradient-to-br hover:from-sky-50 hover:to-white
+                active:scale-95
+              `}
+            >
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-sky-100 flex items-center justify-center group-hover:bg-sky-200 transition-colors">
+                  <FaTag className="h-6 w-6 text-sky-600" />
+                </div>
+                <p className="font-semibold text-gray-800 text-sm tracking-tight">
+                  {value}
+                </p>
+              </div>
+            </div>
+          ))
+        ) : (
+          /* === Final Variation Level (SKU, Price, Stock) === */
+          currentVariations.map((p, index) => {
+            const variationLabel = JSON.parse(p.variationValues)
+              .map(v => v.variationValue)
+              .join(" • ");
+
+            return (
+              <div
+                key={index}
+                onClick={() => handleProductVariationClick(p, selectedProduct)}
+                className={`
+                  group relative overflow-hidden
+                  bg-white rounded-xl p-4 cursor-pointer
+                  border-2 transition-all duration-300
+                  hover:border-sky-400
+                  active:scale-95
+                `}
+              >
+                {/* Stock Badge */}
+                {selectedProduct.isStockTracked ? (
+                  <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold
+                    ${p.stockQty > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}
+                  `}>
+                    {/* {p.stockQty > 0 ? `${p.stockQty} left` : 'Out'} */}
+                  </div>
+                ):''}
+
+                {/* SKU */}
+                <p className="text-xs text-gray-500 font-mono mb-1">
+                  {p.sku || "N/A"}
+                </p>
+
+                {/* Variation Label */}
+                <p className="text-sm font-medium text-gray-700 line-clamp-2 mb-2">
+                  {variationLabel}
+                </p>
+
+                {/* Price */}
+                <p className="text-lg font-bold text-gray-800 text-center">
+                  {formatCurrency(p.unitPrice, true)}
+                </p>
+
+                {/* Hover Indicator */}
+                <div className="absolute inset-0 bg-sky-500 opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none" />
+              </div>
+            );
+          })
+        )
+      ) : (
+        /* === Empty State === */
+        <div className="col-span-full text-center py-12">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+            <FaSearch className="h-10 w-10 text-gray-400" />
+          </div>
+          <p className="text-gray-500 font-medium">No variations found</p>
+          <p className="text-sm text-gray-400 mt-1">Try selecting different options</p>
+        </div>
+      )}
+    </div>
+  </div>
+</DialogModel>
+
+ <div className="max-h-[90vh] bg-white flex flex-col gap-2 overflow-auto m-0 p-2 rounded-lg my-4 ">
+        {/* <DaisyUIPaginator
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          totalRecords={totalRecords}
+          onPageChange={onPageChange}
+          rowsPerPageOptions={[10, 20, 30, 50, 100]}
+        /> 
+        
         <select
           value={selectedCategoryId}
           style={{ margin: 0 }}
@@ -402,12 +510,24 @@ console.log('products',p);
                 {c.categoryName}
               </option>
             ))}
-        </select>
+        </select> */}
+
+
+   {
+            categories?.map((c) => (
+              <CategoryItem c={c}  handleProductClick={handleCategorySelect} selectedCategoryId={selectedCategoryId} />
+            ))}
+
+
+
       </div>
 
-      <div className="overflow-auto max-h-[70vh] m-0 p-2 rounded-lg">
+
+
+      <div className="max-h-[90vh] w-full overflow-auto my-2 p-2 rounded-lg">
         {!productListLoading ? (
-          <div className="grid grid-cols-4 md:grid-cols-3 gap-2 px-4 m-0 p-0 sm:grid-cols-2">
+            <div className="grid gap-2 grid-cols-4 md:grid-cols-4">
+  
             {products.length > 0 ? (
               products.map((p, index) => (
                 <ProductItem key={index} p={p} handleProductClick={handleProductClick} />
@@ -423,6 +543,7 @@ console.log('products',p);
         )}
       </div>
     </div>
+      </div>
   );
 };
 

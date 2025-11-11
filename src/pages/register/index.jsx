@@ -20,7 +20,7 @@ import { setSelectedStore } from "../../state/store/storeSlice";
 import PrinterConnection from "../../components/PrinterConnetion";
 import ProfileMenu from "../../components/ProfileMenu";
 import Barcode from "../../components/productSearch/Barcode";
-
+import posLogo from '../../assets/pos_logo.png';
 
 const Store=({store})=>(
   <div className='flex justify-start gap-1 items-center mb-1 text-gray-700 font-bold rounded-lg px-2'>
@@ -161,20 +161,29 @@ const Syncing=()=>{
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full bg-[#f0f9ff] px-10 gap-2 pt-3  h-16 z-50">
-      <div className="flex justify-between items-center w-full m-0 p-0">
+    <nav className="navbar fixed top-0 left-0 w-full px-10 gap-2 pt-3  h-16 z-50">
+      <div className="grid grid-cols-12 m-0 p-0">
+     
+     <div className=" col-span-7">
       <div className="flex justify-start gap-4 flex-1">
-        <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">
+
+        
+        <div className="flex items-center m-0 p-0 w-[6rem]">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
-          <h3 className="text-xl font-bold text-gray-700">Legend POS</h3>
+
+      <img src={posLogo} alt="Legend POS" className="w-20 h-14" />
+
+         {/* <h3 className="text-xl font-bold text-gray-700">Legend POS</h3> */}
      
         </div>
 
-<div className="w-1/2">
+<div className="w-full">
             <Barcode onProductSelect={handleProductClick} onBarcodeEnter={handleBarcodeEnter} />
 </div>
-    
+    </div>
           </div>
+
+<div className="flex items-center gap-4 m-0 p-0 justify-end col-span-5">
         <div className="flex items-center gap-4 m-0 p-0">
 
       <button
@@ -215,6 +224,7 @@ const Syncing=()=>{
             <Syncing />
             <ProfileMenu />
           </div>
+        </div>
         </div>
       </div>
     </nav>
@@ -287,34 +297,37 @@ const Register = () => {
                 Math.random()
                }}  />
       </DialogModel>
-
-        <div className="flex items-start justify-between gap-2 py-2 bg-[#f0f9ff] ">
-         
-
          
          
           {showPayment ? (
             <PaymentScreen />
           ) : (
-            <div className="grid grid-cols-12 w-full pt-16">
-        <TopMenubar/> 
-              <div className="flex gap-1 col-span-6 m-0 p-0">
+
+            <div className="h-screen bg-[#edf2fa]">
+                    <TopMenubar/> 
+            
+            <div className="grid grid-cols-12 w-full pt-16 mt-2">
+
+
+
+              <div className="flex gap-1 col-span-7 m-0 p-0">
                 <div className="p-1">
                   <Rightsidebar
                     setIsReturnOrderPopupVisible={setIsReturnOrderPopupVisible}
                     setIsSalesHistoryPopupVisible={setIsSalesHistoryPopupVisible}
                   />
                 </div>
-             
-                <OrderListAll />
+                <ProductList />
+               
               </div>
 
-              <div className=" col-span-6">
-                <ProductList />
+              <div className=" col-span-5 ">
+              <OrderListAll />
               </div>
             </div>
+            </div>
           )}
-        </div>
+   
 
     </HOCSession>
   );

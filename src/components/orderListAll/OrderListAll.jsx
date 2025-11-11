@@ -9,7 +9,7 @@ import { CONTACT_TYPE, DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/consta
 import ProductOrderList from "../register/orderList/ProductOrderList";
 import ApplyDiscount from "../register/ApplyDiscount";
 import ProductSearch from "../productSearch/ProductSearch";
-import { FaShoppingCart, FaTimesCircle } from 'react-icons/fa';
+import { FaPlusCircle, FaShoppingCart, FaTimesCircle } from 'react-icons/fa';
 import DialogModel from "../model/DialogModel";
 import Payment from "../register/payment/Payment";
 import PaymentConfirm from "../../pages/paymentConfirm";
@@ -132,7 +132,7 @@ const OrderListAll = () => {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen p-6">
+    <div className="flex flex-col w-full p-6 ">
       <ApplyDiscount
         orderListId={selectedOrderId}
         visible={isDiscountPopupVisible}
@@ -168,7 +168,7 @@ const OrderListAll = () => {
         <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
       </DialogModel>
 
-      <div className="flex flex-col gap-4 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-3 max-w-7xl mx-auto max-h-[80vh] overflow-auto ">
 
 
  <DialogModel
@@ -181,11 +181,13 @@ const OrderListAll = () => {
         }}  />
       </DialogModel>
 
-        <div>
-          <Customer />
-        </div>
 
-        <div className="overflow-y-auto max-h-[60vh] rounded-lg shadow-sm">
+
+        <div className="">
+          <Customer />
+    </div>
+
+        <div className="overflow-y-auto rounded-lg shadow-sm">
           <ProductOrderList showDiscountPopup={showDiscountPopupHandler} />
         </div>
 
@@ -217,26 +219,26 @@ const OrderListAll = () => {
           onClick={()=>{
             setIsAddCustomProductShow(true);
           }}
-           className="flex items-center px-4 font-bold py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+           className="flex items-center px-4 font-bold py-2 rounded-lg bg-orange-500 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
         >
-          Custom Item
+       <FaPlusCircle className="mr-2" />  Add Custom
      
         </button>
    
 
             <button
               onClick={newOrderHandler}
-              className="btn bg-gradient-to-r from-sky-600 to-sky-600 text-white font-semibold border-none h-auto py-4 px-6 rounded-md shadow-sm hover:shadow-lg hover:from-sky-700 hover:to-sky-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200 transform"
+              className="btn bg-slate-50 text-gray-700 hover:bg-slate-100 font-semibold border-none h-auto py-4 px-6 rounded-md shadow-sm hover:shadow-lg hover:from-sky-700 hover:to-sky-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200 transform"
             >
-              <span className="px-2 text-md">New Order</span>
+              <span className="px-2 text-md">New</span>
             </button>
             <button
               onClick={() => setIsPaymentShow(true)}
               disabled={list.length === 0}
-              className={`btn flex justify-center items-center gap-3 bg-[#008a5d] text-white font-semibold h-auto py-5 px-4 rounded-lg shadow-sm transition-all duration-200 transform ${
+              className={`btn flex justify-center items-center gap-3 bg-green-600 text-white font-semibold h-auto py-5 px-4 rounded-lg shadow-sm transition-all duration-200 transform ${
                 list.length === 0
                   ? "text-white opacity-80 cursor-not-allowed shadow-none"
-                  : "bg-gradient-to-r  hover:to-sky-800 hover:shadow-lg hover:scale-105"
+                  : "hover:bg-green-700"
               }`}
             >
               <FaShoppingCart className="text-2xl" />
@@ -244,7 +246,8 @@ const OrderListAll = () => {
             </button>
           </div>
         </div>
-      </div>
+      
+          </div>
     </div>
   );
 };

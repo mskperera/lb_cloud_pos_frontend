@@ -1,68 +1,144 @@
 import { formatCurrency } from "../../../../utils/format";
+import { FaClone } from "react-icons/fa";
 
 const ProductItem = ({ p, handleProductClick }) => {
+  const isVariationProduct = p.productTypeId === 2;
   const hasImage = Boolean(p.imageUrl);
-  const stockClass = p.stockQty > 0 ? "text-green-600" : "text-red-600";
-  const stockText =!!p.isStockTracked &&( p.stockQty > 0 ? `${p.stockQty} ${p.measurementUnitName}` : "Out of stock");
+  const stockText =
+    !!p.isStockTracked &&
+    (p.stockQty > 0 ? `${p.stockQty} ${p.measurementUnitName}` : "");
 
-  const isNewStock = p.hasUnreleasedStock; // Assuming `isNewStock` is a flag for newly released stock
-  
-  // Determine if the card should be disabled
-  const isDisabled =false; //p.stockQty == 0;
+  const isDisabled = false;
 
+  // === Variation Product ===
+  if (isVariationProduct) {
+    return (
+      <div
+        className={`
+          group relative flex flex-col
+          bg-gradient-to-br from-sky-50 to-white
+          rounded-xl cursor-pointer p-6 shadow-md border-2 border-sky-200
+          min-h-[100px] w-full
+          transition-all duration-300 ease-out
+          hover:scale-105 hover:shadow-xl hover:border-sky-400
+          active:scale-95
+          ${isDisabled ? "opacity-50 pointer-events-none" : ""}
+        `}
+        onClick={() => !isDisabled && handleProductClick(p)}
+        title={p.productName}
+      >
+        {/* Image (if exists) */}
+        {hasImage && (
+          <div className="absolute top-2 left-2 w-14 h-14 rounded-lg overflow-hidden shadow-sm ring-1 ring-gray-200">
+            <img
+              src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
+              alt={p.productName}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
+        {/* FaClone Icon */}
+        <div
+          className={`
+            ${hasImage 
+              ? "absolute top-2 right-2 w-8 h-8" 
+              : "flex justify-center items-center w-12 h-12 mx-auto"
+            }
+            text-sky-600 group-hover:text-sky-700 transition-colors
+          `}
+        >
+          <FaClone className="w-full h-full" />
+        </div>
+
+        {/* Spacer to push productName to bottom */}
+        <div className="flex-1" />
+
+        {/* Product Name at bottom */}
+        <p
+          className="mt-4 text-sm font-bold text-gray-700 tracking-tight text-center
+                     group-hover:text-sky-700 transition-colors"
+          title={p.productName}
+        >
+          {p.productName}
+        </p>
+      </div>
+    );
+  }
+
+  // === Regular Product ===
   return (
     <div
-  className={`
-        flex flex-col w-full items-center justify-between
-        rounded-lg cursor-pointer py-2 px-0 shadow-sm border
-      ${p.sku ? 'bg-[#daf3ef]':'bg-[#39c08f] '} 
-        hover:shadow-xl transition duration-300 
-        ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
-        active:scale-95 active:shadow-inner active:border-gray-400
+      className={`
+        group relative overflow-hidden
+        flex flex-col justify-between
+        bg-white/90 backdrop-blur-sm
+        rounded-xl cursor-pointer
+        p-3 shadow-md border border-gray-200
+        min-h-[100px] w-full
+        transition-all duration-300 ease-out
+        hover:scale-[1.02] hover:shadow-xl
+        hover:bg-gradient-to-br hover:from-sky-50 hover:to-white
+        hover:border-sky-400
+        active:scale-95
+        ${isDisabled ? "opacity-50 pointer-events-none" : ""}
       `}
-      onClick={() => !isDisabled && handleProductClick(p)} // Prevent click if disabled
-    
-  >
-  
-      <div className="flex items-center gap-3">
-        {hasImage && (
-          <img
-            src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
-            alt={p.productName}
-            className="w-[60px] h-[60px] rounded-lg object-cover"
-          />
-        )}
-        <div className="flex flex-col">
-          <p className={`text-sm ${stockClass} mb-1`}>
-            {p.productTypeId != 2 && stockText}
-          </p>
-            {p.productTypeId != 2 &&   <p className="text-sm text-gray-600 font-medium">
-           {formatCurrency(p.unitPrice,true)}
-          </p>}
+      onClick={() => !isDisabled && handleProductClick(p)}
+    >
+      {/* Top Row: Image + Stock + Price */}
+      <div className={`flex items-center z-10 justify-center`}>
+        {/* Image or Empty Space */}
+        <div className="w-14 h-14">
+          {hasImage ? (
+            <img
+              src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
+              alt={p.productName}
+              className="w-full h-full rounded-lg object-cover shadow-sm ring-1 ring-gray-200"
+            />
+          ) : (
+            <div className="w-full h-full" />
+          )}
         </div>
-      </div>
-      <div className="text-[1rem] font-semibold text-gray-800 truncate group-hover:overflow-visible group-hover:text-ellipsis group-hover:whitespace-normal">
-        {p.productName}
-      </div>
-      {p.productTypeId != 2 && <p className="text-sm text-gray-600">SKU: {p.sku}</p>}
-{/* {JSON.stringify(p)} */}
 
-      {/* Display message for new stock if available */}
-      {/* {!!p.isStockTracked && isNewStock ? (
-        <p className="text-sm text-yellow-600 mt-2">
-          New unreleased stock available!
+  
+      </div>
+
+      <div className="flex-1" />
+
+      <p
+        className="mt-auto px-1 text-sm  text-gray-800 text-center mb-0
+                   group-hover:text-sky-700 transition-colors"
+        title={p.productName}
+      >
+        {p.productName}
+      </p>
+
+      {p.sku && (
+        <p className="mt-1 text-xs text-gray-500 text-center font-mono">
+          {p.sku}
         </p>
-      ):''} */}
-      
+      )}
+
+        <div className={`flex flex-1 min-w-0 items-center ${stockText ? 'justify-between' : 'justify-center'}`}>
+          <p className="text-sm font-bold text-gray-700">
+            {formatCurrency(p.unitPrice, true)}
+          </p>
+
+               {stockText ? (
+            <p className="text-xs font-medium text-green-600 truncate leading-tight">
+              {stockText}
+            </p>
+          ) : (
+            <div className="h-4" />
+          )}
+
+        </div>
+
     </div>
   );
 };
 
 export default ProductItem;
-
-
-
-
 
 
 // import React from 'react'

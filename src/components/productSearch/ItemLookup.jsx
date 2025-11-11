@@ -4,6 +4,7 @@ import { getProductsAllVariations } from '../../functions/register';
 import { useToast } from '../useToast';
 import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
+import { FaBinoculars, FaStethoscope } from 'react-icons/fa';
 
 const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,hideSearchBox }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,6 +99,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
       onClick={() => setShowAdvancedSearch(true)}
            className="flex items-center px-4 h-16 font-bold py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
         >
+          <FaBinoculars />
              <span className="ml-2 font-bold">Item Lookup</span>
      
         </button>

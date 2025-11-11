@@ -77,9 +77,18 @@ export default function ProductOrderList({ showDiscountPopup }) {
   );
 
   const descriptionBodyTemplate = (product) => (
+
+<div className="flex items-center gap-2">
+  {product.imageUrl ?    <img
+              src={`${process.env.REACT_APP_API_CDN}/${product.imageUrl}?width=200&height=200&quality=80`}
+              alt={product.productName}
+              className="w-14 h-14 rounded-lg object-cover shadow-sm ring-1 ring-gray-200"
+            />:null}
+
     <div className="flex flex-col gap-1">
       <span className="text-sm text-gray-600">{product.sku}</span>
       <span className="text-base font-medium text-gray-800">{product.description}</span>
+    </div>
     </div>
   );
 
@@ -88,17 +97,17 @@ export default function ProductOrderList({ showDiscountPopup }) {
   };
 
   return (
-    <div style={{ maxHeight: '300px', minHeight: '300px', overflowY: 'auto', border: '1px solid #ddd' }} className="bg-[#f0faff] rounded-lg shadow-md border border-gray-200 overflow-hidden">
+    <div  className="min-h-[300px] overflow-auto rounded-lg ">
     <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
-        <thead className="bg-[#f0faff] sticky top-0 z-10 border-b border-gray-200">
+        <thead className="bg-white sticky top-0 z-10 border-b-2 border-sky-600">
           <tr className="text-gray-700">
       <th className="py-3 px-4 text-left" style={{ width: '50%' }}>Description</th>
             <th className="py-3 px-4 text-center">Qty</th>
             <th className="py-3 px-4 text-right">Amount</th>
-            <th className="py-3 px-4 text-right"></th>
+            <th className="py-3 px-4 w-20 text-right"></th>
           </tr>
         </thead>
-        <tbody className="bg-[#f0faff]">
+        <tbody className="">
           {products.length === 0 ? (
             <tr>
               <td colSpan="4" className="py-8 text-center text-gray-500 text-base">
@@ -111,8 +120,8 @@ export default function ProductOrderList({ showDiscountPopup }) {
                 <tr className={`${product?.discount ? "bg-teal-50" : "bg-white"} border-b border-gray-200 hover:bg-gray-50 transition duration-150`}>
                   <td className="py-4 px-4">{descriptionBodyTemplate(product)}</td>
                   <td className="py-4 px-4 text-center">{qty(product)}</td>
-                  <td className="py-4 px-4">{netAmount(product)}</td>
-                  <td className="py-4 px-4">{orderListItemMenu(product)}</td>
+                  <td className="py-4 px-4 ">{netAmount(product)}</td>
+                  <td className="py-4 px-4 ">{orderListItemMenu(product)}</td>
                 </tr>
                 {product?.discount && (
                   <tr className="bg-teal-100 text-gray-700 border-b border-gray-200">
