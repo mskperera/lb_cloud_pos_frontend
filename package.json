@@ -1,6 +1,6 @@
 {
   "name": "lb_cloudpos_new",
-  "version": "2.0.0a",
+  "version": "3.0.0",
   "private": true,
   "dependencies": {
     "@fullhuman/postcss-purgecss": "^6.0.0",
