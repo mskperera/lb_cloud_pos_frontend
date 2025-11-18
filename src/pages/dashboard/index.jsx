@@ -584,7 +584,7 @@ const healthyStock=inStock-lowStock;
 setInventoryStatus({healthyStock, lowStock, outOfStock,expiredStock,expiringSoon,nonExpiredSafeStock });
 
 setInventoryData({
-  labels: ["Healthy Stock","In Stock", "Out of Stock"],
+  labels: ["Healthy Stock","Low Stock", "Out of Stock"],
   datasets: [
     {
       data: [healthyStock,lowStock, outOfStock,],
