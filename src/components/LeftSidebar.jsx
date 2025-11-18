@@ -11,7 +11,8 @@ const Rightsidebar = ({
   visible,
   onChangeVisibility,
   setIsReturnOrderPopupVisible,
-  setIsSalesHistoryPopupVisible
+  setIsSalesHistoryPopupVisible,
+  setIsDayEndPopupVisible
 }) => {
   const dispatch = useDispatch();
   const { voidOrderVisible } = useSelector((state) => state.popup);
@@ -89,7 +90,8 @@ const Rightsidebar = ({
           label="Dayend"
           icon={FaCalendarPlus}
           onClick={() => {
-            navigate("/dayend");
+            setIsDayEndPopupVisible(true);
+           // navigate("/dayend");
           }}
         />
         {/* <LeftSidebarMenu

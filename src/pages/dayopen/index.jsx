@@ -164,8 +164,8 @@ const dayStartHandler=async()=>{
 
   
 return (
-  <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
-    <div className="w-full max-w-2xl p-6 bg-white shadow-md rounded-lg mx-auto flex flex-col items-center">
+  <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-[#edf2fa]">
+    <div className="w-full max-w-2xl p-6 bg-white border-gray-200 border-2 rounded-lg mx-auto flex flex-col items-center">
       <h2 className="text-2xl font-bold text-center mb-6">Day Start</h2>
 
       <div className="grid grid-cols-1 gap-6 w-full max-w-md">
@@ -242,6 +242,14 @@ return (
           disabled={isLoading}
         >
           {isLoading ? "Starting..." : "Start Day"}
+        </button>
+
+        {/* Back to Home Button */}
+        <button
+          className="w-full mt-4 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+          onClick={() => navigate("/home")}
+        >
+          Back to Home
         </button>
       </div>
     </div>

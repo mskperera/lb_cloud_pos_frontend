@@ -93,3 +93,28 @@ export const getLatestSessionDetails = async (terminalId) => {
     return err;
   }
 };
+
+
+export const getSessionMismatchCheck = async (sessionId,terminalId) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .get(`session/mismatchCheck/get?sessionId=${sessionId}&terminalId=${terminalId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+

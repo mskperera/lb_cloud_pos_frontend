@@ -21,6 +21,7 @@ import PrinterConnection from "../../components/PrinterConnetion";
 import ProfileMenu from "../../components/ProfileMenu";
 import Barcode from "../../components/productSearch/Barcode";
 import posLogo from '../../assets/pos_logo.png';
+import DayEnd from "../dayend/DayEnd";
 
 const Store=({store})=>(
   <div className='flex justify-start gap-1 items-center mb-1 text-gray-700 font-bold rounded-lg px-2'>
@@ -161,14 +162,14 @@ const Syncing=()=>{
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full px-10 gap-2 pt-3  h-16 z-50">
+    <nav className="navbar fixed top-0 left-0 w-full px-10 gap-2 pt-3  h-16">
       <div className="grid grid-cols-12 m-0 p-0">
      
      <div className=" col-span-7">
       <div className="flex justify-start gap-4 flex-1">
 
         
-        <div className="flex items-center m-0 p-0 w-[6rem]">
+        <div className="flex items-center m-0 p-0 w-[6rem] ">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
 
       <img src={posLogo} alt="Legend POS" className="w-20 h-14" />
@@ -250,7 +251,10 @@ const Register = () => {
   const [isReturnOrderPopupVisible, setIsReturnOrderPopupVisible] = useState(false);
 
   const [isSalesHistoryPopupVisible, setIsSalesHistoryPopupVisible] = useState(false);
-    
+      
+  const [isDayEndPopupVisible, setIsDayEndPopupVisible] = useState(false);
+  const [isDayendLoading, setIsDayendLoading] = useState(false);
+  
 
   const [showPayment, setShowPayment] = useState(false);
 
@@ -285,19 +289,22 @@ const Register = () => {
       </DialogModel>
 
 
-      <DialogModel
-        header="Sales History"
-        visible={isSalesHistoryPopupVisible}
-        maximizable
-        maximized={true}
-        style={{ width: "50vw" }}
-        onHide={() => setIsSalesHistoryPopupVisible(false)}
-      >
-               <OrderList selectingMode={false} reload={()=>{
-                Math.random()
-               }}  />
-      </DialogModel>
-         
+
+           {isSalesHistoryPopupVisible && 
+
+
+            <OrderList isVisible={isSalesHistoryPopupVisible} 
+           setIsVisible={setIsSalesHistoryPopupVisible} 
+           />
+ 
+           }
+            
+  
+             {isDayEndPopupVisible &&
+
+              <DayEnd isVisible={isDayEndPopupVisible} setIsVisible={setIsDayEndPopupVisible} />
+              }
+
          
           {showPayment ? (
             <PaymentScreen />
@@ -315,6 +322,8 @@ const Register = () => {
                   <Rightsidebar
                     setIsReturnOrderPopupVisible={setIsReturnOrderPopupVisible}
                     setIsSalesHistoryPopupVisible={setIsSalesHistoryPopupVisible}
+                      setIsDayEndPopupVisible={setIsDayEndPopupVisible}
+                    
                   />
                 </div>
                 <ProductList />

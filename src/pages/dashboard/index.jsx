@@ -24,6 +24,9 @@ import { getCurrencyInfo } from "../../utils/utils";
 import { formatCurrency, formatDate, formatUtcToLocal } from "../../utils/format";
 import { getDrpSession, getStoresDrp } from "../../functions/dropdowns";
 import LowStockProducts from "../../components/lowStockProducts/LowStockProducts";
+import DatePicker from 'react-datepicker'; // Install via npm if needed: npm install react-datepicker
+import LineChart from "../../components/dashboard/LineChart";
+import { FaPalette } from "react-icons/fa";
 
 Chart.register(ChartDataLabels);
 
@@ -40,6 +43,215 @@ ChartJS.register(
   ArcElement
 );
 
+
+
+
+
+
+
+// Mock data for demo; replace with real API fetches
+const mockSessions = [
+  { id: 'session1', displayName: 'Day-End Morning Shift' },
+  { id: 'session2', displayName: 'Day-End Evening Shift' },
+];
+
+const mockDailySalesData = {
+  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  datasets: [
+    { label: 'Sales', data: [1200, 1900, 3000, 500, 2000] },
+    { label: 'Transactions', data: [65, 59, 80, 81, 56] },
+  ],
+};
+
+const mockTransactions = [
+  { id: 1, date: '2025-11-15', amount: 150, type: 'Cash' },
+  { id: 2, date: '2025-11-14', amount: 200, type: 'Credit' },
+];
+
+const mockInventory = [
+  { item: 'Product A', stock: 50, turnover: 'High' },
+  { item: 'Product B', stock: 10, turnover: 'Low' },
+];
+
+function POSDashboard({ fetchData }) { // Assume fetchData is a prop for API calls
+  const [selectedSession, setSelectedSession] = useState('');
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [filteredData, setFilteredData] = useState({
+    totalSales: 0,
+    avgTransaction: 0,
+    totalTransactions: 0,
+    inventoryTurnover: 0,
+    lowStockItems: 0,
+    customerCount: 0,
+    salesData: mockDailySalesData,
+    transactions: mockTransactions,
+    inventory: mockInventory,
+  });
+
+  useEffect(() => {
+    // Simulate fetching filtered data based on session/date
+    // In real app: Call API with params like { session: selectedSession, startDate, endDate }
+    const data = fetchData({ session: selectedSession, startDate, endDate }); // Mocked
+    setFilteredData({
+      totalSales: 5000, // Example calculations
+      avgTransaction: 100,
+      totalTransactions: 50,
+      inventoryTurnover: 4.5,
+      lowStockItems: 5,
+      customerCount: 200,
+      salesData: mockDailySalesData, // Filtered chart data
+      transactions: mockTransactions.filter(tx => /* date filter logic */ true),
+      inventory: mockInventory.filter(item => /* session filter */ true),
+    });
+  }, [selectedSession, startDate, endDate, fetchData]);
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top' },
+      title: { display: true, text: 'Sales & Transactions Trend' },
+    },
+    scales: {
+      y: { title: { display: true, text: `Value (${getCurrencyInfo().symbol})` } },
+    },
+  };
+
+  return (
+    <div className="bg-gray-100 p-6">
+      {/* Filters Section */}
+      <div className="flex flex-wrap justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm">
+        <h2 className="text-2xl font-bold">POS Dashboard</h2>
+        <div className="flex space-x-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Session</label>
+            <select
+              value={selectedSession}
+              onChange={(e) => setSelectedSession(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+            >
+              <option value="">All Sessions</option>
+              {mockSessions.map((session) => (
+                <option key={session.id} value={session.id}>
+                  {session.displayName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date Range</label>
+            <div className="flex space-x-2">
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                selectsStart
+                startDate={startDate}
+                endDate={endDate}
+                className="px-3 py-2 border border-gray-300 rounded-md"
+              />
+              <DatePicker
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                selectsEnd
+                startDate={startDate}
+                endDate={endDate}
+                minDate={startDate}
+                className="px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold">Total Sales</h3>
+          <p className="text-2xl font-bold text-green-600">{formatCurrency(filteredData.totalSales)}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold">Avg. Transaction</h3>
+          <p className="text-2xl font-bold text-blue-600">{formatCurrency(filteredData.avgTransaction)}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold">Total Transactions</h3>
+          <p className="text-2xl font-bold">{filteredData.totalTransactions}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold">Inventory Turnover</h3>
+          <p className="text-2xl font-bold">{filteredData.inventoryTurnover}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold">Low Stock Items</h3>
+          <p className="text-2xl font-bold text-red-600">{filteredData.lowStockItems}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold">Customer Count</h3>
+          <p className="text-2xl font-bold">{filteredData.customerCount}</p>
+        </div>
+      </div>
+
+      {/* Sales Trend Chart */}
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+        <h3 className="text-xl font-bold mb-4">Sales & Transactions Trend</h3>
+        <div className="h-80">
+          <LineChart data={filteredData.salesData} options={chartOptions} />
+        </div>
+      </div>
+
+      {/* Transactions Table */}
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+        <h3 className="text-xl font-bold mb-4">Recent Transactions</h3>
+        <table className="w-full table-auto">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">Date</th>
+              <th className="px-4 py-2 text-right">Amount</th>
+              <th className="px-4 py-2 text-left">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.transactions.map((tx) => (
+              <tr key={tx.id}>
+                <td className="px-4 py-2">{tx.id}</td>
+                <td className="px-4 py-2">{tx.date}</td>
+                <td className="px-4 py-2 text-right">{formatCurrency(tx.amount)}</td>
+                <td className="px-4 py-2">{tx.type}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Inventory Overview */}
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h3 className="text-xl font-bold mb-4">Inventory Summary</h3>
+        <table className="w-full table-auto">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="px-4 py-2 text-left">Item</th>
+              <th className="px-4 py-2 text-right">Stock Level</th>
+              <th className="px-4 py-2 text-left">Turnover</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.inventory.map((item, index) => (
+              <tr key={index}>
+                <td className="px-4 py-2">{item.item}</td>
+                <td className="px-4 py-2 text-right">{item.stock}</td>
+                <td className="px-4 py-2">{item.turnover}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
+
 function Dashboard() {
   const [isCollapsed, setIsCollapsed] = useState(false); // Sidebar state
   const [selectedDate, setSelectedDate] = useState(
@@ -52,19 +264,9 @@ function Dashboard() {
   const [dailyRevenueData, setDailyRevenueData] = useState({
     labels: Array.from({ length: 31 }, (_, i) => i + 1), // Days in the month
     datasets: [
+
       {
-        label: "Gross Revenue",
-        data: [
-          200, 250, 300, 400, 350, 500, 450, 550, 600, 700, 800, 900, 950, 1000,
-          1100, 1200, 1250, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000,
-          2100, 2200, 2300, 2400, 2500, 2600, 2700,
-        ], // Daily revenue sample data
-        borderColor: "rgba(0, 123, 255, 0.8)", // Blueish color for revenue
-        backgroundColor: "rgba(0, 123, 255, 0.3)", // Light blueish background
-        tension: 0.4, // Smooth curve for the line
-      },
-      {
-        label: "Net Revenue",
+        label: "Revenue",
         data: [
           50, 60, 70, 90, 80, 100, 90, 110, 120, 140, 160, 180, 190, 200, 220,
           250, 260, 270, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500,
@@ -75,7 +277,7 @@ function Dashboard() {
         tension: 0.4, // Smooth curve for the line
       },
       {
-        label: "Gross Profit",
+        label: "Profit",
         data: [
           50, 60, 70, 90, 80, 100, 90, 110, 120, 140, 160, 180, 190, 200, 220,
           250, 260, 270, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500,
@@ -105,18 +307,9 @@ function Dashboard() {
       "Dec",
     ], // Monthly labels
     datasets: [
+
       {
-        label: "Gross Revenue",
-        data: [
-          6000, 7500, 9000, 12000, 10500, 15000, 13500, 16500, 18000, 21000,
-          24000, 27000,
-        ], // Gross Revenue sample data
-        borderColor: "rgba(0, 123, 255, 0.8)", // Blueish color for revenue
-        backgroundColor: "rgba(0, 123, 255, 0.3)", // Light blueish background
-        tension: 0.4,
-      },
-      {
-        label: "Net Revenue",
+        label: "Revenue",
         data: [
           1000, 1200, 1500, 2000, 1800, 2500, 2200, 2700, 3000, 3500, 4000,
           4500,
@@ -126,7 +319,7 @@ function Dashboard() {
         tension: 0.4,
       },
       {
-        label: "Gross Profit",
+        label: "Profit",
         data: [
           1000, 1200, 1500, 2000, 1800, 2500, 2200, 2700, 3000, 3500, 4000,
           4500,
@@ -272,32 +465,20 @@ const productsExpirationColumns = [
       const dailyRevenueData = {
         labels: Array.from({ length: 31 }, (_, i) => i + 1), // Days 1 to 31
         datasets: [
-          {
-            label: "Gross Revenue",
-            data: Array.from({ length: 31 }, (_, i) => {
-              const record = dailyRevenueRecords.find(
-                (item) => item.Day === i + 1
-              );
-              return record ? parseFloat(record.dailyGrossRevenue) : 0; // Set to 0 if no data for the day
-            }),
-      borderColor: "rgba(0, 123, 255, 0.8)", // Blue
-      backgroundColor: "rgba(0, 123, 255, 0.3)",
-            tension: 0.4,
-          },
             {
-            label: "Net Revenue",
+            label: "Revenue",
             data: Array.from({ length: 31 }, (_, i) => {
               const record = dailyRevenueRecords.find(
                 (item) => item.Day === i + 1
               );
               return record ? parseFloat(record.dailyNetRevenue) : 0; // Set to 0 if no data for the day
             }),
-  borderColor: "rgba(255, 193, 7, 0.8)", // Yellow
-      backgroundColor: "rgba(255, 193, 7, 0.3)",
+      borderColor: "rgba(0, 123, 255, 0.8)", // Blue
+      backgroundColor: "rgba(0, 123, 255, 0.3)",
             tension: 0.4,
           },
           {
-            label: "Gross Profit",
+            label: "Profit",
             data: Array.from({ length: 31 }, (_, i) => {
               const record = dailyRevenueRecords.find(
                 (item) => item.Day === i + 1
@@ -312,35 +493,25 @@ const productsExpirationColumns = [
       };
 
       // Prepare monthly data (for months 1 to 12)
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const monthlyRevenueData = {
-        labels: Array.from({ length: 12 }, (_, i) => `Month ${i + 1}`), // Month 1 to 12
+        labels: monthNames, // Use month abbreviations
         datasets: [
-          {
-            label: "Gross Revenue",
-            data: Array.from({ length: 12 }, (_, i) => {
-              const record = monthlyRevenueRecords.find(
-                (item) => item.Month === i + 1
-              );
-              return record ? parseFloat(record.monthlyGrossRevenue) : 0; // Set to 0 if no data for the month
-            }),
-       borderColor: "rgba(0, 123, 255, 0.8)", // Blue
-      backgroundColor: "rgba(0, 123, 255, 0.3)",
-            tension: 0.4,
-          },
+    
                {
-            label: "Neet Revenue",
+            label: "Revenue",
             data: Array.from({ length: 12 }, (_, i) => {
               const record = monthlyRevenueRecords.find(
                 (item) => item.Month === i + 1
               );
               return record ? parseFloat(record.monthlyNetRevenue) : 0; // Set to 0 if no data for the month
             }),
-    borderColor: "rgba(255, 193, 7, 0.8)", // Yellow
-      backgroundColor: "rgba(255, 193, 7, 0.3)",
+      borderColor: "rgba(0, 123, 255, 0.8)", // Blue
+      backgroundColor: "rgba(0, 123, 255, 0.3)",
             tension: 0.4,
           },
           {
-            label: "Gross Profit",
+            label: "Profit",
             data: Array.from({ length: 12 }, (_, i) => {
               const record = monthlyRevenueRecords.find(
                 (item) => item.Month === i + 1
@@ -407,23 +578,71 @@ const inventoryRecords=records[6];
 // Mapping the result to the chart data format
     
 console.log('inventoryRecords',inventoryRecords);
-const { inStock, lowStock, outOfStock,expiredStock } = inventoryRecords[0]; // Destructure counts
+const { inStock, lowStock, outOfStock,expiredStock,expiringSoon,nonExpiredSafeStock } = inventoryRecords[0]; // Destructure counts
+const healthyStock=inStock-lowStock;
 
+setInventoryStatus({healthyStock, lowStock, outOfStock,expiredStock,expiringSoon,nonExpiredSafeStock });
 
 setInventoryData({
-  labels: ["In Stock", "Expired Stock", "Low Stock", "Out of Stock"],
+  labels: ["Healthy Stock","In Stock", "Out of Stock"],
   datasets: [
     {
-      data: [inStock, expiredStock, lowStock, outOfStock], // Use the counts from your query
+      data: [healthyStock,lowStock, outOfStock,],
       backgroundColor: [
-        "#36A2EB",  // In Stock (Blue)
-        "#FFCE56",  // Expired Stock (Yellow)
-        "#FF6384",  // Low Stock (Pink)
-        "#FF6F61",  // Out of Stock (Red)
+        "rgba(40, 167, 69, 0.8)",  
+        "#FFA239",
+        "#FF6384",
       ],
+      
     },
+
   ],
 });
+
+
+if (nonExpiredSafeStock === 0) {
+  setInventoryExpirationData({
+    labels: ["No Expiring Stock"],
+    datasets: [
+      {
+        data: [1],
+        backgroundColor: ["#EEEEEE"],
+      },
+    ],
+  });
+} else {
+  setInventoryExpirationData({
+    labels: ["Non-Expired Stock", "Expiring Soon", "Expired Stock"],
+    datasets: [
+      {
+        data: [nonExpiredSafeStock, expiringSoon, expiredStock],
+        backgroundColor: [
+          "rgba(40, 167, 69, 0.8)",
+          "#FFA239",
+          "#FF6384",
+        ],
+      },
+    ],
+  });
+}
+
+
+
+
+// setInventoryData({
+//   labels: ["In Stock", "Expired Stock", "Low Stock", "Out of Stock"],
+//   datasets: [
+//     {
+//       data: [inStock, expiredStock, lowStock, outOfStock], // Use the counts from your query
+//       backgroundColor: [
+//         "rgba(40, 167, 69, 0.8)",  // In Stock (Blue)
+//         "#FFCE56",  // Expired Stock (Yellow)
+//         "#FF6F61",  // Low Stock (Pink)
+//         "#FF6384",  // Out of Stock (Red)
+//       ],
+//     },
+//   ],
+// });
 
 
 
@@ -456,6 +675,7 @@ setHighValueCustomerData(highValueCustomerData);
     }
   };
 
+
   // Sample Data for Charts
   const salesData = {
     labels: ["Daily", "Weekly", "Monthly", "Yearly"],
@@ -475,16 +695,34 @@ setHighValueCustomerData(highValueCustomerData);
   };
 
 
+  const [inventoryStatus,setInventoryStatus]=useState(null);
 
   const [inventoryData,setInventoryData] =useState({
     labels: ["In Stock", "Low Stock", "Out of Stock"],
     datasets: [
       {
+        
         data: [300, 50, 20],
-        backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384"],
+        backgroundColor: ["", "", ""],
       },
     ],
   });
+
+
+
+
+  const [inventoryExpirationData,setInventoryExpirationData] =useState({
+    labels: ["In Stock", "Low Stock", "Out of Stock"],
+    datasets: [
+      {
+        
+        data: [300, 50, 20],
+        backgroundColor: ["", "", ""],
+      },
+    ],
+  });
+
+
 
   const inventoryOptions = {
     plugins: {
@@ -511,6 +749,10 @@ const highValueCustomerColumns = [
   // { name: "Most Frequent Items", key: "mostFrequentItems", align: "left" },
   { name: "Most Used Payment Method", key: "mostUsedPaymentMethod", align: "left" },
 ];
+
+
+
+
 
   // High-value customers data with keys matching the column "key" values
   const [highValueCustomerData,setHighValueCustomerData] =useState([]);
@@ -603,13 +845,13 @@ const highValueCustomerColumns = [
   }, [sessionsOptions, selectedStore, selectedSession]);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen ">
 
       <div className="flex-1 ml-5 p-4 overflow-y-auto">
-        <div className="flex flex-col md:flex-row md:items-center justify-between bg-white shadow-sm rounded-lg p-6 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-700">Dashboard</h1>
-            <p className="text-md text-gray-500 mt-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between bg-white rounded-lg p-6 mb-6">
+          <div className="flex gap-1 items-center">
+           <FaPalette className="text-2xl font-bold text-gray-600" /> <h1 className="text-2xl font-bold text-gray-600">Dashboard</h1> 
+            {/* <p className="text-md text-gray-500 mt-2">
               Showing data for{" "}
               <span className="font-semibold">
                 {selectedSession && sessionsOptions.length > 0
@@ -617,12 +859,12 @@ const highValueCustomerColumns = [
                       .displayName
                   : "Select a Session"}
               </span>
-            </p>
+            </p> */}
           </div>
 
           <div className="flex justify-start gap-10">
        
-            <div className="mt-4 md:mt-0">
+            {/* <div className="mt-4 md:mt-0">
             <label
               htmlFor="session-dropdown"
               className="text-md font-medium text-gray-700 mr-2"
@@ -635,18 +877,17 @@ const highValueCustomerColumns = [
               onChange={handleStoreChange}
               className="input input-bordered"
             >
-                {/* <option value="All">All Stores</option> */}
               {storeOptions.map((store) => (
                 <option key={store.id} value={store.id}>
                   {store.displayName}
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
 
 
-          <div className="mt-4 md:mt-0">
+          <div className="flex justify-start items-center gap-1 mt-4 md:mt-0">
             <label
               htmlFor="session-dropdown"
               className="text-md font-medium text-gray-700 mr-2"
@@ -657,7 +898,7 @@ const highValueCustomerColumns = [
               id="session-dropdown"
               value={selectedSession}
               onChange={handleSessionChange}
-              className="input input-bordered"
+              className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             >
               {/* <option value="" disabled>Select a session</option> */}
               {sessionsOptions.map((session) => (
@@ -673,15 +914,28 @@ const highValueCustomerColumns = [
 
       
     {showCharts ?  <>
+    
       <TopCards data={dashboardCards} />
 
-            <RevenueChart
+<div className="grid grid-cols-2 gap-2">
+    
+
+                       <RevenueChart
               monthlyRevenueData={monthlyRevenueData}
               dailyRevenueData={dailyRevenueData}
+              activeTab="daily"
+              title="Daily Revenue & Profit"
             />
-      
 
-      <div className="grid grid-cols-3 gap-5 my-5">
+                    <RevenueChart
+              monthlyRevenueData={monthlyRevenueData}
+              dailyRevenueData={dailyRevenueData}
+                    activeTab="monthly"
+                         title="Monthly Revenue & Profit"
+            />
+      </div>
+
+      {/* <div className="grid grid-cols-3 gap-5 my-5">
           <div className="col-span-2">
           <div className="bg-white p-6 rounded-lg shadow-sm">
           <h3 className="text-xl mb-4">Payment Method Breakdown</h3>
@@ -691,12 +945,12 @@ const highValueCustomerColumns = [
             />
           </div>
           </div>
-          </div>
+          </div> */}
 
  
 
-          <div className="grid grid-cols-3 gap-5 my-5">
-          <div className="col-span-2">
+          <div className="grid grid-cols-2 gap-5 my-5">
+          {/* <div className="col-span-2">
       <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-xl mb-4">Low Stock Products</h3>
 <TableView
@@ -705,20 +959,89 @@ const highValueCustomerColumns = [
               columns={lowStockProductsColumns}
             />
       </div>
-      </div>
+      </div> */}
 
 
    
-
-      <div className="bg-white p-6 rounded-lg shadow-sm">
+     
+      <div className="grid grid-cols-2 gap-5 my-5 bg-white p-6 rounded-lg shadow-sm">
       
-            <h3 className="text-xl mb-4">Inventory Status</h3>
+      <div>
+            <h3 className="text-xl mb-4">In-Stock vs Out-of-Stock</h3>
             <DoughnutChart
               data={inventoryData}
               options={inventoryOptions}
               labels={{ show: true, labelType: "percentage" }}
             />
+      
+      </div>
+
+
+
+      <div className=" flex flex-col gap-2 justify-center">
+        
+       {inventoryStatus ?  <>
+        <div className="border-green-300 border rounded-lg bg-green-50 p-4 flex justify-between px-4 hover:bg-green-100 hover:cursor-pointer hover:text-green-700">
+          <p className="text-gray-700">Healthy Stock</p>
+          <p className="font-semibold text-green-700">{inventoryStatus?.healthyStock}</p>
+        </div>
+
+             <div className="border-[#FFA239] border rounded-lg bg-orange-50 p-4 flex justify-between px-4 hover:bg-orange-100 hover:cursor-pointer hover:text-orange-700">
+            <p className="text-orange-700">Low Stock</p>
+          <p className="font-semibold text-orange-700">{inventoryStatus?.lowStock}</p>
+        </div>
+
+              
+       <div className="border-red-300 border rounded-lg bg-red-50 p-4 flex justify-between px-4 hover:bg-red-100 hover:cursor-pointer hover:text-red-700">
+         <p className="text-red-700">Out Stock</p>
+          <p className="font-semibold text-red-700">{inventoryStatus?.outOfStock}</p>
+        </div>
+</>:<p>loading...</p>
+}
+        </div>
           </div>
+  
+
+       
+
+
+
+
+
+      <div className="grid grid-cols-2 gap-5 my-5 bg-white p-6 rounded-lg shadow-sm">
+      
+      <div>
+            <h3 className="text-xl mb-4">Inventory Expiry Status</h3>
+            <DoughnutChart
+              data={inventoryExpirationData}
+              options={inventoryOptions}
+              labels={{ show: true, labelType: "percentage" }}
+            />
+      
+      </div>
+
+
+      <div className=" flex flex-col gap-2 justify-center">
+        
+        <div className="border-green-300 border rounded-lg bg-green-50 p-4 flex justify-between px-4 hover:bg-green-100 hover:cursor-pointer hover:text-green-700">
+          <p className="text-gray-700">SafeStock</p>
+          <p className="font-semibold text-green-700">{inventoryStatus?.nonExpiredSafeStock}</p>
+        </div>
+              
+                        <div className="border-[#FFA239] border rounded-lg bg-orange-50 p-4 flex justify-between px-4 hover:bg-orange-100 hover:cursor-pointer hover:text-orange-700">
+            <p className="text-orange-700">Expiring Soon</p>
+          <p className="font-semibold text-orange-700">{inventoryStatus?.expiringSoon}</p>
+        </div>
+
+       <div className="border-red-300 border rounded-lg bg-red-50 p-4 flex justify-between px-4 hover:bg-red-100 hover:cursor-pointer hover:text-red-700">
+         <p className="text-red-700">Expired Stock</p>
+          <p className="font-semibold text-red-700">{inventoryStatus?.expiredStock}</p>
+        </div>
+
+
+        </div>
+          </div>
+  
 </div>
 
 
@@ -756,7 +1079,7 @@ const highValueCustomerColumns = [
 </div> */}
       
 
-   <div className="grid grid-cols-3 gap-5 my-5">
+   {/* <div className="grid grid-cols-3 gap-5 my-5">
           <div className="col-span-3">
           <div className="bg-white p-6 rounded-lg shadow-sm">
           <h3 className="text-xl mb-4">Products Nearing Expiration</h3>
@@ -768,10 +1091,10 @@ const highValueCustomerColumns = [
             </div>
           </div>
 
-     </div>
+     </div> */}
         
           <div className="grid grid-cols-4 gap-5 my-5">
-          <div className="col-span-4">
+          {/* <div className="col-span-4">
           <div className="bg-white p-6 rounded-lg shadow-sm">
           <h3 className="text-xl mb-4">High-Value Customers</h3>
             <TableView
@@ -780,7 +1103,7 @@ const highValueCustomerColumns = [
               title="High-Value Customers"
             />
              </div>
-             </div>
+             </div> */}
          
 
              {/* <div className="col-span-4">

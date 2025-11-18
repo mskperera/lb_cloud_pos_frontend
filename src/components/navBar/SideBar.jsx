@@ -20,7 +20,7 @@ const SidebarMenu = ({ label, iconName: Icon, to, submenuItems, isDisabled = fal
   return (
     <div className="sidebar-menu w-full">
       <button
-     className={`flex w-full items-center gap-2 py-3 px-4 text-lg text-white bg-sky-600 
+     className={`flex w-full items-center gap-2 py-3 px-4 text-lg text-white bg-[#1f649d]  
     hover:bg-sky-700 rounded-md transition-transform duration-150 
     active:scale-95 active:bg-sky-800 ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
       onClick={handleClick}
@@ -65,9 +65,9 @@ const Sidebar = () => {
   const assignedTerminals = JSON.parse(localStorage.getItem('assignedTerminals'));
 
   return (
-    <div className="sidebar bg-sky-600 w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
+    <div className="sidebar bg-[#1d5d90] w-64 p-4 shadow-sm fixed top-0 left-0 h-screen overflow-y-auto">
       <div className="mb-8 flex items-center justify-center">
-        <FaHome className="text-4xl text-white" />
+        <FaHome className="text-4xl text-[#f6f6f6]" />
       </div>
 
       <div className="space-y-4">

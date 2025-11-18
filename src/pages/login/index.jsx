@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { setUserAssignedStores } from '../../functions/store';
 import { loadSystemInfoToLocalStorage } from '../../functions/systemSettings';
 import Database from '@tauri-apps/plugin-sql';
+import logo_long from '../../assets/pos_logo_long.png';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -114,27 +115,30 @@ if (isTauriApp){
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-sky-50 to-sky-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 transform transition-all duration-300 hover:shadow-2xl">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-sky-900 tracking-tight">
-            Welcome to Legend POS
+    <div className="min-h-screen bg-[#edf2fa] flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 transform transition-all duration-300 border-gray-200 border-2">
+        <div className="flex justify-center flex-col items-center mb-8">
+          <h2 className="text-3xl font-extrabold text-gray-700 tracking-tight mb-5">
+            Welcome to
           </h2>
-          <p className="mt-2 text-lg text-sky-700 font-bold">Sign in</p>
+
+<img src={logo_long} className='h-12' />
         </div>
 
+       <p className="mt-2 text-center text-xl text-gray-700 font-bold mb-4">Sign in</p>
         <div className="space-y-6">
+             
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block font-medium text-gray-700"
             >
               Email Address
             </label>
             <input
               type="email"
               id="email"
-              className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg  text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
@@ -144,14 +148,14 @@ if (isTauriApp){
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className="block font-medium text-gray-700"
             >
               Password
             </label>
             <input
               type="password"
               id="password"
-              className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -168,7 +172,7 @@ if (isTauriApp){
             />
             <label
               htmlFor="saveCredentials"
-              className="ml-2 block text-sm text-gray-900"
+              className="ml-2 block text-gray-900"
             >
               Save Credentials
             </label>
@@ -182,7 +186,7 @@ if (isTauriApp){
 
           <button
             onClick={signIn}
-            className={`w-full py-3 px-6 text-sm font-semibold text-white bg-sky-600 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200 ${
+            className={`w-full py-3 px-6 font-semibold text-white bg-sky-600 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200 ${
               isLoading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             disabled={isLoading}
@@ -218,16 +222,16 @@ if (isTauriApp){
         </div>
 
         <div className="mt-6 text-center space-y-3">
-          <p className="text-sm text-gray-500">
-            Forgot your password?{' '}
+          <p className=" text-gray-500">
+            
             <a
               href="#"
-              className="text-sky-600 hover:text-sky-800 font-medium transition duration-200"
+              className="text-sky-600 font-bold hover:text-sky-800"
             >
-              Reset it here
+             Forgot my password
             </a>
           </p>
-          <p className="text-sm text-gray-500">
+          {/* <p className=" text-gray-500">
             Need assistance?{' '}
             <a
               href="#"
@@ -235,7 +239,7 @@ if (isTauriApp){
             >
               Contact Support
             </a>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

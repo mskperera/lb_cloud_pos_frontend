@@ -35,8 +35,8 @@ const SelectStore = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#edf2fa] px-4">
+      <div className="bg-white rounded-lg  border-gray-200 border-2 p-8 w-full max-w-md">
      <div className="flex items-center gap-3 mb-6">
   <FaStore className="text-sky-600 text-3xl" />
   <h2 className="text-2xl font-bold text-gray-800">Choose Your Store</h2>

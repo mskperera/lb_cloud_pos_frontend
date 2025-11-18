@@ -24,7 +24,6 @@ import PrivacyPolicy from './pages/privacyPolicy';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
-const DayEnd = React.lazy(() => import("./pages/dayend"));
 const Payment = React.lazy(() => import("./pages/payment"));
 const PaymentConfirm = React.lazy(() => import("./pages/paymentConfirm"));
 const Products = React.lazy(() => import("./pages/products"));
@@ -142,7 +141,7 @@ function AppContent() {
             <Route element={<TopbarLayout />}>
               {/* <Route path="/register/:terminalId" element={<Register />} /> */}
               <Route path="/register/:terminalId" element={<Register />} />
-              <Route path="/dayend" element={<DayEnd />} />
+              {/* <Route path="/dayend" element={<DayEnd />} /> */}
               <Route path="/daystart/:terminalId" element={<DayOpen />} />
               {/* <Route path="/payment" element={<Payment />} /> */}
               {/* <Route path="/ordersCompleted" element={<OrdersCompleted />} />

@@ -10,6 +10,7 @@ import PrinterConnection from '../PrinterConnetion';
 import { getFrontendIdByTerminalId, getPrintdeskByTerminalId } from '../../functions/terminal';
 import { setPrinterList } from '../../state/printer/printerSlice';
 import { FaCompress, FaExpand, FaStore, FaTh } from 'react-icons/fa';
+import logo from '../../assets/pos_logo_long_inv.png';
 
 const Store=({store})=>(
   <div className='flex justify-start gap-1 items-center mb-1 text-white  rounded-lg px-2 cursor-pointer'>
@@ -202,13 +203,13 @@ export default function TopMenubar() {
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full bg-sky-600 px-10 gap-2 pt-3  h-16 z-50">
+    <nav className="navbar fixed top-0 left-0 w-full bg-[#1f649d] px-10 gap-2 pt-3  h-16 z-50">
       <div className="flex justify-between items-center w-full m-0 p-0">
       <div className="flex justify-start gap-4">
-        <div className="flex items-center gap-4 m-0 p-0 w-[13rem]">
+        <div className="flex items-center gap-4 m-0 p-0 ">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
-          <h3 className="text-xl text-white font-bold">Legend POS</h3>
-     
+          {/* <h3 className="text-xl text-white font-bold">Legend POS</h3> */}
+     <img src={logo} className='h-10' />
         </div>
 
       

@@ -7,7 +7,7 @@ import { CURRENCY_DISPLAY_TYPE } from "./constants";
 import { getSystemInfoFromLocalStorage } from "../functions/systemSettings";
 
   // };
-  export const formatCurrency = (value,showSymbol=true) => {
+  export const formatCurrency = (value,showSymbol=true,showCurrencyCode) => {
     const {symbol,currencyCode}=getSystemInfoFromLocalStorage();
     const formattedNumber = new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
@@ -19,7 +19,7 @@ import { getSystemInfoFromLocalStorage } from "../functions/systemSettings";
   export const getCurrency = (displayType) => {
 
     const {symbol,currencyCode}=getSystemInfoFromLocalStorage();
-    console.log('ssssss',symbol)
+  //  console.log('ssssss',symbol)
     return  displayType===CURRENCY_DISPLAY_TYPE.SYMBOL? symbol:currencyCode;
   };
 

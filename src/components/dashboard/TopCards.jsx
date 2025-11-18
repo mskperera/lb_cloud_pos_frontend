@@ -7,8 +7,9 @@ const TopCards = ({ data }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
-      <div className="flex flex-col justify-between transform bg-white p-4 rounded-lg shadow-sm  border-l-4 border-sky-600">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-6">
+      {/* <div className="border-gray-200 border-2">
+      <div className="flex flex-col justify-between transform bg-white p-4 rounded-lg border-l-4 border-sky-600">
         <div className='flex justify-between'>
           <h3 className="text-lg font-semibold text-gray-500">Transactions</h3>
           <p className="text-xl font-bold">{data.noOfTransactions}</p>
@@ -23,22 +24,27 @@ const TopCards = ({ data }) => {
             <p className='text-red-500'>{data.noOfVoidedTransactions}</p>
           </div>
         </div>
-      </div>
+        </div>
+      </div> */}
 
       {[
-        { label: 'Today Revenue', value: `${formatCurrency(data.productSales)}` },
-        { label: 'Today Profit', value: `${formatCurrency(data.netSales)}` },
+                { label: 'Total Sales', value: `${formatCurrency(data.productSales)}` },
+        { label: 'Transactions', value: `${data.noOfTransactions}` },
         { label: 'ATV', value: `${formatCurrency(data.averageTransactionValueNet)}` },
-        { label: 'Receipts Printed', value: data.noOfProductsSold },
-        { label: 'Refunds', value: `${formatCurrency(data.totalRefunds)}` },
+         { label: 'Gross Margin', value: `${parseFloat(data.grossMargin).toFixed(2)}%` },
+
+       // { label: 'Receipts Printed', value: data.noOfProductsSold },
+        // { label: 'Refunds', value: `${formatCurrency(data.totalRefunds)}` },
         { label: 'Items Sold', value: data.noOfProductsSold },
-        { label: 'Unique Customers', value: data.noOfCustomers },
-        { label: 'Opening Cash', value: `${formatCurrency(data.openingCashAmount)}` },
-        { label: 'Expected Cash', value: `${formatCurrency(data.expectedCash)}` },
+        { label: 'Customers', value: data.noOfCustomers },
+      //  { label: 'Opening Cash', value: `${formatCurrency(data.openingCashAmount)}` },
+       // { label: 'Expected Cash', value: `${formatCurrency(data.expectedCash)}` },
       ].map((card, index) => (
-        <div key={index} className="flex flex-col justify-between h-28 bg-white p-4 rounded-lg shadow-sm  border-l-4 border-sky-600">
+        <div className="">
+        <div key={index} className="flex flex-col justify-between items-center h-24 bg-white p-4 rounded-lg border-l-4 border-sky-600">
           <h3 className="text-lg font-semibold text-gray-500">{card.label}</h3>
-          <p className="text-xl font-bold">{card.value}</p>
+          <p className="text-xl font-bold text-gray-600">{card.value}</p>
+        </div>
         </div>
       ))}
     </div>
