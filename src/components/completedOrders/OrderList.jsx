@@ -214,15 +214,7 @@ setSelectedOrderId(o.orderId);
       <div className="flex flex-col p-6 gap-4 bg-gray-50 rounded-lg shadow-sm">
 
 
-  <DialogModel
-        header={"Payment Receipt"}
-        visible={isPaymentConfirmShow}
-        onHide={() => setIsPaymentConfirmShow(false)}
-        fullWidth={true}
-  fullHeight={true}
-      >
-    <PaymentConfirm orderId={selectedOrderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} openBy="SalesHistory" />
-      </DialogModel>
+      
         {isTableDataLoading ? 
   <div className="w-1/2">
   <LoadingPopup text="Opening Sales History Panel…" />
@@ -237,7 +229,23 @@ setSelectedOrderId(o.orderId);
         onHide={() => setIsVisible(false)}
       >
 <>
+
+
+ 
+
+
         <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-4 mb-5">
+         
+          <DialogModel
+        header={"Payment Receipt"}
+        visible={isPaymentConfirmShow}
+        onHide={() => setIsPaymentConfirmShow(false)}
+        fullWidth={true}
+  fullHeight={true}
+      >
+    <PaymentConfirm orderId={selectedOrderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} openBy="SalesHistory" />
+      </DialogModel>
+         
           <div className="flex flex-col ">
             {/* <label className=" font-medium text-gray-700">Filter By</label> */}
             <select

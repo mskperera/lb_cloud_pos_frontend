@@ -17,12 +17,11 @@ const Login = () => {
 
   const isTauriApp = 'isTauri' in window && !!window.isTauri;
 
-  // Load saved credentials on component mount
   useEffect(() => {
     const loadCredentials = async () => {
       try {
         const db = await Database.load('sqlite:credentials.db');
-        // Create table if it doesn't exist
+
         await db.execute(`
           CREATE TABLE IF NOT EXISTS credentials (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +29,7 @@ const Login = () => {
             password TEXT NOT NULL
           )
         `);
-        // Fetch the latest saved credentials
+
         const result = await db.select('SELECT email, password FROM credentials ORDER BY id DESC LIMIT 1');
         if (result.length > 0) {
           setEmail(result[0].email);
@@ -53,13 +52,11 @@ const Login = () => {
       localStorage.clear();
       setIsLoading(true);
       setErrorMessage('');
-      const payload = {
-        userName: email,
-        password: password,
-      };
+
+      const payload = { userName: email, password };
+
       const authRes = await userLogin(payload);
 
-      console.log('authRes', authRes);
       if (authRes.status === 422 || authRes.status === 401) {
         setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
         setIsLoading(false);
@@ -69,111 +66,99 @@ const Login = () => {
       const accessToken = authRes.data.accessToken;
       localStorage.setItem('token', accessToken);
       const plaindata = parseJwt(accessToken);
+
       localStorage.setItem('tenantId', plaindata.tenantId);
       localStorage.setItem('userId', plaindata.userId);
       localStorage.setItem('stores', JSON.stringify(plaindata.stores));
       localStorage.setItem('user', JSON.stringify(plaindata));
+
       await setUserAssignedStores(plaindata.userId);
 
-      // Save credentials to SQLite if checkbox is checked
-if (isTauriApp){
+      if (isTauriApp) {
         try {
           const db = await Database.load('sqlite:credentials.db');
-          // Clear previous credentials to avoid duplicates
           await db.execute('DELETE FROM credentials');
-          // Insert new credentials
-          if(saveCredentials){
-          await db.execute('INSERT INTO credentials (email, password) VALUES ($1, $2)', [
-            email,
-            password,
-          ]);
-        }
+
+          if (saveCredentials) {
+            await db.execute(
+              'INSERT INTO credentials (email, password) VALUES ($1, $2)',
+              [email, password]
+            );
+          }
           await db.close();
         } catch (error) {
           console.error('Failed to save credentials:', error);
         }
-      }  
+      }
 
       await loadSystemInfoToLocalStorage();
-
-      // // Try fullscreen
-      // const el = document.documentElement;
-      // const req =
-      //   el.requestFullscreen ||
-      //   el.webkitRequestFullscreen ||
-      //   el.mozRequestFullScreen ||
-      //   el.msRequestFullscreen;
-      // if (req) {
-      //   await req.call(el);
-      // }
-
-     navigate('/home');
+      navigate('/home');
     } catch (error) {
       setErrorMessage('An error occurred. Please try again.');
       setIsLoading(false);
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent page reload
+    if (!isLoading) {
+      await signIn();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#edf2fa] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl p-8 transform transition-all duration-300 border-gray-200 border-2">
-        <div className="flex justify-center flex-col items-center mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-700 tracking-tight mb-5">
-            Welcome to
-          </h2>
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 border-gray-200 border-2">
 
-<img src={logo_long} className='h-12' />
+        <div className="flex justify-center flex-col items-center mb-8">
+          <h2 className="text-3xl font-extrabold text-gray-700 mb-5">Welcome to</h2>
+          <img src={logo_long} className='h-12' />
         </div>
 
-       <p className="mt-2 text-center text-xl text-gray-700 font-bold mb-4">Sign in</p>
-        <div className="space-y-6">
-             
+        <p className="mt-2 text-center text-xl text-gray-700 font-bold mb-4">Sign in</p>
+
+        {/* FORM STARTS HERE */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+
           <div>
-            <label
-              htmlFor="email"
-              className="block font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block font-medium text-gray-700">
               Email Address
             </label>
             <input
               type="email"
               id="email"
-              className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg  text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              className="mt-1 w-full px-4 py-3 bg-gray-50 border rounded-lg"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
             />
           </div>
+
           <div>
-            <label
-              htmlFor="password"
-              className="block font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block font-medium text-gray-700">
               Password
             </label>
             <input
               type="password"
               id="password"
-              className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+              className="mt-1 w-full px-4 py-3 bg-gray-50 border rounded-lg"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
             />
           </div>
+
           <div className="flex items-center">
             <input
               type="checkbox"
               id="saveCredentials"
-              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+              className="h-4 w-4 text-sky-600 border-gray-300 rounded"
               checked={saveCredentials}
               onChange={(e) => setSaveCredentials(e.target.checked)}
             />
-            <label
-              htmlFor="saveCredentials"
-              className="ml-2 block text-gray-900"
-            >
+            <label htmlFor="saveCredentials" className="ml-2 text-gray-900">
               Save Credentials
             </label>
           </div>
@@ -184,8 +169,9 @@ if (isTauriApp){
             </div>
           )}
 
-          <button
-            onClick={signIn}
+               <button
+           // onClick={signIn}
+           type="submit"
             className={`w-full py-3 px-6 font-semibold text-white bg-sky-600 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200 ${
               isLoading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
@@ -219,213 +205,18 @@ if (isTauriApp){
               'Sign In'
             )}
           </button>
-        </div>
+        </form>
+        {/* FORM ENDS */}
 
         <div className="mt-6 text-center space-y-3">
-          <p className=" text-gray-500">
-            
-            <a
-              href="#"
-              className="text-sky-600 font-bold hover:text-sky-800"
-            >
-             Forgot my password
-            </a>
-          </p>
-          {/* <p className=" text-gray-500">
-            Need assistance?{' '}
-            <a
-              href="#"
-              className="text-sky-600 hover:text-sky-800 font-medium transition duration-200"
-            >
-              Contact Support
-            </a>
-          </p> */}
+          <a href="#" className="text-sky-600 font-bold hover:text-sky-800">
+            Forgot my password
+          </a>
         </div>
+
       </div>
     </div>
   );
 };
 
 export default Login;
-
-
-
-// import React, { useState } from 'react';
-// import { userLogin } from '../../functions/auth';
-// import { parseJwt } from '../../utils/jwt';
-// import { useNavigate } from 'react-router-dom';
-// import { setUserAssignedStores } from '../../functions/store';
-// import { loadSystemInfoToLocalStorage } from '../../functions/systemSettings';
-
-// const Login = () => {
-//   const navigate = useNavigate();
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [errorMessage, setErrorMessage] = useState('');
-//   const [isLoading, setIsLoading] = useState(false);
-
-// const signIn = async () => {
-//   try {
-//     localStorage.clear();
-//     setIsLoading(true);
-//     setErrorMessage('');
-//     const payload = {
-//       userName: email,
-//       password: password,
-//     };
-//     const authRes = await userLogin(payload);
-
-//     console.log('authRes000',authRes)
-//     if (authRes.status === 422 || authRes.status === 401) {
-//       setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
-//       setIsLoading(false);
-//       return;
-//     }
-
-//     const accessToken = authRes.data.accessToken;
-//     localStorage.setItem('token', accessToken);
-//     const plaindata = parseJwt(accessToken);
-//     localStorage.setItem('tenantId', plaindata.tenantId);
-//     localStorage.setItem('userId', plaindata.userId);
-//     localStorage.setItem('stores', JSON.stringify(plaindata.stores));
-//     localStorage.setItem('user', JSON.stringify(plaindata));
-//     await setUserAssignedStores(plaindata.userId);
-
-//     await loadSystemInfoToLocalStorage();
-
-//     // 👉 Try fullscreen
-//     const el = document.documentElement; // whole page
-//     const req =
-//       el.requestFullscreen ||
-//       el.webkitRequestFullscreen ||
-//       el.mozRequestFullScreen ||
-//       el.msRequestFullscreen;
-//     if (req) {
-//       await req.call(el);
-//     }
-
-//     navigate('/home');
-//   } catch (error) {
-//     setErrorMessage('An error occurred. Please try again.');
-//     setIsLoading(false);
-//   }
-// };
-
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-sky-100 via-sky-50 to-sky-100 flex items-center justify-center p-4">
-//       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 transform transition-all duration-300 hover:shadow-2xl">
-//         <div className="text-center mb-8">
-//           <h2 className="text-3xl font-extrabold text-sky-900 tracking-tight">
-//             Welcome to Legend POS
-//           </h2>
-//           <p className="mt-2 text-lg text-sky-700 font-bold">
-//             Sign in
-//           </p>
-//         </div>
-
-//         <div className="space-y-6">
-//           <div>
-//             <label
-//               htmlFor="email"
-//               className="block text-sm font-medium text-gray-700"
-//             >
-//               Email Address
-//             </label>
-//             <input
-//               type="email"
-//               id="email"
-//               className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)}
-//               placeholder="you@example.com"
-//               required
-//             />
-//           </div>
-//           <div>
-//             <label
-//               htmlFor="password"
-//               className="block text-sm font-medium text-gray-700"
-//             >
-//               Password
-//             </label>
-//             <input
-//               type="password"
-//               id="password"
-//               className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-//               value={password}
-//               onChange={(e) => setPassword(e.target.value)}
-//               placeholder="••••••••"
-//               required
-//             />
-//           </div>
-
-//           {errorMessage && (
-//             <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">
-//               {errorMessage}
-//             </div>
-//           )}
-
-//           <button
-//             onClick={signIn}
-//             className={`w-full py-3 px-6 text-sm font-semibold text-white bg-sky-600 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200 ${
-//               isLoading ? 'opacity-50 cursor-not-allowed' : ''
-//             }`}
-//             disabled={isLoading}
-//           >
-//             {isLoading ? (
-//               <span className="flex items-center justify-center">
-//                 <svg
-//                   className="animate-spin h-5 w-5 mr-2 text-white"
-//                   xmlns="http://www.w3.org/2000/svg"
-//                   fill="none"
-//                   viewBox="0 0 24 24"
-//                 >
-//                   <circle
-//                     className="opacity-25"
-//                     cx="12"
-//                     cy="12"
-//                     r="10"
-//                     stroke="currentColor"
-//                     strokeWidth="4"
-//                   ></circle>
-//                   <path
-//                     className="opacity-75"
-//                     fill="currentColor"
-//                     d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"
-//                   ></path>
-//                 </svg>
-//                 Signing In...
-//               </span>
-//             ) : (
-//               'Sign In'
-//             )}
-//           </button>
-//         </div>
-
-//         <div className="mt-6 text-center space-y-3">
-//           <p className="text-sm text-gray-500">
-//             Forgot your password?{' '}
-//             <a
-//               href="#"
-//               className="text-sky-600 hover:text-sky-800 font-medium transition duration-200"
-//             >
-//               Reset it here
-//             </a>
-//           </p>
-//           <p className="text-sm text-gray-500">
-//             Need assistance?{' '}
-//             <a
-//               href="#"
-//               className="text-sky-600 hover:text-sky-800 font-medium transition duration-200"
-//             >
-//               Contact Support
-//             </a>
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Login;

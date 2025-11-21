@@ -162,7 +162,7 @@ const Syncing=()=>{
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full px-10 gap-2 pt-3  h-16">
+    <nav className="navbar fixed top-0 left-0 w-full px-10 gap-2 pt-3  h-16 z-40">
       <div className="grid grid-cols-12 m-0 p-0">
      
      <div className=" col-span-7">
@@ -292,11 +292,10 @@ const Register = () => {
 
            {isSalesHistoryPopupVisible && 
 
-
             <OrderList isVisible={isSalesHistoryPopupVisible} 
            setIsVisible={setIsSalesHistoryPopupVisible} 
            />
- 
+
            }
             
   

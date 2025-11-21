@@ -19,7 +19,7 @@ ChartJS.register(
   Legend
 );
 
-function RevenueChart({ dailyRevenueData, monthlyRevenueData,activeTab,title }) {
+function RevenueChart({ dailyRevenueData, monthlyRevenueData,activeTab,title ,subTitle}) {
  // const [activeTab, setActiveTab] = useState('daily');
   const [metricData, setMetricData] = useState('');
 
@@ -85,11 +85,13 @@ function RevenueChart({ dailyRevenueData, monthlyRevenueData,activeTab,title }) 
     <div className="bg-white p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-start mb-4">
 
-        
+        <div className='flex flex-col gap-2'>
         <h3 className="text-lg font-bold text-gray-600">
          {title}
         </h3>
-
+        
+      <p>{subTitle}</p>
+</div>
           <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
        
           <div
