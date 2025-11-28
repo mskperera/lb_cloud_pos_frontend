@@ -447,11 +447,11 @@ setIsPrintButtonLoading(true);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 z-50">
+    <div className=" bg-gray-100 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
 {/* <ReceiptTestComp /> */}
 
-        <div className="p-6 bg-gray-50 rounded-l-xl">
+        <div className="p-6 rounded-l-xl">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-lg font-semibold text-gray-600">Loading receipt...</div>

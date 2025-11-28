@@ -233,13 +233,13 @@ export default function TopMenubar() {
       )}
     </button>
 
-    <button
+    {/* <button
       className="flex items-center ml-0 p-2 m-0 rounded-md text-white  hover:bg-sky-700"
       onClick={() => navigate('/home')}
     >
       <FaTh className="text-xl" />
       <span className="pl-1">Home</span>
-    </button>
+    </button> */}
 
 
      {/* {JSON.stringify(printDeskInfo)} */}

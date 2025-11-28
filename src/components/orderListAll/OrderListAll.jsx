@@ -9,7 +9,7 @@ import { CONTACT_TYPE, DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/consta
 import ProductOrderList from "../register/orderList/ProductOrderList";
 import ApplyDiscount from "../register/ApplyDiscount";
 import ProductSearch from "../productSearch/ProductSearch";
-import { FaPlusCircle, FaShoppingCart, FaTimesCircle } from 'react-icons/fa';
+import { FaCalendarCheck, FaHistory, FaPause, FaPlusCircle, FaSearch, FaShoppingCart, FaTags, FaTimesCircle, FaUserPlus } from 'react-icons/fa';
 import DialogModel from "../model/DialogModel";
 import Payment from "../register/payment/Payment";
 import PaymentConfirm from "../../pages/paymentConfirm";
@@ -29,10 +29,12 @@ const OrderListAll = () => {
   const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [isPaymentConfirmShow, setIsPaymentConfirmShow] = useState(false);
-   const [isAddCustomProductShow, setIsAddCustomProductShow] = useState(false);
+
   const [isPaymentShow, setIsPaymentShow] = useState(false);
   const [paymentKey, setPaymentKey] = useState(0);
+  const [isItemLookupShow, setIsItemLookupShow] = useState(false);
 
+  
   const { list, orderSummary } = useSelector((state) => state.orderList);
 
   useEffect(() => {
@@ -132,7 +134,7 @@ const OrderListAll = () => {
   };
 
   return (
-    <div className="flex flex-col w-full p-6 ">
+    <div className="flex flex-col w-full">
       <ApplyDiscount
         orderListId={selectedOrderId}
         visible={isDiscountPopupVisible}
@@ -168,26 +170,16 @@ const OrderListAll = () => {
         <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
       </DialogModel>
 
-      <div className="flex flex-col gap-3 max-w-7xl mx-auto max-h-[80vh] overflow-auto ">
-
-
- <DialogModel
-        header="Add Custom Product"
-        visible={isAddCustomProductShow}
-        onHide={() => setIsAddCustomProductShow(false)}
-      >
-        <AddCustomProduct visible={isAddCustomProductShow} onClose={()=>{
-          setIsAddCustomProductShow(false);
-        }}  />
-      </DialogModel>
 
 
 
-        <div className="">
+
+
+      <div className="flex flex-col gap-3 max-w-7xl mx-auto  overflow-auto ">
+
           <Customer />
-    </div>
 
-        <div className="overflow-y-auto rounded-lg shadow-sm">
+        <div className="overflow-y-auto rounded-lg shadow-sm ">
           <ProductOrderList showDiscountPopup={showDiscountPopupHandler} />
         </div>
 
@@ -209,46 +201,51 @@ const OrderListAll = () => {
           </div>
         )}
 
-        <div className="flex flex-col gap-4 mt-4">
           <OrderSummary totalItems={totalItems} />
-          <div className="flex gap-4 justify-between">
-        
-          <ItemLookup hideSearchBox={true} onProductSelect={handleProductClick} onBarcodeEnter={handleBarcodeEnter} />
-              <button
-          type="button"
-          onClick={()=>{
-            setIsAddCustomProductShow(true);
-          }}
-           className="flex items-center px-4 font-bold py-2 rounded-lg bg-orange-500 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
-        >
-       <FaPlusCircle className="mr-2" />  Add Custom
-     
-        </button>
-   
 
-            <button
-              onClick={newOrderHandler}
-              className="btn bg-slate-50 text-gray-700 hover:bg-slate-100 font-semibold border-none h-auto py-4 px-6 rounded-md shadow-sm hover:shadow-lg hover:from-sky-700 hover:to-sky-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200 transform"
-            >
-              <span className="px-2 text-md">New</span>
-            </button>
-            <button
-              onClick={() => setIsPaymentShow(true)}
-              disabled={list.length === 0}
-              className={`btn flex justify-center items-center gap-3 bg-green-600 text-white font-semibold h-auto py-5 px-4 rounded-lg shadow-sm transition-all duration-200 transform ${
-                list.length === 0
-                  ? "text-white opacity-80 cursor-not-allowed shadow-none"
-                  : "hover:bg-green-700"
-              }`}
-            >
-              <FaShoppingCart className="text-2xl" />
-              <span className="text-md">Proceed to Payment</span>
-            </button>
-          </div>
+
+
+  <div className="flex flex-wrap gap-4 items-center justify-between">
+    {/* Left Side: Secondary Actions */}
+    <div className="flex gap-3">
+      <button
+        onClick={newOrderHandler}
+        className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-xl shadow-sm hover:shadow-md hover:border-gray-400 hover:bg-gray-50 transition-all duration-200"
+      >
+        New Order
+      </button>
+
+
+    </div>
+
+    {/* Right Side: Primary Action */}
+    <button
+      onClick={() => setIsPaymentShow(true)}
+      disabled={list.length === 0}
+      className={`flex items-center justify-center gap-3 px-10 py-5 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform ${
+        list.length === 0
+          ? "bg-gray-400 text-gray-200 cursor-not-allowed shadow-none"
+          : "bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 "
+      }`}
+    >
+      <FaShoppingCart className="text-2xl" />
+      <span>Proceed to Payment</span>
+      {list.length > 0 && (
+        <span className="ml-2 bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+          {totalItems} item{totalItems > 1 ? 's' : ''}
+        </span>
+      )}
+    </button>
+  </div>
+
+
+
+
+
         </div>
       
           </div>
-    </div>
+
   );
 };
 

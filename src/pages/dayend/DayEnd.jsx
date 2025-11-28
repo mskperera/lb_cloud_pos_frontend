@@ -155,7 +155,7 @@ const DayEnd = ({isVisible,setIsVisible}) => {
 
 
   return (
-    <div className="bg-[#edf2fa] p-4 sm:p-6 lg:p-8">
+    <div className="bg-[#edf2fa]">
   {isLoading ? 
   <div className="w-1/2">
   <LoadingPopup text="Opening Day-End Panel…" />

@@ -15,20 +15,78 @@ import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
 
 
 
-const CategoryItem = ({ c, handleProductClick,selectedCategoryId }) => {
+// const CategoryItem = ({ c, handleProductClick,selectedCategoryId }) => {
+
+//   return (
+// <div
+//   className={`rounded-lg cursor-pointer
+//    hover:bg-orange-100 p-2 border-2 border-gray-200 text-center flex  justify-center items-center ${c.categoryId===selectedCategoryId && 'border-orange-600 bg-orange-200'}`}
+//   onClick={() => handleProductClick(c)}
+// >
+//   {c.categoryName}
+// </div>
+
+//   );
+// };
+
+const CategoryItem = ({ c, handleProductClick, selectedCategoryId }) => {
+  const isSelected = c.categoryId === selectedCategoryId;
 
   return (
-<div
-  className={`rounded-lg cursor-pointer
-   hover:bg-orange-100 p-2 border-2 border-gray-200 text-center flex  justify-center items-center ${c.categoryId===selectedCategoryId && 'border-orange-600 bg-orange-200'}`}
-  onClick={() => handleProductClick(c)}
->
-  {c.categoryName}
-</div>
+    <div
+      onClick={() => handleProductClick(c)}
+      className={`
+        relative flex items-center gap-4 p-4 rounded-2xl cursor-pointer
+        transition-all duration-300 group
+        ${isSelected 
+          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-xl shadow-orange-500/30' 
+          : 'bg-white hover:bg-orange-50 border border-gray-200 hover:border-orange-300'
+        }
 
+        active:scale-95 
+
+      `}
+    >
+      {/* Icon / Avatar */}
+      <div className={`
+        w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg
+        transition-all duration-300
+        ${isSelected 
+          ? 'bg-white/20 text-white shadow-lg' 
+          : 'bg-gradient-to-br from-orange-100 to-orange-200 text-orange-700 group-hover:from-orange-200 group-hover:to-orange-300'
+        }
+      `}>
+        {c.categoryName.charAt(0).toUpperCase()}
+      </div>
+
+      {/* Category Name */}
+      <span className={`
+        font-semibold text-base tracking-wide flex-1
+        ${isSelected ? 'text-white' : 'text-gray-800 group-hover:text-orange-700'}
+      `}>
+        {c.categoryName}
+      </span>
+
+      {/* Right Arrow / Active Indicator */}
+      <div className="flex items-center">
+        {isSelected ? (
+          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        ) : (
+          <svg className="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        )}
+      </div>
+
+      {/* Active Left Border */}
+      {isSelected && (
+        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full" />
+      )}
+    </div>
   );
 };
-
 const ProductList = () => {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
@@ -319,17 +377,11 @@ console.log('product000000',p);
   else if (width < 900) cols = 4;
   else cols = 4;
   return (
-    <div className="flex flex-col">
-   
-   {totalRecords>rowsPerPage && <DaisyUIPaginator
-          currentPage={currentPage}
-          rowsPerPage={rowsPerPage}
-          totalRecords={totalRecords}
-          onPageChange={onPageChange}
-          rowsPerPageOptions={[10, 20, 30, 50, 100]}
-        /> }
 
-    <div className="flex justify-between gap-2 w-full">
+    <>
+
+
+
     <DialogModel
   header={
     <div className="flex items-center gap-2">
@@ -487,9 +539,37 @@ console.log('product000000',p);
     </div>
   </div>
 </DialogModel>
+ 
+    <div className="grid grid-cols-12  pl-5  h-[80vh]">
+   
+       {totalRecords>rowsPerPage && <DaisyUIPaginator
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          totalRecords={totalRecords}
+          onPageChange={onPageChange}
+          rowsPerPageOptions={[10, 20, 30, 50, 100]}
+        /> }
 
- <div className="max-h-[90vh] bg-white flex flex-col gap-2 overflow-auto m-0 p-2 rounded-lg my-4 ">
-        {/* <DaisyUIPaginator
+<div className="col-span-3 mt-3 flex flex-col h-full bg-gradient-to-b from-gray-50 to-white rounded-2xl shadow-inner border border-gray-200 overflow-hidden">
+  {/* This div takes full remaining height and enables scrolling */}
+  <div className="flex-1 overflow-y-auto custom-scrollbar px-4 pt-4 pb-6 min-h-0">
+    <div className="space-y-3">
+
+      {/* Category List */}
+      {categories?.map((c) => (
+        <CategoryItem
+          key={c.categoryId}
+          c={c}
+          handleProductClick={handleCategorySelect}
+          selectedCategoryId={selectedCategoryId}
+        />
+      ))}
+    </div>
+  </div>
+</div>
+
+
+    {/* <DaisyUIPaginator
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
           totalRecords={totalRecords}
@@ -512,19 +592,7 @@ console.log('product000000',p);
             ))}
         </select> */}
 
-
-   {
-            categories?.map((c) => (
-              <CategoryItem c={c}  handleProductClick={handleCategorySelect} selectedCategoryId={selectedCategoryId} />
-            ))}
-
-
-
-      </div>
-
-
-
-      <div className="max-h-[90vh] w-full overflow-auto my-2 p-2 rounded-lg">
+      <div className="col-span-9 w-full overflow-auto custom-scrollbar my-2 p-2 rounded-lg">
         {!productListLoading ? (
             <div className="grid gap-2 grid-cols-4 md:grid-cols-4">
   
@@ -543,7 +611,8 @@ console.log('product000000',p);
         )}
       </div>
     </div>
-      </div>
+  
+         </>
   );
 };
 

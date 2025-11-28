@@ -20,7 +20,7 @@ const OrderSummary = ({ totalItems }) => {
 
   return (  
     <div className="px-6 py-4 bg-white rounded-lg shadow-sm border ">
-      <div className="flex flex-col md:flex-row justify-between gap-6">
+      <div className="flex flex-col md:flex-row justify-between gap-10">
         <div className="flex flex-col w-full gap-3">
           <div className="flex justify-between items-center">
             <span className="font-semibold text-gray-700">Sub Total</span>
@@ -42,7 +42,7 @@ const OrderSummary = ({ totalItems }) => {
           </div>
           <div className="flex justify-between items-center">
             <span className="font-semibold text-xl text-sky-600">Grand Total</span>
-            <span className="font-bold text-xl text-sky-600">{formatCurrency(orderSummary.grandTotal)}</span>
+            <span className="font-semibold text-xl text-sky-600">{formatCurrency(orderSummary.grandTotal)}</span>
           </div>
         </div>
       </div>

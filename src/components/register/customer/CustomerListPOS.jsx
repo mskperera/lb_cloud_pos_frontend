@@ -1,57 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState, useEffect, useRef } from 'react';
 import { formatUtcToLocal } from '../../../utils/format';
+import { getContacts } from '../../../functions/contacts';
 import { useToast } from '../../useToast';
 import DaisyUIPaginator from '../../DaisyUIPaginator';
-import ConfirmDialog from '../../dialog/ConfirmDialog';
-import { validate } from '../../../utils/formValidation';
-import { CONTACT_TYPE, SAVE_TYPE } from '../../../utils/constants';
-import { deleteCustomer, getContacts } from '../../../functions/contacts';
-import { FaEdit, FaSignInAlt, FaTrash, FaUserPlus } from 'react-icons/fa';
+import { FaTimes, FaSignInAlt } from 'react-icons/fa';
+import { CONTACT_TYPE } from '../../../utils/constants';
 
-export default function CustomerListPOS({selectingMode,onselect }) {
-  const [products, setCustomers] = useState([]);
-  const [isTableDataLoading, setIsTableDataLoading] = useState([]);
-  const navigate = useNavigate();
+export default function CustomerSelectionModal({ showCustomerList, setShowCustomerList, onCustomerSelectHandler }) {
+  const [customers, setCustomers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const showToast = useToast();
-  const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
 
   const [currentPage, setCurrentPage] = useState(0);
-
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  const onPageChange = (event) => {
-    setCurrentPage(event.page);
-    setRowsPerPage(event.rows);
-    loadCustomers(selectedCategoryId, event.page, rowsPerPage);
-  };
+  const [selectedFilterBy, setSelectedFilterBy] = useState({ value: 2 }); // Name by default
+  const [searchValue, setSearchValue] = useState({ value: "" });
+  const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
 
-  const [selectedFilterBy,setSelectedFilterBy] =useState({
-    label: "Filter by",
-    value: 1,
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "integer" },
-  });
+  const searchInputRef = useRef(null);
 
-  const [searchValue,setSearchValue] =useState({
-    label: "Search Value",
-    value: null,
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "string" },
-  });
-
+  const filterByOptions = [
+    { id: 1, displayName: 'Customer Code' },
+    { id: 2, displayName: 'Customer Name' },
+    { id: 3, displayName: 'Email' },
+    { id: 4, displayName: 'Mobile' },
+    { id: 5, displayName: 'Tel' },
+    { id: 6, displayName: 'Whatsapp' },
+  ];
 
   const loadCustomers = async () => {
-    try{
-    setIsTableDataLoading(true);
+    if (!showCustomerList) return;
+
+    setIsLoading(true);
     const skip = currentPage * rowsPerPage;
     const limit = rowsPerPage;
 
-    const filteredData = {
+
+        const payload = {
       contactId: null,
       contactTypeIds:[CONTACT_TYPE.CUSTOMER,CONTACT_TYPE.CUSTOMER_SUPPLIER],
       contactCode: selectedFilterBy.value===1 ? searchValue.value:null,
@@ -66,311 +53,203 @@ export default function CustomerListPOS({selectingMode,onselect }) {
       skip: skip,
       limit: limit,
     };
-    const _result = await getContacts(filteredData, null);
-    const { totalRows } = _result.data.outputValues;
-    setTotalRecords(totalRows);
-    console.log("ppppp", _result.data);
 
-    setCustomers(_result.data.results[0]);
-    setIsTableDataLoading(false);
-  }
-  catch(err){
-    setIsTableDataLoading(false);
-    console.log('error:',err);
-  }
+    try {
+      const res = await getContacts(payload);
+      setCustomers(res.data.results[0] || []);
+      setTotalRecords(res.data.outputValues.totalRows || 0);
+      setSelectedRowIndex(-1);
+    } catch (err) {
+      showToast("error", "Error", "Failed to load customers");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Load when modal opens
   useEffect(() => {
-    loadCustomers(selectedCategoryId);
+    if (showCustomerList) {
+      setSearchValue({ value: "" });
+      setCurrentPage(0);
+      setSelectedRowIndex(-1);
+      loadCustomers();
+    }
+  }, [showCustomerList]);
+
+  // Manual search trigger
+  const handleSearch = () => {
+    setCurrentPage(0);
+    loadCustomers();
+  };
+
+  // Pagination & filters
+  useEffect(() => {
+    if (showCustomerList) {
+      loadCustomers();
+    }
   }, [currentPage, rowsPerPage]);
 
+  // Keyboard navigation
   useEffect(() => {
-    console.log("useEffect search by value");
-  
-    const delayedLoadCustomers = setTimeout(() => {
-        loadCustomers(selectedCategoryId);
-    }, 1000);
+    const handleKey = (e) => {
+      if (!showCustomerList || isLoading || customers.length === 0) return;
 
-    return () => clearTimeout(delayedLoadCustomers);
-  
-}, [searchValue.value]);
-
-
-
-  const [filterByOptions,setFilterByOptions] =useState([{id:1,displayName:'Customer Code'},{id:2,displayName:'Customer Name'},{id:3,displayName:'Email'},{id:4,displayName:'Mobile'},{id:5,displayName:'Tel'},{id:6,displayName:'Whatsapp'}]);
-
-
-
-
-
-
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedIdToDelete, setSelectedIdToDelete] = useState(null);
-
-  const confirmDelete = (outputMessage, productId) => {
-    setSelectedIdToDelete(productId);
-    setShowDialog(true);
-  };
-
-  const deleteAcceptHandler = async (contactId) => {
-    try {
-      setSelectedIdToDelete('');
-      const result = await deleteCustomer(contactId, true);
-
-      const { data } = result;
-      if (data.error) {
-        showToast("error", "Exception", data.error.message);
-        return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedRowIndex(prev => (prev < customers.length - 1 ? prev + 1 : prev));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedRowIndex(prev => (prev > 0 ? prev - 1 : prev));
+      } else if (e.key === "Enter" && selectedRowIndex >= 0) {
+        e.preventDefault();
+        onCustomerSelectHandler(customers[selectedRowIndex]);
+        setShowCustomerList(false);
       }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [showCustomerList, customers, selectedRowIndex, isLoading]);
 
-      setCustomers(products.filter(p=>p.contactId!==contactId));
-      setTotalRecords(totalRecords-1);
-      showToast("success", "Successful", data.outputValues.outputMessage);
-    } catch (err) {
-      console.log("err :", err);
+  // Auto-focus search input
+  useEffect(() => {
+    if (showCustomerList && searchInputRef.current) {
+      searchInputRef.current.focus();
     }
-  };
+  }, [showCustomerList]);
 
-
-  const handleConfirm = () => {
-    deleteAcceptHandler(selectedIdToDelete);
-    setShowDialog(false);
-  };
-
-  const handleCancel = () => {
-    // Handle the cancellation action here
-    console.log("Cancelled!");
-    setShowDialog(false);
-    setSelectedIdToDelete('');
-  };
-
-
-
-
-
-  const handleInputChange = (setState, state, value) => {
-    console.log("Nlllll", state);
-    if (!state.rules) {
-      console.error("No rules defined for validation in the state", state);
-      return;
-    }
-    const validation = validate(value, state);
-    setState({
-      ...state,
-      value: value,
-      isValid: validation.isValid,
-      isTouched: true,
-      validationMessages: validation.messages,
-    });
-  };
-
-
-  
-
-  
-
-//// replaceed by daisy
-const contactTypeNameBodyTemplate = (rowData) => (
-  isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactTypeName}</span>
-);
-
-
-  const customerCodeBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactCode}</span>
-  );
-
-  const customerNameBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.contactName}</span>
-  );
-
-  const emailBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.email}</span>
-  );
-
-  const mobileBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.mobile}</span>
-  );
-
-  const telBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.tel}</span>
-  );
-
-
-  const modifiedDateBodyTemplate = (product) => {
-    const localFormattedDate =formatUtcToLocal(product.modifiedDate_UTC);
-    return isTableDataLoading ? <span>Loading...</span> : <span>{product.modifiedDate_UTC ? localFormattedDate : ''}</span>;
-  };
-//
-
-
-  
-const actionButtons = (item) => (
-  <div className="flex space-x-2">
-
-  {selectingMode && <button
-      className="btn btn-primary btn-xs bg-[#0284c7] text-base-100"
-      onClick={() => {
-        onselect(item.contactId); 
-      }}
-      aria-label="Select" title='Select Customer'
-    >
-               <FaSignInAlt className="text-2xl text-sky-600" />
-      {/* <FontAwesomeIcon icon={faSignIn} /> */}
-    </button>}
-
-    <button
-      className="btn btn-error btn-xs bg-[#f87171] text-base-100 "
-      onClick={async () => {
-        const result = await deleteCustomer(item.contactId, false);
-        const { outputMessage, responseStatus } = result.data.outputValues;
-        confirmDelete(outputMessage, item.contactId);
-      }}
-      aria-label="Delete"
-      title='Delete customer'
-    >
-               <FaTrash className="text-2xl text-sky-600" />
-      {/* <FontAwesomeIcon icon={faTrash} /> */}
-    </button>
-    <button
-      className="btn btn-warning btn-xs bg-[#fb923c] text-base-100"
-      onClick={() =>    navigate(`/customers/add?saveType=${SAVE_TYPE.UPDATE}&id=${item.contactId}`)}
-      aria-label="Edit" title='Edit customer'
-    >
-            <FaEdit className="text-2xl text-sky-600" />
-      {/* <FontAwesomeIcon icon={faEdit} /> */}
-    </button>
-  </div>
-);
-
-
+  if (!showCustomerList) return null;
 
   return (
-    <div className="">
-      {showDialog && (
-        <ConfirmDialog
-          isVisible={true}
-          message="Are you sure you want to delete this item?"
-          onConfirm={handleConfirm}
-          onCancel={handleCancel}
-          title="Confirm Delete"
-          severity="danger"
-        />
-      )}
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={(e) => e.target === e.currentTarget && setShowCustomerList(false)}
+    >
+      {/* Blur Backdrop */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
-      <div className="flex justify-between items-end  gap-2">
-        <div className="flex space-x-4 w-full">
-          <div className="flex flex-col space-y-2 w-1/5">
-            <label className="text-[1rem]">Filter By</label>
-            <select
-              value={selectedFilterBy.value}
-              onChange={(e) =>
-                handleInputChange(
-                  setSelectedFilterBy,
-                  selectedFilterBy,
-                  parseInt(e.target.value)
-                )
-              }
-              className="select select-bordered w-full"
-            >
-              {filterByOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col space-y-2 w-[35%]">
-            <label className="text-[1rem]">Search Value</label>
-            <input
-              type="text"
-              value={searchValue.value}
-              onChange={(e) =>
-                handleInputChange(setSearchValue, searchValue, e.target.value)
-              }
-              className="input input-bordered w-full"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-center items-center">
+      {/* Modal Panel */}
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
+        
+        {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600">
+          <h2 className="text-xl font-bold">Select Customer</h2>
           <button
-            className="btn btn-ghost text-[#0284c7] font-bold"
-            onClick={() =>
-              navigate(`/customers/add?saveType=${SAVE_TYPE.ADD}&id=0`)
-            }
-            title="Add Product"
+            onClick={() => setShowCustomerList(false)}
+          className="p-3 rounded-full hover:bg-slate-200 hover:text-red-500 transition-all duration-200"
           >
-            {/* <FontAwesomeIcon className="text-xl" icon={faUserPlus} /> */}
-                  <FaUserPlus className="text-2xl text-sky-600" />
-            New Customer
+            <FaTimes className="text-2xl" />
           </button>
         </div>
-      </div>
 
-      <div className="flex flex-col h-[50vh]  overflow-hidden">
-        <div className="flex-1 overflow-y-auto w-full">
-          <table className="table w-full border-collapse">
-            <thead className="sticky top-0 bg-slate-50 z-10 text-[1rem] border-b border-gray-300">
+        {/* Filters */}
+        <div className="p-6 bg-gray-50 border-b space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Filter By</label>
+              <select
+                value={selectedFilterBy.value}
+                onChange={(e) => setSelectedFilterBy({ value: +e.target.value })}
+                className="w-full px-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 transition"
+              >
+                {filterByOptions.map(o => (
+                  <option key={o.id} value={o.id}>{o.displayName}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-2 flex gap-4 items-end">
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Search Value</label>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchValue.value || ""}
+                  onChange={(e) => setSearchValue({ value: e.target.value })}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Enter search term..."
+                  className="w-full px-6 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 text-lg"
+                />
+              </div>
+              <button
+                onClick={handleSearch}
+                className="px-10 py-3 bg-sky-600 text-white font-medium rounded-xl hover:bg-sky-700 active:scale-95 transition shadow-md"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+
+          {totalRecords>rowsPerPage &&    <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-gray-600">{totalRecords} customers found</span>
+            <DaisyUIPaginator
+              currentPage={currentPage}
+              rowsPerPage={rowsPerPage}
+              totalRecords={totalRecords}
+              onPageChange={({ page, rows }) => {
+                setCurrentPage(page);
+                setRowsPerPage(rows);
+              }}
+              rowsPerPageOptions={[10, 30, 50, 100]}
+            />
+          </div>}
+
+        </div>
+
+        {/* Customer Table */}
+        <div className="flex-1 overflow-y-auto bg-white p-4">
+          <table className="w-full">
+            <thead className="sticky top-0 bg-gray-50 border-b-2 border-gray-200">
               <tr>
-                {/* <th className="px-4 py-2">Product Id</th> */}
-                <th className="px-4 py-2">contact Type</th>
-                <th className="px-4 py-2">Contact Code</th>
-                <th className="px-4 py-2">Contact Name</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Mobile</th>
-                <th className="px-4 py-2">Tel</th>
-                <th className="px-4 py-2">Modified</th>
-                <th className="px-4 py-2">Actions</th>
+                {["Code", "Name", "Email", "Mobile", "Modified", "Action"].map(h => (
+                  <th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr
-                  key={product.contactId}
-                  className="border-b border-gray-200 hover:bg-gray-100 bg-slate-50 text-[1rem]"
-                >
-                  {/* <td className="px-4 py-2">{product.contactId}</td> */}
-
-                  <td className="px-4 py-2">
-                    {contactTypeNameBodyTemplate(product)}
+            <tbody className="divide-y divide-gray-100">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-20">
+                    <div className="inline-block animate-spin w-10 h-10 border-4 border-sky-500 border-t-transparent rounded-full"></div>
                   </td>
-
-                  <td className="px-4 py-2">
-                    {customerCodeBodyTemplate(product)}
-                  </td>
-                  <td className="px-4 py-2">
-                    {customerNameBodyTemplate(product)}
-                  </td>
-                  <td className="px-4 py-2">{emailBodyTemplate(product)}</td>
-                  <td className="px-4 py-2">{mobileBodyTemplate(product)}</td>
-                  <td className="px-4 py-2">{telBodyTemplate(product)}</td>
-
-                  <td className="px-4 py-2">
-                    {modifiedDateBodyTemplate(product)}
-                  </td>
-                  <td className="px-4 py-2">{actionButtons(product)}</td>
                 </tr>
-              ))}
+              ) : customers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-20 text-gray-500 text-lg">No customers found</td>
+                </tr>
+              ) : (
+                customers.map((c, i) => (
+                  <tr
+                    key={c.contactId}
+                    tabIndex={0}
+                    className={`
+                      hover:bg-sky-50 cursor-pointer transition-all duration-150 outline-none
+                      ${selectedRowIndex === i ? 'bg-sky-100 ring-2 ring-sky-500 ring-inset' : ''}
+                    `}
+                    onClick={() => setSelectedRowIndex(i)}
+                  >
+                    <td className="px-6 py-4 font-medium">{c.contactCode}</td>
+                    <td className="px-6 py-4 font-semibold text-gray-900">{c.contactName}</td>
+                    <td className="px-6 py-4 text-gray-600">{c.email || "-"}</td>
+                    <td className="px-6 py-4">{c.mobile || "-"}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{formatUtcToLocal(c.modifiedDate_UTC)}</td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCustomerSelectHandler(c);
+                          setShowCustomerList(false);
+                        }}
+                        className="px-6 py-3 bg-sky-600 text-white font-medium rounded-xl hover:bg-sky-700 active:scale-95 transition flex items-center gap-2 shadow-md"
+                      >
+                        <FaSignInAlt /> Select
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div className="flex justify-between w-full p-4">
-        {/* Items count display */}
-        <div className="pl-3">
-          <span className=" text-gray-500">{totalRecords} items found</span>
-        </div>
-
-        {/* DaisyUIPaginator component */}
-        <DaisyUIPaginator
-          currentPage={currentPage}
-          rowsPerPage={rowsPerPage}
-          totalRecords={totalRecords}
-          onPageChange={onPageChange}
-          rowsPerPageOptions={[10, 30, 50, 100]}
-        />
       </div>
     </div>
   );

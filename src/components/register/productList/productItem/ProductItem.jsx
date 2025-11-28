@@ -2,7 +2,7 @@ import { formatCurrency } from "../../../../utils/format";
 import { FaClone } from "react-icons/fa";
 
 const ProductItem = ({ p, handleProductClick }) => {
-  const isVariationProduct = p.productTypeId === 2;
+  const isVariationProduct =JSON.parse(p.allProductId).length > 1;
   const hasImage = Boolean(p.imageUrl);
   const stockText =
     !!p.isStockTracked &&
@@ -10,15 +10,18 @@ const ProductItem = ({ p, handleProductClick }) => {
 
   const isDisabled = false;
 
+  const variationProducts=JSON.parse(p.variationProducts);
+  console.log('p,,,,',variationProducts)
   // === Variation Product ===
   if (isVariationProduct) {
+  
     return (
       <div
         className={`
           group relative flex flex-col
           bg-gradient-to-br from-sky-50 to-white
           rounded-xl cursor-pointer p-6 shadow-md border-2 border-sky-200
-          min-h-[100px] w-full
+          min-h-[100px] w-full min-w-44
           transition-all duration-300 ease-out
           hover:scale-105 hover:shadow-xl hover:border-sky-400
           active:scale-95
@@ -75,7 +78,7 @@ const ProductItem = ({ p, handleProductClick }) => {
         bg-white/90 backdrop-blur-sm
         rounded-xl cursor-pointer
         p-3 shadow-md border border-gray-200
-        min-h-[100px] w-full
+        min-h-[100px] w-full min-w-44
         transition-all duration-300 ease-out
         hover:scale-[1.02] hover:shadow-xl
         hover:bg-gradient-to-br hover:from-sky-50 hover:to-white
@@ -113,15 +116,14 @@ const ProductItem = ({ p, handleProductClick }) => {
         {p.productName}
       </p>
 
-      {p.sku && (
         <p className="mt-1 text-xs text-gray-500 text-center font-mono">
-          {p.sku}
+          {variationProducts[0].sku}
         </p>
-      )}
+
 
         <div className={`flex flex-1 min-w-0 items-center ${stockText ? 'justify-between' : 'justify-center'}`}>
           <p className="text-sm font-bold text-gray-700">
-            {formatCurrency(p.unitPrice, true)}
+            {formatCurrency(variationProducts[0].unitPrice, true)}
           </p>
 
                {stockText ? (

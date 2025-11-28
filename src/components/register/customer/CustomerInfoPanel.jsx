@@ -6,6 +6,7 @@ import { setCustomer } from "../../../state/orderList/orderListSlice";
 import DialogModel from "../../model/DialogModel";
 import CustomerListPOS from "./CustomerListPOS";
 import { CONTACT_TYPE } from "../../../utils/constants";
+import { FaAd, FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 
 const Customer = () => {
   const dispatch = useDispatch();
@@ -46,8 +47,9 @@ const Customer = () => {
   };
 
   const onCustomerSelectHandler = (customerId) => {
+    console.log('customerid:',customerId)
     setShowCustomerList(false);
-    loadCustomer(customerId);
+    loadCustomer(customerId.contactId);
   };
 
   const onRemoveCustomerHandler = () => {
@@ -56,16 +58,9 @@ const Customer = () => {
 
   return (
     <>
-      <DialogModel
-        header="Select Customer"
-        visible={showCustomerList}
-        maximizable
-        maximized
-        style={{ width: "50vw" }}
-        onHide={() => setShowCustomerList(false)}
-      >
-        <CustomerListPOS selectingMode={true} onselect={onCustomerSelectHandler} />
-      </DialogModel>
+
+        <CustomerListPOS showCustomerList={showCustomerList} onCustomerSelectHandler={onCustomerSelectHandler}  setShowCustomerList={setShowCustomerList} />
+ 
 
   
       <div className="flex justify-between items-center gap-4 px-4 py-3 bg-white rounded-lg  border border-gray-200">
@@ -88,23 +83,35 @@ const Customer = () => {
         </div>
         <div className="flex items-center">
           {customer ? (
-            <GhostButton
-              onClick={onRemoveCustomerHandler}
-              iconClass="pi pi-user-minus"
-              aria-label="Remove Customer"
-              color="text-red-500"
-              hoverClass="hover:text-red-600 hover:bg-gray-100"
-              className="p-2 rounded-full"
-            />
+
+               <button
+        type="button"
+ 
+            onClick={onRemoveCustomerHandler}
+            aria-label="Remove Customer"
+                className="flex items-center m-0 p-2 rounded-full text-red-600 hover:text-red-700"
+                  hoverClass="hover:text-red-600 hover:bg-gray-100"
+      >
+        
+        <FaMinusCircle className="text-xl" />
+      </button>
+
+     
           ) : (
-            <GhostButton
-              onClick={onAddCustomerHandler}
-              iconClass="pi pi-user-plus"
-              aria-label="Add Customer"
-              color="text-sky-500"
-              hoverClass="hover:text-sky-700 hover:bg-gray-100"
-              className="p-2 rounded-full"
-            />
+
+
+               <button
+        type="button"
+ 
+            onClick={onAddCustomerHandler}
+            aria-label="Remove Customer"
+                className="flex items-center rounded-full text-sky-600 hover:text-sky-700"
+                  hoverClass="hover:text-red-600 hover:bg-gray-100"
+      >
+      
+        <FaPlusCircle className="text-xl" />
+      </button>
+
           )}
         </div>
       </div>

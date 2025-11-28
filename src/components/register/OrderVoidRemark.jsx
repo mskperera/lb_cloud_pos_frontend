@@ -3,10 +3,7 @@ import { showToastBottomCenter } from "../popups/ToastPopup";
 import { voidOrder } from "../../functions/register";
 import { useToast } from "../useToast";
 import { getDrpdownOrderVoidingReason } from "../../functions/dropdowns";
-import { getOrders } from "../../functions/order";
-import ConfirmDialog from "../dialog/ConfirmDialog";
-import DialogModel from "../model/DialogModel";
-
+import { FaTimes } from "react-icons/fa";
 
 export default function OrderVoidRemark({
   visible,
@@ -15,159 +12,210 @@ export default function OrderVoidRemark({
   onUpdateOrderList,
 }) {
   const [value, setValue] = useState("");
-  const [isShowRemark, setIsShowRemark] = useState(false);
-  const [selectedReasonId, setSelectedReasonId] = useState(null);
+  const [selectedReasonId, setSelectedReasonId] = useState("");
   const [voidingReasonOptions, setVoidingReasonOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const showToast = useToast();
 
   const loadDrpOrderVoidingReason = async () => {
     try {
       const objArr = await getDrpdownOrderVoidingReason();
-      setVoidingReasonOptions(objArr.data.results[0]);
+      setVoidingReasonOptions(objArr.data.results[0] || []);
     } catch (err) {
-      console.error("Error loading dropdown order voiding reasons:", err);
+      console.error("Error loading voiding reasons:", err);
     }
   };
 
   useEffect(() => {
-    loadDrpOrderVoidingReason();
-  }, []);
+    if (visible) {
+      loadDrpOrderVoidingReason();
+      setSelectedReasonId("");
+      setValue("");
+    }
+  }, [visible]);
 
   const _voidOrder = async (orderId, reasonId, isConfirm) => {
     const payload = { orderId, reasonId, isConfirm };
     return await voidOrder(payload);
   };
 
-  const voidAcceptHandler = async () => {
-    try {
-      const result = await _voidOrder(orderId, selectedReasonId, true);
-      const { data } = result;
-      if (data.error) {
-        setIsSubmitting(false);
-        showToast("error", "Exception", data.error.message);
-        return;
-      }
-      onUpdateOrderList(orderId);
-      setIsSubmitting(false);
-      showToast("success", "Successful", data.outputValues.outputMessage);
-    } catch (err) {
-      console.error("Error in voidAcceptHandler:", err);
-    }
-  };
-
-  const voidCancelHandler = () => {
-    setSelectedReasonId(null);
-    setShowDialog(false);
-    setIsSubmitting(false);
-  };
-
-  const handleConfirm = () => {
-    voidAcceptHandler();
-    setShowDialog(false);
-  };
-
-  const confirmVoid = (outputMessage, orderId) => {
-    setShowDialog(true);
-  };
-
-  const voidOrderHandler = async (e) => {
+  const handleVoidOrder = async (e) => {
     e.preventDefault();
+    if (!selectedReasonId) {
+      showToast("error", "Validation", "Please select a void reason");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const result = await _voidOrder(orderId, selectedReasonId, false);
       if (result.data.error) {
-        showToast("danger", "Exception", result.data.error.message);
+        showToast("error", "Error", result.data.error.message);
         setIsSubmitting(false);
         return;
       }
-      confirmVoid();
+      setShowConfirmDialog(true); // Show final confirmation
     } catch (err) {
-      console.error("Error in voidOrderHandler:", err);
+      showToast("error", "Error", "Failed to process void request");
+      console.error(err);
+    } finally {
       setIsSubmitting(false);
     }
   };
 
+  const confirmVoid = async () => {
+    setIsSubmitting(true);
+    try {
+      const result = await _voidOrder(orderId, selectedReasonId, true);
+      if (result.data.error) {
+        showToast("error", "Failed", result.data.error.message);
+      } else {
+        showToast("success", "Success", result.data.outputValues.outputMessage || "Order voided successfully");
+        onUpdateOrderList(orderId);
+        onClose();
+      }
+    } catch (err) {
+      showToast("error", "Error", "Void failed");
+    } finally {
+      setIsSubmitting(false);
+      setShowConfirmDialog(false);
+    }
+  };
+
+  if (!visible) return null;
+
   return (
-    visible && (
-      <DialogModel
-        header="Void Order"
-        visible={visible}
-        onHide={onClose}
-   
-        height="fit-content"
-      >
-        {showDialog && (
-          <ConfirmDialog
-            isVisible={true}
-            message="Are you sure you want to delete this item?"
-            onConfirm={handleConfirm}
-            onCancel={voidCancelHandler}
-            title="Confirm Delete"
-            severity="danger"
-          />
-        )}
+    <>
+      {/* Backdrop + Popup Panel */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          onClick={onClose}
+        />
 
-        <form onSubmit={voidOrderHandler}>
-          <div className="form-control mb-4">
-            <label htmlFor="void-reason" className="label">
-              Why do you want to void this order?
-            </label>
-            <select
-              id="void-reason"
-              className="select select-bordered w-full"
-              value={selectedReasonId}
-              onChange={(e) => {
-                setSelectedReasonId(e.target.value);
-                // Logic to show remark field based on selected reason, if needed
-                setIsShowRemark(true); // Example condition
-              }}
-            >
-              <option value="" disabled>
-                Select the reason
-              </option>
-              {voidingReasonOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {isShowRemark && (
-            <div className="form-control mb-4">
-              <label htmlFor="remark" className="label">Enter the reason</label>
-              <textarea
-                id="remark"
-                className="textarea textarea-bordered w-full"
-                placeholder="Enter the reason"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                rows={5}
-              ></textarea>
-            </div>
-          )}
-
-          <div className="flex justify-end gap-2">
+        <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 bg-gradient-to-r from-red-500 to-rose-600 text-white">
+            <h3 className="text-xl font-bold">Void Order</h3>
             <button
-              type="button"
-              className="btn btn-outline"
               onClick={onClose}
+              className="p-2 rounded-full hover:bg-white/20 transition"
+              aria-label="Close"
             >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Voiding..." : "Void Order"}
+              <FaTimes className="text-xl" />
             </button>
           </div>
-        </form>
-      </DialogModel>
-    )
+
+          {/* Body */}
+          <form onSubmit={handleVoidOrder} className="p-6 space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Why do you want to void this order?
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition"
+                value={selectedReasonId}
+                onChange={(e) => setSelectedReasonId(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Select a reason
+                </option>
+                {voidingReasonOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Optional Remark Field - Show if reason requires it (you can add logic later) */}
+            {selectedReasonId && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Additional Remark (Optional)
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none transition"
+                  rows={4}
+                  placeholder="Enter details if needed..."
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                />
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || !selectedReasonId}
+                className="px-6 py-3 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition flex items-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.3" />
+                      <path fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  "Void Order"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Final Confirmation Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowConfirmDialog(false)}
+          />
+          <div className="relative bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full animate-in zoom-in-95">
+            <div className="text-center space-y-6">
+              <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.94 4h13.88a1.88 1.88 0 001.88-1.88V8.12a1.88 1.88 0 00-1.88-1.88H5.94a1.88 1.88 0 00-1.88 1.88v7.76a1.88 1.88 0 001.88 1.88z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">Confirm Void Order?</h3>
+                <p className="text-gray-600 mt-2">This action cannot be undone.</p>
+              </div>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowConfirmDialog(false)}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmVoid}
+                  disabled={isSubmitting}
+                  className="px-6 py-3 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 disabled:opacity-70 transition"
+                >
+                  {isSubmitting ? "Voiding..." : "Yes, Void Order"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

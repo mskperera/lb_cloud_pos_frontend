@@ -6,34 +6,21 @@ import { getDrpSession } from "../../functions/dropdowns";
 import OrderVoidRemark from "../register/OrderVoidRemark";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 import GhostButton from "../iconButtons/GhostButton";
-import DialogModel from "../model/DialogModel";
 import PaymentConfirm from "../../pages/paymentConfirm";
 import LoadingPopup from "../LoadingPopup";
 import DaisyUIPaginator from "../../components/DaisyUIPaginator";
+import { FaTimes } from "react-icons/fa";
 
-
-export default function OrderList({ isVisible,setIsVisible }) {
+export default function OrderList({ isVisible, setIsVisible }) {
   const [orders, setOrders] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
-  const [totalRecords, setTotalRecords] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [isVoidRemarkShow, setIsVoidRemarkShow] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState("");
-
-  const totalPages = Math.ceil(totalRecords / rowsPerPage);
-
-    const [isPaymentConfirmShow,setIsPaymentConfirmShow]=useState(false);
-
-
-  const onPageChange = (event) => {
-   
-               console.log(' event.page', event);
-    setCurrentPage(event.page);
-    setRowsPerPage(event.rows);
-    loadOrders(selectedCategoryId, event.page, rowsPerPage);
-  };
+  const [isPaymentConfirmShow, setIsPaymentConfirmShow] = useState(false);
 
   const [selectedFilterBy, setSelectedFilterBy] = useState({
     label: "Filter by",
@@ -51,11 +38,17 @@ export default function OrderList({ isVisible,setIsVisible }) {
     rules: { required: false, dataType: "string" },
   });
 
-  const loadOrders = async (_searchValue, fromDate, toDate) => {
+  const [searchFromDate, setSearchFromDate] = useState("");
+  const [searchToDate, setSearchToDate] = useState("");
+
+  const onPageChange = (event) => {
+    setCurrentPage(event.page);
+    setRowsPerPage(event.rows);
+  };
+
+  const loadOrders = async (_searchValue = null, fromDate = null, toDate = null) => {
     try {
       setIsTableDataLoading(true);
-      console.log('currentpage',currentPage);
-           console.log('rowsPerPage',rowsPerPage);
       const skip = currentPage * rowsPerPage;
       const limit = rowsPerPage;
 
@@ -66,348 +59,264 @@ export default function OrderList({ isVisible,setIsVisible }) {
         customerName: selectedFilterBy.value === 3 ? _searchValue : null,
         orderFromDate: selectedFilterBy.value === 5 ? fromDate : null,
         orderToDate: selectedFilterBy.value === 5 ? toDate : null,
-        skip: skip,
-        limit: limit,
+        skip,
+        limit,
       };
-      console.log("filteredData", filteredData);
+
       const _result = await getOrders(filteredData);
-      console.log("ppppp", _result);
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
-
-      setOrders(_result.data.results[0]);
-      setIsTableDataLoading(false);
+      setOrders(_result.data.results[0] || []);
     } catch (err) {
+      console.error("Error loading orders:", err);
+      setOrders([]);
+    } finally {
       setIsTableDataLoading(false);
-      console.log("error:", err);
     }
   };
 
   useEffect(() => {
-    if(isVisible){
-    console.log("useEffect lo");
-    loadOrders(null, null, null);
+    if (isVisible) {
+      loadOrders(null, null, null);
     }
-  }, [currentPage, rowsPerPage,isVisible]);
-
-  const [filterByOptions, setFilterByOptions] = useState([
-    { id: 1, displayName: "Order Number" },
-    { id: 5, displayName: "Order Date" },
-  ]);
-
-  const [sessionsOptions, setSessionsOptions] = useState([]);
-
-  const loadDrpSession = async () => {
-    const objArr = await getDrpSession();
-    setSessionsOptions(objArr.data.results[0]);
-  };
-
-  useEffect(() => {
-    loadDrpSession();
-  }, []);
+  }, [isVisible, currentPage, rowsPerPage]);
 
   const actionButtons = (o) => (
     <div className="flex space-x-2">
       <GhostButton
         onClick={() => {
-setIsPaymentConfirmShow(true);
-setSelectedOrderId(o.orderId);
-         // window.open(`/paymentConfirm?orderId=${o.orderId}`, "_blank");
+          setSelectedOrderId(o.orderId);
+          setIsPaymentConfirmShow(true);
         }}
         iconClass="pi pi-copy"
         color="text-blue-500"
-        hoverClass="hover:text-blue-700 hover:bg-transparent"
+        hoverClass="hover:text-blue-700"
         aria-label="View Receipt"
       />
       {!o.isVoided ? (
         <GhostButton
-          onClick={async () => {
+          onClick={() => {
             setSelectedOrderId(o.orderId);
             setIsVoidRemarkShow(true);
           }}
           iconClass="pi pi-stop"
           color="text-red-500"
-          hoverClass="hover:text-red-700 hover:bg-transparent"
+          hoverClass="hover:text-red-700"
           aria-label="Void Order"
         />
       ) : (
-        <div className="text-red-600 font-medium">Voided</div>
+        <span className="text-red-600 font-medium text-xs">Voided</span>
       )}
     </div>
   );
 
-  const handleInputChange = (setState, state, value) => {
-    console.log("Nlllll", state);
-    if (!state.rules) {
-      console.error("No rules defined for validation in the state", state);
-      return;
-    }
-    const validation = validate(value, state);
-    setState({
-      ...state,
-      value: value,
-      isValid: validation.isValid,
-      isTouched: true,
-      validationMessages: validation.messages,
-    });
-  };
-
-  const [searchFromDate, setSearchFromDate] = useState("");
-  const [searchToDate, setSearchToDate] = useState("");
-
   const updateOrderListHandler = (orderId) => {
-    const existingOrderList = [...orders];
-    const index = orders.findIndex((o) => o.orderId === orderId);
-    existingOrderList[index].isVoided = true;
-    setOrders(existingOrderList);
+    setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, isVoided: true } : o));
     setIsVoidRemarkShow(false);
   };
 
-  const orderNoBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{rowData.orderNo}</span>
-  );
-
-  const customerBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : (
-      rowData.customerName
-    )
-  );
-
-  const grossAmountBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.grossAmount_total, false)}</span>
-  );
-
-  const discountBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.all_DiscountAmount_total, false)}</span>
-  );
-
-  const taxBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.lineTaxAmount_total, false)}</span>
-  );
-
-  const grandTotalBodyTemplate = (rowData) => (
-    isTableDataLoading ? <span>Loading...</span> : <span>{formatCurrency(rowData.grandTotal, false)}</span>
-  );
-
-  const modifiedDateBodyTemplate = (item) => {
-    const localFormattedDate = formatUtcToLocal(item.createdDate_UTC);
-    return isTableDataLoading ? <span>Loading...</span> : <span>{item.createdDate_UTC ? localFormattedDate : ''}</span>;
+  // Close panel when clicking backdrop
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setIsVisible(false);
+    }
   };
 
-  const handleRowsPerPageChange = (rows) => {
-    setRowsPerPage(rows);
-    setCurrentPage(0);
-  };
+  if (!isVisible) return null;
 
   return (
-    <div className="">
+    <>
+      {/* Backdrop + Panel */}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onClick={handleBackdropClick}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+
+        {/* Panel */}
+        <div className="relative w-full max-w-6xl max-h-[92vh] bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600">
+            <h2 className="text-xl font-bold">Sales History</h2>
+            <button
+              onClick={() => setIsVisible(false)}
+              className="p-3 rounded-full hover:bg-slate-200 hover:text-red-500 transition-all duration-200"
+              aria-label="Close"
+            >
+              <FaTimes className="text-2xl" />
+            </button>
+          </div>
+
+          {/* Body - Scrollable */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            {/* Filters */}
+            <div className="flex flex-col lg:flex-row lg:items-end gap-4">
+              <div className="flex-1 max-w-xs">
+                <select
+                  value={selectedFilterBy.value}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    setSelectedFilterBy(prev => ({ ...prev, value: val }));
+                  }}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                >
+                  <option value={1}>Order Number</option>
+                  <option value={5}>Order Date</option>
+                </select>
+              </div>
+
+              {[1, 2, 3].includes(selectedFilterBy.value) && (
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchValue.value}
+                  onChange={(e) => setSearchValue(prev => ({ ...prev, value: e.target.value }))}
+                  onKeyDown={(e) => e.key === 'Enter' && loadOrders(searchValue.value)}
+                  className="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                />
+              )}
+
+              {selectedFilterBy.value === 5 && (
+                <div className="flex gap-3">
+                  <input
+                    type="date"
+                    value={searchFromDate ? moment(searchFromDate).format("YYYY-MM-DD") : ""}
+                    onChange={(e) => setSearchFromDate(e.target.value)}
+                    className="px-4 py-3 rounded-xl border border-gray-300"
+                  />
+                  <input
+                    type="date"
+                    value={searchToDate ? moment(searchToDate).format("YYYY-MM-DD") : ""}
+                    onChange={(e) => setSearchToDate(e.target.value)}
+                    className="px-4 py-3 rounded-xl border border-gray-300"
+                  />
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => loadOrders(
+                    searchValue.value,
+                    searchFromDate ? moment(searchFromDate).format("YYYY-MM-DD") : null,
+                    searchToDate ? moment(searchToDate).format("YYYY-MM-DD") : null
+                  )}
+                  className="px-6 py-3 bg-sky-600 text-white rounded-xl hover:bg-sky-700 font-medium transition"
+                >
+                  Search
+                </button>
+                <button
+                  onClick={() => {
+                    setSearchValue(prev => ({ ...prev, value: "" }));
+                    setSearchFromDate("");
+                    setSearchToDate("");
+                    loadOrders();
+                  }}
+                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-medium transition"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            {/* Table */}
+            {isTableDataLoading ? (
+              <div className="flex justify-center py-12">
+                <LoadingPopup text="Loading orders..." />
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order No</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Gross</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Discount</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tax</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {orders.length === 0 ? (
+                        <tr>
+                          <td colSpan="8" className="text-center py-12 text-gray-500">
+                            No orders found
+                          </td>
+                        </tr>
+                      ) : (
+                        orders.map((item) => (
+                          <tr key={item.orderId} className="hover:bg-gray-50 transition">
+                            <td className="px-6 py-4 font-medium">{item.orderNo}</td>
+                            <td className="px-6 py-4">{item.customerName || "-"}</td>
+                            <td className="px-6 py-4">{formatCurrency(item.grossAmount_total, false)}</td>
+                            <td className="px-6 py-4">{formatCurrency(item.all_DiscountAmount_total, false)}</td>
+                            <td className="px-6 py-4">{formatCurrency(item.lineTaxAmount_total, false)}</td>
+                            <td className="px-6 py-4 font-semibold text-sky-600">{formatCurrency(item.grandTotal, false)}</td>
+                            <td className="px-6 py-4 text-sm">{formatUtcToLocal(item.createdDate_UTC)}</td>
+                            <td className="px-6 py-4">{actionButtons(item)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="text-sm text-gray-600">
+                      {totalRecords} order{totalRecords !== 1 ? 's' : ''} found
+                    </div>
+                    <DaisyUIPaginator
+                      currentPage={currentPage}
+                      rowsPerPage={rowsPerPage}
+                      totalRecords={totalRecords}
+                      onPageChange={onPageChange}
+                      rowsPerPageOptions={[10, 20, 30, 50, 100]}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Reusable Modals */}
       <OrderVoidRemark
         visible={isVoidRemarkShow}
-        onClose={() => {
-          setIsVoidRemarkShow(false);
-        }}
+        onClose={() => setIsVoidRemarkShow(false)}
         orderId={selectedOrderId}
         onUpdateOrderList={updateOrderListHandler}
       />
 
-
-      <div className="flex flex-col p-6 gap-4 bg-gray-50 rounded-lg shadow-sm">
-
-
-      
-        {isTableDataLoading ? 
-  <div className="w-1/2">
-  <LoadingPopup text="Opening Sales History Panel…" />
-  </ div>:
-
-          <DialogModel
-        header="Sales History"
-        visible={true}
-        maximizable
-        maximized={true}
-        fullHeight={true} fullWidth={true}
-        onHide={() => setIsVisible(false)}
-      >
-<>
-
-
- 
-
-
-        <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-4 mb-5">
-         
-          <DialogModel
-        header={"Payment Receipt"}
-        visible={isPaymentConfirmShow}
-        onHide={() => setIsPaymentConfirmShow(false)}
-        fullWidth={true}
-  fullHeight={true}
-      >
-    <PaymentConfirm orderId={selectedOrderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} openBy="SalesHistory" />
-      </DialogModel>
-         
-          <div className="flex flex-col ">
-            {/* <label className=" font-medium text-gray-700">Filter By</label> */}
-            <select
-              value={selectedFilterBy.value}
-              onChange={(e) => {
-                handleInputChange(
-                  setSelectedFilterBy,
-                  selectedFilterBy,
-                  parseInt(e.target.value)
-                );
-              }}
-              className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-            >
-              {filterByOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-
-          {[1, 2, 3].includes(selectedFilterBy.value) && (
-            <div className="flex flex-col space-y-2 w-full sm:w-1/3 mt-4 sm:mt-0">
-              {/* <label className="font-medium text-gray-700">Search Value</label> */}
-              <input
-                type="text"
-                value={searchValue.value}
-                onChange={(e) =>
-                  handleInputChange(setSearchValue, searchValue, e.target.value)
-                }
-                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-                placeholder="Enter search term"
-              />
-            </div>
-          )}
-
-          {selectedFilterBy.value === 5 && (
-            <div className="flex flex-col sm:flex-row sm:space-x-4 w-full sm:w-1/3 mt-4 sm:mt-0">
-              <div className="flex flex-col space-y-2 w-full">
-                <label className="text-sm font-medium text-gray-700">From Date</label>
-                <input
-                  type="date"
-                  value={searchFromDate ? moment(searchFromDate).format("YYYY-MM-DD") : ""}
-                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-                  placeholder="From"
-                  onChange={(e) => {
-                    setSearchFromDate(e.target.value ? new Date(e.target.value) : "");
-                  }}
-                />
-              </div>
-              <div className="flex flex-col space-y-2 w-full mt-4 sm:mt-0">
-                <label className="text-sm font-medium text-gray-700">To Date</label>
-                <input
-                  type="date"
-                  value={searchToDate ? moment(searchToDate).format("YYYY-MM-DD") : ""}
-                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-                  placeholder="To"
-                  onChange={(e) => {
-                    setSearchToDate(e.target.value ? new Date(e.target.value) : "");
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
-          {(searchValue.value || searchFromDate || searchToDate) && (
-            <div className="flex items-end mt-4 sm:mt-0">
-              <button
-                title="Clear Search"
-                className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-gray-800 transition duration-200"
-                onClick={() => {
-                  setSearchValue({ ...searchValue, value: "" });
-                  setSearchFromDate("");
-                  setSearchToDate("");
-                  loadOrders(null, null, null);
-                }}
-              >
-                <i className="pi pi-times mr-2"></i> Clear Search
+      {isPaymentConfirmShow && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && setIsPaymentConfirmShow(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600">
+               <h3 className="text-xl font-bold">Payment Receipt</h3>
+              <button onClick={() => setIsPaymentConfirmShow(false)}    className="p-3 rounded-full  hover:text-red-500 transition-all duration-200">
+                <FaTimes className="text-xl" />
               </button>
             </div>
-          )}
 
-          <div className="flex-1 flex items-end gap-4 mt-4 sm:mt-0">
-            <button
-              title="Click here to view"
-              className="flex items-center px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200"
-              onClick={() => {
-                loadOrders(
-                  searchValue.value,
-                  moment(searchFromDate).format("YYYY-MM-DD HH:mm:ss"),
-                  moment(searchToDate).format("YYYY-MM-DD HH:mm:ss")
-                );
-              }}
-            >
-              <i className="pi pi-search mr-2"></i> View
-            </button>
+
+
+            <div className="p-6 overflow-y-auto">
+              <PaymentConfirm
+                orderId={selectedOrderId}
+                setIsPaymentConfirmShow={setIsPaymentConfirmShow}
+                openBy="SalesHistory"
+              />
+            </div>
           </div>
         </div>
-
-        {isTableDataLoading ? (
-          <div className="flex justify-center py-8">
-            <p className="text-lg text-gray-600">Loading...</p>
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-col h-[65vh] overflow-hidden">
-              <div className="flex-1 overflow-y-auto">
-                <table className="w-full border-collapse">
-                  <thead className="sticky top-0 bg-gray-100 text-sm font-semibold text-gray-700 border-b border-gray-300">
-                    <tr>
-                      <th className="px-4 py-3 text-left">Order No</th>
-                      <th className="px-4 py-3 text-left">Customer</th>
-                      <th className="px-4 py-3 text-left">Gross Amount</th>
-                      <th className="px-4 py-3 text-left">Discounts</th>
-                      <th className="px-4 py-3 text-left">Tax</th>
-                      <th className="px-4 py-3 text-left">Grand Total</th>
-                      <th className="px-4 py-3 text-left">Created Date</th>
-                      <th className="px-4 py-3 text-left"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orders.map((item) => (
-                      <tr
-                        key={item.orderId}
-                        className="border-b border-gray-200 hover:bg-gray-50 text-sm text-gray-700"
-                      >
-                        <td className="px-4 py-3">{orderNoBodyTemplate(item)}</td>
-                        <td className="px-4 py-3">{customerBodyTemplate(item)}</td>
-                        <td className="px-4 py-3">{grossAmountBodyTemplate(item)}</td>
-                        <td className="px-4 py-3">{discountBodyTemplate(item)}</td>
-                        <td className="px-4 py-3">{taxBodyTemplate(item)}</td>
-                        <td className="px-4 py-3">{grandTotalBodyTemplate(item)}</td>
-                        <td className="px-4 py-3">{modifiedDateBodyTemplate(item)}</td>
-                        <td className="px-4 py-3">{actionButtons(item)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className="flex justify-between items-center p-4">
-              <div className="text-sm text-gray-500">{totalRecords} items found</div>
-
-
-              <DaisyUIPaginator
-                        currentPage={currentPage}
-                        rowsPerPage={rowsPerPage}
-                        totalRecords={totalRecords}
-                        onPageChange={onPageChange}
-                        rowsPerPageOptions={[10, 20, 30, 50, 100]}
-                      /> 
-
-            </div>
-          </>
-        )}
-
-</>
-</DialogModel>
-      }
-
-      </div>
-    </div>
+      )}
+    </>
   );
 }

@@ -49,7 +49,7 @@ const HOCSession = ({terminalId, children }) => {
   }
 
   if (!isSessionEnded && !isLoading) {
-    return <>{ children}</>;
+    return <div className="">{ children}</div>;
   }
 
   return null;

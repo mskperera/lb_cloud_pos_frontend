@@ -97,7 +97,7 @@ export default function ProductOrderList({ showDiscountPopup }) {
   };
 
   return (
-    <div  className="min-h-[300px] overflow-auto rounded-lg ">
+    <div  className="h-[52vh] overflow-auto rounded-lg ">
     <table className="table-auto w-full" style={{ tableLayout: 'fixed' }}>
         <thead className="bg-white sticky top-0 z-10 border-b-2 border-sky-600">
           <tr className="text-gray-700">

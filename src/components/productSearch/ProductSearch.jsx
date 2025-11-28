@@ -5,7 +5,7 @@ import { useToast } from '../useToast';
 import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,hideSearchBox }) => {
+const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,hideSearchBox, hideButton,showAdvancedSearcho }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -13,6 +13,10 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
   const searchRef = useRef(null);
   const showToast = useToast();
  
+  useEffect(()=>{
+    if(showAdvancedSearcho)
+    setShowAdvancedSearch(true)
+  },[showAdvancedSearcho])
 
   const fetchProducts = async (searchTerm) => {
     if (!store?.storeId) {
@@ -113,23 +117,18 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
             </button>
           )}
         </div>:''}
-        <button
+      {!hideButton ? <button
           type="button"
           onClick={() => setShowAdvancedSearch(true)}
           className="flex items-center px-4 py-2 text-sm rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
         >
           <span className="pi pi-filter text-base"></span>
           <span className="ml-2">Item Lookup</span>
-        </button>
+        </button>:null}
       </div>
 
 
-      {showAdvancedSearch && (
-        <DialogModel
-          header="Advanced Product Search"
-          visible={showAdvancedSearch}
-          onHide={() => setShowAdvancedSearch(false)}
-        >
+    
           <AdvancedProductSearch
             visible={showAdvancedSearch}
             onHide={() => setShowAdvancedSearch(false)}
@@ -139,8 +138,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
             }}
             showOnlyProductItems={showOnlyProductItems}
           />
-        </DialogModel>
-      )}
+ 
     </div>
   );
 };
