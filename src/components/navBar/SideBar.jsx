@@ -119,7 +119,7 @@ const Sidebar = () => {
         <SidebarMenu
           label="Reports"
           iconName={FaChartLine}
-          to="/reports/reportViewer"
+          to="/reports/report-dashboard"
         />
         <SidebarMenu
           label="Settings"

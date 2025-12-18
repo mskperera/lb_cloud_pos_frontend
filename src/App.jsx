@@ -8,7 +8,7 @@ import Customers from './pages/customers';
 import Login from './pages/login';
 import DayOpen from './pages/dayopen';
 import Dashboard from './pages/dashboard';
-import ReportViewer from './pages/reports/ReportViewer';
+import SalesByProductMonthlyReport from './pages/reports/SalesByProductMonthlyReport';
 import MainLayout from './layouts/MainLayout';
 import SidebarLayout from './layouts/SidebarLayout';
 import TopbarLayout from './layouts/TopbarLayout';
@@ -21,6 +21,9 @@ import SystemDataSetup from './pages/systemDataInitialization';
 import SelectStore from './pages/store';
 import About from './pages/about';
 import PrivacyPolicy from './pages/privacyPolicy';
+import InventoryOnHandReport from './pages/reports/InventoryOnHandReport';
+import DailySalesSummaryReport from './pages/reports/DailySalesSummaryReport';
+import LowStockReport from './pages/reports/LowStockReport';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -38,6 +41,7 @@ const StockAdjustment  = React.lazy(() => import("./pages/inventory/stockAdjustm
 const InventoryTransactionHistory  = React.lazy(() => import("./pages/inventoryTransactionHistory"));
 const Categories  = React.lazy(() => import("./pages/categories"));
 const MeasurementUnits= React.lazy(() => import("./pages/measurementUnits"));
+const ReportsDashboard= React.lazy(() => import("./pages/reports/ReportsDashboard"));
 
 function AppContent() {
   const location = useLocation();
@@ -123,7 +127,11 @@ function AppContent() {
 
          
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/reports/reportViewer" element={<ReportViewer />} />
+              <Route path="/reports/salesByProductMonthlyReport" element={<SalesByProductMonthlyReport />} />
+    <Route path="/reports/dailySalesSummaryReport" element={<DailySalesSummaryReport />} />
+   <Route path="/reports/low-stock" element={<LowStockReport />} />
+
+
 
               <Route
                 path="/about"
@@ -134,6 +142,19 @@ function AppContent() {
                 path="/privacy-policy"
                 element={<PrivacyPolicy />}
               />
+
+<Route
+                path="/reports/report-dashboard"
+                element={<ReportsDashboard />}
+              />
+
+<Route
+                path="/reports/InventoryOnHandReport"
+                element={<InventoryOnHandReport />}
+              />
+
+
+              
 
             </Route>
 

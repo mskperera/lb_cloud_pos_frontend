@@ -974,7 +974,7 @@ const handleNewAddVariation = () => {
                   </div>
                   <p className="text-gray-500">{getInstruction("isProductItem")}</p>
                 </div>
-                <div className="flex flex-col gap-1">
+                {/* <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -986,7 +986,7 @@ const handleNewAddVariation = () => {
                     <label htmlFor="isNotForSelling" className="font-medium text-gray-700">Not For Selling</label>
                   </div>
                   <p className="text-gray-500">{getInstruction("isNotForSelling")}</p>
-                </div>
+                </div> */}
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <input
