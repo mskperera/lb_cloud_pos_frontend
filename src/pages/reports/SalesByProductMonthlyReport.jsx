@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaPrint, FaCalendarAlt, FaSpinner } from 'react-icons/fa';
 import { getMonthlySalesDetails } from '../../functions/report';
+import { useNavigate } from 'react-router-dom';
 
 const SalesByProductMonthlyReport = () => {
   const [reportData, setReportData] = useState([]);
@@ -44,7 +45,7 @@ const SalesByProductMonthlyReport = () => {
   const totalProfit = totalRevenue - totalCost;
   const totalTax = reportData.reduce((sum, item) => sum + parseFloat(item.taxAmount || 0), 0);
   const hasTax = totalTax > 0;
-
+const navigate=useNavigate();
   // Format number with commas, no symbol
   const formatNumber = (amount) => {
     return new Intl.NumberFormat('en-PH', {
@@ -216,7 +217,12 @@ const SalesByProductMonthlyReport = () => {
               className="no-print absolute right-10 top-1/2 -translate-y-1/2 bg-sky-700 hover:bg-sky-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg flex items-center gap-3">
               <FaPrint /> Print / Save PDF
             </button>
-            <button onClick={() => setShowReport(false)}
+            <button onClick={() => 
+ {           
+ // setShowReport(false);
+navigate('/reports/report-dashboard');
+}
+            }
               className="no-print absolute left-10 top-1/2 -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
               Back
             </button>

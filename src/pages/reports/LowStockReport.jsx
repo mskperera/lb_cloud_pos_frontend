@@ -3,6 +3,7 @@ import { FaExclamationTriangle, FaPrint, FaSpinner } from 'react-icons/fa';
 import { getInventoryOnHand, getLowStockReport } from '../../functions/report';
 import { useToast } from '../../components/useToast';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 const LowStockReport = () => {
   const [reportData, setReportData] = useState([]);
@@ -13,6 +14,7 @@ const LowStockReport = () => {
   const storeId = JSON.parse(localStorage.getItem('selectedStore'))?.storeId;
   const systemInfo = JSON.parse(localStorage.getItem('systemInfo') || '{}');
   const currencySymbol = systemInfo.symbol || 'LKR';
+const navigate=useNavigate();
 
   const fetchReport = async () => {
     if (!storeId) {
@@ -165,7 +167,14 @@ const LowStockReport = () => {
               <FaPrint /> Print / Save PDF
             </button>
             <button
-              onClick={() => setShowReport(false)}
+              onClick={() => 
+             {
+//setShowReport(false)
+navigate('/reports/report-dashboard');
+             }   
+
+
+              }
               className="no-print absolute left-10 top-1/2 -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg"
             >
               Back
@@ -195,7 +204,10 @@ const LowStockReport = () => {
                         <p className="text-2xl font-bold text-gray-700">No Data Found</p>
                         <p className="text-gray-500 mt-2 text-lg">No products found for this store.</p>
                         <button
-                          onClick={() => setShowReport(false)}
+                          onClick={() => {
+
+                            navigate('/reports/report-dashboard')
+                          }}
                           className="mt-6 px-8 py-3 bg-sky-700 hover:bg-sky-800 text-white font-semibold rounded-xl shadow-lg"
                         >
                           Go Back

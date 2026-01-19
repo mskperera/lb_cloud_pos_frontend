@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { getDailySalesSummary } from '../../functions/report';
 import { useToast } from '../../components/useToast';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 const DailySalesSummaryReport = () => {
   const [reportData, setReportData] = useState([]);
@@ -17,6 +18,8 @@ const [endDate, setEndDate] = useState(new Date());
   const systemInfo = JSON.parse(localStorage.getItem('systemInfo') || '{}');
   const currencySymbol = systemInfo.symbol;
 
+  const navigate=useNavigate();
+  
   const fetchReport = async () => {
     setLoading(true);
     try {
@@ -222,7 +225,9 @@ const periodLabel = moment(startDate).isSame(endDate, 'day')
               className="no-print absolute right-10 top-1/2 -translate-y-1/2 bg-sky-700 hover:bg-sky-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg flex items-center gap-3">
               <FaPrint /> Print / Save PDF
             </button>
-            <button onClick={() => setShowReport(false)}
+            <button onClick={() => {
+              navigate('/reports/report-dashboard')
+            }}
               className="no-print absolute left-10 top-1/2 -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
               Back
             </button>

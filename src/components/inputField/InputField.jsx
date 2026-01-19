@@ -11,6 +11,7 @@ const InputField = ({
   isReadOnly = false,
   type = "text",
   required = false,
+  max
 }) => {
   return (
     <div className="flex flex-col space-y-1">
@@ -28,6 +29,7 @@ const InputField = ({
         onChange={onChange}
         disabled={isDisabled}
         readOnly={isReadOnly}
+        max={max}
       />
       {validationMessages && (
         <span className="text-red-500 text-xs mt-1 animate-fade-in">

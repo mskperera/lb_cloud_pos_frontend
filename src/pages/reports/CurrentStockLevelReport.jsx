@@ -98,7 +98,7 @@ const CurrentStockLevelReport = () => {
             <button onClick={() => window.print()} className="no-print absolute right-10 top-1/2 -translate-y-1/2 bg-sky-700 hover:bg-sky-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg flex items-center gap-3">
               <FaPrint /> Print / Save PDF
             </button>
-            <button onClick={() => setShowReport(false)} className="no-print absolute left-10 top-1/2 -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
+            <button onClick={() => {setShowReport(false)}} className="no-print absolute left-10 top-1/2 -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
               Back
             </button>
           </div>

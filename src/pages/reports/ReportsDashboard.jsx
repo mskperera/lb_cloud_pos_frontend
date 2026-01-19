@@ -31,7 +31,7 @@ const ReportsDashboard = () => {
         { name: "Low Stock / Reorder Alert", icon: <FaExclamationTriangle />, path: "/reports/low-stock" },
         // { name: "Inventory Value Summary", icon: <FaFileInvoiceDollar />, path: "/reports/inventory-value" },
         // { name: "Stock Aging / Dead Stock", icon: <FaHistory />, path: "/reports/dead-stock" },
-        { name: "Sell-Through & Turnover", icon: <FaChartLine />, path: "/reports/turnover" },
+        // { name: "Sell-Through & Turnover", icon: <FaChartLine />, path: "/reports/turnover" },
         // { name: "Inventory vs Sales", icon: <FaSearchDollar />, path: "/reports/stock-vs-sales" },
       ]
     },

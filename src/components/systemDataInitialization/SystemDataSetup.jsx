@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
 import InputField from "../inputField/InputField";
 import DropdownField from "../inputField/DropdownField";
-import { getCountries, getCurrencies, getLanguages, getTimezones } from "../../functions/dropdowns";
+import { getCurrencies } from "../../functions/dropdowns";
 import { useToast } from "../useToast";
-import { getSystemInfo, initializeSystemData, loadSystemInfoToLocalStorage } from "../../functions/systemSettings";
+import {
+  initializeSystemData,
+  loadSystemInfoToLocalStorage,
+} from "../../functions/systemSettings";
 import { useNavigate } from "react-router-dom";
 import { setUserAssignedStores } from "../../functions/store";
-import { FaBuilding, FaCashRegister, FaGlobe } from "react-icons/fa";
+import { FaBuilding, FaCashRegister, FaGlobe, FaSpinner } from "react-icons/fa";
+import {
+  getCountries,
+  getLanguages,
+  getTimezones,
+} from "../../functions/dropdownOperational";
+
 const SystemDataSetup = () => {
-
-   const systemInit_SystemInfoData=localStorage.getItem('systemInit_SystemInfoData') && JSON.parse(localStorage.getItem('systemInit_SystemInfoData'));
-   const systemInit_Company=localStorage.getItem('systemInit_Company') && JSON.parse(localStorage.getItem('systemInit_Company'));
-  
-  // utcOffset,countryId,currencyId,primaryLanguageId,timeZoneId
-
-
+  // ────────────────────────────────────────────────
+  //  Form field states
+  // ────────────────────────────────────────────────
   const [terminalName, setTerminalName] = useState({
     label: "Terminal Name",
     value: "",
@@ -22,7 +27,6 @@ const SystemDataSetup = () => {
     isValid: false,
     rules: { required: true, dataType: "string" },
   });
-  
 
   const [storeName, setStoreName] = useState({
     label: "Branch / Store Name",
@@ -72,373 +76,446 @@ const SystemDataSetup = () => {
     rules: { required: true, dataType: "string" },
   });
 
+
+
   const [address, setAddress] = useState({
     label: "Address",
     value: "",
     isTouched: false,
-    isValid: true,
+    isValid: false,
     rules: { required: true, dataType: "string" },
   });
-  
+
   const [city, setCity] = useState({
     label: "City",
     value: "",
     isTouched: false,
-    isValid: true,
+    isValid: false,
     rules: { required: true, dataType: "string" },
   });
-  
+
   const [province, setProvince] = useState({
-    label: "Province",
+    label: "Province / State",
     value: "",
     isTouched: false,
-    isValid: true,
+    isValid: false,
     rules: { required: true, dataType: "string" },
   });
-  
+
   const [emailAddress, setEmailAddress] = useState({
     label: "Email Address",
     value: "",
     isTouched: false,
-    isValid: true,
+    isValid: false,
     rules: { required: true, dataType: "string" },
   });
-  
+
   const [tel1, setTel1] = useState({
     label: "Telephone 1",
     value: "",
     isTouched: false,
-    isValid: true,
+    isValid: false,
     rules: { required: true, dataType: "string" },
   });
-  
+
   const [tel2, setTel2] = useState({
     label: "Telephone 2",
     value: "",
     isTouched: false,
     isValid: true,
-    rules: { required: true, dataType: "string" },
+    rules: { required: false, dataType: "string" },
   });
 
-  
-
-    const [currencyOptions, setCurrencyOptions] = useState([]);
-    const [timeZoneOptions, setTimeZoneOptions] = useState([]);
-    const [countriesOptions, setCountriesOptions] = useState([]);
-    const [languagesOptions, setLanguagesOptions] = useState([]);
 
 
-    useEffect(() => {
-      if (systemInit_SystemInfoData) {
-        setCurrencyId(prev => ({ ...prev,  value: systemInit_SystemInfoData?.currencyId }));
-      }
-      if (systemInit_SystemInfoData) {
-        setTimeZoneId(prev => ({ ...prev, value: systemInit_SystemInfoData?.timeZoneId }));
-      }
-      if (systemInit_SystemInfoData) {
-        setCountryId(prev => ({ ...prev,  value: systemInit_SystemInfoData?.countryId }));
-      }
-      if (systemInit_SystemInfoData) {
-        setLanguageId(prev => ({ ...prev,  value: systemInit_SystemInfoData?.languageId }));
-      }
-      if (systemInit_Company) {
-        setLanguageId(prev => ({ ...prev,    value: systemInit_Company?.companyName}));
-      }
-    }, []);
 
-    
+
+  // Dropdown options
+  const [currencyOptions, setCurrencyOptions] = useState([]);
+  const [timeZoneOptions, setTimeZoneOptions] = useState([]);
+  const [countriesOptions, setCountriesOptions] = useState([]);
+  const [languagesOptions, setLanguagesOptions] = useState([]);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const showToast = useToast();
+  const navigate = useNavigate();
+
+  const userinfo = JSON.parse(localStorage.getItem("user") || "{}");
+
+  // ────────────────────────────────────────────────
+  //  Load previously saved values
+  // ────────────────────────────────────────────────
+  useEffect(() => {
+    const systemInfoStr = localStorage.getItem("systemInit_SystemInfoData");
+    const companyInfoStr = localStorage.getItem("systemInit_Company");
+
+    if (systemInfoStr) {
+      const data = JSON.parse(systemInfoStr);
+      setCurrencyId((prev) => ({ ...prev, value: data?.currencyId || "" }));
+      setTimeZoneId((prev) => ({ ...prev, value: data?.timeZoneId || "" }));
+      setCountryId((prev) => ({ ...prev, value: data?.countryId || "" }));
+      setLanguageId((prev) => ({ ...prev, value: data?.languageId || "" }));
+    }
+
+    if (companyInfoStr) {
+      const data = JSON.parse(companyInfoStr);
+      setCompanyName((prev) => ({ ...prev, value: data?.companyName || "" }));
+    }
+  }, []);
+
+  // ────────────────────────────────────────────────
+  //  Load dropdown data once on mount
+  // ────────────────────────────────────────────────
+  useEffect(() => {
+    const loadDropdowns = async () => {
+      try {
+        const [currRes, tzRes, countryRes, langRes] = await Promise.all([
+          getCurrencies(),
+          getTimezones(),
+          getCountries(),
+          getLanguages(),
+        ]);
+
+        setCurrencyOptions(currRes?.data?.results?.[0] || currRes?.data || []);
+        setTimeZoneOptions(tzRes?.data || []);
+        setCountriesOptions(countryRes?.data || []);
+        setLanguagesOptions(langRes?.data || []);
+      } catch (err) {
+        console.error("Failed to load dropdown options:", err);
+        showToast("danger", "Error", "Could not load some options. Please refresh.");
+      }
+    };
+
+    loadDropdowns();
+  }, []);
+
+  // ────────────────────────────────────────────────
+  //  Handlers
+  // ────────────────────────────────────────────────
   const handleInputChange = (setter, field, value) => {
     setter({
       ...field,
       value,
       isTouched: true,
-      isValid: field.rules.required ? value.trim() !== "" : true,
+      isValid: field.rules?.required ? !!value?.trim() : true,
     });
   };
 
-  const validationMessages = (field) => {
-    if (field.isTouched && !field.isValid) {
-      return <span className="text-red-500 text-sm">This field is required.</span>;
+  const showError = (field) =>
+    field.isTouched && !field.isValid ? (
+      <span className="text-red-600 text-xs mt-1 block font-medium">
+        This field is required
+      </span>
+    ) : null;
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    // Basic client-side check
+    const requiredFields = [
+      companyName,
+      storeName,
+      terminalName,
+      address,
+      city,
+      province,
+      emailAddress,
+      tel1,
+      currencyId,
+      timeZoneId,
+      countryId,
+      languageId,
+    ];
+
+    const hasError = requiredFields.some((f) => !f.isValid);
+    const f = requiredFields.find((f) => !f.isValid);
+    if (hasError) {
+      console.log('f',f)
+      showToast("warning", "Incomplete", "Please fill all required fields.");
+      return;
     }
-    return null;
-  };
-  const showToast = useToast();
-  const navigate = useNavigate();
-    useEffect(() => {
-      loadDrpCurrency();
-      loadDrpTimezones();
-      loadDrpCountries();
-      loadDrpLanguages();
-    }, [currencyId]);
-  
 
-     
+    const selectedTz = timeZoneOptions.find(
+      (t) => t.id === parseInt(timeZoneId.value)
+    );
 
-    const loadDrpCurrency = async () => {
-     const objArr = await getCurrencies();
-      setCurrencyOptions(objArr.data.results[0]);
-    };
-  
-    const loadDrpTimezones = async () => {
-      const objArr = await getTimezones();
-      console.log('timeZoneOptions',objArr.data.results[0])
-      setTimeZoneOptions(objArr.data.results[0]);
-     };
-   
-     const loadDrpCountries = async () => {
-      const objArr = await getCountries();
-      setCountriesOptions(objArr.data.results[0]);
-     };
+    if (!selectedTz) {
+      showToast("warning", "Invalid", "Selected time zone not found.");
+      return;
+    }
 
-     const loadDrpLanguages = async () => {
-      const objArr = await getLanguages();
-      setLanguagesOptions(objArr.data.results[0]);
-     };
-     
-     
-      const [isSubmitting, setIsSubmitting] = useState(false);
+    const payload = {
 
-      const userinfo=JSON.parse(localStorage.getItem('user'));
-
-
-       const onSubmit = async (e) => {
-         e.preventDefault();
-        
-const timeZoneselectd=timeZoneOptions.find(t=>t.id===parseInt(timeZoneId.value));
-
-         try {
-           const payLoad = {   
-    userId:userinfo.userId,
-    storeName:storeName.value,
-    terminalName:terminalName.value,
-    currencyId:currencyId.value,
-    utcOffset:timeZoneselectd.utcOffsetMinutes,
-    timeZoneId:timeZoneId.value,
-    countryId:countryId.value,
-    languageId:languageId.value,
-    companyhName:companyName.value,
-
-    address: address.value,
-    city: city.value,
-    province: province.value,
-    emailAddress: emailAddress.value,
-    tel1: tel1.value,
-    tel2: tel2.value,
-
-           };
-
-           setIsSubmitting(true);
+      storeName: storeName.value.trim(),
+      terminalName: terminalName.value.trim(),
+      currencyId: currencyId.value,
  
-           const res = await initializeSystemData(payLoad);
-             if (res.data.error) {
-               const { error } = res.data;
-     
-               showToast("danger", "Exception", error.message);
-               setIsSubmitting(false);
-               return;
-             }
-     
-             const { outputMessage, responseStatus } = res.data.outputValues;
-             if (responseStatus === "failed") {
-               showToast("warning", "Exception", outputMessage);
-               setIsSubmitting(false);
-             } else {
-               showToast("success", "Success", outputMessage);
-  
-              await setUserAssignedStores(userinfo.userId);
-                   navigate('/home');           
-               // navigate(`/products/add?saveType=add`);
-             }
-            
-             loadSystemInfoToLocalStorage();
-             
-           setIsSubmitting(false);
-         } catch (error) {
-           setIsSubmitting(false);
-           console.error("payloadd", error);
-         }
-       };
-     
+      timeZoneId: timeZoneId.value,
+           utcOffset: selectedTz.utcOffsetMinutes,
+
+        countryCode:countryId.value,
+    countryName:countriesOptions.find(c=>c.id===countryId.value).displayName,
+
+      languageId: languageId.value,
+      companyName: companyName.value.trim(),
+      address: address.value.trim(),
+      city: city.value.trim(),
+      province: province.value.trim(),
+      emailAddress: emailAddress.value.trim(),
+      tel1: tel1.value.trim(),
+      tel2: tel2.value.trim()
+
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await initializeSystemData(payload);
+
+      if (res?.data?.error) {
+        showToast("danger", "Error", res.data.error.message || "Operation failed");
+        return;
+      }
+
+      const { outputMessage, responseStatus } = res.data.outputValues || {};
+
+      if (responseStatus === "failed") {
+        showToast("warning", "Failed", outputMessage || "Setup could not be completed");
+      } else {
+        showToast("success", "Success", outputMessage || "System initialized successfully");
+        await setUserAssignedStores(userinfo?.userId);
+        await loadSystemInfoToLocalStorage();
+        setTimeout(() => navigate("/home"), 900);
+      }
+    } catch (err) {
+      console.error("Initialization error:", err);
+      showToast("danger", "Error", "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ────────────────────────────────────────────────
+  //  Render
+  // ────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50/70 py-10 px-5 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full px-40">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-10 tracking-tight">
+          System Initialization
+        </h1>
+
+        <form onSubmit={onSubmit} className="space-y-10">
+          {/* Company & Branch */}
+          <section className="bg-white rounded-2xl  border border-gray-200/60 overflow-hidden transition-shadow hover:shadow-md">
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+                <FaBuilding className="text-sky-600 text-2xl" />
+                Company & Branch Details
+              </h2>
+            </div>
+
+            <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <InputField
+                label={companyName.label}
+                value={companyName.value}
+                required
+                onChange={(e) => handleInputChange(setCompanyName, companyName, e.target.value)}
+                placeholder="Company name"
+                validationMessages={showError(companyName)}
+              />
+              
 
 
-       return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col items-center py-12">
-          <div className="w-full max-w-4xl">
-            <h2 className="text-3xl font-bold text-center text-gray-800 mb-10 animate-fade-in">
-              System Initialization
-            </h2>
-    
-            {/* Company Details Section */}
-            <div className="bg-white rounded-xl p-6 mb-8">
-              <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-                 <FaBuilding className="text-sky-600 text-3xl" /> Company Details
-              </h3>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <InputField
-                  label={companyName.label}
-                  value={companyName.value}
-                  required={companyName.rules.required}
-                  onChange={(e) => handleInputChange(setCompanyName, companyName, e.target.value)}
-                  type="text"
-                  placeholder="Enter Company Name"
-                  validationMessages={validationMessages(companyName)}
-                />
-    
-       
-    <div className="col-span-2">
+    <div className="sm:col-span-2 lg:col-span-1"> {/* Adjusted grid span for layout balance */}
+      <InputField
+        label={storeName.label}
+        value={storeName.value}
+        required
+        onChange={(e) => handleInputChange(setStoreName, storeName, e.target.value)}
+        placeholder="Branch / Store name"
+        validationMessages={showError(storeName)}
+      />
+    </div>
+
+   {/* <div className="sm:col-span-2 lg:col-span-3">
+<InputField
+      label={businessDescription.label}
+      value={businessDescription.value}
+      
+      onChange={(e) => handleInputChange(setBusinessDescription, businessDescription, e.target.value)}
+      placeholder="Briefly tell us about your business"
+      validationMessages={showError(businessDescription)}
+      max={100}
+    />
+</div> */}
+
+              <div className="sm:col-span-2 lg:col-span-2">
                 <InputField
                   label={address.label}
                   value={address.value}
-                  required={address.rules.required}
+                  required
                   onChange={(e) => handleInputChange(setAddress, address, e.target.value)}
-                  type="text"
-                  placeholder="Enter Address"
-                  validationMessages={validationMessages(address)}
+                  placeholder="Full street address"
+                  validationMessages={showError(address)}
                 />
-    </div>
+              </div>
 
-    <InputField
-                  label={storeName.label}
-                  value={storeName.value}
-                  required={storeName.rules.required}
-                  onChange={(e) => handleInputChange(setStoreName, storeName, e.target.value)}
-                  type="text"
-                  placeholder="Enter Branch/Store Name"
-                  validationMessages={validationMessages(storeName)}
-                />
-    
-                <InputField
-                  label={city.label}
-                  value={city.value}
-                  required={city.rules.required}
-                  onChange={(e) => handleInputChange(setCity, city, e.target.value)}
-                  type="text"
-                  placeholder="Enter City"
-                  validationMessages={validationMessages(city)}
-                />
-    
-                <InputField
-                  label={province.label}
-                  value={province.value}
-                  required={province.rules.required}
-                  onChange={(e) => handleInputChange(setProvince, province, e.target.value)}
-                  type="text"
-                  placeholder="Enter Province"
-                  validationMessages={validationMessages(province)}
-                />
-    
-                <InputField
-                  label={emailAddress.label}
-                  value={emailAddress.value}
-                  required={emailAddress.rules.required}
-                  onChange={(e) => handleInputChange(setEmailAddress, emailAddress, e.target.value)}
-                  type="text"
-                  placeholder="Enter Email Address"
-                  validationMessages={validationMessages(emailAddress)}
-                />
-    
-                <InputField
-                  label={tel1.label}
-                  value={tel1.value}
-                  required={tel1.rules.required}
-                  onChange={(e) => handleInputChange(setTel1, tel1, e.target.value)}
-                  type="text"
-                  placeholder="Enter Telephone 1"
-                  validationMessages={validationMessages(tel1)}
-                />
-    
-                <InputField
-                  label={tel2.label}
-                  value={tel2.value}
-                  required={tel2.rules.required}
-                  onChange={(e) => handleInputChange(setTel2, tel2, e.target.value)}
-                  type="text"
-                  placeholder="Enter Telephone 2"
-                  validationMessages={validationMessages(tel2)}
-                />
-              </div>
+  
+              <InputField
+                label={city.label}
+                value={city.value}
+                required
+                onChange={(e) => handleInputChange(setCity, city, e.target.value)}
+                placeholder="City"
+                validationMessages={showError(city)}
+              />
+
+              <InputField
+                label={province.label}
+                value={province.value}
+                required
+                onChange={(e) => handleInputChange(setProvince, province, e.target.value)}
+                placeholder="Province / State"
+                validationMessages={showError(province)}
+              />
+
+              <InputField
+                label={emailAddress.label}
+                value={emailAddress.value}
+                required
+                type="email"
+                onChange={(e) => handleInputChange(setEmailAddress, emailAddress, e.target.value)}
+                placeholder="example@company.com"
+                validationMessages={showError(emailAddress)}
+              />
+
+              <InputField
+                label={tel1.label}
+                value={tel1.value}
+                required
+                type="tel"
+                onChange={(e) => handleInputChange(setTel1, tel1, e.target.value)}
+                placeholder="+94 11 234 5678"
+                validationMessages={showError(tel1)}
+              />
+
+              <InputField
+                label={tel2.label}
+                value={tel2.value}
+                type="tel"
+                onChange={(e) => handleInputChange(setTel2, tel2, e.target.value)}
+                placeholder="Optional second number"
+                validationMessages={showError(tel2)}
+              />
             </div>
-    
-            {/* POS Terminal Details Section */}
-            <div className="bg-white rounded-xl p-6 mb-8">
-              <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-                <FaCashRegister className="text-sky-600 text-3xl" /> POS Terminal Details
-              </h3>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <InputField
-                  label={terminalName.label}
-                  value={terminalName.value}
-                  required={terminalName.rules.required}
-                  onChange={(e) => handleInputChange(setTerminalName, terminalName, e.target.value)}
-                  type="text"
-                  placeholder="Enter Terminal Name"
-                  validationMessages={validationMessages(terminalName)}
-                />
-              </div>
+          </section>
+
+          {/* POS Terminal */}
+          <section className="bg-white rounded-2xl border border-gray-200/60 overflow-hidden transition-shadow hover:shadow-md">
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+                <FaCashRegister className="text-sky-600 text-2xl" />
+                POS Terminal
+              </h2>
             </div>
-    
-            {/* Localization Settings Section */}
-            <div className="bg-white rounded-xl p-6 mb-8">
-              <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-          <FaGlobe className="text-sky-600 text-3xl" /> Localization Settings
-       
-              </h3>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <DropdownField
-                  id="currencyId"
-                  label={currencyId.label}
-                  value={currencyId.value}
-                  required={currencyId.rules.required}
-                  onChange={(e) => handleInputChange(setCurrencyId, currencyId, e.target.value)}
-                  options={currencyOptions}
-                  placeholder="Select Currency"
-                />
-    
-                <DropdownField
-                  id="timeZoneId"
-                  label={timeZoneId.label}
-                  value={timeZoneId.value}
-                  required={timeZoneId.rules.required}
-                  onChange={(e) => handleInputChange(setTimeZoneId, timeZoneId, e.target.value)}
-                  options={timeZoneOptions}
-                  placeholder="Select Time Zone"
-                />
-    
-                <DropdownField
-                  id="countryId"
-                  label={countryId.label}
-                  value={countryId.value}
-                  required={countryId.rules.required}
-                  onChange={(e) => handleInputChange(setCountryId, countryId, e.target.value)}
-                  options={countriesOptions}
-                  placeholder="Select Country"
-                />
-    
-                <DropdownField
-                  id="languageId"
-                  label={languageId.label}
-                  value={languageId.value}
-                  required={languageId.rules.required}
-                  onChange={(e) => handleInputChange(setLanguageId, languageId, e.target.value)}
-                  options={languagesOptions}
-                  placeholder="Select Language"
-                />
-              </div>
+
+            <div className="grid grid-cols-3">
+            <div className="p-6">
+              <InputField
+                label={terminalName.label}
+                value={terminalName.value}
+                required
+                onChange={(e) => handleInputChange(setTerminalName, terminalName, e.target.value)}
+                placeholder="Terminal / Cash register identifier"
+                validationMessages={showError(terminalName)}
+              />
             </div>
-    
-            {/* Submit Button */}
-            <div className="flex justify-center mt-8">
-              <button
-                className="btn bg-blue-600 text-white w-40 hover:bg-blue-700 transition-all duration-300 shadow-md"
-                disabled={isSubmitting}
-                onClick={onSubmit}
-              >
-                {isSubmitting ? "Submitting..." : "Submit"}
-              </button>
             </div>
+          </section>
+
+          {/* Localization */}
+          <section className="bg-white rounded-2xl border border-gray-200/60 overflow-hidden transition-shadow hover:shadow-md">
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+                <FaGlobe className="text-sky-600 text-2xl" />
+                Localization Settings
+              </h2>
+            </div>
+
+            <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <DropdownField
+                label={currencyId.label}
+                value={currencyId.value}
+                required
+                onChange={(e) => handleInputChange(setCurrencyId, currencyId, e.target.value)}
+                options={currencyOptions}
+                placeholder="Select currency"
+              />
+
+              <DropdownField
+                label={timeZoneId.label}
+                value={timeZoneId.value}
+                required
+                onChange={(e) => handleInputChange(setTimeZoneId, timeZoneId, e.target.value)}
+                options={timeZoneOptions}
+                placeholder="Select time zone"
+              />
+
+              <DropdownField
+                label={countryId.label}
+                value={countryId.value}
+                required
+                onChange={(e) => handleInputChange(setCountryId, countryId, e.target.value)}
+                options={countriesOptions}
+                placeholder="Select country"
+              />
+
+              <DropdownField
+                label={languageId.label}
+                value={languageId.value}
+                required
+                onChange={(e) => handleInputChange(setLanguageId, languageId, e.target.value)}
+                options={languagesOptions}
+                placeholder="Select primary language"
+              />
+            </div>
+          </section>
+
+          {/* Submit */}
+          <div className="flex justify-center pt-8 pb-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`
+                flex items-center justify-center gap-2.5
+                min-w-[220px] px-10 py-3.5
+                font-semibold text-white text-lg
+                rounded-xl shadow-lg
+                transition-all duration-200
+                focus:outline-none focus:ring-4 focus:ring-sky-300/40
+                ${
+                  isSubmitting
+                    ? "bg-sky-700 cursor-wait"
+                    : "bg-sky-600 hover:bg-sky-700 active:bg-sky-800"
+                }
+              `}
+            >
+              {isSubmitting ? (
+                <>
+                  <FaSpinner className="animate-spin text-xl" />
+                  Initializing...
+                </>
+              ) : (
+                "Complete Setup"
+              )}
+            </button>
           </div>
-        </div>
-      );
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default SystemDataSetup;

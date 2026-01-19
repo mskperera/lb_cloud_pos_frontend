@@ -20,10 +20,14 @@ import UserRegList from './pages/userRegistration';
 import SystemDataSetup from './pages/systemDataInitialization';
 import SelectStore from './pages/store';
 import About from './pages/about';
-import PrivacyPolicy from './pages/privacyPolicy';
 import InventoryOnHandReport from './pages/reports/InventoryOnHandReport';
 import DailySalesSummaryReport from './pages/reports/DailySalesSummaryReport';
 import LowStockReport from './pages/reports/LowStockReport';
+import { RefundPolicy } from './components/legal/RefundPolicy';
+import { TermsOfService } from './components/legal/TermsOfService';
+import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
+import SignUpPage from './pages/signup';
+import ForgotPassword from './pages/forgotPassword';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -74,6 +78,17 @@ function AppContent() {
             {/* <Route path="/login" element={<Login />} /> */}
             <Route path="*" element={<NotFound />} />
             <Route path="/" element={<Login />} />
+                      <Route path="/signin" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+
+     <Route path="/signup" element={<SignUpPage />} />
+
+
+            <Route path="/refund" element={<RefundPolicy />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+
             <Route path="/systemDataInitialization" element={<SystemDataSetup />} />
             <Route path="/selectStore" element={<SelectStore />} />
 
