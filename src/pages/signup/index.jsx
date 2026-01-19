@@ -59,6 +59,9 @@ const MarketingPanel = ({ isMobile = false }) => {
             Run your entire store using the laptop, PC, or tablet you already own — no expensive hardware required.
           </p>
 
+
+
+
           {/* Features with icons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {features.map((feature, index) => {
@@ -74,6 +77,39 @@ const MarketingPanel = ({ isMobile = false }) => {
             })}
           </div>
         </div>
+
+{/* Pricing */}
+<div className="text-center mt-4 mb-8">
+<div className="flex items-center justify-center gap-4">
+  {/* Old Price */}
+  <span className="text-2xl text-blue-100 font-medium line-through decoration-red-500 decoration-[3px]">
+    $17
+  </span>
+  
+  {/* New Price */}
+  <div className="flex flex-col items-start leading-tight">
+    <p className="text-5xl font-black text-white tracking-tight">
+      $10<span className="text-xl font-bold text-blue-200 ml-1">/mo</span>
+    </p>
+  </div>
+</div>
+
+  {/* Lifetime Guarantee Badge */}
+  {/* <div className="mt-3 inline-flex items-center gap-1.5 bg-emerald-500/20 backdrop-blur-sm px-4 py-1.5 rounded-full border border-emerald-500/30">
+    <span className="relative flex h-2 w-2">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+    </span>
+    <p className="text-xs font-bold text-emerald-300 uppercase tracking-wide">
+      Lifetime Price Lock
+    </p>
+  </div> */}
+
+  <p className="text-md text-blue-200/80 mt-3">
+    Join now and keep this rate <span className="text-white font-bold underline decoration-blue-400">forever</span>. 
+    {/* <br/>Standard price for new users will be $15/mo. */}
+  </p>
+</div>
 
         {/* Already have an account? */}
         <div className="flex items-center justify-center gap-4 mb-8">
