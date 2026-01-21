@@ -4,6 +4,7 @@ import { getAuthInfo, logout } from "../functions/auth";
 import { useDispatch } from "react-redux";
 import { setSelectedStore } from "../state/store/storeSlice";
 import { FaUserCircle, FaCog, FaUser, FaSignOutAlt } from "react-icons/fa";
+import FeedbackModal from "./FeedbackModal";
 
 const userinfo = JSON.parse(localStorage.getItem('user'));
 
@@ -17,7 +18,7 @@ export default function ProfileMenu() {
     console.log("Logout clicked");
     logout();
     dispatch(setSelectedStore({ selectedStore: null }));
-    navigate('/');
+    navigate('/signin');
   };
 
   const toggleMenu = () => {
@@ -75,6 +76,7 @@ export default function ProfileMenu() {
               <FaUser className="text-lg" />
               <span>Profile</span>
             </button>
+
             <hr className="my-2 border-gray-200" />
             <button
               className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-red-50 transition-colors duration-200 text-red-600"
@@ -83,7 +85,10 @@ export default function ProfileMenu() {
               <FaSignOutAlt className="text-lg" />
               <span>Logout</span>
             </button>
+
           </div>
+                               <hr className="my-2 border-gray-200" />
+         {/* <FeedbackModal /> */}
         </div>
       )}
     </div>

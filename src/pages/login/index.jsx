@@ -104,7 +104,7 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
-        <div className="w-full  bg-white rounded-3xl shadow-md overflow-hidden">
+        <div className="w-full  bg-white rounded-3xl overflow-hidden">
           <div className="grid lg:grid-cols-2 ">
                 {/* Right Side - Login Form */}
             <div className="p-8 lg:p-12 flex flex-col justify-center bg-white">
@@ -308,7 +308,7 @@ const Login = () => {
                 </p>
 
                {/* Two highlighted features with icons */}
-      <div className="flex flex-col sm:flex-row gap-5 lg:gap-8 justify-center lg:justify-start mb-10">
+      {/* <div className="flex flex-col sm:flex-row gap-5 lg:gap-8 justify-center lg:justify-start mb-10">
         <div className="flex items-center gap-3 text-blue-50">
           <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl flex-shrink-0">
             <Cloud className="w-6 h-6" />
@@ -322,7 +322,7 @@ const Login = () => {
           </div>
           <span className="text-base lg:text-lg font-medium">Use Your Existing Hardware</span>
         </div>
-      </div>
+      </div> */}
 
 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
   <p className="text-lg font-semibold ">

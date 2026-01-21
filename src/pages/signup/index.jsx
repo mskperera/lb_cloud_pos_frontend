@@ -26,28 +26,32 @@ const MarketingPanel = ({ isMobile = false }) => {
           : "hidden lg:flex p-8 lg:p-12 justify-between h-full"
       }`}
     >
+         {/* Logo */}
+        <div className="mb-8">
+          
+          <img
+            src={pos_logo_long_inv}
+            alt="Legend POS"
+            className="h-12 mx-auto"
+          />
+      
+        </div>
       {/* Background decorative blobs */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
       </div>
 
+
       <div className="relative z-10 flex flex-col h-full">
-        {/* Logo */}
-        <div className="mb-8">
-          <img
-            src={pos_logo_long_inv}
-            alt="Legend POS"
-            className="h-12 mx-auto"
-          />
-        </div>
+     
 
         {/* Headline */}
-        <div className="mb-8 text-center">
+        {/* <div className="mb-8 text-center">
           <h2 className="text-4xl font-extrabold leading-tight">
             Welcome to Legend POS
           </h2>
-        </div>
+        </div> */}
 
         {/* Tagline + Description + Features */}
         <div className="flex flex-col gap-6 mb-10">
@@ -94,25 +98,32 @@ const MarketingPanel = ({ isMobile = false }) => {
   </div>
 </div>
 
-  {/* Lifetime Guarantee Badge */}
-  {/* <div className="mt-3 inline-flex items-center gap-1.5 bg-emerald-500/20 backdrop-blur-sm px-4 py-1.5 rounded-full border border-emerald-500/30">
-    <span className="relative flex h-2 w-2">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-    </span>
-    <p className="text-xs font-bold text-emerald-300 uppercase tracking-wide">
-      Lifetime Price Lock
-    </p>
-  </div> */}
 
-  <p className="text-md text-blue-200/80 mt-3">
+
+    <p className="text-md text-blue-200/80 mt-3">
     Join now and keep this rate <span className="text-white font-bold underline decoration-blue-400">forever</span>. 
     {/* <br/>Standard price for new users will be $15/mo. */}
   </p>
+  {/* Trial Message */}
+  <p className="text-md text-blue-200/90 mt-3">
+    <span className="text-white font-bold">1-month free trial</span> — no credit card required
+  </p>
+
+
 </div>
 
+<div className="flex justify-center mb-8">
+  <Link
+    to="/"
+    className="text-white/90 underline underline-offset-4 hover:text-white transition text-sm font-medium"
+  >
+    Learn more about Legend POS →
+  </Link>
+</div>
+
+
         {/* Already have an account? */}
-        <div className="flex items-center justify-center gap-4 mb-8">
+        <div className="flex items-center justify-center gap-4">
           <p className="text-lg font-medium text-blue-100">
             Already have an account?
           </p>
@@ -126,7 +137,7 @@ const MarketingPanel = ({ isMobile = false }) => {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-sm text-blue-100 mt-auto pt-6 border-t border-white/10">
+        <div className="text-center text-sm text-blue-100 mt-auto pt-4 border-t border-white/10">
           <div className="flex flex-wrap justify-center gap-5 mb-4">
             <Link to="/privacy" className="hover:text-white hover:underline">
               Privacy Policy
@@ -137,9 +148,12 @@ const MarketingPanel = ({ isMobile = false }) => {
             <Link to="/refund" className="hover:text-white hover:underline">
               Refund Policy
             </Link>
+            <Link to="/cookie-policy" className="hover:text-white transition-colors font-medium">
+             Learn more in our Cookie Policy
+            </Link>
           </div>
           <p className="text-blue-200">
-            © {new Date().getFullYear()} Legend POS by LegendByte
+            © {new Date().getFullYear()} Legend POS by Legendbyte
           </p>
         </div>
       </div>
@@ -674,7 +688,7 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
-        <div className="w-full max-w-6xl bg-white rounded-3xl shadow-xl overflow-hidden">
+        <div className="w-full max-w-6xl bg-white rounded-3xl overflow-hidden">
           <div className="flex flex-col lg:grid lg:grid-cols-2 min-h-[620px]">
             {/* Main content area */}
             <div

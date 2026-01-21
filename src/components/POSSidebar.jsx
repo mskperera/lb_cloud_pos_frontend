@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaBook, FaPause, FaUndo, FaTags, FaCoins, FaFileAlt, FaCalendarPlus, FaThLarge } from 'react-icons/fa';
+import {  FaBook, FaPause, FaUndo, FaTags, FaCoins, FaFileAlt, FaCalendarPlus, FaThLarge } from 'react-icons/fa';
 import HoldOrder from './register/HoldOrder';
 import ConfirmDialogCustom from './register/ConfirmDialogCustom';
 import ApplyDiscount from './register/ApplyDiscount';
 import { DISCOUNT_SCOPE } from '../utils/constants';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  Home,
+  BookOpen,
+  Pause,
+  Undo2,
+  Tag,
+  Coins,
+  FileText,
+  CalendarPlus,
+  LayoutGrid,
+  HomeIcon,
+} from "lucide-react";
 
 const Rightsidebar = ({
   visible,
@@ -22,31 +34,39 @@ const Rightsidebar = ({
   const [isOrderVoidConfirmShow, setIsOrderVoidConfirmShow] = useState(false);
   const [isDiscountPopupVisible, setIsDiscountPopupVisible] = useState(false);
 
-  const LeftSidebarMenu = ({ onClick, label, icon: Icon, iconColor, bgColor, textColor }) => {
-    return (
-      <button
-        className={`flex items-center flex-col gap-1 hover:bg-sky-700 py-3 shadow-sm transition-transform duration-150 active:scale-95 ${bgColor || ''}`}
-        onClick={onClick}
-      >
-        <Icon className={`text-lg ${iconColor ? iconColor : "text-white"}`} />
-        <span className={`${textColor ? textColor : "text-white text-md"}`}>{label}</span>
-      </button>
-    );
-  };
+const LeftSidebarMenu = ({
+  onClick,
+  label,
+  icon: Icon,
+  iconColor,
+  bgColor,
+  textColor,
+}) => {
+  return (
+    <button
+      className={`flex items-center flex-col gap-1 hover:bg-sky-700 py-3 shadow-sm transition-transform duration-150 active:scale-95 ${bgColor || ""}`}
+      onClick={onClick}
+    >
+      <Icon className={`w-5 h-5 ${iconColor || "text-white"}`} />
+      <span className={textColor || "text-white text-md"}>{label}</span>
+    </button>
+  );
+};
+
 
   return (
     <div className='rounded-lg p-2'>
       <div className="flex flex-col gap-2 bg-sky-600 w-[6rem] shadow-lg">
         <LeftSidebarMenu
           label="Home"
-          icon={FaHome}
+          icon={HomeIcon}
           onClick={() => {
             navigate("/home");
           }}
         />
         <LeftSidebarMenu
           label="Sales History"
-          icon={FaBook}
+          icon={BookOpen}
           onClick={() => {
             setIsSalesHistoryPopupVisible(true);
           }}
@@ -88,7 +108,7 @@ const Rightsidebar = ({
         /> */}
         <LeftSidebarMenu
           label="Dayend"
-          icon={FaCalendarPlus}
+          icon={CalendarPlus}
           onClick={() => {
             setIsDayEndPopupVisible(true);
            // navigate("/dayend");

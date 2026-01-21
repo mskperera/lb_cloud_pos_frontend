@@ -1,5 +1,5 @@
 
-import Rightsidebar from "../../components/LeftSidebar";
+import Rightsidebar from "../../components/POSSidebar";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ProductList from "../../components/register/productList/ProductList";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +24,7 @@ import posLogo from '../../assets/pos_logo_long.png';
 import DayEnd from "../dayend/DayEnd";
 import ProductSearch from "../../components/productSearch/ProductSearch";
 import AddCustomProduct from "../../components/register/AddCustomProduct";
+import { Grid, HomeIcon, LayoutGrid, Menu } from "lucide-react";
 
 const Store=({store})=>(
   <div className='flex justify-start items-center gap-1 text-gray-700 font-bold rounded-lg px-2'>
@@ -516,7 +517,7 @@ const Syncing=()=>{
       className="flex items-center ml-0 p-2 m-0 rounded-md text-gray-700 hover:text-[#0284C7]"
       onClick={() => navigate('/home')}
     >
-      <FaArrowCircleLeft className="text-2xl " />
+      <HomeIcon className="text-2xl " />
       <span className="pl-1 font-bold text-lg">Home</span>
     </button>
 
@@ -524,7 +525,7 @@ const Syncing=()=>{
       className="flex items-center ml-0 p-2 m-0 rounded-md text-gray-700 hover:text-[#0284C7]"
       onClick={() => setShowMoreMenu(true)}
     >
-      <FaTh className="text-2xl " />
+      <LayoutGrid className="text-2xl " />
       <span className="pl-1 font-bold text-lg">Menu</span>
     </button>
 

@@ -28,6 +28,9 @@ import { TermsOfService } from './components/legal/TermsOfService';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
 import SignUpPage from './pages/signup';
 import ForgotPassword from './pages/forgotPassword';
+import LandingPage from './pages/landing';
+import CookieConsentBanner from './components/CookieConsentBanner';
+import CookiePolicy from './pages/CookiePolicy';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -67,6 +70,7 @@ function AppContent() {
 
   return (
     <>
+    <CookieConsentBanner />
       <ToastProvider>
         {/* {shouldShowNavBar && <TopMenubar />} */}
 
@@ -77,9 +81,10 @@ function AppContent() {
           <Routes>
             {/* <Route path="/login" element={<Login />} /> */}
             <Route path="*" element={<NotFound />} />
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<LandingPage />} />
                       <Route path="/signin" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/cookie-policy" element={<CookiePolicy />} />
 
 
      <Route path="/signup" element={<SignUpPage />} />
