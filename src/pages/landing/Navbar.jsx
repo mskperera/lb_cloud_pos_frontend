@@ -45,12 +45,11 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => scrollToSection("hero")}
-              className="text-gray-600 hover:text-sky-600 font-medium transition-colors"
-            >
-              Home
-            </button>
+    
+                        <Link to="/#" className="text-gray-600 hover:text-sky-600 font-medium transition-colors">
+  Home
+</Link>
+
 
 
 
