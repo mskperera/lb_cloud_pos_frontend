@@ -281,10 +281,85 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Desktop App Area remains unchanged */}
-        <div id="desktop" className="mt-12 bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 p-6 sm:p-8 md:p-10 lg:p-12">
-          {/* ... your existing desktop app content ... */}
+             <div id="desktop" className="mt-12 bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 p-6 sm:p-8 md:p-10 lg:p-12">
+  <div className="max-w-5xl mx-auto">
+    {/* Header */}
+    <div className="text-center mb-10 md:mb-12">
+      <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-5">
+        Download Desktop App
+      </h2>
+      <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        Print receipts instantly — just like a traditional POS.<br className="hidden sm:inline" />
+        Connects seamlessly to your cloud account and local printer.
+      </p>
+    </div>
+
+    {/* Screenshot – centered and responsive */}
+    <div className="mb-10 md:mb-14">
+      <div className="relative mx-auto max-w-3xl">
+        <img
+          src={desktop_app_screenshot}
+          alt="Legend POS Desktop App screenshot"
+          className="rounded-2xl shadow-2xl w-full border border-gray-200 object-cover"
+          // Consider adding loading="lazy" if this is below the fold
+        />
+      </div>
+    </div>
+
+    {/* Download buttons – responsive grid */}
+    <div className="grid sm:grid-cols-2 gap-6 md:gap-8 max-w-xl mx-auto">
+      {/* Windows Card */}
+      <div className="group bg-gray-50/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-xl hover:border-sky-200 hover:bg-white">
+        <div className="flex items-center gap-4 mb-5">
+          <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center">
+            <img src={windows_icon} alt="Windows" className="w-10 h-10 md:w-12 md:h-12" />
+          </div>
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900">Windows</h3>
         </div>
+
+        <p className="text-gray-600 mb-6 text-sm md:text-base">
+          Windows 10 & 11 (64-bit)
+        </p>
+
+        <a
+          href="#"
+          className="flex items-center justify-center gap-3 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white px-6 py-4 rounded-xl font-semibold text-base md:text-lg transition-colors shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+       
+       >
+          <Download className="w-5 h-5 md:w-6 md:h-6" />
+          Download for Windows
+        </a>
+      </div>
+
+      {/* Linux Card */}
+      <div className="group bg-gray-50/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-xl hover:border-sky-200 hover:bg-white">
+        <div className="flex items-center gap-4 mb-5">
+          <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center">
+            <img src={linux_icon} alt="Linux" className="w-10 h-10 md:w-12 md:h-12" />
+          </div>
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900">Linux</h3>
+        </div>
+
+        <p className="text-gray-600 mb-6 text-sm md:text-base">
+          Ubuntu, Fedora, Debian, Mint...
+        </p>
+
+        <a
+          href="#"
+          className="flex items-center justify-center gap-3 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white px-6 py-4 rounded-xl font-semibold text-base md:text-lg transition-colors shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+        >
+          <Download className="w-5 h-5 md:w-6 md:h-6" />
+          Download for Linux
+        </a>
+      </div>
+    </div>
+
+    {/* Optional small footer note */}
+    {/* <p className="text-center text-sm text-gray-500 mt-10">
+      Version 1.4.2 • Requires internet connection for first login
+    </p> */}
+  </div>
+</div>
       </div>
     </section>
   );
@@ -317,41 +392,46 @@ const AboutSection = () => {
 // ─── Features ──────────────────────────────────────────────────────────────
 const FeaturesSection = () => {
   const features = [
+{
+  icon: CheckCircle,
+  title: "Real-Time Inventory",
+  desc: "Monitor stock levels instantly and stay updated on every product"
+},
+
     {
       icon: CheckCircle,
-      title: "Real-Time Inventory",
-      desc: "Track stock levels instantly with low-stock alerts"
-    },
-    {
-      icon: CheckCircle,
-      title: "Fast Sales Processing",
+      title: "Sales Processing",
       desc: "Quick checkout with barcode scanning support"
     },
     {
-      icon: CheckCircle,
-      title: "Combo Products",
-      desc: "Create combo items using multiple products easily"
-    },
+  icon: CheckCircle,
+  title: "Assembly Products (Combo Products)",
+  desc: "Assemble multiple products into one item while managing stock automatically"
+}
+,
     {
       icon: CheckCircle,
       title: "Product Variations",
       desc: "Manage variations like size, color, and more"
     },
-    {
-      icon: CheckCircle,
-      title: "Quick Printing",
-      desc: "Print receipts instantly with minimal setup"
-    },
+{
+  icon: CheckCircle,
+  title: "Quick Printing",
+  desc: "Print receipts quickly with the desktop app"
+}
+
+,
     {
       icon: CheckCircle,
       title: "Customer & Supplier Management",
       desc: "Store customer and supplier details in one place"
     },
     {
-      icon: CheckCircle,
-      title: "GRN (Goods Received Notes)",
-      desc: "Record stock receiving and supplier deliveries accurately"
-    },
+  icon: CheckCircle,
+  title: "Stock Entry & GRN (Goods Received Notes)",
+  desc: "Record stock received and supplier deliveries accurately"
+}
+,
     {
       icon: CheckCircle,
       title: "Reports & Analytics",
