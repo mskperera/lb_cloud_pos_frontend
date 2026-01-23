@@ -592,24 +592,41 @@ console.log('product000000',p);
             ))}
         </select> */}
 
-      <div className="col-span-9 w-full overflow-auto custom-scrollbar my-2 p-2 rounded-lg">
-        {!productListLoading ? (
-            <div className="grid gap-2 grid-cols-4 md:grid-cols-4">
-  
-            {products.length > 0 ? (
-              products.map((p, index) => (
-                <ProductItem key={index} p={p} handleProductClick={handleProductClick} />
-              ))
-            ) : (
-              <div>No products found</div>
-            )}
-          </div>
-        ) : (
-          <div className="flex justify-center items-center h-[80vh] text-lg font-semibold text-gray-600">
-            Please wait, loading products...
-          </div>
-        )}
-      </div>
+   <div className="col-span-9 w-full overflow-auto custom-scrollbar my-2 p-2 rounded-lg">
+  {!productListLoading ? (
+    <div className="grid gap-2 grid-cols-4 md:grid-cols-4">
+      {products.length > 0 ? (
+        products.map((p, index) => (
+          <ProductItem key={index} p={p} handleProductClick={handleProductClick} />
+        ))
+      ) : (
+        <div className="col-span-full flex flex-col items-center justify-center h-64 text-center p-6 rounded-lg text-gray-500">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 mb-3 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 014-4h6a4 4 0 014 4h-1a4 4 0 00-4 4v2m-6 0h6"
+            />
+          </svg>
+          <span className="text-lg font-semibold">No products found</span>
+          <span className="text-sm text-gray-400">Try adjusting your search or filter</span>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="flex justify-center items-center h-[80vh] text-lg font-semibold text-gray-600">
+      Please wait, loading products...
+    </div>
+  )}
+</div>
+
     </div>
   
          </>

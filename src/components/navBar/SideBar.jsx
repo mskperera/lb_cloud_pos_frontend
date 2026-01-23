@@ -163,7 +163,7 @@ const Sidebar = () => {
           Powered by Legend POS
         </Link>
         <div className="mt-1 opacity-80">
-          © {new Date().getFullYear()} LegendByte. All rights reserved.
+          © {new Date().getFullYear()} Legendbyte. All rights reserved.
         </div>
       </div>
     </div>

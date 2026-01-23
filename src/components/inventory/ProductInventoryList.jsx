@@ -22,7 +22,7 @@ import ProductVariationDetails from "./ProductVariationDetails";
 import GhostButton from "../iconButtons/GhostButton";
 import { FaAngleDown, FaAngleRight, FaWrench } from "react-icons/fa";
 
-const ProductDetails = ({ selectedProduct, confirmDelete }) => {
+const ProductDetails = ({ selectedProduct }) => {
   const [stores, setStores] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,61 +35,8 @@ const ProductDetails = ({ selectedProduct, confirmDelete }) => {
 
   const [stockInfo, setStockInfo] = useState([]);
 
-  const loadDetails = async () => {
-    if (!selectedProduct) return;
-    setLoading(true);
-    try {
-      const details = await getProductExtraDetails(selectedProduct.productId);
-      // setExtraDetails(details);
-      const stores = details.data.results[1];
-      const productSkuBarcodes = details.data.results[0];
+  
 
-      console.log("stores", stores);
-      console.log("singleProductSkuBarcodes", singleProductSkuBarcodes);
-      const productTypeId = details?.data?.outputValues?.productTypeId;
-      setProductTypeId(productTypeId);
-      console.log("productTypeId", productTypeId);
-
-      // setVariations(details.data.results[0])
-      //   setStores(details.data.results[1]);
-      setCategories(JSON.parse(selectedProduct.categories));
-      setStores(stores);
-
-      if (productTypeId == 1) {
-        setSingleProductSkuBarcodes(productSkuBarcodes[0]);
-
-        const stockInfoRes = await getStockInfo(selectedProduct.inventoryId);
-        const stockInfo = stockInfoRes.data;
-        console.log("stockInfo", stockInfo);
-        setStockInfo(stockInfoRes.data); // Set stock info here
-      } else if (productTypeId == 2) {
-        const parsedVariations = productSkuBarcodes.map((variation) => ({
-          ...variation,
-          variationDetails:
-            typeof variation.variationDetails === "string"
-              ? JSON.parse(variation.variationDetails)
-              : variation.variationDetails,
-        }));
-
-        setVariationProductSkuBarcodes(parsedVariations);
-
-        const stockInfoRes = await getStockInfo(selectedProduct.inventoryId);
-        const stockInfo = stockInfoRes.data;
-        console.log("stockInfo", stockInfo);
-        setStockInfo(stockInfoRes.data); // Set stock info here
-      } else if (productTypeId == 3) {
-        setComboProductDetails(productSkuBarcodes);
-      }
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadDetails();
-  }, [selectedProduct]);
 
   const renderExtraDetails = () => {
     if (loading) {
@@ -122,88 +69,13 @@ const ProductDetails = ({ selectedProduct, confirmDelete }) => {
             </p>
           </div>
         </div>
-        <div className="col-span-2 flex justify-end gap-5">
-          {/* Inventory History View */}
-          {/* View Transactional History */}
-          <GhostButton
-            onClick={() =>
-              navigate(
-                `/inventory/transactionHistory?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
-              )
-            }
-            iconClass="pi pi-history"
-            label="View History"
-            tooltip="View all transactional history"
-            color="text-blue-500"
-            hoverClass="hover:text-blue-700 hover:bg-transparent"
-          />
-
-          {/* Delete */}
-          <GhostButton
-            onClick={async () => {
-              const result = await deleteProduct(
-                selectedProduct.productId,
-                false
-              );
-              const { outputMessage, responseStatus } =
-                result.data.outputValues;
-              confirmDelete(outputMessage, selectedProduct.productId);
-            }}
-            iconClass="pi pi-trash"
-            label="Delete"
-            tooltip="Delete this item"
-            color="text-red-500"
-            hoverClass="hover:text-red-700 hover:bg-transparent"
-          />
-
-          {/* Edit */}
-          <GhostButton
-            onClick={() =>
-              navigate(
-                `/products/add?saveType=update&id=${selectedProduct.productId}`
-              )
-            }
-            iconClass="pi pi-pencil"
-            label="Edit"
-            tooltip="Edit this item"
-            color="text-green-500"
-            hoverClass="hover:text-green-700 hover:bg-transparent"
-          />
-
-          {/* Manage Stock */}
-          <GhostButton
-            onClick={() =>{
-              console.log('selectedProduct.inventoryId',selectedProduct.inventoryId);
-                navigate(
-                `/inventory/stockAdjustment?inventoryId=${selectedProduct.inventoryId}&prodN=${selectedProduct.productName}&qty=${selectedProduct.stockQty}&measU=${selectedProduct.measurementUnitName}&sku=${selectedProduct.sku}&prodNo=${selectedProduct.productNo}`
-              )
-            }
-            
-            }
-            iconClass="pi pi-cog"
-            label="Manage Stock"
-            tooltip="Manage stock levels"
-            color="text-yellow-500"
-            hoverClass="hover:text-yellow-700 hover:bg-transparent"
-          />
-        </div>
-
-        {productTypeId === 2 && (
-          <>
-            <div className="col-span-2">
-              <ProductVariationDetails
-                variationProductSkuBarcodes={variationProductSkuBarcodes}
-              />
-            </div>
-            <div className="col-span-2">
-              {/* <StockInfo inventoryId={selectedProduct.inventoryId} /> */}
-            </div>
-          </>
-        )}
-
-        {productTypeId === 3 && (
+ 
+  
+     
+     
+        {selectedProduct.isAssemblyProduct === 1 && (
           <div className="m-4 bg-white p-4 rounded-md col-span-2">
-            <h3 className="text-center font-bold pb-5">Combo Ingredients</h3>
+            <h3 className="text-center font-bold pb-5">Assembly Products</h3>
             <table className="table border-collapse">
               <thead>
                 <tr>
@@ -213,7 +85,7 @@ const ProductDetails = ({ selectedProduct, confirmDelete }) => {
                 </tr>
               </thead>
               <tbody>
-                {comboProductDetails.map((item) => (
+                {selectedProduct.assemblyProducts.map((item) => (
                   <tr key={item.productId}>
                     <td className="px-4 py-2">{item.productName}</td>
                     <td className="px-4 py-2">
@@ -226,6 +98,7 @@ const ProductDetails = ({ selectedProduct, confirmDelete }) => {
             </table>
           </div>
         )}
+
       </div>
     );
   };
@@ -378,7 +251,7 @@ export default function ProductInventoryList({}) {
   }, [isSearchValueEntered]);
 
   const [filterByOptions, setFilterByOptions] = useState([
-    { id: 1, displayName: "Product No" },
+    // { id: 1, displayName: "Product No" },
     { id: 2, displayName: "Product Name" },
       { id: 7, displayName: "Product Description" },
     { id: 3, displayName: "Barcode" },
@@ -457,19 +330,6 @@ export default function ProductInventoryList({}) {
         hoverClass="hover:text-blue-700 hover:bg-transparent"
       />
 
-
-
-      {/* <GhostButton
-        onClick={() => handleRowExpand(index, item)}
-        iconClass={`fas ${
-          expandedRowId === index ? "pi pi-angle-down" : "pi pi-angle-right"
-        } text-lg`}
-          labelClass="text-md font-normal"
-        label="More"
-        color="text-blue-500"
-        hoverClass="hover:text-blue-700 hover:bg-transparent"
-      /> */}
-
       
 <GhostButton
         onClick={async () => {
@@ -502,24 +362,6 @@ export default function ProductInventoryList({}) {
 
 {item.inventoryId ? (
 
-
-//    // Call the function via the namespace to bypass the Webpack import issue
-//     const win = webviewWindow.WebviewWindow('stock-adjustment-window', {
-//       url: `/inventory/stockAdjustment?inventoryId=${item.inventoryId}`,
-//       width: 1000,
-//       height: 700,
-//       title: 'Stock Adjustment',
-//       resizable: true,
-//     });
-
-//     win.once('tauri://created', () => {
-//       console.log('webview window created');
-//     });
-//     win.once('tauri://error', (e) => {
-//       console.error('Failed to create webview window:', e);
-//     });
-
-// import * as webviewWindow from '@tauri-apps/api/webviewWindow';
 
 
   <GhostButton
@@ -637,41 +479,7 @@ export default function ProductInventoryList({}) {
 
 
        <div className="flex flex-col md:flex-row w-full gap-6">
-            <div className="flex flex-col w-full md:w-1/3">
-              <label className="text-sm font-medium text-gray-700 mb-2">Product Type</label>
-              <div className="flex flex-row gap-4">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="singleProduct"
-                    checked={isSingleProductChecked}
-                    onChange={(e) => setIsSingleProductChecked(e.target.checked)}
-                    className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-2 focus:ring-sky-500"
-                  />
-                  <label htmlFor="singleProduct" className="text-sm font-medium text-gray-800">Single</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="variationProduct"
-                    checked={isVariationProductChecked}
-                    onChange={(e) => setIsVariationProductChecked(e.target.checked)}
-                    className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-2 focus:ring-sky-500"
-                  />
-                  <label htmlFor="variationProduct" className="text-sm font-medium text-gray-800">Variation</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="comboProduct"
-                    checked={isComboProductChecked}
-                    onChange={(e) => setIsComboProductChecked(e.target.checked)}
-                    className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-2 focus:ring-sky-500"
-                  />
-                  <label htmlFor="comboProduct" className="text-sm font-medium text-gray-800">Combo</label>
-                </div>
-              </div>
-            </div>
+           
             <div className="flex flex-col w-full md:w-1/5">
               <label className="text-sm font-medium text-gray-700 mb-2">Store</label>
               <select
@@ -703,7 +511,7 @@ export default function ProductInventoryList({}) {
               </select>
             </div>
             {[1, 2, 3, 6,7].includes(selectedFilterBy.value) && (
-              <div className="flex flex-col w-full md:w-1/3">
+              <div className="flex flex-col w-full md:w-full">
                 <label className="text-sm font-medium text-gray-700 mb-2">Search Value</label>
                 <div className="flex gap-2">
                   <input
@@ -781,7 +589,7 @@ export default function ProductInventoryList({}) {
   <thead className="sticky top-0 bg-gray-50 text-sm font-medium text-gray-700 border-b border-gray-200 z-10">
     <tr>
       <th className="px-4 py-3 text-left"></th>
-      <th className="px-4 py-3 text-left">Product No</th>
+      {/* <th className="px-4 py-3 text-left">Product No</th> */}
       <th className="px-4 py-3 text-left">SKU</th>
       <th className="px-4 py-3 text-left">Product Description</th>
       <th className="px-4 py-3 text-left">Brand</th>
@@ -789,8 +597,8 @@ export default function ProductInventoryList({}) {
       <th className="px-4 py-3 text-left">Unit Price</th>
       <th className="px-4 py-3 text-left">Tax (%)</th>
       <th className="px-4 py-3 text-left">Stock Qty</th>
-      <th className="px-4 py-3 text-left">Product Type</th>
-      <th className="px-4 py-3 text-left">Actions</th>
+    <th className="px-4 py-3 text-left">Assembly Product</th>
+      <th className="px-4 py-3">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -826,7 +634,6 @@ export default function ProductInventoryList({}) {
                 className="text-gray-600"
               /> */}
             </td>
-            <td className="px-4 py-2">{item.productNo}</td>
             <td className="px-4 py-2">{item.sku}</td>
             <td className="px-4 py-2">{item.productDescription}</td>
             <td className="px-4 py-2">{item.brandName}</td>
@@ -834,7 +641,7 @@ export default function ProductInventoryList({}) {
             <td className="px-4 py-2">{item.unitPrice}</td>
             <td className="px-4 py-2">{item.taxPerc}</td>
             <td className="px-4 py-2">{item.stockQty}</td>
-            <td className="px-4 py-2">{item.productTypeName}</td>
+           <td className="px-4 py-2">{(item.isAssemblyProduct===1) ? "True":"False"}</td>
             <td className="px-4 py-2">{actionButtons(index, item)}</td>
           </tr>
           {expandedRowId === index && (

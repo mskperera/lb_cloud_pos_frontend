@@ -499,7 +499,7 @@ const Syncing=()=>{
          
         <div className="flex  items-center justify-between m-0 pl-10 gap-20">
 
-      <img src={posLogo} alt="Legend POS" className="h-10" />
+      <img src={posLogo} alt="Legend POS" className="h-8" />
  
        
    <div className="w-full">
@@ -517,16 +517,16 @@ const Syncing=()=>{
       className="flex items-center ml-0 p-2 m-0 rounded-md text-gray-700 hover:text-[#0284C7]"
       onClick={() => navigate('/home')}
     >
-      <HomeIcon className="text-2xl " />
-      <span className="pl-1 font-bold text-lg">Home</span>
+      <HomeIcon className="text-xl " />
+      <span className="pl-1 font-bold text-md">Home</span>
     </button>
 
            <button
       className="flex items-center ml-0 p-2 m-0 rounded-md text-gray-700 hover:text-[#0284C7]"
       onClick={() => setShowMoreMenu(true)}
     >
-      <LayoutGrid className="text-2xl " />
-      <span className="pl-1 font-bold text-lg">Menu</span>
+      <LayoutGrid className="text-xl " />
+      <span className="pl-1 font-bold text-md">Menu</span>
     </button>
 
                    {/* <button

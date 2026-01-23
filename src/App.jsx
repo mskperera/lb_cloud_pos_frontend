@@ -31,6 +31,9 @@ import ForgotPassword from './pages/forgotPassword';
 import LandingPage from './pages/landing';
 import CookieConsentBanner from './components/CookieConsentBanner';
 import CookiePolicy from './pages/CookiePolicy';
+import PricingPage from './pages/landing/PricingPage';
+import PublicRoutes from './routes/PublicRoutes';
+import ScrollToHash from './pages/landing/ScrollToHash';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -76,23 +79,26 @@ function AppContent() {
 
         {/* <div className="flex flex-col h-[92vh] overflow-hidden"> */}
         {/* <div className="flex-1 overflow-y-auto"> */}
-
+<ScrollToHash />
         <React.Suspense fallback={<>Loading...</>}>
           <Routes>
+            <Route path="/*" element={<PublicRoutes />} />
             {/* <Route path="/login" element={<Login />} /> */}
             <Route path="*" element={<NotFound />} />
-            <Route path="/" element={<LandingPage />} />
+            {/* <Route path="/" element={<LandingPage />} /> */}
                       <Route path="/signin" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/cookie-policy" element={<CookiePolicy />} />
 
 
-     <Route path="/signup" element={<SignUpPage />} />
+
+     {/* <Route path="/signup" element={<SignUpPage />} /> */}
 
 
-            <Route path="/refund" element={<RefundPolicy />} />
+            {/* <Route path="/refund" element={<RefundPolicy />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/pricing" element={<PricingPage />} /> */}
+
 
             <Route path="/systemDataInitialization" element={<SystemDataSetup />} />
             <Route path="/selectStore" element={<SelectStore />} />

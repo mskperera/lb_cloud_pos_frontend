@@ -471,7 +471,7 @@ export default function ProductOrderList({ }) {
 
 
   const [filterByOptions, setFilterByOptions] = useState([
-    { id: 1, displayName: 'Product No' },
+    // { id: 1, displayName: 'Product No' },
     { id: 2, displayName: 'Product Name' },
     { id: 7, displayName: 'Product Description' },
     { id: 3, displayName: 'Barcode' },
@@ -888,7 +888,7 @@ const [selectedRowIndex,setSelectedRowIndex]=useState(null);
             <tr>
               {/* <th className="px-4 py-2">Product Id</th> */}
               <th className=""></th>
-              <th className="px-4 py-2">Product No</th>
+              {/* <th className="px-4 py-2">Product No</th> */}
               <th className="px-4 py-2">SKU</th>
               <th className="px-4 py-2">Product Name</th>
 

@@ -100,20 +100,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     isValid: false,
     rules: { required: false, dataType: "string" },
   });
-  const [unitCost, setUnitCost] = useState({
-    label: "Unit Cost",
-    value: "",
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "decimal" },
-  });
-  const [unitPrice, setUnitPrice] = useState({
-    label: "Unit Price",
-    value: "",
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "decimal" },
-  });
+
   const [reorderLevel, setReorderLevel] = useState({
     label: "Reorder Level",
     value: "",
@@ -121,27 +108,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
     isValid: false,
     rules: { required: false, dataType: "decimal" },
   });
-  const [barcode, setBarcode] = useState({
-    label: "Barcode",
-    value: "",
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "string" },
-  });
-  const [sku, setSku] = useState({
-    label: "SKU",
-    value: "",
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "string" },
-  });
-  const [taxRatePerc, setTaxRatePerc] = useState({
-    label: "Tax Rate (%)",
-    value: "",
-    isTouched: false,
-    isValid: false,
-    rules: { required: false, dataType: "decimal" },
-  });
+
   const [productType, setProductType] = useState({
     label: "Product Type",
     value: "2",
@@ -199,16 +166,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
 
 
 
-  const generateSKU = () => {
-    if (!productName.value) {
-      showToast("warning", "Warning", "Please enter a product name first.");
-      return;
-    }
-    const prefix = productName.value.replace(/\s+/g, '').slice(0, 5).toUpperCase();
-    const randomNum = Math.floor(10 + Math.random() * 90);
-    const newSKU = `${prefix}${randomNum}`;
-    handleInputChange(setSku, sku, newSKU);
-  };
+
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
@@ -260,20 +218,32 @@ const handleRemoveImage = () => {
     setIsUnique(false);
     setIsStockTracked({ value: true, isDisabled: false });
     setIsAssemblyProduct({ value: false });
-    setComboIngredients([]);
+
     setSubProductsList([]);
-    setVariations([]);
+
+
+    const initialVariation = {
+      variationProductId: null,
+      sku: "",
+      barcode: "",
+      unitCost: "",
+      unitPrice: "",
+      taxPerc: "",
+      variationDetails: [], // Important: start empty so user can add Size/Color
+      isAssemblyProduct: false,
+      subProductsList: [],
+    };
+
+    setVariations([initialVariation]);
+
     setProductName({ ...productName, value: "", isTouched: false, isValid: false });
     setProductCategory({ ...productCategory, value: "", isTouched: false, isValid: false });
     setMeasurementUnit({ ...measurementUnit, value: "", isTouched: false, isValid: false });
-    setBrand({ ...brand, value: "", isTouched: false, isValid: false });
-    setUnitCost({ ...unitCost, value: "", isTouched: false, isValid: false });
-    setUnitPrice({ ...unitPrice, value: "", isTouched: false, isValid: false });
+    setBrand({ ...brand, value: "1", isTouched: false, isValid: false });
+  
     setReorderLevel({ ...reorderLevel, value: "", isTouched: false, isValid: false });
-    setBarcode({ ...barcode, value: "", isTouched: false, isValid: false });
-    setSku({ ...sku, value: "", isTouched: false, isValid: false });
-    setTaxRatePerc({ ...taxRatePerc, value: "", isTouched: false, isValid: false });
-    setProductType({ ...productType, value: "1", isTouched: false, isValid: false });
+
+    setProductType({ ...productType, value: "2", isTouched: false, isValid: false });
     setSubProductSku({ ...subProductSku, value: "", isTouched: false, isValid: false });
     setSubProductQty({ ...subProductQty, value: "", isTouched: false, isValid: false });
     setVariationType({ ...variationType, value: "", isTouched: false, isValid: false });
@@ -305,15 +275,10 @@ const handleRemoveImage = () => {
 
     console.log('loadValuesForUpdate:',res);
     const {
-      barcode,
       categories,
       measurementUnitId,
       productName,
-      productNo,
       reorderLevel,
-      unitCost,
-      unitPrice,
-      taxPerc,
       brandId,
       productTypeId,
       isStockTracked,
@@ -321,27 +286,21 @@ const handleRemoveImage = () => {
       isAssemblyProduct,
       isUnique,
       isNotForSelling,
-      sku,
       imageUrl,
       isExpiringProduct,
       allProductId
     } = res.data.results[0][0];
 
-    setBarcode((prev) => ({ ...prev, value: barcode }));
     setSelectedCategories(JSON.parse(categories).map((c) => c.id));
     setMeasurementUnit((prev) => ({ ...prev, value: measurementUnitId }));
-    setProductNo((prev) => ({ ...prev, value: productNo }));
     setProductName((prev) => ({ ...prev, value: productName }));
-    setTaxRatePerc((prev) => ({ ...prev, value: taxPerc }));
-    setUnitCost((prev) => ({ ...prev, value: unitCost }));
-    setUnitPrice((prev) => ({ ...prev, value: unitPrice }));
     setBrand((prev) => ({ ...prev, value: brandId }));
     setProductType((prev) => ({ ...prev, value: productTypeId }));
     setIsExpiringProduct(isExpiringProduct);
     setIsProductItem(isProductItem);
     setIsUnique(isUnique);
     setIsNotForSelling(isNotForSelling);
-    setSku((prev) => ({ ...prev, value: sku }));
+
     setImageHash(imageUrl);
     console.log('lllimageUrllll:',imageUrl)
   //   if(imageHash){
@@ -355,28 +314,7 @@ const handleRemoveImage = () => {
     const details = await getProductExtraDetails(id);
 
     if (productTypeId === 1) {
-      setReorderLevel((prev) => ({
-        ...prev,
-        value: reorderLevel,
-      }));
    
-
-      const _singleProductSkuBarcode = details.data.results[0][0];
-      const _singleProductStores = details.data.results[1];
-      setStores(_singleProductStores);
-
-      if (isAssemblyProduct) {
-        const resSubProductist = await getSubProductList(allProductId);
-        const _subProducts = resSubProductist.data.results[0];
-        setSubProductsList(_subProducts.map(item => ({
-          allProductId: item.allProductId_mat,
-          qty: item.qty,
-          productDescription: item.productDescription,
-          productTypeName: item.productTypeName,
-          sku: item.sku,
-          measurementUnitName: item.measurementUnitName,
-        })));
-      }
     } else if (productTypeId === 2) {
       setReorderLevel((prev) => ({ ...prev, value: reorderLevel }));
     
@@ -402,14 +340,7 @@ const handleRemoveImage = () => {
       const productStores = details.data.results[1];
       setStores(productStores);
     } else if (productTypeId === 3) {
-      setReorderLevel((prev) => ({ ...prev, isDisabled: true }));
-      setIsStockTracked({ value: false, isDisabled: true });
-
-      const _comboProductSkuBarcode = details.data.results[0];
-      setComboIngredients(_comboProductSkuBarcode);
-
-      const _comboProductStores = details.data.results[1];
-      setStores(_comboProductStores);
+      
     }
 
     setIsLoading(false);
@@ -476,19 +407,19 @@ const handleRemoveImage = () => {
         //isAssemblyProduct: v.isAssemblyProduct || false,
         subProductsList: isAssemblyProduct.value ? v.subProductsList || [] : [],
       }));
-      const _comboIngredients = [...comboIngredients];
-      const _prepaired_comboIngredients = _comboIngredients.map((item) => ({
-        barcode: item.barcode,
-        measurementUnitName: item.measurementUnitName,
-        productId: item.productId,
-        productId_mat: item.productTypeId === 1 ? item.productId_mat : null,
-        variationProductId_mat: item.productTypeId === 2 ? item.productId_mat : null,
-        productName: item.productName,
-        productTypeId: item.productTypeId,
-        productTypeName: item.productTypeName,
-        qty: item.qty,
-        sku: item.sku,
-      }));
+      // const _comboIngredients = [...comboIngredients];
+      // const _prepaired_comboIngredients = _comboIngredients.map((item) => ({
+      //   barcode: item.barcode,
+      //   measurementUnitName: item.measurementUnitName,
+      //   productId: item.productId,
+      //   productId_mat: item.productTypeId === 1 ? item.productId_mat : null,
+      //   variationProductId_mat: item.productTypeId === 2 ? item.productId_mat : null,
+      //   productName: item.productName,
+      //   productTypeId: item.productTypeId,
+      //   productTypeName: item.productTypeName,
+      //   qty: item.qty,
+      //   sku: item.sku,
+      // }));
       const _subProductsList = subProductsList.map((item) => ({
         qty: item.qty,
         allProductId: item.allProductId,
@@ -496,14 +427,14 @@ const handleRemoveImage = () => {
 
       const payLoad = {
         tableId: null,
-        productNo: productNo.value,
+       // productNo: productNo.value,
         productTypeId: parseInt(productType.value),
         storeIdList: stores,
-        isProductNoAutoGenerate: autoGenerateProductNo,
+       // isProductNoAutoGenerate: autoGenerateProductNo,
         productName: productName.value,
         categoryIdList: selectedCategories,
         variationProductList: _variations,
-        comboProductDetailList: _prepaired_comboIngredients,
+      //  comboProductDetailList: _prepaired_comboIngredients,
         subProductsList: _subProductsList,
         measurementUnitId: measurementUnit.value,
         isNotForSelling: isNotForSelling,
@@ -513,17 +444,20 @@ const handleRemoveImage = () => {
         isProductItem: isProductItem,
         isAssemblyProduct: isAssemblyProduct.value,
         brandId: brand.value,
-        unitCost: isNumeric(unitCost.value) ? unitCost.value : null,
-        unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
-        taxPerc: isNumeric(taxRatePerc.value) ? taxRatePerc.value : null,
-        sku: sku.value,
-        barcode: barcode.value === '' ? null : barcode.value,
+     //   unitCost: isNumeric(unitCost.value) ? unitCost.value : null,
+      //  unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
+      //  taxPerc: isNumeric(taxRatePerc.value) ? taxRatePerc.value : null,
+      //  sku: sku.value,
+      //  barcode: barcode.value === '' ? null : barcode.value,
         reorderLevel: reorderLevel.value ? reorderLevel.value : null,
         isExpiringProduct: isExpiringProduct,
       };
       setIsSubmitting(true);
       if (saveType === SAVE_TYPE.ADD) {
         const res = await addProduct(payLoad);
+
+        console.log('res',res.data.outputValues);
+   
         if (res.data.error) {
           showToast("danger", "Exception", res.data.error.message);
           setIsSubmitting(false);
@@ -536,6 +470,10 @@ const handleRemoveImage = () => {
           return;
         }
         
+
+        
+
+
           if (uploadResponse) {
             await commitFile(uploadResponse.hash);
           }

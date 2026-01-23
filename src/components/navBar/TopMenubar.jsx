@@ -209,7 +209,7 @@ export default function TopMenubar() {
         <div className="flex items-center gap-4 m-0 p-0 ">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
           {/* <h3 className="text-xl text-white font-bold">Legend POS</h3> */}
-     <img src={logo} className='h-10' />
+     <img src={logo} className='h-8' />
         </div>
 
       
