@@ -35,14 +35,16 @@ jobs:
         run: npm install  # Or yarn install
 
 
-      - name: Deploy to production directory
+      - name: Build project
         run: |
           DEPLOY_DIR=/var/www/lbpos/lb_cloud_pos_frontend
           sudo rsync -a --exclude='.git' ./ $DEPLOY_DIR/  # Copy code to deploy dir (exclude Git)
           cd $DEPLOY_DIR
-          npm install  # Re-install deps in deploy dir if needed
           rm -rf build
-          npm run build
-          pm2 reload lbpos-frontend  # Restart app (assume PM2 ecosystem file or name 'posbackend')
-          # Or if using systemd: sudo systemctl restart your-app.service
+          CI=false npm run build
+
+         
+      - name: Reload PM2 
+        run: pm2 reload lbpos-frontend  # Restart app (assume PM2 ecosystem file or name 'posbackend')
+       # Or if using systemd: sudo systemctl restart your-app.service
  
