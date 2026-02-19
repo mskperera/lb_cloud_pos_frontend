@@ -1,0 +1,47 @@
+name: CI/CD for lbpos Frontend
+
+on:
+  push:
+    branches: [ main ]  # Trigger on push to main
+  pull_request:
+    branches: [ main ]  # Trigger on PRs to main
+
+jobs:
+ # test:  # CI: Test and Build
+  #  runs-on: ubuntu-latest  # Use GitHub-hosted for lightweight CI
+  #  steps:
+  #    - uses: actions/checkout@v4
+  #    - name: Set up Node.js
+  #      uses: actions/setup-node@v4
+   #     with:
+   #       node-version: '20'  # Your Node version
+ #     - name: Install dependencies
+ #       run: npm install  # Or yarn install
+  #    - name: Run tests
+  #      run: npm test  # If you have tests; add if not
+
+  deploy:  # CD: Deploy to Server
+  #  needs: test  # Only deploy if tests pass
+    runs-on: [self-hosted,lb-frontend]  # Target your self-hosted runner (use the label you set)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install  # Or yarn install
+
+
+      - name: Deploy to production directory
+        run: |
+          DEPLOY_DIR=/var/www/lbpos/lb_cloud_pos_frontend
+          sudo rsync -a --exclude='.git' ./ $DEPLOY_DIR/  # Copy code to deploy dir (exclude Git)
+          cd $DEPLOY_DIR
+          npm install  # Re-install deps in deploy dir if needed
+          npm run build
+          pm2 reload lbpos-frontend  # Restart app (assume PM2 ecosystem file or name 'posbackend')
+          # Or if using systemd: sudo systemctl restart your-app.service
+ 
