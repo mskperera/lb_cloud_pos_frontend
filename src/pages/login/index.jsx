@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Store, Cloud, Laptop, Zap, Shield, TrendingUp, CheckCircle, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
  import logo_long from '../../assets/pos_logo_long.png';
  import pos_logo_long_inv from '../../assets/pos_logo_long_inv.png';
   import { userLogin } from '../../functions/auth';
@@ -9,7 +9,7 @@ import { Store, Cloud, Laptop, Zap, Shield, TrendingUp, CheckCircle, ChevronRigh
 import { parseJwt } from '../../utils/jwt';
 import { Link, useNavigate } from 'react-router-dom';
 import { setUserAssignedStores } from '../../functions/store';
-import { getSystemInfo, getSystemInfoFromLocalStorageOpti, loadSystemInfoToLocalStorage } from '../../functions/systemSettings';
+import {  getSystemInfoFromLocalStorageOpti } from '../../functions/systemSettings';
 import Database from '@tauri-apps/plugin-sql';
 
 
