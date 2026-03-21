@@ -26,12 +26,15 @@ import ProductSearch from "../../components/productSearch/ProductSearch";
 import AddCustomProduct from "../../components/register/AddCustomProduct";
 import { Grid, HomeIcon, LayoutGrid, Menu } from "lucide-react";
 
-const Store=({store})=>(
-  <div className='flex justify-start items-center gap-1 text-gray-700 font-bold rounded-lg px-2'>
+const Store=({store,navigate})=>(
+  <button className='flex justify-start items-center gap-1 text-gray-700 font-bold rounded-lg px-2'
+    onClick={()=>{
+    navigate('/selectStore')
+  }}>
     <FaStore className='text-xl' />
 {/* <FontAwesomeIcon icon={faStore} style={{ fontSize: '1.5rem' }} /> */}
  {store && <div className='text-lg'>{`${store.storeName}`}</div>}
- </div>
+ </button>
 )
 
 
@@ -584,7 +587,7 @@ const Syncing=()=>{
 
           <div className="flex items-center gap-7 m-0 p-0">
              
-          {selectedStore &&  <Store store={selectedStore}/>}
+          {selectedStore &&  <Store store={selectedStore} navigate={navigate} />}
 {/* <PrinterConnection status={messages.status} /> */}
 
 

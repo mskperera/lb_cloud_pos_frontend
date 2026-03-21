@@ -4,8 +4,9 @@ import { getProductsAllVariations } from '../../functions/register';
 import { useToast } from '../useToast';
 import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
+import Barcode from "./Barcode";
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,hideSearchBox, hideButton,showAdvancedSearcho }) => {
+const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, hideButton,showAdvancedSearcho }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -93,40 +94,48 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+
+
+
+
+  
+  const handleBarcodeEnter = (p) => {
+    const description = `${p.productName}`;
+    const qty = 1;
+    const unitPrice = Number(p.unitPrice);
+
+    const order = {
+      productNo: p.productNo,
+      description,
+      productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
+      unitPrice,
+      productTypeId: p.productTypeId,
+      lineTaxRate: p.taxPerc,
+      qty,
+    };
+   // dispatch(addOrder(order));
+  };
+
+
+
   return (
     <div ref={searchRef} className="relative w-full">
-      <div className="flex items-center gap-3 w-full">
-     {!hideSearchBox ?
-        <div className="relative flex items-center w-full bg-[#f0faff] border border-gray-200 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition duration-200">
-          <i className="pi pi-search text-gray-600 text-lg absolute left-3"></i>
-          <input
-            type="text"
-            className="w-full py-3 pl-10 pr-10 text-base bg-transparent border-none focus:outline-none placeholder-gray-400"
-            placeholder={barcodeMode ? 'Scan Barcode' : 'Enter SKU'}
-            value={searchTerm}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-          />
-          {searchTerm && (
-            <button
-              className="absolute right-3 text-gray-500 hover:text-gray-700"
-              onClick={handleClearSearch}
-              aria-label="Clear search"
-            >
-              <i className="pi pi-times text-base"></i>
-            </button>
-          )}
-        </div>:''}
+      <div className="flex items-center gap-5 w-full">
+
+        <div className='flex-1'>
+    <Barcode onProductSelect={onProductSelect} onBarcodeEnter={onBarcodeEnter} />
+ </div>
+
+        <div className=''>
       {!hideButton ? <button
           type="button"
           onClick={() => setShowAdvancedSearch(true)}
-          className="flex items-center px-4 py-2 text-sm rounded-lg bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+          className="flex font-semibold  items-center px-4 py-4 text-sm rounded-lg btn-primary text-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
         >
-          <span className="pi pi-filter text-base"></span>
-          <span className="ml-2">Item Lookup</span>
+          <span className="ml-2">Advanced Search</span>
         </button>:null}
       </div>
-
+</div>
 
     
           <AdvancedProductSearch

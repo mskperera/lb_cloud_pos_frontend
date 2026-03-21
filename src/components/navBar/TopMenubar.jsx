@@ -10,16 +10,20 @@ import PrinterConnection from '../PrinterConnetion';
 import { getFrontendIdByTerminalId, getPrintdeskByTerminalId } from '../../functions/terminal';
 import { setPrinterList } from '../../state/printer/printerSlice';
 import { FaCompress, FaExpand, FaStore, FaTh } from 'react-icons/fa';
+import { HomeIcon, Menu, PanelLeft, PanelLeftClose } from 'lucide-react';
 import logo from '../../assets/pos_logo_long_inv.png';
 
-const Store=({store})=>(
-  <div className='flex justify-start gap-1 items-center mb-1 text-white  rounded-lg px-2 cursor-pointer'>
+const Store=({store,navigate})=>(
+  <button className='flex justify-start gap-1 items-center mb-1 text-white  rounded-lg px-2 cursor-pointer' 
+  onClick={()=>{
+    navigate('/selectStore')
+  }}>
     <FaStore className='text-lg' />
 {/* <FontAwesomeIcon icon={faStore} style={{ fontSize: '1.5rem' }} /> */}
  {store && <div className='mt-1'>{`${store.storeName}`}</div>}
- </div>
+ </button>
 )
-export default function TopMenubar() {
+export default function TopMenubar({ onToggleSidebar, isSidebarCollapsed }) {
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -35,8 +39,6 @@ export default function TopMenubar() {
   const [leftTerminal,setLeftTerminal]=useState(false);
   // 3jkfsjl
 
-
-
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   const toggleFullScreen = () => {
@@ -49,6 +51,11 @@ export default function TopMenubar() {
         console.error(`Error exiting fullscreen: ${err.message}`);
       });
     }
+  };
+
+  const toggleSidebar = () => {
+    console.log('Toggle sidebar clicked, current state:', isSidebarCollapsed);
+    onToggleSidebar(!isSidebarCollapsed);
   };
 
   useEffect(() => {
@@ -203,13 +210,24 @@ export default function TopMenubar() {
   // bg-slate-50 shadow-sm
   return (
 
-    <nav className="navbar fixed top-0 left-0 w-full bg-[#1f649d] px-10 gap-2 pt-3  h-16 z-50">
-      <div className="flex justify-between items-center w-full m-0 p-0">
+    <nav className="navbar fixed top-0 left-0 w-full bg-[#1f649d]  gap-2 pt-3  h-16 z-50">
+      <div className="flex justify-between items-center w-full m-0 p-0 pr-5 pl-3">
       <div className="flex justify-start gap-4">
-        <div className="flex items-center gap-4 m-0 p-0 ">
+        <div className="flex justify-start items-center gap-2 m-0 p-0 ">
           {/* <i className="pi pi-calculator text-2xl"></i> */}
           {/* <h3 className="text-xl text-white font-bold">Legend POS</h3> */}
+          
+             <button
+       onClick={toggleSidebar}
+       className={`p-2 text-white hover:bg-sky-700 rounded-md transition-colors duration-200 ${isSidebarCollapsed ? 'bg-transparent' : 'bg-transparent'}`}
+       title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+     >
+       <Menu className="w-6 h-6" />
+     </button>
+     
      <img src={logo} className='h-8' />
+
+  
         </div>
 
       
@@ -246,7 +264,7 @@ export default function TopMenubar() {
 
           <div className="flex items-center gap-5 m-0 p-0">
              
-          {selectedStore &&  <Store store={selectedStore}/>}
+          {selectedStore &&  <Store store={selectedStore} navigate={navigate} />}
 <PrinterConnection status={messages.status} />
 
 

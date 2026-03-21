@@ -239,15 +239,19 @@ useEffect(() => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {isTableDataLoading ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-16"><div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div></td>
-                    </tr>
-                ) : products.length === 0 ? (
+               
+              {products.length === 0 ? 
                   <tr>
                     <td colSpan={6} className="text-center py-20 text-gray-500 text-lg">No products found</td>
                     </tr>
-                ) : (
+                
+              :
+               
+                isTableDataLoading ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-16"><div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div></td>
+                    </tr>
+                )  : (
                   products.map((item, i) => (
                 
   <tr
@@ -302,6 +306,7 @@ useEffect(() => {
                  
                 ))
                 )}
+
               </tbody>
             </table>
           </div>

@@ -23,17 +23,13 @@ import About from './pages/about';
 import InventoryOnHandReport from './pages/reports/InventoryOnHandReport';
 import DailySalesSummaryReport from './pages/reports/DailySalesSummaryReport';
 import LowStockReport from './pages/reports/LowStockReport';
-import { RefundPolicy } from './components/legal/RefundPolicy';
-import { TermsOfService } from './components/legal/TermsOfService';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
-import SignUpPage from './pages/signup';
 import ForgotPassword from './pages/forgotPassword';
-import LandingPage from './pages/landing';
 import CookieConsentBanner from './components/CookieConsentBanner';
-import CookiePolicy from './pages/CookiePolicy';
-import PricingPage from './pages/landing/PricingPage';
 import PublicRoutes from './routes/PublicRoutes';
 import ScrollToHash from './pages/landing/ScrollToHash';
+import TransferOrderDetail from './pages/transferOrderDetail';
+
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -52,6 +48,7 @@ const InventoryTransactionHistory  = React.lazy(() => import("./pages/inventoryT
 const Categories  = React.lazy(() => import("./pages/categories"));
 const MeasurementUnits= React.lazy(() => import("./pages/measurementUnits"));
 const ReportsDashboard= React.lazy(() => import("./pages/reports/ReportsDashboard"));
+const TransferOrder= React.lazy(() => import("./pages/tranferOrder"));
 
 function AppContent() {
   const location = useLocation();
@@ -149,6 +146,12 @@ function AppContent() {
                 path="/inventory/transactionHistory"
                 element={<InventoryTransactionHistory />}
               />
+
+
+    
+    <Route path="/inventory/transferorders/create" element={<TransferOrder />} />
+<Route path="/inventory/transferorders/:id" element={<TransferOrderDetail />} />
+{/* <Route path="/inventory/transferorders/list" element={<TransferOrderList />} /> */}
 
          
               <Route path="/dashboard" element={<Dashboard />} />

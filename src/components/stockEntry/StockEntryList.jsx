@@ -9,7 +9,7 @@ import { validate } from "../../utils/formValidation";
 import { FaEye, FaStop } from "react-icons/fa";
 
 export default function StockEntryList({ selectingMode }) {
-  const store = JSON.parse(localStorage.getItem("stores"))[0];
+  const store = JSON.parse(localStorage.getItem("selectedStore"));
 
   const [orders, setOrders] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState([]);

@@ -169,12 +169,12 @@ import { getTenantId, getToken } from "./authService";
     }
   };
 
-  export const getTeminallByUserId = async (userId) => {
+  export const getTeminallByUserId = async (userId,storeId) => {
     try {
       const tenantId = getTenantId();
       const token = getToken();
       return await customAxios
-        .get(`/dropdown/getTeminallByUserId?userId=${userId}`, {
+        .get(`/dropdown/getTeminallByUserId?userId=${userId}&storeId=${storeId}`, {
           headers: {
             'Content-Type': 'application/json',
             "authorization":`Bearer ${token}`,

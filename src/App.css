@@ -53,10 +53,15 @@ label,option,span{
 } */
 
 .btn-primary:hover {
-  background-color: var(--primaryColorHover);
+  background-color:#276ea9;
 
-  /* background-color: var(--primaryColor); */
 }
+
+.btn-primary {
+  background-color:#2b78b8;
+  color:white;
+}
+
 
 
 .bg-primary{
@@ -130,3 +135,11 @@ input {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
 }
+
+
+
+
+
+
+
+

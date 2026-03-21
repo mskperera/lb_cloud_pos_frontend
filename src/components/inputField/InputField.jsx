@@ -14,7 +14,7 @@ const InputField = ({
   max
 }) => {
   return (
-    <div className="flex flex-col space-y-1">
+    <div className="flex flex-col">
       <label htmlFor={id} className=" font-medium text-gray-700">
         {label} {required && <span className="text-red-500">*</span>}
       </label>

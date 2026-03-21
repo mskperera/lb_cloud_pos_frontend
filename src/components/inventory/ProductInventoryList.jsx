@@ -121,7 +121,12 @@ export default function ProductInventoryList({}) {
   const [selectedMeasurementUnitId, setSelectedMeasurementUnitId] =
     useState(-1);
   const [storesOptions, setStoresOptions] = useState([]);
-  const [selectedStoreId, setSelectedStoreId] = useState("");
+
+
+
+const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
+
+  const [selectedStoreId, setSelectedStoreId] = useState(selectedStore.storeId);
 
     const searchInputRef = useRef(null); // ✅ create ref
   // New states for checkboxes
@@ -197,9 +202,9 @@ export default function ProductInventoryList({}) {
     }
   };
 
-  useEffect(() => {
-    setSelectedStoreId(storesOptions.length > 0 && storesOptions[0].id);
-  }, [storesOptions]);
+  // useEffect(() => {
+  //   setSelectedStoreId(storesOptions.length > 0 && storesOptions[0].id);
+  // }, [storesOptions]);
 
   useEffect(() => {
     loadProducts();
@@ -480,7 +485,7 @@ export default function ProductInventoryList({}) {
 
        <div className="flex flex-col md:flex-row w-full gap-6">
            
-            <div className="flex flex-col w-full md:w-1/5">
+            {/* <div className="flex flex-col w-full md:w-1/5">
               <label className="text-sm font-medium text-gray-700 mb-2">Store</label>
               <select
                 value={selectedStoreId}
@@ -494,7 +499,7 @@ export default function ProductInventoryList({}) {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
             <div className="flex flex-col w-full md:w-1/5">
               <label className="text-sm font-medium text-gray-700 mb-2">Filter By</label>
               <select

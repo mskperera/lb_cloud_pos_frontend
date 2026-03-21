@@ -12,6 +12,7 @@ import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
 import DialogModel from "../../model/DialogModel";
 import { formatCurrency } from "../../../utils/format";
 import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
+import LeftArrowIcon from "../../icons/LeftArrowIcon";
 
 
 
@@ -401,15 +402,7 @@ console.log('product000000',p);
         className="p-1.5 rounded-full hover:bg-sky-100 transition-colors"
         title="Back"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 text-sky-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
+        <LeftArrowIcon className="h-4 w-4 text-sky-600" />
       </button>
 
       <button

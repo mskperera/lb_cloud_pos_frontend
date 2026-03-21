@@ -90,7 +90,7 @@ function RevenueChart({ dailyRevenueData, monthlyRevenueData,activeTab,title ,su
          {title}
         </h3>
         
-      <p>{subTitle}</p>
+      <p className='text-sky-600 font-semibold'>{subTitle}</p>
 </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
        
