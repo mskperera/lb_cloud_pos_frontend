@@ -295,7 +295,10 @@ function Dashboard() {
     const [selectedSessionName, setSelectedSessionName] = useState(null); 
   const [sessionsOptions, setSessionsOptions] = useState([]); // Session options from API
 
-  const [selectedStore, setSelectedStore] = useState(null);
+
+    const store = JSON.parse(localStorage.getItem("selectedStore"));
+
+  const [selectedStore, setSelectedStore] = useState(store.storeId);
   const [storeOptions, setStoreOptions] = useState([]); // Session options from API
   const [showCharts, setShowCharts] = useState(false);
 
@@ -389,14 +392,7 @@ function Dashboard() {
     setStoreOptions(storesDrpArr);
   };
 
-  // Load store from localStorage
-  const loadStoreFromLocalStorage = () => {
-    const store = JSON.parse(localStorage.getItem("stores"))[0];
-    console.log("store", store);
-    if (store) {
-      setSelectedStore(store.storeId);
-    }
-  };
+
 
   const loadDashboardDetails = async (sessionId) => {
     try {
@@ -675,6 +671,7 @@ function Dashboard() {
   // Handle session change
   const handleSessionChange = (e) => {
     const selectedSessionId = e.target.value;
+    console.log("selectedSessionId", selectedSessionId);
     setSelectedSession(selectedSessionId);
   };
 
@@ -688,9 +685,7 @@ function Dashboard() {
     loadDrpStore();
   }, []);
 
-  useEffect(() => {
-    loadStoreFromLocalStorage();
-  }, []);
+
 
   useEffect(() => {
     loadDrpSession();
@@ -708,6 +703,7 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen ">
+    
       <div className="flex-1 ml-5 p-4 overflow-y-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between bg-white rounded-lg p-6 mb-6">
           <div className="flex gap-1 items-center">
@@ -753,8 +749,8 @@ function Dashboard() {
               >
                 Session:
               </label>
-              <p>{selectedSessionName}</p>
-              {/* <select
+              {/* <p>{selectedSessionName}</p> */}
+              <select
                 id="session-dropdown"
                 value={selectedSession}
                 onChange={handleSessionChange}
@@ -765,7 +761,7 @@ function Dashboard() {
                     {session.displayName}
                   </option>
                 ))}
-              </select> */}
+              </select>
             </div>
           </div>
         </div>
@@ -779,16 +775,16 @@ function Dashboard() {
                 monthlyRevenueData={monthlyRevenueData}
                 dailyRevenueData={dailyRevenueData}
                 activeTab="daily"
-                title="Daily Revenue & Profit"
-                subTitle={`For ${moment().format("MMMM")}`}
+                title="Revenue & Profit"
+                subTitle={` ${moment().format("MMMM")} ${moment().format("YYYY")}`}
               />:null}
 
            {monthlyRevenueData ?  <RevenueChart
                 monthlyRevenueData={monthlyRevenueData}
                 dailyRevenueData={dailyRevenueData}
                 activeTab="monthly"
-                title="Monthly Revenue & Profit"
-                subTitle={`For ${moment().format("YYYY")}`}
+                title="Revenue & Profit"
+                subTitle={` ${moment().format("YYYY")}`}
               />:null}
             </div>
 

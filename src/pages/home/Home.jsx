@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import Sidebar from "../../components/navBar/SideBar";
 import { getTeminallByUserId } from "../../functions/dropdowns";
 import moment from "moment";
@@ -59,20 +58,22 @@ const UserInfo = () => {
   const formattedDate = currentTime ? currentTime.format("MMMM D, YYYY") : "Loading...";
 
   return (
-    <div className="bg-white rounded-2xl  p-6 border border-gray-100">
-      <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+    <div className="flex justify-between gap-5 items-center  rounded-2xl  border border-gray-100">
+      <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
         <Clock className="w-5 h-5 text-sky-600" />
         Welcome, {userinfo?.displayName || "User"}
       </h3>
-      <div className="text-4xl font-extrabold text-gray-900 tracking-tight mb-1">
+      <div>
+      <div className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1">
         {formattedTime}
       </div>
       <div className="text-lg text-gray-600 mb-1">
         {formattedDate}
       </div>
-      <div className="text-sm text-gray-500">
-        Timezone: {timezone || "Loading..."}
       </div>
+      {/* <div className="text-sm text-gray-500">
+        Timezone: {timezone || "Loading..."}
+      </div> */}
     </div>
   );
 };
@@ -135,8 +136,11 @@ const Home = () => {
   const [assignedTerminals, setAssignedTerminals] = useState([]);
   const userinfo = safeParse("user");
   const selectedStore = safeParse("selectedStore");
+const [isLoading,setIsLoading]=useState(false);
 
   useEffect(() => {
+
+    console.log("selectedStore in Home.jsx useEffect:", selectedStore);
     if (!selectedStore) {
       navigate("/selectStore");
     }
@@ -145,12 +149,15 @@ const Home = () => {
   useEffect(() => {
     const loadTerminals = async () => {
       try {
-        const terminals = await getTeminallByUserId(userinfo?.userId);
+      setIsLoading(true);
+        const terminals = await getTeminallByUserId(userinfo?.userId,selectedStore.storeId);
         if (terminals?.data) {
           setAssignedTerminals(terminals.data);
           localStorage.setItem("assignedTerminals", JSON.stringify(terminals.data));
         }
+           setIsLoading(false);
       } catch (err) {
+         setIsLoading(false);
         console.error("Failed to load terminals:", err);
       }
     };
@@ -159,23 +166,23 @@ const Home = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
 
       <div className="flex-1 ml-10 p-6 md:p-8 lg:p-10">
+
+{!isLoading ? <div>
+
         {/* Header Greeting & Time */}
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {userinfo?.displayName || "User"}!
-          </h1>
-          <p className="text-gray-600 text-lg">
+                 <UserInfo />
+          {/* <p className="text-gray-600 text-lg">
             Manage your business from here — select a terminal to begin
-          </p>
+          </p> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: POS Terminals */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
               <Monitor className="w-7 h-7 text-sky-600" />
               Your POS Terminals
             </h2>
@@ -212,7 +219,7 @@ const Home = () => {
 
           {/* Right: User Info & Quick Actions */}
           <div className="space-y-6">
-            <UserInfo />
+  
 
             {/* Quick Links */}
             <div className="bg-white rounded-2xl  p-6 border border-gray-100">
@@ -279,171 +286,26 @@ const Home = () => {
             </a>
           </div>
         </div> */}
+
+</div>:
+<div className="flex min-h-[60vh] flex-col items-center justify-center">
+    {/* Modern loading spinner + text */}
+    <div className="relative flex flex-col items-center gap-6">
+      {/* Spinner */}
+      <div className="h-16 w-16 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
+
+      {/* Loading text */}
+      <div className="text-center">
+        <p className="text-2xl font-semibold text-gray-700">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+}
+
       </div>
     </div>
   );
 };
 
 export default Home;
-
-
-// import React, { useEffect, useState } from "react";
-// import { Link, useNavigate } from "react-router-dom";
-// import { FaCashRegister } from "react-icons/fa";
-// import { useDispatch } from "react-redux";
-// import Sidebar from "../../components/navBar/SideBar";
-// import { getTeminallByUserId } from "../../functions/dropdowns";
-// import moment from "moment";
-
-// const safeParse = (item) => {
-//   const value = localStorage.getItem(item);
-//   if (!value || value === "undefined") return null;
-//   try {
-//     return JSON.parse(value);
-//   } catch (e) {
-//     console.error(`Failed to parse ${item} from localStorage:`, e);
-//     return null;
-//   }
-// };
-
-// const UserInfo = () => {
-//   const [currentTime, setCurrentTime] = useState(moment.utc());
-//   const [timezone, setTimezone] = useState(null);
-
-//   const userinfo = safeParse("user");
-//   const systemInfo = safeParse("systemInfo");
-//   const utcOffset = systemInfo?.utcOffset || 0;
-
-//   const getTimeZoneFromOffset = (utcOffset) => {
-//     const hours = Math.floor(Math.abs(utcOffset) / 60);
-//     const minutes = Math.abs(utcOffset) % 60;
-//     const sign = utcOffset >= 0 ? "+" : "-";
-//     return `GMT${sign}${hours}${minutes > 0 ? `:${minutes.toString().padStart(2, "0")}` : ""}`;
-//   };
-
-//   const loadTimeZone = () => {
-//     if (!systemInfo) {
-//       setTimezone("Unknown Timezone");
-//       return;
-//     }
-//     const timeZne = getTimeZoneFromOffset(utcOffset);
-//     setTimezone(timeZne);
-//   };
-
-//   const loadTime = () => {
-//     const adjustedTime = moment.utc().add(utcOffset, "minutes");
-//     setCurrentTime(adjustedTime);
-//   };
-
-//   useEffect(() => {
-//     loadTimeZone();
-//     loadTime();
-//   }, []);
-
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       const adjustedTime = moment.utc().add(utcOffset, "minutes");
-//       setCurrentTime(adjustedTime);
-//     }, 1000);
-
-//     return () => clearInterval(interval);
-//   }, [utcOffset]);
-
-//   const formattedTime = currentTime ? currentTime.format("h:mm:ss A") : "Loading...";
-//   const formattedDate = currentTime
-//     ? currentTime.format("MMMM D, YYYY")
-//     : "Loading...";
-
-//   return (
-//     <div className="flex flex-col items-right justify-center p-6 w-full">
-//       <div className="text-2xl font-semibold text-gray-700 mb-4 ml-3">
-//         Hi, {userinfo?.displayName || "Guest"}!
-//       </div>
-//       <div className="text-5xl text-gray-600 mb-2">{formattedTime}</div>
-//       <div className="text-xl text-gray-500 mb-2 ml-2">Date: {formattedDate}</div>
-//       <div className="text-lg text-gray-400 ml-2">Timezone: {timezone || "Loading..."}</div>
-//     </div>
-//   );
-// };
-
-// const HomeMenuButton = ({
-//   to,
-//   label,
-//   iconName: Icon,
-//   submenuItems,
-//   isDisabled = false,
-// }) => {
-//   return (
-//     <Link
-//       className={`flex flex-col min-w-[150px] items-center h-auto
-//       rounded-lg cursor-pointer py-4 px-3 bg-white shadow-sm border
-//       hover:border-gray-300 hover:bg-slate-100
-//       hover:shadow-lg transition duration-300 
-//       ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
-//       to={to}
-//     >
-//       <div className="flex items-center gap-3 mb-2">
-//         <Icon className="text-xl" />
-//       </div>
-//       <div className="text-lg font-semibold text-gray-800 truncate group-hover:overflow-visible group-hover:text-ellipsis group-hover:whitespace-normal">
-//         {label}
-//       </div>
-//     </Link>
-//   );
-// };
-
-// const Home = () => {
-//   const navigate = useNavigate();
-//   const dispatch = useDispatch();
-//   const [assignedTerminals, setAssignedTerminals] = useState([
-//     { terminalId: 1, terminalName: "Testing Terminal 1" },
-//   ]);
-//   const userinfo = JSON.parse(localStorage.getItem('user'));
-
-//   const selectedStore = localStorage.getItem("selectedStore") && JSON.parse(localStorage.getItem("selectedStore"));
-
-//   useEffect(() => {
-//     console.log("selectStore", selectedStore);
-//     if (!selectedStore) {
-//       navigate('/selectStore');
-//     }
-//   }, [selectedStore]);
-
-//   useEffect(() => {
-//     loadTeminals();
-//   }, []);
-
-//   const [terminals, setTerminals] = useState(null);
-//   const loadTeminals = async () => {
-//     const terminals = await getTeminallByUserId(userinfo.userId);
-//     setTerminals(terminals.data);
-//     localStorage.setItem('assignedTerminals', JSON.stringify(terminals.data));
-//   };
-
-//   return (
-//     <>
-//       <div className="flex">
-//         <Sidebar />
-//         <div className="flex-1 ml-64">
-//           <div className="flex justify-between items-center gap-52">
-//             <div className="w-full my-24">
-//               <div className="flex gap-4">
-//                 {terminals?.map((t) => (
-//                   <HomeMenuButton
-//                     label={t.displayName}
-//                     iconName={FaCashRegister}
-//                     to={`/register/${t.id}`}
-//                   />
-//                 ))}
-//               </div>
-//             </div>
-
-//             <UserInfo />
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Home;

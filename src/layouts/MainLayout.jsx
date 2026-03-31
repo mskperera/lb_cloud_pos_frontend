@@ -1,12 +1,24 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import TopMenubar from "../components/navBar/TopMenubar";
 import Sidebar from "../components/navBar/SideBar";
-import { useEffect } from "react";
+import MobileMenu from "../components/navBar/MobileMenu";
+import { useEffect, useState } from "react";
 import { isSystemDataExists } from "../functions/systemSettings";
 
 const MainLayout = () => {
   const navigate = useNavigate();
   const userinfo=JSON.parse(localStorage.getItem('user'));
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleToggleSidebar = (collapsed) => {
+    console.log('MainLayout: Setting sidebar collapsed to:', collapsed);
+    setIsSidebarCollapsed(collapsed);
+  };
+
+  const handleToggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   useEffect(()=>{
     loadSystemData();
@@ -40,13 +52,26 @@ const loadSystemData=async()=>{
   
   return (
     <div className="flex flex-col">
-      <TopMenubar />
+      <TopMenubar
+        onToggleSidebar={handleToggleSidebar}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleMobileMenu={handleToggleMobileMenu}
+        isMobileMenuOpen={isMobileMenuOpen}
+      />
       <div className="flex">
-        <Sidebar />
-        <main className="flex-1 mt-16 ml-60">
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <Sidebar isCollapsed={isSidebarCollapsed} onToggle={handleToggleSidebar} />
+        </div>
+        <main className={`flex-1 mt-16 ${isSidebarCollapsed ? 'md:ml-16' : 'md:ml-64'} transition-all duration-300`}>
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile Fullscreen Menu */}
+      {isMobileMenuOpen && (
+        <MobileMenu onClose={() => setIsMobileMenuOpen(false)} />
+      )}
     </div>
   );
 };

@@ -12,7 +12,6 @@ import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
 import DialogModel from "../../model/DialogModel";
 import { formatCurrency } from "../../../utils/format";
 import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
-import { ChevronDownIcon, PackageIcon, XIcon } from "lucide-react";
 
 
 
@@ -29,113 +28,6 @@ import { ChevronDownIcon, PackageIcon, XIcon } from "lucide-react";
 
 //   );
 // };
-
-const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
-  const [overflowIds, setOverflowIds] = useState([]);
-  const [dropOpen, setDropOpen] = useState(false);
-  const barRef = useRef();
-  const moreRef = useRef();
-
-  const allCats = [ ...categories];
-
-  useEffect(() => {
-    measureTabs();
-  }, [categories]);
-
-  useEffect(() => {
-    const ro = new ResizeObserver(() => measureTabs());
-    if (barRef.current) ro.observe(barRef.current);
-    return () => ro.disconnect();
-  }, [categories]);
-
-  const measureTabs = () => {
-    if (!barRef.current) return;
-    const containerW = barRef.current.offsetWidth - 80; // reserve for "More" btn
-    let used = 0;
-    const overflow = [];
-    allCats.forEach((c, i) => {
-      const approxW = c.categoryName.length * 8.5 + 34;
-      if (i > 0 && used + approxW > containerW) {
-        overflow.push(c.categoryId);
-      } else {
-        used += approxW + 8;
-      }
-    });
-    setOverflowIds(overflow);
-  };
-
-  const visibleCats = allCats.filter(c => !overflowIds.includes(c.categoryId));
-  const hiddenCats = allCats.filter(c => overflowIds.includes(c.categoryId));
-  const activeInOverflow = overflowIds.includes(selectedCategoryId);
-
-  return (
-    <div style={{padding:"14px 20px 0",display:"flex",alignItems:"center",gap:8,flexShrink:0,position:"relative"}}>
-      <div ref={barRef} style={{display:"flex",gap:8,flex:1,overflow:"hidden",minWidth:0}}>
-        {visibleCats.map(c => (
-          <button
-            key={c.categoryId}
-            className={`lpos-cat-tab${selectedCategoryId===c.categoryId?" active":""}`}
-            onClick={() => onSelect(c)}
-          >
-            {c.categoryName}
-          </button>
-        ))}
-      </div>
-      {hiddenCats.length > 0 && (
-        <div ref={moreRef} style={{position:"relative",flexShrink:0}}>
-          <button
-            onClick={() => setDropOpen(v=>!v)}
-            style={{
-              display:"flex",alignItems:"center",gap:5,padding:"8px 13px",
-              borderRadius:"var(--lpos-radius-sm)",border:activeInOverflow?"1.5px solid var(--lpos-accent-medium)":"none",
-              background:activeInOverflow?"var(--lpos-accent-soft)":"var(--lpos-surface)",
-              fontFamily:"inherit",fontSize:13.5,fontWeight:600,
-              color:activeInOverflow?"var(--lpos-accent)":"var(--lpos-text-secondary)",
-              cursor:"pointer",boxShadow:"var(--lpos-shadow-sm)",flexShrink:0,
-            }}
-          >
-            More <span style={{background:"var(--lpos-accent)",color:"white",fontSize:10,fontWeight:700,padding:"1px 5px",borderRadius:10}}>{hiddenCats.length}</span>
-            <span style={{transform:dropOpen?"rotate(180deg)":"rotate(0)",transition:"transform .2s",display:"flex"}}><ChevronDownIcon /></span>
-          </button>
-          {dropOpen && (
-            <div style={{
-              position:"absolute",right:0,top:"calc(100% + 8px)",
-              minWidth:210,background:"var(--lpos-surface)",
-              borderRadius:"var(--lpos-radius-md)",
-              boxShadow:"0 8px 30px rgba(0,0,0,0.14),0 2px 8px rgba(0,0,0,0.07)",
-              border:"1px solid var(--lpos-border)",padding:6,zIndex:2000,
-            }}>
-              {hiddenCats.map(c => (
-                <div
-                  key={c.categoryId}
-                  onClick={() => { onSelect(c); setDropOpen(false); }}
-                  style={{
-                    display:"flex",alignItems:"center",justifyContent:"space-between",
-                    padding:"9px 12px",borderRadius:9,cursor:"pointer",
-                    fontSize:13.5,fontWeight:c.categoryId===selectedCategoryId?600:500,
-                    color:c.categoryId===selectedCategoryId?"var(--lpos-accent)":"var(--lpos-text-secondary)",
-                    background:c.categoryId===selectedCategoryId?"var(--lpos-accent-soft)":"transparent",
-                    transition:"background .13s",gap:10,
-                  }}
-                  onMouseEnter={e=>{ if(c.categoryId!==selectedCategoryId) e.currentTarget.style.background="var(--lpos-bg)"; }}
-                  onMouseLeave={e=>{ if(c.categoryId!==selectedCategoryId) e.currentTarget.style.background="transparent"; }}
-                >
-                  {c.categoryName}
-                  {c.categoryId===selectedCategoryId && (
-                    <div style={{width:16,height:16,borderRadius:"50%",background:"var(--lpos-accent)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                      <svg width="10" height="10" fill="none" stroke="white" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {dropOpen && <div style={{position:"fixed",inset:0,zIndex:1999}} onClick={()=>setDropOpen(false)}/>}
-    </div>
-  );
-};
 
 const CategoryItem = ({ c, handleProductClick, selectedCategoryId }) => {
   const isSelected = c.categoryId === selectedCategoryId;
@@ -195,7 +87,7 @@ const CategoryItem = ({ c, handleProductClick, selectedCategoryId }) => {
     </div>
   );
 };
-const ProductList = ({onMobClose}) => {
+const ProductList = () => {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -475,11 +367,6 @@ console.log('product000000',p);
   return width;
 }
 
-
-
- const activeCatLabel = selectedCategoryId === -1 ? "All Items" : (categories.find(c=>c.categoryId===selectedCategoryId)?.categoryName || "Products");
-
-
   const containerRef = useRef();
   const width = useContainerWidth(containerRef);
 
@@ -653,8 +540,7 @@ console.log('product000000',p);
   </div>
 </DialogModel>
  
-   <div className="lpos-main lpos-scroll" style={{display:"flex",flexDirection:"column",overflow:"hidden",background:"var(--lpos-bg)",flex:1}}>
-   
+    <div className="grid grid-cols-12  pl-5  h-[80vh]">
    
        {totalRecords>rowsPerPage && <DaisyUIPaginator
           currentPage={currentPage}
@@ -664,68 +550,81 @@ console.log('product000000',p);
           rowsPerPageOptions={[10, 20, 30, 50, 100]}
         /> }
 
+<div className="col-span-3 mt-3 flex flex-col h-full bg-gradient-to-b from-gray-50 to-white rounded-2xl shadow-inner border border-gray-200 overflow-hidden">
+  {/* This div takes full remaining height and enables scrolling */}
+  <div className="flex-1 overflow-y-auto custom-scrollbar px-4 pt-4 pb-6 min-h-0">
+    <div className="space-y-3">
 
-   <div className="mob-sheet-handle" style={{display:"none",alignItems:"center",justifyContent:"space-between",padding:"12px 16px 0",flexShrink:0}}>
-        <span style={{fontSize:16,fontWeight:700,letterSpacing:"-.3px"}}>Browse Products</span>
-        <button onClick={onMobClose} style={{width:32,height:32,borderRadius:"50%",border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-          <XIcon/>
-        </button>
-      </div>
-      {/* Category tabs */}
-      <CategoryBar categories={categories} selectedCategoryId={selectedCategoryId} onSelect={handleCategorySelect} />
-    
-      {/* Section header */}
-      <div style={{padding:"14px 20px 2px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
-        <span style={{fontSize:18,fontWeight:700,letterSpacing:"-.3px"}}>{activeCatLabel}</span>
-        <span style={{fontSize:13,color:"var(--lpos-text-tertiary)",fontWeight:500}}>{products.length} item{products.length!==1?"s":""}</span>
-      </div>
+      {/* Category List */}
+      {categories?.map((c) => (
+        <CategoryItem
+          key={c.categoryId}
+          c={c}
+          handleProductClick={handleCategorySelect}
+          selectedCategoryId={selectedCategoryId}
+        />
+      ))}
+    </div>
+  </div>
+</div>
 
 
-
-    <div className="lpos-scroll" style={{flex:1,overflowY:"auto",padding:"12px 20px 20px"}}>
-    
-    
-        {productListLoading ? (
-          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"60%",gap:14,color:"var(--lpos-text-secondary)"}}>
-            <div style={{width:40,height:40,borderRadius:"50%",border:"3px solid var(--lpos-accent-medium)",borderTopColor:"var(--lpos-accent)",animation:"spin 0.8s linear infinite"}}/>
-            <span style={{fontSize:14,fontWeight:500}}>Loading products…</span>
-            <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-          </div>
-        ) : products.length === 0 ? (
-          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"60%",gap:12,color:"var(--lpos-text-tertiary)"}}>
-            <PackageIcon/>
-            <span style={{fontSize:17,fontWeight:700,color:"var(--lpos-text-secondary)"}}>No products found</span>
-            <span style={{fontSize:13,color:"var(--lpos-text-tertiary)"}}>Try selecting a different category</span>
-          </div>
-        ) : (
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
-            {products.map((p, i) => (
-                    <ProductItem key={i} p={p} handleProductClick={handleProductClick} />
-     
-              // <ProductItem
-              //   key={p.productId || i}
-              //   p={p}
-              //   handleProductClick={onProductClick}
-              //   inCart={cartQtyMap?.[p.productId] || 0}
-              // />
+    {/* <DaisyUIPaginator
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          totalRecords={totalRecords}
+          onPageChange={onPageChange}
+          rowsPerPageOptions={[10, 20, 30, 50, 100]}
+        /> 
+        
+        <select
+          value={selectedCategoryId}
+          style={{ margin: 0 }}
+          onChange={handleCategorySelect}
+          className="w-full max-w-xs px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+        >
+          <option value="-1">All Categories</option>
+          {categories.length > 0 &&
+            categories.map((c) => (
+              <option key={c.categoryId} value={c.categoryId}>
+                {c.categoryName}
+              </option>
             ))}
-          </div>
-        )}
-    
-    
-  
-        {/* Pagination */}
-        {totalRecords > rowsPerPage && (
-          <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:8,marginTop:20}}>
-            <button disabled={currentPage===0} onClick={()=>onPageChange({page:currentPage-1,rows:rowsPerPage})} style={{padding:"6px 14px",borderRadius:8,border:"1px solid var(--lpos-border)",background:"var(--lpos-surface)",cursor:currentPage===0?"not-allowed":"pointer",fontSize:13,fontWeight:600,color:"var(--lpos-text-secondary)",opacity:currentPage===0?.5:1}}>← Prev</button>
-            <span style={{fontSize:13,color:"var(--lpos-text-secondary)",fontWeight:500}}>Page {currentPage+1} of {Math.ceil(totalRecords/rowsPerPage)}</span>
-            <button disabled={(currentPage+1)*rowsPerPage>=totalRecords} onClick={()=>onPageChange({page:currentPage+1,rows:rowsPerPage})} style={{padding:"6px 14px",borderRadius:8,border:"1px solid var(--lpos-border)",background:"var(--lpos-surface)",cursor:(currentPage+1)*rowsPerPage>=totalRecords?"not-allowed":"pointer",fontSize:13,fontWeight:600,color:"var(--lpos-text-secondary)",opacity:(currentPage+1)*rowsPerPage>=totalRecords?.5:1}}>Next →</button>
-          </div>
-        )}
+        </select> */}
 
-
-
-
+   <div className="col-span-9 w-full overflow-auto custom-scrollbar my-2 p-2 rounded-lg">
+  {!productListLoading ? (
+    <div className="grid gap-2 grid-cols-4 md:grid-cols-4">
+      {products.length > 0 ? (
+        products.map((p, index) => (
+          <ProductItem key={index} p={p} handleProductClick={handleProductClick} />
+        ))
+      ) : (
+        <div className="col-span-full flex flex-col items-center justify-center h-64 text-center p-6 rounded-lg text-gray-500">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 mb-3 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 014-4h6a4 4 0 014 4h-1a4 4 0 00-4 4v2m-6 0h6"
+            />
+          </svg>
+          <span className="text-lg font-semibold">No products found</span>
+          <span className="text-sm text-gray-400">Try adjusting your search or filter</span>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="flex justify-center items-center h-[80vh] text-lg font-semibold text-gray-600">
+      Please wait, loading products...
+    </div>
+  )}
 </div>
 
     </div>

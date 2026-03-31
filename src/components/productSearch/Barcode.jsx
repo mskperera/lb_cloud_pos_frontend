@@ -178,10 +178,12 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
 
         {/* Search Input */}
         <div className="relative flex-1">
-          <div className="relative flex items-center w-full bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition">
+          <div className="relative flex items-center w-full bg-white border border-gray-300 rounded-lg shadow-sm 
+          focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition">
              {/* Mode Button (Icon Only + Arrow) */}
         <div ref={buttonRef} className="relative">
           <button
+          type='button'
             onClick={handleToggleClick}
             className="flex items-center gap-2 px-4 py-4  rounded-lg  transition shadow-sm
             
@@ -207,12 +209,13 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter }) => {
               value={searchTerm}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder={barcodeMode ? 'Scan or enter barcode...' : 'Type product name or description...'}
+              placeholder={barcodeMode ? 'Scan or enter barcode...' : 'Type product description...'}
               className="w-full py-4 pl-0 pr-12 text-base bg-transparent border-none focus:outline-none placeholder-gray-400"
             />
 
             {searchTerm && (
               <button
+              type='button'
                 onClick={handleClear}
                 className="absolute right-4 text-gray-500 hover:text-red-600 transition z-10"
               >

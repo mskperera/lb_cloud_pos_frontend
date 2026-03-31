@@ -42,9 +42,10 @@ const Login = () => {
       localStorage.setItem('token', accessToken);
       const plaindata = parseJwt(accessToken);
 
+      //console.log('plaindata', plaindata);
+
       localStorage.setItem('tenantId', plaindata.tenantId);
       localStorage.setItem('userId', plaindata.userId);
-      localStorage.setItem('stores', JSON.stringify(plaindata.stores));
       localStorage.setItem('user', JSON.stringify(plaindata));
 
       await setUserAssignedStores(plaindata.userId);

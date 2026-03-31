@@ -22,6 +22,8 @@ export default function OrderList({ isVisible, setIsVisible }) {
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [isPaymentConfirmShow, setIsPaymentConfirmShow] = useState(false);
 
+const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
+
   const [selectedFilterBy, setSelectedFilterBy] = useState({
     label: "Filter by",
     value: 1,
@@ -53,6 +55,7 @@ export default function OrderList({ isVisible, setIsVisible }) {
       const limit = rowsPerPage;
 
       const filteredData = {
+        terminalId:selectedTerminaId,
         orderId: null,
         orderNo: selectedFilterBy.value === 1 ? _searchValue : null,
         customerCode: selectedFilterBy.value === 2 ? _searchValue : null,
