@@ -1,9 +1,9 @@
 
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {  useEffect, useState } from "react";
 import ProductList from "../../components/register/productList/ProductList";
 import { useDispatch, useSelector } from "react-redux";
-import {  useLocation, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import Payment from "../../components/register/payment/Payment";
 import {
   addOrder,
@@ -17,7 +17,7 @@ import ReturnOrder from "../../components/returnOrder/ReturnOrderComp";
 import HOCSession from "../../hocComponents/WrapperSession";
 import OrderListAll from "../../components/orderListAll/OrderListAll";
 import OrderList from "../../components/completedOrders/OrderList";
-import { FaCalendarCheck, FaCompressAlt,FaHistory, FaPlusCircle, FaSearch, FaStore, FaTh, FaThList, FaTimes } from "react-icons/fa";
+import { FaCalendarCheck, FaCompressAlt,FaHistory, FaPlusCircle, FaSearch, FaTh, FaTimes } from "react-icons/fa";
 import { setSelectedStore } from "../../state/store/storeSlice";
 import ProfileMenu from "../../components/ProfileMenu";
 import Barcode from "../../components/productSearch/Barcode";
@@ -122,7 +122,6 @@ const Register = () => {
   const [isSalesHistoryPopupVisible, setIsSalesHistoryPopupVisible] = useState(false);
       
   const [isDayEndPopupVisible, setIsDayEndPopupVisible] = useState(false);
-  const [isDayendLoading, setIsDayendLoading] = useState(false);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   
    const [isAddCustomProductShow, setIsAddCustomProductShow] = useState(false);
@@ -290,18 +289,6 @@ const ActionButtonsPopup = () => {
     };
   }, []);
 
-  const location = useLocation();
-  const { id } = useParams(); 
-
-
-
-  //onst [printerList, setPrinterList] = useState([]);
-  const [printDeskInfo, setPrintDeskInfo] = useState(null); // Example ID
-
-  const [leftTerminal,setLeftTerminal]=useState(false);
-  // 3jkfsjl
-
-
 
   const [expanded, setExpanded] = useState(false);
 
@@ -309,11 +296,6 @@ const ActionButtonsPopup = () => {
   const [mobProductsOpen, setMobProductsOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-
- 
-
- 
-
 
   const storeName = selectedStore?.storeName || null;
 
@@ -388,6 +370,7 @@ const Topbar = () => (
         <Barcode
           onProductSelect={handleProductClick}
           onBarcodeEnter={handleBarcodeEnter}
+          isMobile={isMobile}
         />
       </div>
 
