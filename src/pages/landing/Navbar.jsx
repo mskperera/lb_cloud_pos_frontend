@@ -161,15 +161,18 @@ const Navbar = () => {
 
           {/* Auth buttons */}
           <div className="flex items-center space-x-4">
-            <Link to="/signin" className="text-sky-600 hover:text-sky-800 font-medium px-4 py-2">
+            <Link to="/signin" 
+            // className="text-sky-600 hover:text-sky-800 font-medium px-4 py-2"
+            className="bg-sky-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-sky-700 transition-colors shadow-sm"
+            >
               Sign In
             </Link>
-            <Link
+            {/* <Link
               to="/signup"
               className="bg-sky-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-sky-700 transition-colors shadow-sm"
             >
               Start Free Trial
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

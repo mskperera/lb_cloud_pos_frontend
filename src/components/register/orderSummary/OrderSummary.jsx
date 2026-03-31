@@ -1,51 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { DISCOUNT_TYPES } from '../../../utils/constants';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { formatCurrency } from '../../../utils/format';
-import { useDispatch, useSelector } from 'react-redux';
 
-const OrderSummary = ({ totalItems }) => {
-  const orderList = useSelector((state) => state.orderList);
+const OrderSummary = () => {
   const orderSummary = useSelector((state) => state.orderList.orderSummary);
-  const subtotal = formatCurrency(orderSummary?.subtotal || 0);
-  const totalDiscounts = orderSummary.overallDiscounts + orderSummary.lineDiscounts;
-  const [products, setProducts] = useState([]);
+  const orderList = useSelector((state) => state.orderList.list || []);
 
-  useEffect(() => {
-    const productsWithLineNumber = orderList.list.map((product, index) => ({
-      ...product,
-      originalLineNumber: index + 1,
-    }));
-    setProducts(productsWithLineNumber);
-  }, [orderList]);
+  const subtotal = orderSummary?.subtotal || 0;
+  const totalDiscounts = (orderSummary?.overallDiscounts || 0) + (orderSummary?.lineDiscounts || 0);
+  const totalTax = orderSummary?.totalTax || 0;
+  const grandTotal = orderSummary?.grandTotal || 0;
 
-  return (  
-    <div className="px-6 py-4 bg-white rounded-lg shadow-sm border ">
-      <div className="flex flex-col md:flex-row justify-between gap-10">
-        <div className="flex flex-col w-full gap-3">
-          <div className="flex justify-between items-center">
-            <span className="font-semibold text-gray-700">Sub Total</span>
-            <span className="font-medium text-gray-800">{subtotal}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="font-semibold text-gray-700">Discounts</span>
-            <span className="font-medium text-gray-800">{formatCurrency(totalDiscounts)}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="font-semibold text-gray-700">Tax</span>
-            <span className="font-medium text-gray-800">{formatCurrency(orderSummary.totalTax)}</span>
-          </div>
+  const itemCount = orderList.reduce((sum, item) => sum + (item.qty || 0), 0);
+
+  return (
+    <div style={{
+      padding: "12px 18px",
+      borderTop: "1px solid var(--lpos-border)",
+      display: "flex",
+      flexDirection: "column",
+      gap: 6,
+      flexShrink: 0,
+      background: "var(--lpos-surface)"
+    }}>
+      {/* Summary Items */}
+      {[
+        { label: "Subtotal", val: formatCurrency(subtotal) },
+        { 
+          label: "Discount", 
+          val: `- ${formatCurrency(totalDiscounts)}`, 
+          color: "var(--lpos-green)" 
+        },
+        { label: "Tax", val: formatCurrency(totalTax) },
+      ].map(({ label, val, color }) => (
+        <div 
+          key={label} 
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "13px",
+            color: "var(--lpos-text-secondary)"
+          }}
+        >
+          <span style={{ fontWeight: 500 }}>{label}</span>
+          <span style={{ 
+            fontWeight: 600, 
+            color: color || "var(--lpos-text-primary)" 
+          }}>
+            {val}
+          </span>
         </div>
-        <div className="flex flex-col w-full justify-between">
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-semibold text-gray-700">Total Items</span>
-            <span className="font-medium text-gray-800">{totalItems}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="font-semibold text-xl text-sky-600">Grand Total</span>
-            <span className="font-semibold text-xl text-sky-600">{formatCurrency(orderSummary.grandTotal)}</span>
-          </div>
-        </div>
+      ))}
+
+      {/* Grand Total - Highlighted */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        fontSize: "16px",
+        fontWeight: 700,
+        color: "var(--lpos-text-primary)",
+        marginTop: 4,
+        paddingTop: 10,
+        borderTop: "1px solid var(--lpos-border)"
+      }}>
+        <span>Total</span>
+        <span style={{ 
+          color: "var(--lpos-accent)", 
+          fontSize: "17px" 
+        }}>
+          {formatCurrency(grandTotal)}
+        </span>
       </div>
+
+ 
     </div>
   );
 };

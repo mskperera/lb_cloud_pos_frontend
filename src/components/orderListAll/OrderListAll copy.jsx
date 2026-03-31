@@ -8,20 +8,20 @@ import { addOrder, cancelOverallDiscount, clearOrderList, clearPayment, setCusto
 import { CONTACT_TYPE, DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/constants";
 import ProductOrderList from "../register/orderList/ProductOrderList";
 import ApplyDiscount from "../register/ApplyDiscount";
-import { FaTimesCircle } from 'react-icons/fa';
+import ProductSearch from "../productSearch/ProductSearch";
+import { FaCalendarCheck, FaHistory, FaPause, FaPlusCircle, FaSearch, FaShoppingCart, FaTags, FaTimesCircle, FaUserPlus } from 'react-icons/fa';
 import DialogModel from "../model/DialogModel";
 import Payment from "../register/payment/Payment";
 import PaymentConfirm from "../../pages/paymentConfirm";
 import AddCustomProduct from "../register/AddCustomProduct";
 
-import { ShoppingCartIcon, UserIcon } from "lucide-react";
+import ItemLookup from "../../components/productSearch/ItemLookup";
+
 
 const OrderListAll = () => {
   const navigate = useNavigate();
   let { terminalId } = useParams();
   const dispatch = useDispatch();
-
-  const orderList=useSelector((state) => state.orderList.list);
 
   const [loadCount, setLoadCount] = useState(0);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -133,9 +133,8 @@ const OrderListAll = () => {
     setIsPaymentShow(false);
   };
 
-
   return (
-  <>
+    <div className="flex flex-col w-full">
       <ApplyDiscount
         orderListId={selectedOrderId}
         visible={isDiscountPopupVisible}
@@ -171,13 +170,18 @@ const OrderListAll = () => {
         <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
       </DialogModel>
 
-    <div style={{width:"var(--lpos-cart-w)",background:"var(--lpos-surface)",borderLeft:"1px solid var(--lpos-border)",display:"flex",flexDirection:"column",overflow:"hidden",flexShrink:0}} className="lpos-cart">
-   
+
+
+
+
+
+      <div className="flex flex-col gap-3 max-w-7xl mx-auto  overflow-auto ">
 
           <Customer />
 
-    <ProductOrderList showDiscountPopup={showDiscountPopupHandler} />
-   
+        <div className="overflow-y-auto rounded-lg shadow-sm ">
+          <ProductOrderList showDiscountPopup={showDiscountPopupHandler} />
+        </div>
 
         {orderSummary.overallDiscounts > 0 && (
           <div className="flex justify-between items-center h-14 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -200,81 +204,48 @@ const OrderListAll = () => {
           <OrderSummary totalItems={totalItems} />
 
 
-{/* Action Buttons */}
-        <div style={{
-          padding: "14px 18px",
-          display: "flex",
-          gap: 10,
-          flexShrink: 0
-        }}>
-          <button 
-            onClick={newOrderHandler}
-            style={{
-              flex: 1,
-              padding: 13,
-              borderRadius: "var(--lpos-radius-sm)",
-              border: "1.5px solid var(--lpos-border)",
-              background: "var(--lpos-surface)",
-              fontFamily: "inherit",
-              fontSize: 14,
-              fontWeight: 700,
-              color: "var(--lpos-text-secondary)",
-              cursor: "pointer",
-              transition: "all .15s"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--lpos-text-secondary)";
-              e.currentTarget.style.color = "var(--lpos-text-primary)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--lpos-border)";
-              e.currentTarget.style.color = "var(--lpos-text-secondary)";
-            }}
-          >
-            New
-          </button>
 
-          <button 
-            onClick={() => setIsPaymentShow(true)}
-            disabled={list.length === 0}
-            className="lpos-btn-proceed"
-            style={{
-              flex: 2,
-              padding: 13,
-              borderRadius: "var(--lpos-radius-sm)",
-              border: "none",
-              fontFamily: "inherit",
-              fontSize: 14,
-              fontWeight: 700,
-              color: "white",
-              cursor: list.length === 0 ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              opacity: list.length === 0 ? 0.7 : 1
-            }}
-          >
-            <ShoppingCartIcon size={18} />
-            Charge 
-      
-            {totalItems > 0 && (
-              <span style={{
-                marginLeft: 6,
-                background: "rgba(255,255,255,0.25)",
-                color: "white",
-                fontSize: 11,
-                fontWeight: 700,
-                padding: "2px 7px",
-                borderRadius: 20
-              }}>
-                {totalItems} Items
-              </span>
-            )}
-          </button>
+  <div className="flex flex-wrap gap-4 items-center justify-between">
+    {/* Left Side: Secondary Actions */}
+    <div className="flex gap-3">
+      <button
+        onClick={newOrderHandler}
+        className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-xl shadow-sm hover:shadow-md hover:border-gray-400 hover:bg-gray-50 transition-all duration-200"
+      >
+        New Order
+      </button>
+
+
+    </div>
+
+    {/* Right Side: Primary Action */}
+    <button
+      onClick={() => setIsPaymentShow(true)}
+      disabled={list.length === 0}
+      className={`flex items-center justify-center gap-3 px-10 py-5 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform ${
+        list.length === 0
+          ? "bg-gray-400 text-gray-200 cursor-not-allowed shadow-none"
+          : "bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 "
+      }`}
+    >
+      <FaShoppingCart className="text-2xl" />
+      <span>Proceed to Payment</span>
+      {list.length > 0 && (
+        <span className="ml-2 bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+          {totalItems} item{totalItems > 1 ? 's' : ''}
+        </span>
+      )}
+    </button>
+  </div>
+
+
+
+
+
         </div>
-      </div>
-</>
+      
+          </div>
+
   );
 };
 

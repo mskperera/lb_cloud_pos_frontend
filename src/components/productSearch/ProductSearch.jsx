@@ -6,7 +6,7 @@ import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
 import Barcode from "./Barcode";
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, hideButton,showAdvancedSearcho }) => {
+const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, hideButton,showAdvancedSearcho,hideSearchBox }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -119,18 +119,18 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, 
 
 
   return (
-    <div ref={searchRef} className="relative w-full">
-      <div className="flex items-center gap-5 w-full">
+    <div ref={searchRef} className="relative w-full ">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-5 w-full">
 
         <div className='flex-1'>
     <Barcode onProductSelect={onProductSelect} onBarcodeEnter={onBarcodeEnter} />
  </div>
 
-        <div className=''>
+        <div className='sm:w-auto'>
       {!hideButton ? <button
           type="button"
           onClick={() => setShowAdvancedSearch(true)}
-          className="flex font-semibold  items-center px-4 py-4 text-sm rounded-lg btn-primary text-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
+          className="w-full sm:w-auto flex font-semibold items-center justify-center px-4 py-4 text-sm rounded-lg btn-primary text-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition duration-200"
         >
           <span className="ml-2">Advanced Search</span>
         </button>:null}

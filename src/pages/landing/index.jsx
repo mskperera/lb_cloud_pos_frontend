@@ -309,7 +309,7 @@ const HeroSection = () => {
     {/* Download buttons – responsive grid */}
     <div className="grid sm:grid-cols-2 gap-6 md:gap-8 max-w-xl mx-auto">
       {/* Windows Card */}
-      <div className="group bg-gray-50/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-xl hover:border-sky-200 hover:bg-white">
+      <div className="group w-full bg-gray-50/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-xl hover:border-sky-200 hover:bg-white">
         <div className="flex items-center gap-4 mb-5">
           <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center">
             <img src={windows_icon} alt="Windows" className="w-10 h-10 md:w-12 md:h-12" />
@@ -332,7 +332,7 @@ const HeroSection = () => {
       </div>
 
       {/* Linux Card */}
-      <div className="group bg-gray-50/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-xl hover:border-sky-200 hover:bg-white">
+      <div className="group w-full bg-gray-50/70 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-xl hover:border-sky-200 hover:bg-white">
         <div className="flex items-center gap-4 mb-5">
           <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center">
             <img src={linux_icon} alt="Linux" className="w-10 h-10 md:w-12 md:h-12" />

@@ -29,6 +29,7 @@ import CookieConsentBanner from './components/CookieConsentBanner';
 import PublicRoutes from './routes/PublicRoutes';
 import ScrollToHash from './pages/landing/ScrollToHash';
 import TransferOrderDetail from './pages/transferOrderDetail';
+import RegisterPage from './pages/register/register_redesigned';
 
 
 const Register = React.lazy(() => import("./pages/register"));
@@ -49,6 +50,7 @@ const Categories  = React.lazy(() => import("./pages/categories"));
 const MeasurementUnits= React.lazy(() => import("./pages/measurementUnits"));
 const ReportsDashboard= React.lazy(() => import("./pages/reports/ReportsDashboard"));
 const TransferOrder= React.lazy(() => import("./pages/tranferOrder"));
+const TransferOrderList= React.lazy(() => import("./pages/transferOrderList"));
 
 function AppContent() {
   const location = useLocation();
@@ -151,7 +153,7 @@ function AppContent() {
     
     <Route path="/inventory/transferorders/create" element={<TransferOrder />} />
 <Route path="/inventory/transferorders/:id" element={<TransferOrderDetail />} />
-{/* <Route path="/inventory/transferorders/list" element={<TransferOrderList />} /> */}
+<Route path="/inventory/transferorders/list" element={<TransferOrderList />} />
 
          
               <Route path="/dashboard" element={<Dashboard />} />
@@ -190,6 +192,9 @@ function AppContent() {
             <Route element={<TopbarLayout />}>
               {/* <Route path="/register/:terminalId" element={<Register />} /> */}
               <Route path="/register/:terminalId" element={<Register />} />
+
+               <Route path="/registerr/:terminalId" element={<RegisterPage />} />
+
               {/* <Route path="/dayend" element={<DayEnd />} /> */}
               <Route path="/daystart/:terminalId" element={<DayOpen />} />
               {/* <Route path="/payment" element={<Payment />} /> */}

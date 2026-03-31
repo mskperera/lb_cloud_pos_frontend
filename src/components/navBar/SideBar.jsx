@@ -22,85 +22,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-// const SidebarMenu = ({ label, iconName: Icon, to, submenuItems, isDisabled = false, isCollapsed = false }) => {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const navigate = useNavigate();
-
-//   // Close submenu when sidebar collapses
-//   useEffect(() => {
-//     if (isCollapsed && isOpen) {
-//       setIsOpen(false);
-//     }
-//   }, [isCollapsed, isOpen]);
-
-//   const handleClick = () => {
-//     // Don't allow submenu expansion when sidebar is collapsed
-//     if (isCollapsed) {
-//       if (to) {
-//         navigate(to);
-//       }
-//       return;
-//     }
-
-//     if (submenuItems?.length) {
-//       setIsOpen(!isOpen);
-//     } else if (to) {
-//       navigate(to);
-//     }
-//   };
-
-//   return (
-//     <div className="sidebar-menu w-full">
-//       <button
-//         className={`flex w-full items-center ${isCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 text-white 
-//         hover:bg-sky-700 rounded-md transition-transform duration-150
-//         active:scale-95 active:bg-sky-800
-//         ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
-//         onClick={handleClick}
-//         title={isCollapsed ? label : undefined}
-//       >
-//         <Icon className={`${isCollapsed ? 'w-5 h-5' : 'w-6 h-6'}`} />
-//         {!isCollapsed && <span className="font-semibold text-sm">{label}</span>}
-
-//         {!isCollapsed && submenuItems?.length > 0 && (
-//           <ChevronDown
-//             className={`ml-auto w-6 h-6 transition-transform ${
-//               isOpen ? "rotate-180" : ""
-//             }`}
-//           />
-//         )}
-//       </button>
-
-//       {isOpen && submenuItems?.length > 0 && (
-//         <ul className={`submenu-list mt-2 space-y-2 ${isCollapsed ? 'pl-2' : 'pl-6'}`}>
-//           {submenuItems.map((item, index) => (
-//             <li key={index}>
-//               {item.submenuItems ? (
-//                 <SidebarMenu {...item} isCollapsed={isCollapsed} />
-//               ) : (
-//                 <Link
-//                   to={item.to}
-//                   className={`flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-2 px-4'} py-2 text-white
-//                   hover:bg-sky-700 rounded-md transition-transform duration-150
-//                   active:scale-95 active:bg-sky-800`}
-//                   title={isCollapsed ? item.label : undefined}
-//                 >
-//                   <item.icon className={`${isCollapsed ? 'w-5 h-5' : 'w-6 h-6'}`} />
-//                   {!isCollapsed && <span className="text-sm">{item.label}</span>}
-//                 </Link>
-//               )}
-//             </li>
-//           ))}
-//         </ul>
-//       )}
-//     </div>
-//   );
-// };
-
-
-
-
-
 
 const SidebarMenu = ({
   label,
@@ -205,9 +126,7 @@ const SidebarMenu = ({
         )}
       </button>
 
-      {/* ──────────────────────────────────────────────── */}
-      {/* Expanded mode → inline dropdown (accordion)       */}
-      {/* ──────────────────────────────────────────────── */}
+
       {!isCollapsed && isOpen && submenuItems?.length > 0 && (
         <ul className="submenu-list mt-1.5 space-y-1 pl-11">
           {submenuItems.map((item, idx) => (
@@ -236,7 +155,7 @@ const SidebarMenu = ({
       {/* Collapsed mode → flyout panel to the right       */}
       {/* ──────────────────────────────────────────────── */}
       {isCollapsed && isOpen && submenuItems?.length > 0 && (
-       <div className="fixed inset-0 pointer-events-none z-50">
+       <div className="fixed inset-0 pointer-events-none z-[9999]">
     <div 
       style={{ 
         position: 'absolute',

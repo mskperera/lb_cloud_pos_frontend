@@ -23,7 +23,7 @@ export const setUserAssignedStores=async(userId)=>{
 
 }
 
- const getUserAssignedStores = async (userId) => {
+ export const getUserAssignedStores = async (userId) => {
   try {
  
     const tenantId = getTenantId();
