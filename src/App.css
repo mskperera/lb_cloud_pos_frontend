@@ -148,8 +148,6 @@ input {
 
 
 
-
-
 /* ///redesigned css/ */
 
 
@@ -337,6 +335,7 @@ input {
 
   /* Second row: Full-width Search */
   .lpos-search-container {
+     padding:0;
     grid-column: 1 / -1;         /* Span both columns */
     grid-row: 2;
     width: 100%;
@@ -467,4 +466,67 @@ input {
   background: rgba(0,0,0,0.5);
   backdrop-filter: blur(4px);
   z-index: 490;
+}
+
+
+
+/* Prevent unwanted zoom on tap in mobile browsers */
+button, 
+input, 
+select, 
+textarea,
+.lpos-menu-btn,
+.lpos-si-wrap > div,
+.lpos-product-card,
+.lpos-qty-btn,
+.lpos-btn-proceed {
+  touch-action: manipulation;           /* Best modern fix */
+  -webkit-tap-highlight-color: transparent;   /* Removes highlight + helps zoom */
+}
+
+/* Extra safety for iOS */
+@media (max-width: 639px) {
+  * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  button:active,
+  .lpos-menu-btn:active {
+    transform: scale(0.98);   /* Gives nice feedback without triggering zoom */
+  }
+}
+
+
+
+button, 
+.lpos-menu-btn,
+.lpos-icon-btn,
+.lpos-si-wrap > div {
+  font-size: 16px !important;   /* Minimum 16px prevents auto-zoom on iOS */
+}
+
+
+
+
+
+/* Anti-zoom fixes */
+button, [role="button"], .lpos-menu-btn, .lpos-product-card {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  font-size: 16px;                    /* Critical for iOS */
+}
+
+@media (max-width: 639px) {
+  * {
+    -webkit-touch-callout: none;
+  }
+}
+
+
+
+.lpos-menu-btn {
+  font-size: 16px;           /* Important for iOS */
+  touch-action: manipulation;
 }
