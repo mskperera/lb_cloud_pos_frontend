@@ -1,9 +1,7 @@
-
-
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ProductList from "../../components/register/productList/ProductList";
 import { useDispatch, useSelector } from "react-redux";
-import {  useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Payment from "../../components/register/payment/Payment";
 import {
   addOrder,
@@ -17,19 +15,44 @@ import ReturnOrder from "../../components/returnOrder/ReturnOrderComp";
 import HOCSession from "../../hocComponents/WrapperSession";
 import OrderListAll from "../../components/orderListAll/OrderListAll";
 import OrderList from "../../components/completedOrders/OrderList";
-import { FaCalendarCheck, FaCompressAlt,FaHistory, FaPlusCircle, FaSearch, FaTh, FaTimes } from "react-icons/fa";
+import {
+  FaCalendarCheck,
+  FaCompressAlt,
+  FaHistory,
+  FaPlusCircle,
+  FaSearch,
+  FaTh,
+  FaTimes,
+} from "react-icons/fa";
 import { setSelectedStore } from "../../state/store/storeSlice";
 import ProfileMenu from "../../components/ProfileMenu";
 import Barcode from "../../components/productSearch/Barcode";
-import posLogo from '../../assets/pos_logo_long.png';
+import posLogo from "../../assets/pos_logo_long.png";
 import DayEnd from "../dayend/DayEnd";
 import AddCustomProduct from "../../components/register/AddCustomProduct";
-import {  BellIcon, CalendarIcon, ExpandIcon, HistoryIcon, HomeIcon, MenuIcon, PlusIcon, RefreshCwIcon, SearchXIcon, ShoppingCartIcon, StoreIcon } from "lucide-react";
+import {
+  BellIcon,
+  CalendarIcon,
+  ExpandIcon,
+  HistoryIcon,
+  HomeIcon,
+  MenuIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  SearchXIcon,
+  ShoppingCartIcon,
+  StoreIcon,
+} from "lucide-react";
 import AdvancedProductSearch from "../../components/AdvancedProductSearch";
 
-
-
-const Sidebar = ({ expanded, onNavigate, onAction, storeName, isMobOpen, onMobClose }) => {
+const Sidebar = ({
+  expanded,
+  onNavigate,
+  onAction,
+  storeName,
+  isMobOpen,
+  onMobClose,
+}) => {
   const navItems = [
     { id: "new", icon: <ShoppingCartIcon />, label: "New Sale" },
     { id: "lookup", icon: <SearchXIcon />, label: "Item Lookup" },
@@ -44,20 +67,20 @@ const Sidebar = ({ expanded, onNavigate, onAction, storeName, isMobOpen, onMobCl
   return (
     <>
       {isMobOpen && (
-        <div 
-          onClick={onMobClose} 
+        <div
+          onClick={onMobClose}
           style={{
             position: "absolute",
             inset: 0,
             background: "rgba(0,0,0,0.4)",
             zIndex: 490,
-            backdropFilter: "blur(2px)"
+            backdropFilter: "blur(2px)",
           }}
         />
       )}
 
-      <aside 
-        className={cls} 
+      <aside
+        className={cls}
         style={{
           background: "var(--lpos-surface)",
           borderRight: "1px solid var(--lpos-border)",
@@ -82,18 +105,30 @@ const Sidebar = ({ expanded, onNavigate, onAction, storeName, isMobOpen, onMobCl
             </div>
 
             {/* Improved Tooltip - Only shows when NOT expanded */}
-            {!expanded && (
-              <div className="lpos-si-tooltip">
-                {item.label}
-              </div>
-            )}
+            {!expanded && <div className="lpos-si-tooltip">{item.label}</div>}
           </div>
         ))}
 
         {/* Divider */}
-        <div style={{ height: 1, background: "var(--lpos-border)", margin: "8px 4px" }} />
+        <div
+          style={{
+            height: 1,
+            background: "var(--lpos-border)",
+            margin: "8px 4px",
+          }}
+        />
 
-        <div className="lpos-sidebar-label" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--lpos-text-tertiary)", padding: "6px 8px 2px" }}>
+        <div
+          className="lpos-sidebar-label"
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: ".08em",
+            color: "var(--lpos-text-tertiary)",
+            padding: "6px 8px 2px",
+          }}
+        >
           Settings
         </div>
       </aside>
@@ -101,30 +136,30 @@ const Sidebar = ({ expanded, onNavigate, onAction, storeName, isMobOpen, onMobCl
   );
 };
 
-
 const Register = () => {
   const navigate = useNavigate();
   let { terminalId } = useParams();
 
   const dispatch = useDispatch();
- const isTauriApp = 'isTauri' in window && !!window.isTauri;
+  const isTauriApp = "isTauri" in window && !!window.isTauri;
 
-  useEffect(()=>{
+  useEffect(() => {
     const selectedStore = localStorage.getItem("selectedStore");
-    if(!selectedStore){
-      navigate('/home');
+    if (!selectedStore) {
+      navigate("/home");
     }
-  },[])
- 
+  }, []);
 
-  const [isReturnOrderPopupVisible, setIsReturnOrderPopupVisible] = useState(false);
+  const [isReturnOrderPopupVisible, setIsReturnOrderPopupVisible] =
+    useState(false);
 
-  const [isSalesHistoryPopupVisible, setIsSalesHistoryPopupVisible] = useState(false);
-      
+  const [isSalesHistoryPopupVisible, setIsSalesHistoryPopupVisible] =
+    useState(false);
+
   const [isDayEndPopupVisible, setIsDayEndPopupVisible] = useState(false);
-    const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  
-   const [isAddCustomProductShow, setIsAddCustomProductShow] = useState(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+
+  const [isAddCustomProductShow, setIsAddCustomProductShow] = useState(false);
 
   const [showPayment, setShowPayment] = useState(false);
 
@@ -143,20 +178,29 @@ const Register = () => {
   const addReturnedProductsHandler = (products) => {
     dispatch(addReturnedProduct({ returnedProducts: products }));
   };
-  
-  const buttons = [
 
-     {
-  label: "Item Lookup",
-  icon: <FaSearch className="text-sky-600 text-xl" />,
-  onClick: () => setShowAdvancedSearch(Math.random()),
-},
-    { label: "Sales History",     icon: <FaHistory className="text-teal-600 text-xl" />,      onClick: () => setIsSalesHistoryPopupVisible(true) },
- 
-  
- { label: "Add Custom Item",   icon: <FaPlusCircle className="text-orange-500 text-xl" />, onClick: () => setIsAddCustomProductShow(true) },
-     { label: "Day End",           icon: <FaCalendarCheck className="text-rose-600 text-xl" />, onClick: () => setIsDayEndPopupVisible(true) },
- 
+  const buttons = [
+    {
+      label: "Item Lookup",
+      icon: <FaSearch className="text-sky-600 text-xl" />,
+      onClick: () => setShowAdvancedSearch(Math.random()),
+    },
+    {
+      label: "Sales History",
+      icon: <FaHistory className="text-teal-600 text-xl" />,
+      onClick: () => setIsSalesHistoryPopupVisible(true),
+    },
+
+    {
+      label: "Add Custom Item",
+      icon: <FaPlusCircle className="text-orange-500 text-xl" />,
+      onClick: () => setIsAddCustomProductShow(true),
+    },
+    {
+      label: "Day End",
+      icon: <FaCalendarCheck className="text-rose-600 text-xl" />,
+      onClick: () => setIsDayEndPopupVisible(true),
+    },
   ];
 
   const handleProductClick = (p) => {
@@ -176,65 +220,61 @@ const Register = () => {
     dispatch(addOrder(order));
   };
 
-
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
-const ActionButtonsPopup = () => {
+  const ActionButtonsPopup = () => {
+    return (
+      <>
+        {showMoreMenu && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-8">
+            <div
+              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+              onClick={() => setShowMoreMenu(false)}
+            />
+            <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600">
+                {/* Title with icon inline */}
+                <h2 className="flex items-center gap-3">
+                  <FaTh className="text-xl" />
+                  <span className="text-xl font-bold">Menu</span>
+                </h2>
 
+                <button
+                  onClick={() => setShowMoreMenu(false)}
+                  className="p-3 rounded-full hover:bg-slate-200 hover:text-red-500 transition-all duration-200"
+                >
+                  <FaTimes className="text-2xl" />
+                </button>
+              </div>
 
-
-  return (
-    <>
- 
-       {showMoreMenu &&  <div className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-8">
-          <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-            onClick={() => setShowMoreMenu(false)}
-          />
-          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600">
-  {/* Title with icon inline */}
-  <h2 className="flex items-center gap-3">
-    <FaTh className="text-xl" />
-    <span className="text-xl font-bold">Menu</span>
-  </h2>
-
-  <button
-    onClick={() => setShowMoreMenu(false)}
-    className="p-3 rounded-full hover:bg-slate-200 hover:text-red-500 transition-all duration-200"
-  >
-    <FaTimes className="text-2xl" />
-  </button>
-</div>
-
-            <div className="p-6 space-y-2">
-              {buttons && buttons.map((btn,index) => {
-  
-                return (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      btn.onClick();
-                      setShowMoreMenu(false);
-                    }}
-                    className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl hover:bg-gray-100 transition-all group"
-                  >
-                    <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-gray-200 transition">
-                      {btn.icon}
-                    </div>
-                    <span className="font-semibold text-gray-800">{btn.label}</span>
-                  </button>
-                );
-              })}
+              <div className="p-6 space-y-2">
+                {buttons &&
+                  buttons.map((btn, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          btn.onClick();
+                          setShowMoreMenu(false);
+                        }}
+                        className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl hover:bg-gray-100 transition-all group"
+                      >
+                        <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-gray-200 transition">
+                          {btn.icon}
+                        </div>
+                        <span className="font-semibold text-gray-800">
+                          {btn.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+              </div>
             </div>
-   
           </div>
-        </div>
-}
-    </>
-  );
-};
-
+        )}
+      </>
+    );
+  };
 
   const handleBarcodeEnter = (p) => {
     const description = `${p.productName}`;
@@ -253,22 +293,17 @@ const ActionButtonsPopup = () => {
     dispatch(addOrder(order));
   };
 
-
-
   const [isFullScreen, setIsFullScreen] = useState(false);
   const { selectedStore } = useSelector((state) => state.store);
 
-   useEffect(() => {
-    if(!selectedStore){
-
-      const store = JSON.parse(localStorage.getItem('selectedStore'));
-      dispatch(setSelectedStore({ selectedStore:store }));
-      
+  useEffect(() => {
+    if (!selectedStore) {
+      const store = JSON.parse(localStorage.getItem("selectedStore"));
+      dispatch(setSelectedStore({ selectedStore: store }));
     }
   }, []);
 
-
- useEffect(() => {
+  useEffect(() => {
     // Sync state when Fullscreen API is used
     const handleChange = () => setIsFullScreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handleChange);
@@ -289,7 +324,6 @@ const ActionButtonsPopup = () => {
     };
   }, []);
 
-
   const [expanded, setExpanded] = useState(false);
 
   const [mobSidebarOpen, setMobSidebarOpen] = useState(false);
@@ -298,74 +332,136 @@ const ActionButtonsPopup = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
   const storeName = selectedStore?.storeName || null;
+  const [hideProductList, setHideProductList] = useState(false);
 
+  // Better resize handler
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 640;
+      setIsMobile(mobile);
 
-// Better resize handler
-useEffect(() => {
-  const handleResize = () => {
-    const mobile = window.innerWidth < 640;
-    setIsMobile(mobile);
+      // Critical Fix: Close mobile sidebar when switching to desktop
+      if (!mobile && mobSidebarOpen) {
+        setMobSidebarOpen(false);
+      }
+    };
 
-    // Critical Fix: Close mobile sidebar when switching to desktop
-    if (!mobile && mobSidebarOpen) {
-      setMobSidebarOpen(false);
-    }
-  };
-
-  window.addEventListener('resize', handleResize);
-  return () => window.removeEventListener('resize', handleResize);
-}, [mobSidebarOpen]);
-
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [mobSidebarOpen]);
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(()=>{});
-    else document.exitFullscreen?.().catch(()=>{});
+    if (!document.fullscreenElement)
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    else document.exitFullscreen?.().catch(() => {});
   };
-  
 
   const handleAction = (id) => {
     setMobSidebarOpen(false);
-        if (id === "new") {  
-            dispatch(clearOrderList({}));
-            dispatch(setCustomer({ customer: null }));
-          }
-    if (id === "home") { navigate("/home") }
-    if (id === "history") {  setIsSalesHistoryPopupVisible(true) }
-    if (id === "dayend") { setIsDayEndPopupVisible(true) }
-    if (id === "custom") { setIsAddCustomProductShow(true)}
-    if (id === "lookup") { setShowAdvancedSearch(Math.random()) }
-
+    if (id === "new") {
+      dispatch(clearOrderList({}));
+      dispatch(setCustomer({ customer: null }));
+    }
+    if (id === "home") {
+      navigate("/home");
+    }
+    if (id === "history") {
+      setIsSalesHistoryPopupVisible(true);
+    }
+    if (id === "dayend") {
+      setIsDayEndPopupVisible(true);
+    }
+    if (id === "custom") {
+      setIsAddCustomProductShow(true);
+    }
+    if (id === "lookup") {
+      setShowAdvancedSearch(Math.random());
+    }
   };
 
+  // const Topbar = () => (
+  //     <header className="lpos-topbar">
+  //       <div className="lpos-topbar-left">
+  //     {/* In Topbar */}
+  // <button
+  //   onClick={() => {
+  //     if (isMobile) {
+  //       setMobSidebarOpen(v=>!v);
+  //     } else {
+  //       setExpanded(v => !v);
+  //     }
+  //   }}
+  //   className="lpos-menu-btn"
+  // >
+  //   <MenuIcon />
+  // </button>
 
-const Topbar = () => (
+  //       {!isMobile ?  <img
+  //           src={posLogo}
+  //           alt="Legend POS"
+  //           className="lpos-logo h-8"
+  //         />
+
+  // :null}
+  //   </div>
+
+  //       {/* Search - Full width on mobile, inline on desktop */}
+  //       <div className="lpos-search-container">
+  //         <Barcode
+  //           onProductSelect={handleProductClick}
+  //           onBarcodeEnter={handleBarcodeEnter}
+  //           isMobile={isMobile}
+  //         />
+  //       </div>
+
+  //        {/* Right */}
+  //       <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
+  //         {[<BellIcon/>,<RefreshCwIcon/>].map((ic,i) => (
+  //           <button key={i} style={{width:36,height:36,borderRadius:10,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .15s"}}
+  //           onMouseEnter={e=>{e.currentTarget.style.background="var(--lpos-border)";}}
+  //           onMouseLeave={e=>{e.currentTarget.style.background="var(--lpos-bg)";}}>
+  //             {ic}
+  //           </button>
+  //         ))}
+  //         {storeName && (
+  //           <div style={{display:"flex",alignItems:"center",gap:6,padding:"0 12px",height:36,background:"var(--lpos-bg)",borderRadius:10,fontSize:13,fontWeight:500,color:"var(--lpos-text-secondary)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}}>
+  //             <StoreIcon/>{storeName}
+  //           </div>
+  //         )}
+  //         <button onClick={toggleFullscreen} style={{width:36,height:36,borderRadius:10,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}} title={isFullScreen?"Exit Full Screen":"Full Screen"}>
+  //           {isFullScreen?<FaCompressAlt/>:<ExpandIcon/>}
+  //         </button>
+  //         {/* <div style={{width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#0071e3,#0a84ff)",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"var(--lpos-shadow-sm)"}}>
+  //           {storeName ? storeName.charAt(0).toUpperCase() : "U"}
+  //         </div> */}
+  //            <ProfileMenu />
+  //       </div>
+
+  //     </header>
+  //   );
+
+  const Topbar = () => (
     <header className="lpos-topbar">
       <div className="lpos-topbar-left">
-    {/* In Topbar */}
-<button 
-  onClick={() => {
-    if (isMobile) {
-      setMobSidebarOpen(v=>!v);
-    } else {
-      setExpanded(v => !v);
-    }
-  }} 
-  className="lpos-menu-btn"
->
-  <MenuIcon />
-</button>
+        <button
+          onClick={() => {
+            if (isMobile) {
+              setMobSidebarOpen((v) => !v);
+            } else {
+              setExpanded((v) => !v);
+            }
+          }}
+          className="lpos-menu-btn"
+        >
+          <MenuIcon />
+        </button>
 
+        {!isMobile && (
+          <img src={posLogo} alt="Legend POS" className="lpos-logo h-8" />
+        )}
+      </div>
 
-      {!isMobile ?  <img 
-          src={posLogo} 
-          alt="Legend POS" 
-          className="lpos-logo h-8"
-        />
-    
-:null}
-  </div>
-
-      {/* Search - Full width on mobile, inline on desktop */}
+      {/* Search */}
       <div className="lpos-search-container">
         <Barcode
           onProductSelect={handleProductClick}
@@ -374,40 +470,72 @@ const Topbar = () => (
         />
       </div>
 
+      {/* Right Side Controls */}
+      <div
+        style={{
+          marginLeft: "auto",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        {/* New Toggle Button */}
+        {!isMobile && (
+          <button
+            onClick={() => setHideProductList((prev) => !prev)}
+            className="lpos-toggle-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+            title={
+              hideProductList
+                ? "Show Product List"
+                : "Hide Product List (Traditional Mode)"
+            }
+          >
+            {hideProductList ? (
+              <>
+                <FaTh className="text-lg" /> Show Items
+              </>
+            ) : (
+              <>
+                <FaCompressAlt className="text-lg" /> Traditional Mode
+              </>
+            )}
+          </button>
+        )}
 
-
-       {/* Right */}
-      <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
-        {[<BellIcon/>,<RefreshCwIcon/>].map((ic,i) => (
-          <button key={i} style={{width:36,height:36,borderRadius:10,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .15s"}}
-          onMouseEnter={e=>{e.currentTarget.style.background="var(--lpos-border)";}}
-          onMouseLeave={e=>{e.currentTarget.style.background="var(--lpos-bg)";}}>
+        {[<BellIcon />, <RefreshCwIcon />].map((ic, i) => (
+          <button
+            key={i}
+            className="lpos-icon-btn"
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background = "var(--lpos-border)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "var(--lpos-bg)")
+            }
+          >
             {ic}
           </button>
         ))}
+
         {storeName && (
-          <div style={{display:"flex",alignItems:"center",gap:6,padding:"0 12px",height:36,background:"var(--lpos-bg)",borderRadius:10,fontSize:13,fontWeight:500,color:"var(--lpos-text-secondary)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}}>
-            <StoreIcon/>{storeName}
+          <div className="lpos-store-name">
+            <StoreIcon />
+            {storeName}
           </div>
         )}
-        <button onClick={toggleFullscreen} style={{width:36,height:36,borderRadius:10,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}} title={isFullScreen?"Exit Full Screen":"Full Screen"}>
-          {isFullScreen?<FaCompressAlt/>:<ExpandIcon/>}
+
+        <button
+          onClick={toggleFullscreen}
+          className="lpos-icon-btn"
+          title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
+        >
+          {isFullScreen ? <FaCompressAlt /> : <ExpandIcon />}
         </button>
-        {/* <div style={{width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#0071e3,#0a84ff)",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"var(--lpos-shadow-sm)"}}>
-          {storeName ? storeName.charAt(0).toUpperCase() : "U"}
-        </div> */}
-           <ProfileMenu />
+
+        <ProfileMenu />
       </div>
-
-
-
     </header>
   );
-
-
-
-
-
 
   return (
     <HOCSession terminalId={terminalId}>
@@ -465,56 +593,64 @@ const Topbar = () => (
       ) : (
         <>
           <div id="lpos-toast" />
-          <div className="lpos-app" style={{display:"flex",flexDirection:"column",height:"100vh",overflow:"hidden"}}>
-            <Topbar
-     
-        />
+          <div
+            className="lpos-app"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100vh",
+              overflow: "hidden",
+            }}
+          >
+            <Topbar />
 
-      
+            <div className="bg-blue-600"
+              style={{
+                display: "flex",
+                flex: 1,
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              <Sidebar
+                expanded={expanded}
+                onAction={handleAction}
+                storeName={storeName}
+                isMobOpen={mobSidebarOpen}
+                onMobClose={() => setMobSidebarOpen(false)}
+              />
 
-
-        <div style={{display:"flex",flex:1,overflow:"hidden",position:"relative"}}>
-       
-         <Sidebar
-  expanded={expanded}
-  onAction={handleAction}
-  storeName={storeName}
-  isMobOpen={mobSidebarOpen}
-  onMobClose={() => setMobSidebarOpen(false)}
-/>
-
-
-{isMobile && mobSidebarOpen && (
-  <div 
-    className="lpos-mobile-backdrop show"
-    onClick={() => setMobSidebarOpen(false)}
-  />
-)}
-
-                  <ProductList
-                        
-        
-            selectedCategoryId={selectedCategoryId}
-  
-            onProductClick={handleProductClick}
-           // isLoading={isLoading}
-            //cartQtyMap={cartQtyMap}
-           // totalRecords={totalRecords || products.length}
-          //  rowsPerPage={rowsPerPage}
-           // currentPage={currentPage}
-          //  onPageChange={onPageChange}
-            onMobClose={() => setMobProductsOpen(false)}
-        
-                  
-                  />
-
-  <OrderListAll />
+              {isMobile && mobSidebarOpen && (
+                <div
+                  className="lpos-mobile-backdrop show"
+                  onClick={() => setMobSidebarOpen(false)}
+                />
+              )}
 
 
-              
-                </div>
-        </div>
-      </>
+{!hideProductList ?  <>
+ <ProductList
+                selectedCategoryId={selectedCategoryId}
+                onProductClick={handleProductClick}
+                onMobClose={() => setMobProductsOpen(false)}
+              />
+
+     <OrderListAll />
+</>
+             :
+             
+
+             <OrderListAll isTraditionalMode={hideProductList} />
+
+             }
+
+             
+
+
+
+            </div>
+          </div>
+        </>
       )}
     </HOCSession>
   );

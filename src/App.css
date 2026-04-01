@@ -530,3 +530,25 @@ button, [role="button"], .lpos-menu-btn, .lpos-product-card {
   font-size: 16px;           /* Important for iOS */
   touch-action: manipulation;
 }
+
+
+/* Traditional Mode Toggle Button */
+.lpos-toggle-btn {
+  background: var(--lpos-bg);
+  color: var(--lpos-text-secondary);
+  border: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  height: 38px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.lpos-toggle-btn:hover {
+  background: var(--lpos-accent);
+  color: white;
+}
+
+.lpos-toggle-btn:active {
+  transform: scale(0.96);
+}
