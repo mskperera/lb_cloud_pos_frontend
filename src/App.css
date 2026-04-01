@@ -170,7 +170,7 @@ input {
     --lpos-radius-md: 14px;
     --lpos-sidebar-w: 58px;
     --lpos-sidebar-w-exp: 216px;
-    --lpos-cart-w: 340px;
+    --lpos-cart-w: 430px; /* 340px; */
     --lpos-trans: 0.25s cubic-bezier(0.4,0,0.2,1);
   }
   .lpos-app * { box-sizing: border-box; }

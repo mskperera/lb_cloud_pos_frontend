@@ -16,7 +16,7 @@ import AddCustomProduct from "../register/AddCustomProduct";
 
 import { ShoppingCartIcon, UserIcon } from "lucide-react";
 
-const OrderListAll = () => {
+const OrderListAll = ({ isTraditionalMode = false }) => {
   const navigate = useNavigate();
   let { terminalId } = useParams();
   const dispatch = useDispatch();
@@ -171,16 +171,16 @@ const OrderListAll = () => {
         <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
       </DialogModel>
 
-    <div style={{width:"var(--lpos-cart-w)",background:"var(--lpos-surface)",borderLeft:"1px solid var(--lpos-border)",display:"flex",flexDirection:"column",overflow:"hidden",flexShrink:0}} className="lpos-cart">
+    <div style={{width: isTraditionalMode ? "100%" : "var(--lpos-cart-w)", background:"var(--lpos-surface)",borderLeft: isTraditionalMode ? "none" : "1px solid var(--lpos-border)",display:"flex",flexDirection:"column",overflow:"hidden",flexShrink:0, margin: isTraditionalMode ? "0 auto" : "0", maxWidth: isTraditionalMode ? "1200px" : "none"}} className="lpos-cart">
    
 
-          <Customer />
+       <Customer />
 
-    <ProductOrderList showDiscountPopup={showDiscountPopupHandler} />
+    <ProductOrderList showDiscountPopup={showDiscountPopupHandler} isTraditionalMode={isTraditionalMode} />
    
 
         {orderSummary.overallDiscounts > 0 && (
-          <div className="flex justify-between items-center h-14 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="flex justify-between items-center h-14 bg-white rounded-lg shadow-sm border border-gray-200 p-4" style={{ margin: isTraditionalMode ? "12px 16px 0" : "0" }}>
             <div className="text-sm font-medium text-gray-700">
               {`Overall Discount: ${overallDiscountData[0].value}${overallDiscountData[0].symbol} - ${overallDiscountData[0].overallDiscountReasonName}`}
             </div>
@@ -202,7 +202,7 @@ const OrderListAll = () => {
 
 {/* Action Buttons */}
         <div style={{
-          padding: "14px 18px",
+          padding: isTraditionalMode ? "14px 16px" : "14px 18px",
           display: "flex",
           gap: 10,
           flexShrink: 0

@@ -34,14 +34,19 @@ import {
   BellIcon,
   CalendarIcon,
   ExpandIcon,
+  GripIcon,
   HistoryIcon,
   HomeIcon,
   MenuIcon,
+  MenuSquareIcon,
   PlusIcon,
   RefreshCwIcon,
   SearchXIcon,
   ShoppingCartIcon,
+  SquareMenuIcon,
   StoreIcon,
+  TableIcon,
+  ToiletIcon,
 } from "lucide-react";
 import AdvancedProductSearch from "../../components/AdvancedProductSearch";
 
@@ -52,6 +57,9 @@ const Sidebar = ({
   storeName,
   isMobOpen,
   onMobClose,
+  hideProductList,
+  setHideProductList,
+  isMobile,
 }) => {
   const navItems = [
     { id: "new", icon: <ShoppingCartIcon />, label: "New Sale" },
@@ -131,6 +139,28 @@ const Sidebar = ({
         >
           Settings
         </div>
+
+        {/* Toggle Products Settings Item */}
+        {!isMobile && (
+          <div className="lpos-si-wrap relative">
+            <div
+              onClick={() => onAction("toggleProducts")}
+              className="flex items-center gap-10 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
+            >
+              <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                {hideProductList ? <GripIcon /> : <TableIcon />}
+              </span>
+              <span className="lpos-si-label">
+                {hideProductList ? "Menu View" : "Traditional View"}
+              </span>
+            </div>
+            {!expanded && (
+              <div className="lpos-si-tooltip">
+                {hideProductList ? "Menu View" : "Traditional View"}
+              </div>
+            )}
+          </div>
+        )}
       </aside>
     </>
   );
@@ -344,6 +374,11 @@ const Register = () => {
       if (!mobile && mobSidebarOpen) {
         setMobSidebarOpen(false);
       }
+
+      if(mobile){
+        setHideProductList(false); // Always show product list on mobile for better UX
+      }
+
     };
 
     window.addEventListener("resize", handleResize);
@@ -377,68 +412,11 @@ const Register = () => {
     if (id === "lookup") {
       setShowAdvancedSearch(Math.random());
     }
+    if (id === "toggleProducts") {
+      setHideProductList((prev) => !prev);
+    }
   };
 
-  // const Topbar = () => (
-  //     <header className="lpos-topbar">
-  //       <div className="lpos-topbar-left">
-  //     {/* In Topbar */}
-  // <button
-  //   onClick={() => {
-  //     if (isMobile) {
-  //       setMobSidebarOpen(v=>!v);
-  //     } else {
-  //       setExpanded(v => !v);
-  //     }
-  //   }}
-  //   className="lpos-menu-btn"
-  // >
-  //   <MenuIcon />
-  // </button>
-
-  //       {!isMobile ?  <img
-  //           src={posLogo}
-  //           alt="Legend POS"
-  //           className="lpos-logo h-8"
-  //         />
-
-  // :null}
-  //   </div>
-
-  //       {/* Search - Full width on mobile, inline on desktop */}
-  //       <div className="lpos-search-container">
-  //         <Barcode
-  //           onProductSelect={handleProductClick}
-  //           onBarcodeEnter={handleBarcodeEnter}
-  //           isMobile={isMobile}
-  //         />
-  //       </div>
-
-  //        {/* Right */}
-  //       <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
-  //         {[<BellIcon/>,<RefreshCwIcon/>].map((ic,i) => (
-  //           <button key={i} style={{width:36,height:36,borderRadius:10,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .15s"}}
-  //           onMouseEnter={e=>{e.currentTarget.style.background="var(--lpos-border)";}}
-  //           onMouseLeave={e=>{e.currentTarget.style.background="var(--lpos-bg)";}}>
-  //             {ic}
-  //           </button>
-  //         ))}
-  //         {storeName && (
-  //           <div style={{display:"flex",alignItems:"center",gap:6,padding:"0 12px",height:36,background:"var(--lpos-bg)",borderRadius:10,fontSize:13,fontWeight:500,color:"var(--lpos-text-secondary)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}}>
-  //             <StoreIcon/>{storeName}
-  //           </div>
-  //         )}
-  //         <button onClick={toggleFullscreen} style={{width:36,height:36,borderRadius:10,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}} title={isFullScreen?"Exit Full Screen":"Full Screen"}>
-  //           {isFullScreen?<FaCompressAlt/>:<ExpandIcon/>}
-  //         </button>
-  //         {/* <div style={{width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#0071e3,#0a84ff)",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"var(--lpos-shadow-sm)"}}>
-  //           {storeName ? storeName.charAt(0).toUpperCase() : "U"}
-  //         </div> */}
-  //            <ProfileMenu />
-  //       </div>
-
-  //     </header>
-  //   );
 
   const Topbar = () => (
     <header className="lpos-topbar">
@@ -479,28 +457,7 @@ const Register = () => {
           gap: 8,
         }}
       >
-        {/* New Toggle Button */}
-        {!isMobile && (
-          <button
-            onClick={() => setHideProductList((prev) => !prev)}
-            className="lpos-toggle-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
-            title={
-              hideProductList
-                ? "Show Product List"
-                : "Hide Product List (Traditional Mode)"
-            }
-          >
-            {hideProductList ? (
-              <>
-                <FaTh className="text-lg" /> Show Items
-              </>
-            ) : (
-              <>
-                <FaCompressAlt className="text-lg" /> Traditional Mode
-              </>
-            )}
-          </button>
-        )}
+
 
         {[<BellIcon />, <RefreshCwIcon />].map((ic, i) => (
           <button
@@ -604,7 +561,7 @@ const Register = () => {
           >
             <Topbar />
 
-            <div className="bg-blue-600"
+            <div 
               style={{
                 display: "flex",
                 flex: 1,
@@ -618,6 +575,8 @@ const Register = () => {
                 storeName={storeName}
                 isMobOpen={mobSidebarOpen}
                 onMobClose={() => setMobSidebarOpen(false)}
+                hideProductList={hideProductList}
+           
               />
 
               {isMobile && mobSidebarOpen && (
