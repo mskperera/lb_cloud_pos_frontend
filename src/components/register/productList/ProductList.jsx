@@ -569,25 +569,15 @@ console.log('product000000',p);
 
                     return (
                       <div
+                      className="border text-md border-gray-200 bg-white rounded-lg p-3 cursor-pointer transition-all flex flex-col gap-4 relative"
                         key={index}
                         onClick={() => handleProductVariationClick(p, selectedProduct)}
-                        style={{
-                          backgroundColor:"white",
-                          border:"1.5px solid var(--lpos-border)",
-                          borderRadius:12,
-                          padding:12,
-                          cursor:"pointer",
-                          transition:"all 0.2s",
-                          display:"flex",
-                          flexDirection:"column",
-                          gap:6,
-                          minHeight:140,
-                          position:"relative"
-                        }}
+                    
                         onMouseEnter={(e)=>{e.currentTarget.style.borderColor="var(--lpos-accent)";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.1)";}}
                         onMouseLeave={(e)=>{e.currentTarget.style.borderColor="var(--lpos-border)";e.currentTarget.style.boxShadow="none";}}
                       >
-                        <p style={{fontSize:10,color:"var(--lpos-text-tertiary)",fontWeight:600,fontFamily:"monospace"}}>{p.sku || "N/A"}</p>
+                        <p className="p-2 bg-gray-700 text-white rounded-lg text-sm" style={{color:"var(--lpos-text-tertiary)",fontWeight:600,fontFamily:"monospace"}}>{p.sku || "N/A"}</p>
+
                         <p style={{fontSize:12,fontWeight:600,color:"var(--lpos-text-primary)",lineHeight:1.3}}>{variationLabel}</p>
                         <p style={{fontSize:14,fontWeight:700,color:"var(--lpos-accent)",marginTop:"auto"}}>{formatCurrency(p.unitPrice, true)}</p>
                         {selectedProduct.isStockTracked && p.stockQty <= 0 ? (
