@@ -170,7 +170,7 @@ input {
     --lpos-radius-md: 14px;
     --lpos-sidebar-w: 58px;
     --lpos-sidebar-w-exp: 216px;
-    --lpos-cart-w: 340px;
+    --lpos-cart-w: 430px; /* 340px; */
     --lpos-trans: 0.25s cubic-bezier(0.4,0,0.2,1);
   }
   .lpos-app * { box-sizing: border-box; }
@@ -529,4 +529,26 @@ button, [role="button"], .lpos-menu-btn, .lpos-product-card {
 .lpos-menu-btn {
   font-size: 16px;           /* Important for iOS */
   touch-action: manipulation;
+}
+
+
+/* Traditional Mode Toggle Button */
+.lpos-toggle-btn {
+  background: var(--lpos-bg);
+  color: var(--lpos-text-secondary);
+  border: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  height: 38px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.lpos-toggle-btn:hover {
+  background: var(--lpos-accent);
+  color: white;
+}
+
+.lpos-toggle-btn:active {
+  transform: scale(0.96);
 }

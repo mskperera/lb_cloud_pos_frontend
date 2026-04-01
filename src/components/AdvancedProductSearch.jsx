@@ -4,7 +4,9 @@ import { getProducts } from "../functions/register";
 import { getDropdownMeasurementUnit, getDrpdownCategory, getStoresDrp } from "../functions/dropdowns";
 import DaisyUIPaginator from './DaisyUIPaginator';
 import { useToast } from "./useToast";
-import { FaTimes } from "react-icons/fa";
+import { FaSignInAlt, FaTimes } from "react-icons/fa";
+import { SignalHighIcon, XIcon } from "lucide-react";
+import CloseButton from "./buttons/CloseButton";
 
 const AdvancedProductSearch = ({ visible, onHide, onProductSelect, showOnlyProductItems }) => {
   const [products, setProducts] = useState([]);
@@ -149,142 +151,218 @@ useEffect(() => {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4" onClick={(e) => e.target === e.currentTarget && onHide()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-1 xs:p-2 sm:p-4" onClick={(e) => e.target === e.currentTarget && onHide()}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Main Panel */}
-      <div className="relative w-full h-full sm:h-auto sm:max-w-7xl sm:max-h-[92vh] bg-white rounded-none sm:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
-        {/* Header */}
-         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600">
-           <h2 className="text-lg sm:text-xl font-bold">Advanced Product Search</h2>
-          <button onClick={onHide}  className="p-2 sm:p-3 rounded-full hover:bg-slate-200 hover:text-red-500 transition-all duration-200 touch-manipulation">
-            <FaTimes className="text-xl sm:text-2xl" />
-          </button>
+      <div className="relative w-full h-full lg:h-auto lg:max-w-7xl lg:max-h-[92vh] bg-white rounded-none lg:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
+        {/* Header - Responsive */}
+        <div className="flex items-center justify-between px-2 xs:px-3 sm:px-4 py-2.5 xs:py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600 flex-shrink-0">
+          <h2 className="text-base xs:text-lg sm:text-xl lg:text-lg font-bold truncate">Advanced Product Search</h2>
+     
+      <CloseButton onClick={onHide} />
         </div>
 
         {/* Body */}
         <div className="flex-1 overflow-hidden flex flex-col">
-          {/* Filters */}
-          <div className="p-3 sm:p-6 space-y-4 sm:space-y-5 bg-gray-50 border-b">
-            {/* Filter By Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-5">
+          {/* Filters - Responsive */}
+          <div className="px-2 xs:px-3 sm:px-4 lg:px-6 py-2.5 xs:py-3 sm:py-4 lg:py-5 space-y-2.5 xs:space-y-3 sm:space-y-4 lg:space-y-5 bg-gray-50 border-b flex-shrink-0 overflow-y-auto">
+            
+            {/* Mobile: Compact Filter Layout */}
+            <div className="lg:hidden space-y-2.5 xs:space-y-3">
+              {/* Filter By Dropdown */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Filter By</label>
+                <label className="block text-xs xs:text-sm font-semibold text-gray-700 mb-1.5">Filter By</label>
                 <select
                   value={selectedFilterBy.value}
                   onChange={(e) => setSelectedFilterBy({ value: +e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-base"
+                  className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 rounded-lg xs:rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-xs xs:text-sm"
                 >
-                  <option value={7}>Product Description</option>
-                  <option value={2}>Product Name</option>
+                  <option value={7}>Description</option>
+                  <option value={2}>Name</option>
                   <option value={3}>Barcode</option>
                   <option value={6}>SKU</option>
                   <option value={4}>Category</option>
-                  <option value={5}>Measurement Unit</option>
+                  <option value={5}>Unit</option>
                 </select>
               </div>
 
-              {/* Search Controls - Full width on mobile */}
-              <div className="sm:col-span-3 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3 sm:gap-4">
-                {[1,2,3,6,7].includes(selectedFilterBy.value) && (
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2 sm:hidden">Search</label>
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      value={searchValue.value}
-                      onChange={(e) => setSearchValue({ value: e.target.value })}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                      placeholder="Search products..."
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-base"
-                    />
-                  </div>
-                )}
-                {selectedFilterBy.value === 4 && (
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2 sm:hidden">Category</label>
-                    <select
-                      value={selectedCategoryId}
-                      onChange={(e) => setSelectedCategoryId(+e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                    >
-                      {categoryOptions.map(c => <option key={c.id} value={c.id}>{c.displayName}</option>)}
-                    </select>
-                  </div>
-                )}
-                {selectedFilterBy.value === 5 && (
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2 sm:hidden">Unit</label>
-                    <select
-                      value={selectedMeasurementUnitId}
-                      onChange={(e) => setSelectedMeasurementUnitId(+e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                    >
-                      {measurementUnitOptions.map(u => <option key={u.id} value={u.id}>{u.displayName}</option>)}
-                    </select>
-                  </div>
-                )}
-                <button
-                  onClick={handleSearch}
-                  className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-sky-600 text-white font-medium rounded-xl hover:bg-sky-700 active:bg-sky-800 transition touch-manipulation"
+              {/* Search Input - Mobile */}
+              {[1,2,3,6,7].includes(selectedFilterBy.value) && (
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchValue.value}
+                  onChange={(e) => setSearchValue({ value: e.target.value })}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Search..."
+                  className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 rounded-lg xs:rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-xs xs:text-sm"
+                />
+              )}
+
+              {/* Category Select - Mobile */}
+              {selectedFilterBy.value === 4 && (
+                <select
+                  value={selectedCategoryId}
+                  onChange={(e) => setSelectedCategoryId(+e.target.value)}
+                  className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 rounded-lg xs:rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-xs xs:text-sm"
                 >
-                  Search
-                </button>
+                  {categoryOptions.map(c => <option key={c.id} value={c.id}>{c.displayName}</option>)}
+                </select>
+              )}
+
+              {/* Unit Select - Mobile */}
+              {selectedFilterBy.value === 5 && (
+                <select
+                  value={selectedMeasurementUnitId}
+                  onChange={(e) => setSelectedMeasurementUnitId(+e.target.value)}
+                  className="w-full px-2.5 xs:px-3 sm:px-4 py-2 xs:py-2.5 sm:py-3 rounded-lg xs:rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-xs xs:text-sm"
+                >
+                  {measurementUnitOptions.map(u => <option key={u.id} value={u.id}>{u.displayName}</option>)}
+                </select>
+              )}
+
+              {/* Search Button - Full Width Mobile */}
+              <button
+                onClick={handleSearch}
+                className="w-full px-3 xs:px-4 py-2.5 xs:py-3 bg-sky-600 text-white font-medium text-xs xs:text-sm rounded-lg xs:rounded-xl hover:bg-sky-700 active:bg-sky-800 transition touch-manipulation"
+              >
+                Search
+              </button>
+
+              {/* Results Count - Mobile */}
+              <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center gap-2 text-xs xs:text-sm text-gray-600 font-medium">
+                <span>{totalRecords} found</span>
+                <div className="w-full xs:w-auto">
+                  <DaisyUIPaginator
+                    currentPage={currentPage}
+                    rowsPerPage={rowsPerPage}
+                    totalRecords={totalRecords}
+                    onPageChange={({page, rows}) => {setCurrentPage(page); setRowsPerPage(rows);}}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Results and Pagination */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
-              <span className="text-sm text-gray-600 font-medium">{totalRecords} products found</span>
-              <div className="w-full sm:w-auto">
-                <DaisyUIPaginator
-                  currentPage={currentPage}
-                  rowsPerPage={rowsPerPage}
-                  totalRecords={totalRecords}
-                  onPageChange={({page, rows}) => {setCurrentPage(page); setRowsPerPage(rows);}}
-                />
+            {/* Desktop: Full Filter Layout */}
+            <div className="hidden lg:block space-y-5">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Filter By</label>
+                  <select
+                    value={selectedFilterBy.value}
+                    onChange={(e) => setSelectedFilterBy({ value: +e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm"
+                  >
+                    <option value={7}>Product Description</option>
+                    <option value={2}>Product Name</option>
+                    <option value={3}>Barcode</option>
+                    <option value={6}>SKU</option>
+                    <option value={4}>Category</option>
+                    <option value={5}>Measurement Unit</option>
+                  </select>
+                </div>
+
+                <div className="lg:col-span-3 flex items-end gap-5">
+                  {[1,2,3,6,7].includes(selectedFilterBy.value) && (
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Search</label>
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchValue.value}
+                        onChange={(e) => setSearchValue({ value: e.target.value })}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        placeholder="Search products..."
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm"
+                      />
+                    </div>
+                  )}
+                  {selectedFilterBy.value === 4 && (
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                      <select
+                        value={selectedCategoryId}
+                        onChange={(e) => setSelectedCategoryId(+e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm"
+                      >
+                        {categoryOptions.map(c => <option key={c.id} value={c.id}>{c.displayName}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  {selectedFilterBy.value === 5 && (
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
+                      <select
+                        value={selectedMeasurementUnitId}
+                        onChange={(e) => setSelectedMeasurementUnitId(+e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm"
+                      >
+                        {measurementUnitOptions.map(u => <option key={u.id} value={u.id}>{u.displayName}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleSearch}
+                    className="px-8 py-3 bg-sky-600 text-white font-medium text-sm rounded-xl hover:bg-sky-700 active:bg-sky-800 transition touch-manipulation flex-shrink-0"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+
+              {/* Results and Pagination - Desktop */}
+              <div className="flex justify-between items-center gap-5">
+                <span className="text-sm text-gray-600 font-medium">{totalRecords} products found</span>
+                <div className="w-auto">
+                  <DaisyUIPaginator
+                    currentPage={currentPage}
+                    rowsPerPage={rowsPerPage}
+                    totalRecords={totalRecords}
+                    onPageChange={({page, rows}) => {setCurrentPage(page); setRowsPerPage(rows);}}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Products List */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+          <div className="flex-1 overflow-y-auto px-2 xs:px-3 sm:px-4 lg:px-4 py-2 xs:py-3 sm:py-4">
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+            <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
                   <tr>
                     {["SKU", "Description", "Price", "Stock", "Action"].map(h => (
-                      <th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-               
-              {products.length === 0 ? 
-                  <tr>
-                    <td colSpan={5} className="text-center py-20 text-gray-500">
-                      <div className="text-4xl mb-3">📦</div>
-                      <div className="text-lg font-medium">No products found</div>
-                      <div className="text-sm mt-1">Try adjusting your search filters</div>
-                    </td>
-                  </tr>
-              : isTableDataLoading ? (
-                  <tr>
-                    <td colSpan={5} className="text-center py-16">
-                      <div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
-                      <div className="text-sm text-gray-600 mt-3">Loading products...</div>
-                    </td>
-                  </tr>
-              ) : (
-                  products.map((item, i) => (
+                  {products.length === 0 ? 
+                    <tr>
+                      <td colSpan={5} className="text-center py-16 lg:py-20 text-gray-500">
+                        <div className="text-3xl lg:text-4xl mb-2 lg:mb-3">📦</div>
+                        <div className="text-base lg:text-lg font-medium">No products found</div>
+                        <div className="text-xs lg:text-sm mt-1">Try adjusting your search filters</div>
+                      </td>
+                    </tr>
+                  : isTableDataLoading ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-12 lg:py-16">
+                        <div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
+                        <div className="text-xs lg:text-sm text-gray-600 mt-2 lg:mt-3">Loading products...</div>
+                      </td>
+                    </tr>
+                  ) : (
+                    products.map((item, i) => (
                 
   <tr
     key={i}
-    tabIndex={0}  // Critical: Makes row focusable
+    tabIndex={0}
     className={`
-      hover:bg-sky-50 transition cursor-pointer outline-none 
+      hover:bg-sky-50 transition cursor-pointer outline-none text-sm
       ${selectedRowIndex === i ? 'bg-sky-100 ring-2 ring-sky-500 ring-inset' : ''}
     `}
     onClick={() => setSelectedRowIndex(i)}
@@ -295,26 +373,24 @@ useEffect(() => {
         onHide();
       }
     }}
-    // Auto-focus the selected row
     ref={(el) => {
       if (selectedRowIndex === i && el) {
         el.focus();
       }
     }}
   >
-    {/* <td className="px-6 py-4 font-medium">{item.productNo}</td> */}
-    <td className="px-6 py-4 text-gray-600">{item.sku || "-"}</td>
-    <td className="px-6 py-4 font-medium text-gray-800">{item.productDescription}</td>
-    <td className="px-6 py-4 font-semibold text-sky-600">{formatCurrency(item.unitPrice)}</td>
-    <td className="px-6 py-4">{item.stockQty ?? "-"}</td>
-    <td className="px-6 py-4">
+    <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-600">{item.sku || "-"}</td>
+    <td className="px-4 lg:px-6 py-3 lg:py-4 font-medium text-gray-800 truncate">{item.productDescription}</td>
+    <td className="px-4 lg:px-6 py-3 lg:py-4 font-semibold text-sky-600">{formatCurrency(item.unitPrice)}</td>
+    <td className="px-4 lg:px-6 py-3 lg:py-4">{item.stockQty ?? "-"}</td>
+    <td className="px-4 lg:px-6 py-3 lg:py-4">
       <button
         onClick={(e) => {
           e.stopPropagation();
           onProductSelect(item);
           onHide();
         }}
-        className="px-5 py-2 bg-sky-600 text-white font-medium rounded-lg hover:bg-sky-700 active:scale-95 transition"
+        className="px-4 py-1.5 lg:py-2 bg-sky-600 text-white font-medium text-xs lg:text-sm rounded-lg hover:bg-sky-700 active:scale-95 transition whitespace-nowrap"
       >
         Select
       </button>
@@ -329,7 +405,6 @@ useEffect(() => {
 
 
 
-                 
                 ))
                 )}
 
@@ -337,61 +412,114 @@ useEffect(() => {
             </table>
             </div>
 
-            {/* Mobile Card View */}
-            <div className="md:hidden space-y-3">
+            {/* Tablet Card View (md to lg) */}
+            <div className="hidden md:block lg:hidden space-y-2">
               {products.length === 0 ? (
-                <div className="text-center py-16 text-gray-500">
-                  <div className="text-4xl mb-3">📦</div>
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-3xl mb-2">📦</div>
                   <div className="text-sm font-medium">No products found</div>
                   <div className="text-xs mt-1">Try adjusting your search filters</div>
                 </div>
               ) : isTableDataLoading ? (
-                <div className="text-center py-16">
+                <div className="text-center py-12">
                   <div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
-                  <div className="text-sm text-gray-600 mt-3">Loading products...</div>
+                  <div className="text-xs text-gray-600 mt-2">Loading products...</div>
                 </div>
               ) : (
                 products.map((item, i) => (
                   <div
                     key={i}
                     className={`
-                      bg-white rounded-xl border border-gray-200 p-4 cursor-pointer transition-all
-                      hover:bg-gray-50 active:bg-gray-100
+                      bg-white rounded-lg border border-gray-200 p-3 cursor-pointer transition-all
+                      hover:bg-gray-50 active:bg-gray-100 text-sm
                       ${selectedRowIndex === i ? 'ring-2 ring-sky-500 bg-sky-50' : ''}
                     `}
                     onClick={() => setSelectedRowIndex(i)}
                   >
-                    <div className="flex justify-between items-start mb-3">
+                    <div className="flex justify-between items-start gap-2 mb-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-800 text-sm leading-tight mb-1">
+                        <div className="font-semibold text-gray-800 text-sm mb-1 line-clamp-2">
                           {item.productDescription}
                         </div>
                         <div className="text-xs text-gray-500 font-mono">
-                          SKU: {item.sku || "N/A"}
+                          {item.sku || "N/A"}
                         </div>
                       </div>
-                      <div className="text-right ml-3">
-                        <div className="text-lg font-bold text-sky-600">
+                      <div className="text-right flex-shrink-0">
+                        <div className="font-bold text-sky-600 text-sm">
                           {formatCurrency(item.unitPrice)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          Stock: {item.stockQty ?? "N/A"}
+                          {item.stockQty ?? "N/A"}
                         </div>
                       </div>
                     </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onProductSelect(item);
+                        onHide();
+                      }}
+                      className="w-full px-3 py-2 bg-sky-600 text-white font-medium text-xs rounded-lg hover:bg-sky-700 active:scale-95 transition touch-manipulation"
+                    >
+                      Select
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
 
-                    <div className="flex justify-end">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onProductSelect(item);
-                          onHide();
-                        }}
-                        className="w-full px-6 py-3 bg-sky-600 text-white font-medium rounded-lg hover:bg-sky-700 active:scale-95 transition touch-manipulation"
-                      >
-                        Select Product
-                      </button>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-2 xs:space-y-2.5">
+              {products.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <div className="text-3xl mb-2">📦</div>
+                  <div className="text-xs xs:text-sm font-medium">No products found</div>
+                  <div className="text-xs mt-0.5">Try adjusting filters</div>
+                </div>
+              ) : isTableDataLoading ? (
+                <div className="text-center py-10">
+                  <div className="inline-block animate-spin w-7 h-7 border-3 border-sky-500 border-t-transparent rounded-full"></div>
+                  <div className="text-xs text-gray-600 mt-2">Loading...</div>
+                </div>
+              ) : (
+                products.map((item, i) => (
+                  <div
+                    key={i}
+                    className={`
+                      bg-white rounded-lg border border-gray-200 p-2.5 xs:p-3 cursor-pointer transition-all active:bg-gray-100 text-xs xs:text-sm
+                      ${selectedRowIndex === i ? 'ring-2 ring-sky-500 bg-sky-50' : ''}
+                    `}
+                    onClick={() => setSelectedRowIndex(i)}
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-800 line-clamp-2">
+                          {item.productDescription}
+                        </div>
+                        <div className="text-xs text-gray-500 font-mono mt-0.5">
+                          {item.sku || "N/A"}
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0 ml-1">
+                        <div className="font-bold text-sky-600">
+                          {formatCurrency(item.unitPrice)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {item.stockQty ?? "N/A"}
+                        </div>
+                      </div>
                     </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onProductSelect(item);
+                        onHide();
+                      }}
+                      className="w-full px-3 py-2 bg-sky-600 text-white font-medium text-xs rounded-lg hover:bg-sky-700 active:scale-95 transition touch-manipulation"
+                    >
+                     Select
+                    </button>
                   </div>
                 ))
               )}

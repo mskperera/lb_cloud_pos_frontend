@@ -7,9 +7,9 @@ import {
 } from "../../../state/orderList/orderListSlice";
 import { DISCOUNT_TYPES, CURRENCY_DISPLAY_TYPE } from "../../../utils/constants";
 import { formatCurrency, getCurrency } from '../../../utils/format';
-import { PackageIcon, PercentCircle, PercentCircleIcon, XIcon } from "lucide-react";
+import { PackageIcon, PercentCircle, PercentCircleIcon, XIcon, Trash2 } from "lucide-react";
 
-export default function ProductOrderList({ showDiscountPopup }) {
+export default function ProductOrderList({ showDiscountPopup, isTraditionalMode = false }) {
   const orderList = useSelector((state) => state.orderList);
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
@@ -46,6 +46,303 @@ export default function ProductOrderList({ showDiscountPopup }) {
     dispatch(cancelDiscount({ orderListId: product.orderListId }));
   };
 
+  if (isTraditionalMode) {
+    // Traditional POS Table Mode
+    return (
+      <div className="lpos-scroll" style={{
+        flex: 1,
+        overflowY: "auto",
+        background: "var(--lpos-surface)"
+      }}>
+        {products.length === 0 ? (
+          <div style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            color: "var(--lpos-text-tertiary)",
+            fontSize: 14,
+            fontWeight: 500,
+            minHeight: 180,
+            opacity: 0.6
+          }}>
+            <div style={{ fontSize: 48, opacity: 0.3 }}>
+              <PackageIcon size={48} strokeWidth={1.2} />
+            </div>
+            <span>No products added</span>
+            <span style={{ fontSize: 13 }}>Add items to get started</span>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {/* Table Header */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "50px 80px 1fr 90px 120px 90px 80px",
+              gap: "12px",
+              padding: "12px 16px",
+              background: "var(--lpos-bg)",
+              borderBottom: "2px solid var(--lpos-border)",
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              fontSize: 12,
+              fontWeight: 700,
+              color: "var(--lpos-text-secondary)",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px"
+            }}>
+              <div>#</div>
+              <div>SKU</div>
+              <div>Description</div>
+              <div style={{ textAlign: "right" }}>Unit Price</div>
+              <div style={{ textAlign: "center" }}>Qty + Unit</div>
+              <div style={{ textAlign: "right" }}>Total</div>
+              <div style={{ textAlign: "center" }}>Actions</div>
+            </div>
+
+            {/* Table Rows */}
+            <div>
+              {products.map((product, idx) => {
+                const hasDiscount = Boolean(product?.discount);
+                const lineTotal = product.netAmount || (product.unitPrice * product.qty);
+                const unitPrice = product.unitPrice || 0;
+                const discountAmount = product.discount?.discountAmount || 0;
+
+                return (
+                  <div key={product.orderListId}>
+                    {/* Main Row */}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "50px 80px 1fr 90px 120px 90px 80px",
+                        gap: "12px",
+                        padding: "12px 16px",
+                        alignItems: "center",
+                        borderBottom: "1px solid var(--lpos-border)",
+                        background: idx % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)",
+                        transition: "background 0.15s"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(0,0,0,0.04)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = idx % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)";
+                      }}
+                    >
+                      {/* Line Number */}
+                      <div style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: "var(--lpos-text-secondary)"
+                      }}>
+                        {product.originalLineNumber}
+                      </div>
+
+                      {/* SKU */}
+                      <div style={{
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: "var(--lpos-text-tertiary)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                      }} title={product.sku}>
+                        {product.sku || "—"}
+                      </div>
+
+
+                      {/* Description */}
+                      <div style={{
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: "var(--lpos-text-primary)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                      }} title={product.description}>
+                        {product.description}
+                      </div>
+
+                      {/* Unit Price */}
+                      <div style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        textAlign: "right",
+                        color: "var(--lpos-text-primary)"
+                      }}>
+                        {formatCurrency(unitPrice, true)}
+                      </div>
+
+                      {/* Qty + Unit */}
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6
+                      }}>
+                        <button
+                          className="lpos-qty-btn"
+                          onClick={() => handleQtyChange(product, product.qty - 1)}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            padding: 0,
+                            fontSize: 12,
+                            minWidth: "auto"
+                          }}
+                        >
+                          −
+                        </button>
+                        <span style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          minWidth: 30,
+                          textAlign: "center"
+                        }}>
+                          {product.qty}
+                        </span>
+                        <button
+                          className="lpos-qty-btn"
+                          onClick={() => handleQtyChange(product, product.qty + 1)}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            padding: 0,
+                            fontSize: 12,
+                            minWidth: "auto"
+                          }}
+                        >
+                          +
+                        </button>
+                        <span style={{
+                          fontSize: 11,
+                          color: "var(--lpos-text-tertiary)",
+                          minWidth: 35,
+                          textAlign: "right"
+                        }}>
+                          {product.measurementUnitName || ""}
+                        </span>
+                      </div>
+
+                      {/* Total */}
+                      <div style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        textAlign: "right",
+                        color: hasDiscount ? "var(--lpos-green)" : "var(--lpos-text-primary)"
+                      }}>
+                        {formatCurrency(lineTotal, true)}
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6
+                      }}>
+                        <button
+                          onClick={() => handleDiscountClick(product)}
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 6,
+                            border: hasDiscount ? "1px solid var(--lpos-green)" : "1px solid var(--lpos-border)",
+                            background: hasDiscount ? "rgba(52,199,89,.15)" : "white",
+                            color: hasDiscount ? "var(--lpos-green)" : "var(--lpos-text-secondary)",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 12,
+                            padding: 0,
+                            transition: "all 0.15s"
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = "var(--lpos-green)";
+                            e.currentTarget.style.background = "rgba(52,199,89,.2)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = hasDiscount ? "var(--lpos-green)" : "var(--lpos-border)";
+                            e.currentTarget.style.background = hasDiscount ? "rgba(52,199,89,.15)" : "white";
+                          }}
+                          title="Apply Discount"
+                        >
+                          <PercentCircle size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleRemove(product)}
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 6,
+                            border: "1px solid var(--lpos-border)",
+                            background: "white",
+                            color: "var(--lpos-text-secondary)",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: 0,
+                            transition: "all 0.15s"
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = "var(--lpos-red)";
+                            e.currentTarget.style.background = "rgba(255,59,48,.1)";
+                            e.currentTarget.style.color = "var(--lpos-red)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = "var(--lpos-border)";
+                            e.currentTarget.style.background = "white";
+                            e.currentTarget.style.color = "var(--lpos-text-secondary)";
+                          }}
+                          title="Remove Item"
+                        >
+                          <Trash2 size={14} strokeWidth={2} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Discount Row - if applicable */}
+                    {hasDiscount && (
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "50px 80px 1fr 90px 120px 90px 80px",
+                        gap: "12px",
+                        padding: "8px 16px",
+                        background: "rgba(52,199,89,.08)",
+                        borderBottom: "1px solid rgba(52,199,89,.2)",
+                        alignItems: "center",
+                        fontSize: 12
+                      }}>
+                        <div></div>
+                        <div></div>
+                        <div style={{ color: "var(--lpos-green)", fontWeight: 500 }}>
+                          <span>Discount: {product.discount.discountValue}{product.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE ? "%" : ` ${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)}`}</span>
+                          {product.discount.reasonName && <span> • {product.discount.reasonName}</span>}
+                        </div>
+                        <div style={{
+                          textAlign: "right",
+                          color: "var(--lpos-green)",
+                          fontWeight: 600
+                        }}>
+                          -{formatCurrency(discountAmount, true)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Original Card Mode (default)
   return (
     <div className="lpos-scroll" style={{
       flex: 1,
