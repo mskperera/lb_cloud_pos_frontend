@@ -11,7 +11,6 @@ const ProductItem = ({ p, handleProductClick }) => {
   const isDisabled = false;
 
   const variationProducts=JSON.parse(p.variationProducts);
-  console.log('p,,,,',variationProducts)
   // === Variation Product ===
   if (isVariationProduct) {
   
@@ -23,7 +22,7 @@ const ProductItem = ({ p, handleProductClick }) => {
           rounded-xl cursor-pointer p-6 border border-gray-200
           min-h-[100px] w-full min-w-44
           transition-all duration-300 ease-out
-         hover:shadow-xl hover:border-sky-400
+         hover:shadow-md hover:border-sky-400
           active:scale-95
           ${isDisabled ? "opacity-50 pointer-events-none" : ""}
         `}
@@ -32,7 +31,7 @@ const ProductItem = ({ p, handleProductClick }) => {
       >
         {/* Image (if exists) */}
         {hasImage && (
-          <div className="absolute top-2 left-2 w-14 h-14 rounded-lg overflow-hidden shadow-sm ring-1 ring-gray-200">
+          <div className="absolute top-2 left-2 w-14 h-14 rounded-lg overflow-hidden ring-1 ring-gray-200">
             <img
               src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
               alt={p.productName}

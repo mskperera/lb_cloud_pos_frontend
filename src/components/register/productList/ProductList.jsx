@@ -16,19 +16,6 @@ import { ChevronDownIcon, PackageIcon, XIcon } from "lucide-react";
 
 
 
-// const CategoryItem = ({ c, handleProductClick,selectedCategoryId }) => {
-
-//   return (
-// <div
-//   className={`rounded-lg cursor-pointer
-//    hover:bg-orange-100 p-2 border-2 border-gray-200 text-center flex  justify-center items-center ${c.categoryId===selectedCategoryId && 'border-orange-600 bg-orange-200'}`}
-//   onClick={() => handleProductClick(c)}
-// >
-//   {c.categoryName}
-// </div>
-
-//   );
-// };
 
 const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
   const [overflowIds, setOverflowIds] = useState([]);
@@ -137,64 +124,7 @@ const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
   );
 };
 
-const CategoryItem = ({ c, handleProductClick, selectedCategoryId }) => {
-  const isSelected = c.categoryId === selectedCategoryId;
 
-  return (
-    <div
-      onClick={() => handleProductClick(c)}
-      className={`
-        relative flex items-center gap-4 p-4 rounded-2xl cursor-pointer
-        transition-all duration-300 group
-        ${isSelected 
-          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-xl shadow-orange-500/30' 
-          : 'bg-white hover:bg-orange-50 border border-gray-200 hover:border-orange-300'
-        }
-
-        active:scale-95 
-
-      `}
-    >
-      {/* Icon / Avatar */}
-      <div className={`
-        w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg
-        transition-all duration-300
-        ${isSelected 
-          ? 'bg-white/20 text-white shadow-lg' 
-          : 'bg-gradient-to-br from-orange-100 to-orange-200 text-orange-700 group-hover:from-orange-200 group-hover:to-orange-300'
-        }
-      `}>
-        {c.categoryName.charAt(0).toUpperCase()}
-      </div>
-
-      {/* Category Name */}
-      <span className={`
-        font-semibold text-base tracking-wide flex-1
-        ${isSelected ? 'text-white' : 'text-gray-800 group-hover:text-orange-700'}
-      `}>
-        {c.categoryName}
-      </span>
-
-      {/* Right Arrow / Active Indicator */}
-      <div className="flex items-center">
-        {isSelected ? (
-          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-          </svg>
-        ) : (
-          <svg className="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        )}
-      </div>
-
-      {/* Active Left Border */}
-      {isSelected && (
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-r-full" />
-      )}
-    </div>
-  );
-};
 const ProductList = ({onMobClose}) => {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
@@ -222,6 +152,10 @@ const ProductList = ({onMobClose}) => {
     setSelectedCategoryId(c.categoryId);
     setCurrentPage(0);
     loadProducts(c.categoryId, 0, rowsPerPage);
+
+    setSelectedVariationProducts([]);
+    setVariationPath([]);
+    setVariationLevel(0);
   };
 
   const onPageChange = ({ page, rows }) => {
@@ -343,8 +277,7 @@ console.log('product000000',p);
           };
           dispatch(addOrder(order));
         } else {
-          // If variations exist, show dialog and set up variation selection
-          setIsVariationSelectionMenuShow(true);
+          // If variations exist, show inline in main product list area
           setSelectedVariationProducts(variations);
           setSelectedProduct(p);
           setVariationLevel(0);
@@ -457,7 +390,10 @@ console.log('product000000',p);
              imageUrl:selectedProduct.imageUrl
     };
     dispatch(addOrder(order));
-    setIsVariationSelectionMenuShow(false);
+    // Exit variation selection mode
+    setSelectedVariationProducts([]);
+    setVariationPath([]);
+    setVariationLevel(0);
   };
 
   function useContainerWidth(ref) {
@@ -495,164 +431,7 @@ console.log('product000000',p);
 
 
 
-    <DialogModel
-  header={
-    <div className="flex items-center gap-2">
-      <FaPalette className="h-5 w-5 text-white" />
-      <span className="font-semibold text-lg">{selectedProduct.productName}</span>
-    </div>
-  }
-  visible={isVariationSelectionMenuShow}
-  onHide={() => setIsVariationSelectionMenuShow(false)}
-  className="w-full max-w-4xl"
->
-  <div className="p-6 bg-gradient-to-b from-gray-50 to-white rounded-xl">
-    {/* Breadcrumb Navigation */}
-    <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6 flex-wrap">
-      <button
-        onClick={handleBack}
-        className="p-1.5 rounded-full hover:bg-sky-100 transition-colors"
-        title="Back"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 text-sky-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
 
-      <button
-        onClick={() => {
-          setVariationLevel(0);
-          setVariationPath([]);
-          setCurrentVariations(
-            getVariationValuesForType(
-              selectedVariationProducts,
-              getVariationTypes(selectedVariationProducts)[0],
-              []
-            )
-          );
-        }}
-        className="px-2 py-1 rounded-md hover:bg-sky-100 hover:text-sky-600 transition-all font-medium"
-      >
-       {selectedProduct.productName}
-      </button>
-
-      {variationPath.map((p, index) => (
-        <React.Fragment key={index}>
-          <span className="text-gray-400">/</span>
-          <button
-            onClick={() => handleBreadcrumbClick(index)}
-            className="px-2 py-1 rounded-md hover:bg-sky-100 hover:text-sky-600 transition-all font-medium capitalize"
-          >
-            {p.value}
-          </button>
-        </React.Fragment>
-      ))}
-    </nav>
-
-    {/* Variation Grid */}
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {currentVariations.length > 0 ? (
-        variationLevel < getVariationTypes(selectedVariationProducts).length - 1 ? (
-          /* === Option Level (e.g., Size, Color) === */
-          currentVariations.map((value, index) => (
-            <div
-              key={index}
-              onClick={() =>
-                handleVariationSelect(
-                  value,
-                  getVariationTypes(selectedVariationProducts)[variationLevel]
-                )
-              }
-              className={`
-                group relative overflow-hidden
-                bg-white/70 backdrop-blur-sm
-                rounded-xl p-5 cursor-pointer
-                border border-gray-200
-                transition-all duration-300 ease-out
-                hover:scale-105 hover:shadow-lg hover:border-sky-400
-                hover:bg-gradient-to-br hover:from-sky-50 hover:to-white
-                active:scale-95
-              `}
-            >
-              <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-sky-100 flex items-center justify-center group-hover:bg-sky-200 transition-colors">
-                  <FaTag className="h-6 w-6 text-sky-600" />
-                </div>
-                <p className="font-semibold text-gray-800 text-sm tracking-tight">
-                  {value}
-                </p>
-              </div>
-            </div>
-          ))
-        ) : (
-          /* === Final Variation Level (SKU, Price, Stock) === */
-          currentVariations.map((p, index) => {
-            const variationLabel = JSON.parse(p.variationValues)
-              .map(v => v.variationValue)
-              .join(" • ");
-
-            return (
-              <div
-                key={index}
-                onClick={() => handleProductVariationClick(p, selectedProduct)}
-                className={`
-                  group relative overflow-hidden
-                  bg-white rounded-xl p-4 cursor-pointer
-                  border-2 transition-all duration-300
-                  hover:border-sky-400
-                  active:scale-95
-                `}
-              >
-                {/* Stock Badge */}
-                {selectedProduct.isStockTracked ? (
-                  <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold
-                    ${p.stockQty > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}
-                  `}>
-                    {/* {p.stockQty > 0 ? `${p.stockQty} left` : 'Out'} */}
-                  </div>
-                ):''}
-
-                {/* SKU */}
-                <p className="text-xs text-gray-500 font-mono mb-1">
-                  {p.sku || "N/A"}
-                </p>
-
-                {/* Variation Label */}
-                <p className="text-sm font-medium text-gray-700 line-clamp-2 mb-2">
-                  {variationLabel}
-                </p>
-
-                {/* Price */}
-                <p className="text-lg font-bold text-gray-800 text-center">
-                  {formatCurrency(p.unitPrice, true)}
-                </p>
-
-                {/* Hover Indicator */}
-                <div className="absolute inset-0 bg-sky-500 opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none" />
-              </div>
-            );
-          })
-        )
-      ) : (
-        /* === Empty State === */
-        <div className="col-span-full text-center py-12">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-            <FaSearch className="h-10 w-10 text-gray-400" />
-          </div>
-          <p className="text-gray-500 font-medium">No variations found</p>
-          <p className="text-sm text-gray-400 mt-1">Try selecting different options</p>
-        </div>
-      )}
-    </div>
-  </div>
-</DialogModel>
- 
    <div className="lpos-main lpos-scroll" style={{display:"flex",flexDirection:"column",overflow:"hidden",background:"var(--lpos-bg)",flex:1}}>
    
    
@@ -674,11 +453,63 @@ console.log('product000000',p);
       {/* Category tabs */}
       <CategoryBar categories={categories} selectedCategoryId={selectedCategoryId} onSelect={handleCategorySelect} />
     
-      {/* Section header */}
+      {/* Section header - Changes based on mode */}
       <div style={{padding:"14px 20px 2px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
-        <span style={{fontSize:18,fontWeight:700,letterSpacing:"-.3px"}}>{activeCatLabel}</span>
-        <span style={{fontSize:13,color:"var(--lpos-text-tertiary)",fontWeight:500}}>{products.length} item{products.length!==1?"s":""}</span>
+        {selectedVariationProducts.length > 0 ? (
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <button
+              onClick={() => {
+                setSelectedVariationProducts([]);
+                setVariationPath([]);
+                setVariationLevel(0);
+              }}
+         
+              style={{width:36,height:36,borderRadius:8,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18}}
+              title="Back to products"
+            >
+              <ChevronDownIcon  style={{transform:"rotate(90deg)"}}/>
+            </button>
+         
+          </div>
+        ) : null}
+         <>
+            <span style={{fontSize:18,fontWeight:700,letterSpacing:"-.3px"}}>{activeCatLabel}</span>
+            <span style={{fontSize:13,color:"var(--lpos-text-tertiary)",fontWeight:500}}>{products.length} item{products.length!==1?"s":""}</span>
+          </>
       </div>
+
+      {/* Breadcrumb Navigation for Variations */}
+      {selectedVariationProducts.length > 0 && (
+        <div style={{padding:"12px 20px 8px",borderBottom:"1px solid var(--lpos-border)",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",fontSize:13}}>
+          <button
+            onClick={() => {
+              setVariationLevel(0);
+              setVariationPath([]);
+              setCurrentVariations(
+                getVariationValuesForType(
+                  selectedVariationProducts,
+                  getVariationTypes(selectedVariationProducts)[0],
+                  []
+                )
+              );
+            }}
+            style={{color:"var(--lpos-accent)",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}
+          >
+            {selectedProduct.productName}
+          </button>
+          {variationPath.map((p, index) => (
+            <React.Fragment key={index}>
+              <span style={{color:"var(--lpos-text-tertiary)"}}>/</span>
+              <button
+                onClick={() => handleBreadcrumbClick(index)}
+                style={{color:"var(--lpos-accent)",fontWeight:500,background:"none",border:"none",cursor:"pointer",padding:0,textTransform:"capitalize"}}
+              >
+                {p.value}
+              </button>
+            </React.Fragment>
+          ))}
+        </div>
+      )}
 
 
 
@@ -690,6 +521,90 @@ console.log('product000000',p);
             <div style={{width:40,height:40,borderRadius:"50%",border:"3px solid var(--lpos-accent-medium)",borderTopColor:"var(--lpos-accent)",animation:"spin 0.8s linear infinite"}}/>
             <span style={{fontSize:14,fontWeight:500}}>Loading products…</span>
             <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+          </div>
+        ) : selectedVariationProducts.length > 0 ? (
+          /* === INLINE VARIATION SELECTION VIEW === */
+          <div>
+            {currentVariations.length > 0 ? (
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
+                {variationLevel < getVariationTypes(selectedVariationProducts).length - 1 ? (
+                  /* === Option Level (e.g., Size, Color) === */
+                  currentVariations.map((value, index) => (
+                    <div
+                      key={index}
+                      onClick={() =>
+                        handleVariationSelect(
+                          value,
+                          getVariationTypes(selectedVariationProducts)[variationLevel]
+                        )
+                      }
+                      style={{
+                        backgroundColor:"white",
+                        border:"1.5px solid var(--lpos-border)",
+                        borderRadius:12,
+                        padding:16,
+                        cursor:"pointer",
+                        textAlign:"center",
+                        transition:"all 0.2s",
+                        display:"flex",
+                        flexDirection:"column",
+                        alignItems:"center",
+                        justifyContent:"center",
+                        gap:8,
+                        minHeight:120
+                      }}
+                      onMouseEnter={(e)=>{e.currentTarget.style.borderColor="var(--lpos-accent)";e.currentTarget.style.backgroundColor="var(--lpos-accent-soft)";e.currentTarget.style.transform="scale(1.05)";}}
+                      onMouseLeave={(e)=>{e.currentTarget.style.borderColor="var(--lpos-border)";e.currentTarget.style.backgroundColor="white";e.currentTarget.style.transform="scale(1)";}}
+                    >
+                      <FaTag style={{fontSize:24,color:"var(--lpos-accent)",opacity:0.7}}/>
+                      <span style={{fontSize:13,fontWeight:600,color:"var(--lpos-text-primary)"}}>{value}</span>
+                    </div>
+                  ))
+                ) : (
+                  /* === Final Variation Level (SKU, Price, Stock) === */
+                  currentVariations.map((p, index) => {
+                    const variationLabel = JSON.parse(p.variationValues)
+                      .map(v => v.variationValue)
+                      .join(" • ");
+
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => handleProductVariationClick(p, selectedProduct)}
+                        style={{
+                          backgroundColor:"white",
+                          border:"1.5px solid var(--lpos-border)",
+                          borderRadius:12,
+                          padding:12,
+                          cursor:"pointer",
+                          transition:"all 0.2s",
+                          display:"flex",
+                          flexDirection:"column",
+                          gap:6,
+                          minHeight:140,
+                          position:"relative"
+                        }}
+                        onMouseEnter={(e)=>{e.currentTarget.style.borderColor="var(--lpos-accent)";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.1)";}}
+                        onMouseLeave={(e)=>{e.currentTarget.style.borderColor="var(--lpos-border)";e.currentTarget.style.boxShadow="none";}}
+                      >
+                        <p style={{fontSize:10,color:"var(--lpos-text-tertiary)",fontWeight:600,fontFamily:"monospace"}}>{p.sku || "N/A"}</p>
+                        <p style={{fontSize:12,fontWeight:600,color:"var(--lpos-text-primary)",lineHeight:1.3}}>{variationLabel}</p>
+                        <p style={{fontSize:14,fontWeight:700,color:"var(--lpos-accent)",marginTop:"auto"}}>{formatCurrency(p.unitPrice, true)}</p>
+                        {selectedProduct.isStockTracked && p.stockQty <= 0 ? (
+                          <span style={{fontSize:10,color:"var(--lpos-red)",fontWeight:600}}>Out of Stock</span>
+                        ):''}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            ) : (
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:300,gap:12,color:"var(--lpos-text-tertiary)"}}>
+                <FaSearch style={{fontSize:48,opacity:0.3}}/>
+                <span style={{fontSize:16,fontWeight:600,color:"var(--lpos-text-secondary)"}}>No variations found</span>
+                <span style={{fontSize:13}}>Try selecting different options</span>
+              </div>
+            )}
           </div>
         ) : products.length === 0 ? (
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"60%",gap:12,color:"var(--lpos-text-tertiary)"}}>
@@ -715,7 +630,7 @@ console.log('product000000',p);
     
   
         {/* Pagination */}
-        {totalRecords > rowsPerPage && (
+        {!selectedVariationProducts.length && totalRecords > rowsPerPage && (
           <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:8,marginTop:20}}>
             <button disabled={currentPage===0} onClick={()=>onPageChange({page:currentPage-1,rows:rowsPerPage})} style={{padding:"6px 14px",borderRadius:8,border:"1px solid var(--lpos-border)",background:"var(--lpos-surface)",cursor:currentPage===0?"not-allowed":"pointer",fontSize:13,fontWeight:600,color:"var(--lpos-text-secondary)",opacity:currentPage===0?.5:1}}>← Prev</button>
             <span style={{fontSize:13,color:"var(--lpos-text-secondary)",fontWeight:500}}>Page {currentPage+1} of {Math.ceil(totalRecords/rowsPerPage)}</span>
