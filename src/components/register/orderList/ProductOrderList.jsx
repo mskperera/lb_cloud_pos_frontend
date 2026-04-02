@@ -37,6 +37,8 @@ export default function ProductOrderList({ showDiscountPopup, isTraditionalMode 
       );
     }
   };
+  
+const [openMenuId, setOpenMenuId] = useState(null);
 
   const handleDiscountClick = (product) => {
     showDiscountPopup(product.orderListId);
@@ -343,260 +345,202 @@ export default function ProductOrderList({ showDiscountPopup, isTraditionalMode 
   }
 
   // Original Card Mode (default)
-  return (
-    <div className="lpos-scroll" style={{
-      flex: 1,
-      overflowY: "auto",
-      padding: "10px 18px",
-      display: "flex",
-      flexDirection: "column",
-      gap: 8,
-      background: "var(--lpos-surface)"
-    }}>
-      {products.length === 0 ? (
-        <div style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 12,
-          color: "var(--lpos-text-tertiary)",
-          fontSize: 14,
-          fontWeight: 500,
-          minHeight: 180,
-          opacity: 0.6
-        }}>
-          <div style={{ fontSize: 48, opacity: 0.3 }}>
-            <PackageIcon size={48} strokeWidth={1.2} />
-          </div>
-          <span>No products added</span>
-          <span style={{ fontSize: 13 }}>Add items from the product grid</span>
-        </div>
-      ) : (
-        products.map((product) => {
-          const hasDiscount = Boolean(product?.discount);
-          const lineTotal = product.netAmount || (product.unitPrice * product.qty);
-          const unitPrice = product.unitPrice || 0;
+// ==================== IMPROVED CARD MODE (Default) ====================
+return (
+  <div className="lpos-scroll" style={{
+    flex: 1,
+    overflowY: "auto",
+    padding: "12px 16px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    background: "var(--lpos-surface)"
+  }}>
+    {products.length === 0 ? (
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 12,
+        color: "var(--lpos-text-tertiary)",
+        fontSize: 14,
+        fontWeight: 500,
+        minHeight: 200,
+        opacity: 0.6
+      }}>
+        <PackageIcon size={48} strokeWidth={1.2} />
+        <span>No products added</span>
+        <span style={{ fontSize: 13 }}>Add items from the product grid</span>
+      </div>
+    ) : (
+      products.map((product) => {
+        const hasDiscount = Boolean(product?.discount);
+        const lineTotal = product.netAmount || (product.unitPrice * product.qty);
+        const unitPrice = product.unitPrice || 0;
 
-          return (
-            <div 
-              key={product.orderListId}
-              className="lpos-cart-item"
-              style={{
-                background: "var(--lpos-bg)",
-                borderRadius: "var(--lpos-radius-sm)",
-                padding: "12px 14px",
-                border: "1px solid transparent",
-                transition: "border-color .15s"
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--lpos-border)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "transparent"; }}
-            >
-              {/* Top Row */}
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                {/* Image */}
-                <div style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 10,
-                  background: "white",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  boxShadow: "var(--lpos-shadow-sm)",
-                  overflow: "hidden"
-                }}>
-                  {product.imageUrl ? (
-                    <img
-                      src={`${process.env.REACT_APP_API_CDN}/${product.imageUrl}?width=200&height=200&quality=80`}
-                      alt={product.description}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  ) : (
-                    <PackageIcon size={22} strokeWidth={1.8} color="var(--lpos-text-tertiary)" />
-                  )}
+        return (
+          <div
+            key={product.orderListId}
+            className="lpos-cart-item bg-white border border-transparent hover:border-gray-200 rounded-2xl transition-all duration-200 px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-5 relative"
+           style={{
+              background: "var(--lpos-bg)",
+              borderRadius: "var(--lpos-radius-md)",
+              padding: "14px 16px",
+              border: "1px solid transparent",
+              transition: "all 0.2s",
+            }}
+       
+       >
+            {/* Top Section */}
+            <div className="flex gap-3 sm:gap-4">
+              {/* Product Image */}
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-[52px] lg:h-[52px] rounded-xl bg-white flex-shrink-0 shadow-sm overflow-hidden">
+                {product.imageUrl ? (
+                  <img
+                    src={`${process.env.REACT_APP_API_CDN}/${product.imageUrl}?width=200&height=200&quality=80`}
+                    alt={product.description}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <PackageIcon size={24} strokeWidth={1.6} className="text-gray-400" />
+                  </div>
+                )}
+              </div>
+
+              {/* Product Info */}
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm sm:text-base lg:text-[15px] leading-tight line-clamp-2 mb-2 text-gray-900">
+                  {product.description}
                 </div>
 
-                {/* Product Info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: 13.5,
-                    fontWeight: 600,
-                    lineHeight: 1.35,
-                    marginBottom: 3,
-                    overflow: "hidden",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical"
-                  }}>
-                    {product.description}
-                  </div>
-
-                 
-                 <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-3 flex-wrap">
                   {product.sku && (
-                    <div className="text-gray-200 bg-gray-700 py-[1px] px-[6px]" style={{
-
-
-                      fontFamily: "monospace",
-                      borderRadius: 4,
-                      display: "inline-block",
-                      marginBottom: 4
-                    }}>
+                    <div className="text-[10px] sm:text-xs font-mono text-gray-200 bg-gray-700 px-1.5 py-0.5 rounded">
                       {product.sku}
                     </div>
                   )}
-
-
-                                   {/* Discount Button */}
-                <button
-                  onClick={() => handleDiscountClick(product)}
-                  className=""
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "6px 10px",
-                    borderRadius: 6,
-                    border: hasDiscount ? "1px solid var(--lpos-green)" : "1px solid var(--lpos-border)",
-                    background: hasDiscount ? "rgba(52,199,89,.1)" : "white",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: hasDiscount ? "var(--lpos-green)" : "var(--lpos-text-secondary)",
-                    cursor: "pointer",
-                    boxShadow: "var(--lpos-shadow-sm)",
-                    whiteSpace: "nowrap"
-                  }}
-                >
-                  <PercentCircle size={18} />
-                  {hasDiscount ? `${product.discount.discountValue}% off` : ""}
-                </button>
-</div>
-
-{/* <div className="flex items-center justify-between gap-6">
-                  <div style={{ fontSize: 12, color: "var(--lpos-text-secondary)", fontWeight: 500 }}>
-                   {formatCurrency(unitPrice,false)}
+                  <div className="text-sm sm:text-base font-medium text-gray-700">
+                    {formatCurrency(unitPrice)}
                   </div>
-
-                  
-       
-                </div> */}
-
-                </div>
-
-                {/* Remove Button */}
-                <button
-                  onClick={() => handleRemove(product)}
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                    border: "none",
-                    background: "none",
-                    color: "var(--lpos-text-tertiary)",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "all .15s"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255,59,48,.1)";
-                    e.currentTarget.style.color = "var(--lpos-red)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "none";
-                    e.currentTarget.style.color = "var(--lpos-text-tertiary)";
-                  }}
-                >
-                  <XIcon size={16} strokeWidth={3} />
-                </button>
-              </div>
-
-              {/* Bottom Row */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
-                {/* Quantity Controls */}
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <button
-                    className="lpos-qty-btn"
-                    onClick={() => handleQtyChange(product, product.qty - 1)}
-                    style={{ width: 28, height: 28 }}
-                  >
-                    −
-                  </button>
-                  <span style={{ 
-                    fontSize: 15, 
-                    fontWeight: 700, 
-                    minWidth: 28, 
-                    textAlign: "center" 
-                  }}>
-                    {product.qty}
-                  </span>
-                  <button
-                    className="lpos-qty-btn"
-                    onClick={() => handleQtyChange(product, product.qty + 1)}
-                    style={{ width: 28, height: 28 }}
-                  >
-                    +
-                  </button>
-                  {product.measurementUnitName && (
-                    <span style={{ fontSize: 12, color: "var(--lpos-text-tertiary)", marginLeft: 4 }}>
-                      {product.measurementUnitName}
-                    </span>
-                  )}
-                </div>
-
-        
-
-                {/* Net Amount */}
-                <div style={{
-                  marginLeft: "auto",
-                  fontSize: 14.5,
-                  fontWeight: 700,
-                  color: hasDiscount ? "var(--lpos-accent)" : "var(--lpos-text-primary)"
-                }}>
-                  {lineTotal.toFixed(2)}
                 </div>
               </div>
 
-              {/* Discount Info Row */}
-              {hasDiscount && (
-                <div style={{
-                  marginTop: 8,
-                  padding: "8px 12px",
-                  background: "rgba(52,199,89,.08)",
-                  borderRadius: 8,
-                  border: "1px solid rgba(52,199,89,.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  fontSize: 13
-                }}>
-                  <div style={{ color: "var(--lpos-green)", fontWeight: 500 }}>
-                    Discount: {product.discount.discountValue}
-                    {product.discount.discountTypeId === DISCOUNT_TYPES.PERCENTAGE ? "%" : ` ${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)}`}
-                    {" • "}{product.discount.reasonName}
+              {/* Dropdown Menu Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setOpenMenuId(openMenuId === product.orderListId ? null : product.orderListId)}
+                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all"
+                >
+                  <span className="text-2xl leading-none">⋯</span>
+                </button>
+
+                {/* Dropdown Menu */}
+                {openMenuId === product.orderListId && (
+                  <div className="absolute right-0 top-10 bg-white shadow-xl border border-gray-200 rounded-xl py-1 z-20 w-48 text-sm">
+                    <button
+                      onClick={() => {
+                        hasDiscount ? handleCancelDiscount(product) : handleDiscountClick(product);
+                        setOpenMenuId(null);
+                      }}
+
+                      className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 ${
+                        hasDiscount ? "text-red-600" : "text-gray-700"
+                      }`}
+                    >
+                      <PercentCircle size={18} />
+                      {hasDiscount ? "Remove Discount" : "Apply Discount"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        handleRemove(product);
+                        setOpenMenuId(null);
+                      }}
+                      className="w-full text-sm text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-red-600"
+                    >
+                      <Trash2 size={18} />
+                      Remove Item
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleCancelDiscount(product)}
-                    style={{
-                      color: "var(--lpos-red)",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: "2px 6px",
-                      borderRadius: 4
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          );
-        })
-      )}
-    </div>
-  );
+
+            {/* Bottom Bar - Quantity & Total */}
+            <div className="flex items-center justify-between mt-5">
+              {/* Quantity Controls */}
+              <div className="flex items-center gap-2">
+                <button
+                  className="lpos-qty-btn w-8 h-8 sm:w-9 sm:h-9 text-lg flex items-center justify-center"
+                  onClick={() => handleQtyChange(product, product.qty - 1)}
+                >
+                  −
+                </button>
+                <span className="font-bold text-base sm:text-lg w-8 text-center">
+                  {product.qty}
+                </span>
+                <button
+                  className="lpos-qty-btn w-8 h-8 sm:w-9 sm:h-9 text-lg flex items-center justify-center"
+                  onClick={() => handleQtyChange(product, product.qty + 1)}
+                >
+                  +
+                </button>
+
+                {product.measurementUnitName && (
+                  <span className="text-xs sm:text-sm text-gray-500 ml-2">
+                    {product.measurementUnitName}
+                  </span>
+                )}
+              </div>
+
+              {/* Line Total */}
+              <div className={`font-bold text-base sm:text-lg lg:text-xl ${
+                hasDiscount ? "text-green-600" : "text-gray-900"
+              }`}>
+                {formatCurrency(lineTotal,true)}
+              </div>
+            </div>
+
+
+
+
+                       {/* Discount Info Row - Shown only when discount is applied */}
+            {hasDiscount && (
+              <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between bg-green-50/70 rounded-xl px-4 py-2.5">
+                <div className="text-sm font-medium text-green-700">
+                  Discount: {product.discount.discountValue}
+                  {product.discount.discountTypeId === 1 ? "%" : ` ${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)}`}
+                  {product.discount.reasonName && ` • ${product.discount.reasonName}`}
+                </div>
+                
+           <button
+                  onClick={() => hasDiscount 
+                    ? handleCancelDiscount(product) 
+                    : handleDiscountClick(product)
+                  }
+                  className={`w-8 h-8 sm:w-9 sm:h-9 bg-white border rounded-xl flex items-center justify-center transition-all active:scale-95 ${
+                    hasDiscount 
+                      ? "border-red-400 text-red-500 hover:bg-red-50" 
+                      : "border-gray-200 hover:border-green-400 hover:text-green-500"
+                  }`}
+                  title={hasDiscount ? "Remove Discount" : "Apply Discount"}
+                >
+                  <PercentCircle 
+                    size={18} 
+                    strokeWidth={hasDiscount ? 3 : 2.5} 
+                  />
+                </button>
+              </div>
+            )}
+
+
+          </div>
+        );
+      })
+    )}
+  </div>
+);
 }

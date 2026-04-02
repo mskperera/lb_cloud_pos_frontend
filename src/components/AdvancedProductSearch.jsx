@@ -429,6 +429,13 @@ useEffect(() => {
                 products.map((item, i) => (
                   <div
                     key={i}
+                        style={{
+              background: "var(--lpos-bg)",
+              borderRadius: "var(--lpos-radius-md)",
+              padding: "14px 16px",
+              border: "1px solid transparent",
+              transition: "all 0.2s",
+            }}
                     className={`
                       bg-white rounded-lg border border-gray-200 p-3 cursor-pointer transition-all
                       hover:bg-gray-50 active:bg-gray-100 text-sm
@@ -486,8 +493,15 @@ useEffect(() => {
                 products.map((item, i) => (
                   <div
                     key={i}
+                        style={{
+              background: "var(--lpos-bg)",
+              borderRadius: "var(--lpos-radius-md)",
+
+              border: "1px solid transparent",
+              transition: "all 0.2s",
+            }}
                     className={`
-                      bg-white rounded-lg border border-gray-200 p-2.5 xs:p-3 cursor-pointer transition-all active:bg-gray-100 text-xs xs:text-sm
+                      p-2.5 xs:p-3 cursor-pointer transition-all active:bg-gray-100 text-xs xs:text-sm
                       ${selectedRowIndex === i ? 'ring-2 ring-sky-500 bg-sky-50' : ''}
                     `}
                     onClick={() => setSelectedRowIndex(i)}
@@ -516,7 +530,7 @@ useEffect(() => {
                         onProductSelect(item);
                         onHide();
                       }}
-                      className="w-full px-3 py-2 bg-sky-600 text-white font-medium text-xs rounded-lg hover:bg-sky-700 active:scale-95 transition touch-manipulation"
+                      className="w-full px-3 py-2 bg-sky-600 text-white  text-xs rounded-lg hover:bg-sky-700 active:scale-95 transition touch-manipulation"
                     >
                      Select
                     </button>

@@ -100,6 +100,13 @@ const Sidebar = ({
           flexShrink: 0,
         }}
       >
+
+        {isMobile && (
+          <div style={{display: "flex",  justifyContent: "center", alignItems: "center", padding: "8px 0", marginBottom: 4}}>
+            <img src={posLogo} alt="Legend POS" className=" w-auto h-6" />
+          </div>
+        )}
+
         {navItems.map((item) => (
           <div key={item.id} className="lpos-si-wrap relative">
             <div
@@ -576,7 +583,7 @@ const Register = () => {
                 isMobOpen={mobSidebarOpen}
                 onMobClose={() => setMobSidebarOpen(false)}
                 hideProductList={hideProductList}
-           
+           isMobile={isMobile}
               />
 
               {isMobile && mobSidebarOpen && (

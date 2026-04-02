@@ -4,6 +4,7 @@ import { getProducts } from '../../functions/register';
 import { useToast } from '../useToast';
 import { FaBarcode, FaSearch } from 'react-icons/fa';
 import { formatCurrency } from '../../utils/format';
+import { XIcon } from 'lucide-react';
 
 const ProductSearch = ({ onProductSelect, onBarcodeEnter,isMobile }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -216,14 +217,22 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter,isMobile }) => {
                 onClick={handleClear}
                 className="absolute right-4 text-gray-500 hover:text-red-600 transition z-10"
               >
-                <i className="pi pi-times text-lg"></i>
+              <XIcon />
               </button>
             )}
           </div>
 
           {/* Keyword Search Results Dropdown */}
           {!barcodeMode && (loading || products.length > 0) && (
-            <div className="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-40 max-h-96">
+            <div 
+              className="absolute top-full mt-2 w-full shadow-2xl z-40 max-h-96 overflow-hidden"
+    style={{
+      background: "var(--lpos-bg)",
+      borderRadius: "var(--lpos-radius-md)",
+      border: "1px solid var(--lpos-border)",
+      transition: "all 0.2s",
+    }}
+            >
               {loading ? (
                 <div className="p-10 text-center">
                   <div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
