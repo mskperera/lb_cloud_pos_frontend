@@ -65,7 +65,7 @@ const OrderSummary = () => {
         paddingTop: 10,
         borderTop: "1px solid var(--lpos-border)"
       }}>
-        <span>Total</span>
+        <span>Grand Total</span>
         <span style={{ 
           color: "var(--lpos-accent)", 
           fontSize: "17px" 
