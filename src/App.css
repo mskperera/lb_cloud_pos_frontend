@@ -172,6 +172,8 @@ input {
     --lpos-sidebar-w-exp: 216px;
     --lpos-cart-w: 430px; /* 340px; */
     --lpos-trans: 0.25s cubic-bezier(0.4,0,0.2,1);
+    --lpos-search-bg: #dbeafe;
+    --lpos-barcode-bg: #85f5a1;
   }
   .lpos-app * { box-sizing: border-box; }
   .lpos-app {

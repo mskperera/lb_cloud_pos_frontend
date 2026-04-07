@@ -378,3 +378,28 @@ export const voidOrder = async (data) => {
     return err;
   }
 };
+
+
+
+export const getBatchedItems = async (allProductId,storeIdId) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .get(`/stock/stockInfoBy_allProductId_storeId?allProductId=${allProductId}&storeId=${storeIdId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};

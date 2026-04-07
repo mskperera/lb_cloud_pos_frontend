@@ -159,6 +159,17 @@ const orderListSlice = createSlice({
             orderListSlice.caseReducers.calculateOrderSummary(state);
         },
 
+
+        updateOrderBatchId:(state,action)=>{
+            const {allProductId,storeId,stockBatchId}=action.payload;
+            state.list.forEach(order => {
+                if (allProductId===order.allProductId && order.storeId === storeId) {
+                    order.stockBatchId = stockBatchId;
+                }
+            });
+        },
+
+
         removeOrder: (state, action) => {
             const { orderListId } = action.payload; 
             console.log('remove order',orderListId)
@@ -578,6 +589,6 @@ const orderListSlice = createSlice({
 
 export const { addOrder, increaseQty, decreaseQty,removeOrder,applyDiscount ,cancelDiscount,calculateOrderSummary,applyOverallDiscount,cancelOverallDiscount,
     addMultiPayment,addSinglePayment,clearPayment,removePayment,setMultiPayment,calculateBalance,clearOrderList,setCustomer,
-    addReturnedProduct} = orderListSlice.actions;
+    addReturnedProduct,updateOrderBatchId} = orderListSlice.actions;
 
 export default orderListSlice.reducer;

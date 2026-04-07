@@ -1,12 +1,9 @@
+import { CopyIcon, PackageIcon } from "lucide-react";
 import { formatCurrency } from "../../../../utils/format";
-import { FaClone } from "react-icons/fa";
 
 const ProductItem = ({ p, handleProductClick }) => {
-  const isVariationProduct =JSON.parse(p.allProductId).length > 1;
+  const isVariationProduct =JSON.parse(p.variationProducts).length > 1;
   const hasImage = Boolean(p.imageUrl);
-  const stockText =
-    !!p.isStockTracked &&
-    (p.stockQty > 0 ? `${p.stockQty} ${p.measurementUnitName}` : "");
 
   const isDisabled = false;
 
@@ -28,19 +25,25 @@ const ProductItem = ({ p, handleProductClick }) => {
         `}
         onClick={() => !isDisabled && handleProductClick(p)}
         title={p.productName}
+        
       >
         {/* Image (if exists) */}
         {hasImage && (
-          <div className="absolute top-2 left-2 w-14 h-14 rounded-lg overflow-hidden ring-1 ring-gray-200">
+          <div className={`w-14 h-14 rounded-lg overflow-hidden ring-1 ring-gray-200 
+             ${hasImage 
+              ? "flex justify-center items-center w-14 h-14 mx-auto" 
+              : ""
+            }`}>
             <img
               src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
               alt={p.productName}
               className="w-full h-full object-cover"
             />
+            
           </div>
         )}
 
-        {/* FaClone Icon */}
+ 
         <div
           className={`
             ${hasImage 
@@ -50,13 +53,13 @@ const ProductItem = ({ p, handleProductClick }) => {
             text-sky-600 group-hover:text-sky-700 transition-colors
           `}
         >
-          <FaClone className="w-full h-full" />
+          {/* <FaClone className="w-full h-full" /> */}
+          <CopyIcon className="w-full h-full"  />
+              {/* <PackageIcon className="w-full h-full" strokeWidth={1.2} /> */}
         </div>
+    
 
-        {/* Spacer to push productName to bottom */}
         <div className="flex-1" />
-
-        {/* Product Name at bottom */}
         <p
           className="mt-4 text-sm font-bold text-gray-700 tracking-tight text-center
                      group-hover:text-sky-700 transition-colors"
@@ -64,6 +67,7 @@ const ProductItem = ({ p, handleProductClick }) => {
         >
           {p.productName}
         </p>
+
       </div>
     );
   }
@@ -87,7 +91,8 @@ const ProductItem = ({ p, handleProductClick }) => {
       `}
       onClick={() => !isDisabled && handleProductClick(p)}
     >
-      {/* Top Row: Image + Stock + Price */}
+
+     {JSON.stringify(variationProducts)}
       <div className={`flex items-center z-10 justify-center`}>
         {/* Image or Empty Space */}
         <div className="w-14 h-14">
@@ -98,7 +103,7 @@ const ProductItem = ({ p, handleProductClick }) => {
               className="w-full h-full rounded-lg object-cover shadow-sm ring-1 ring-gray-200"
             />
           ) : (
-            <div className="w-full h-full" />
+               <PackageIcon className="w-10 h-10 text-sky-600"  />
           )}
         </div>
 
@@ -108,32 +113,61 @@ const ProductItem = ({ p, handleProductClick }) => {
       <div className="flex-1" />
 
       <p
-        className="mt-auto px-1 text-sm  text-gray-800 text-center mb-0
+        className="mt-auto px-1 text-sm  text-gray-800 text-center mb-1
                    group-hover:text-sky-700 transition-colors"
         title={p.productName}
       >
         {p.productName}
       </p>
 
-        <p className="mt-1 text-xs text-gray-500 text-center font-mono">
+        {/* <p className="mt-1 text-xs text-gray-500 text-center font-mono">
           {variationProducts[0].sku}
-        </p>
+        </p> */}
 
 
-        <div className={`flex flex-1 min-w-0 items-center ${stockText ? 'justify-between' : 'justify-center'}`}>
-          <p className="text-sm font-bold text-gray-700">
-            {formatCurrency(variationProducts[0].unitPrice, true)}
-          </p>
 
-               {stockText ? (
-            <p className="text-xs font-medium text-green-600 truncate leading-tight">
-              {stockText}
-            </p>
-          ) : (
-            <div className="h-4" />
-          )}
+        <p className="mt-1 text-xs text-gray-500 text-center font-mono"
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: "var(--lpos-accent)",
+                            marginTop: "auto",
+                          }}
+                        >
+                          {formatCurrency(variationProducts[0].unitPrice, true)}
+                        </p>
 
-        </div>
+
+<div>
+        {p?.isStockTracked ? (
+                          <>
+                            {p.stockQty === 0 && (
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  color: "var(--lpos-red)",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Out of Stock
+                              </span>
+                            )}
+
+                            {p.stockQty > 0 && (
+                              <p
+                                style={{
+                                  fontSize: 12,
+                                  fontWeight: 700,
+                                  color: "var(--lpos-green)",
+                                  marginTop: "auto",
+                                }}
+                              >
+                                Qty: {p.stockQty}
+                              </p>
+                            )}
+                          </>
+                        ):null}
+</div>
 
     </div>
   );

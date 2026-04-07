@@ -8,9 +8,11 @@ import {
   addReturnedProduct,
   clearOrderList,
   setCustomer,
+  updateOrderBatchId,
 } from "../../state/orderList/orderListSlice";
 
 import DialogModel from "../../components/model/DialogModel";
+import BatchSelectionDialog from "../../components/BatchSelectionDialog";
 import ReturnOrder from "../../components/returnOrder/ReturnOrderComp";
 import HOCSession from "../../hocComponents/WrapperSession";
 import OrderListAll from "../../components/orderListAll/OrderListAll";
@@ -19,6 +21,7 @@ import {
   FaCalendarCheck,
   FaCompressAlt,
   FaHistory,
+  FaPalette,
   FaPlusCircle,
   FaSearch,
   FaTh,
@@ -49,6 +52,8 @@ import {
   ToiletIcon,
 } from "lucide-react";
 import AdvancedProductSearch from "../../components/AdvancedProductSearch";
+import { getBatchedItems } from "../../functions/register";
+import { formatCurrency, formatDate } from "../../utils/format";
 
 const Sidebar = ({
   expanded,
@@ -200,6 +205,16 @@ const Register = () => {
 
   const [showPayment, setShowPayment] = useState(false);
 
+  const store = JSON.parse(localStorage.getItem("selectedStore"));
+    const [addOrderTemp, setAddOrderTemp] = useState(null);
+  
+    const [batchedItemList, setBatchedItemList] = useState([]);
+  
+    const [isBatchedItemsModalOpen, setIsBatchedItemsModalOpen] = useState(false);
+const existingOrders=useSelector((state) => state.orderList.list);
+
+const [selectedProduct, setSelectedProduct] = useState(null);
+
   const PaymentScreen = () => {
     return (
       <div className="flex flex-1 align-item-center justify-content-center m-5">
@@ -240,12 +255,23 @@ const Register = () => {
     },
   ];
 
-  const handleProductClick = (p) => {
+  const handleProductClick = async (p) => {
     const description = `${p.productDescription}`;
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
 
+    setSelectedProduct(p);
+    const batchedItemsRes = await getBatchedItems(
+      p.allProductId,
+      store.storeId,
+    );
+    const batchedItems = batchedItemsRes.data.results[0];
+    console.log("batchedItems", batchedItems);
+
+    
     const order = {
+       allProductId:p.allProductId,
+      storeId:store.storeId,
       productNo: p.productNo,
       description,
       productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
@@ -254,8 +280,39 @@ const Register = () => {
       lineTaxRate: p.taxPerc,
       qty,
     };
-    dispatch(addOrder(order));
+
+    if (batchedItems.length > 0) {
+      setBatchedItemList(batchedItems);
+      setIsBatchedItemsModalOpen(true);
+      setAddOrderTemp(order);
+      return;
+    } else {
+      order.stockBatchId = batchedItems[0]?.stockBatchId
+        ? batchedItems[0].stockBatchId
+        : null;
+      dispatch(addOrder(order));
+    }
   };
+
+
+   const addItemstoOrderListFinal=(stockBatchId,order)=>{
+  
+      const isOrderExtist=existingOrders.find(o=>o.allProductId===order.allProductId && o.storeId===order.storeId);
+   console.log('stockBatchId,order',stockBatchId,order);
+      console.log('isOrderExtist',isOrderExtist);
+      if(isOrderExtist){
+       dispatch(updateOrderBatchId({ allProductId: order.allProductId, storeId: order.storeId, stockBatchId }));
+      }
+  
+      const orderFinal={...addOrderTemp,stockBatchId};
+  
+       dispatch(addOrder(orderFinal));
+  
+       setAddOrderTemp(null);
+                
+        setIsBatchedItemsModalOpen(false);
+  
+    }
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -313,12 +370,22 @@ const Register = () => {
     );
   };
 
-  const handleBarcodeEnter = (p) => {
+  const handleBarcodeEnter =async (p) => {
     const description = `${p.productName}`;
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
 
+        const batchedItemsRes = await getBatchedItems(
+      p.allProductId,
+      store.storeId,
+    );
+    const batchedItems = batchedItemsRes.data.results[0];
+    console.log("batchedItems", batchedItems);
+
+
     const order = {
+       allProductId:p.allProductId,
+      storeId:store.storeId,
       productNo: p.productNo,
       description,
       productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
@@ -327,7 +394,19 @@ const Register = () => {
       lineTaxRate: p.taxPerc,
       qty,
     };
-    dispatch(addOrder(order));
+
+    if (batchedItems.length > 0) {
+      setBatchedItemList(batchedItems);
+      setIsBatchedItemsModalOpen(true);
+      setAddOrderTemp(order);
+      return;
+    } else {
+      order.stockBatchId = batchedItems[0]?.stockBatchId
+        ? batchedItems[0].stockBatchId
+        : null;
+      dispatch(addOrder(order));
+    }
+    
   };
 
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -514,6 +593,20 @@ const Register = () => {
       />
 
       <ActionButtonsPopup />
+
+
+
+    <BatchSelectionDialog
+      visible={isBatchedItemsModalOpen}
+      onHide={() => setIsBatchedItemsModalOpen(false)}
+      selectedProduct={selectedProduct}
+      batchedItemList={batchedItemList}
+      onBatchSelect={(stockBatchId) => addItemstoOrderListFinal(stockBatchId, addOrderTemp)}
+    />
+
+
+
+
       <DialogModel
         header="Return Order"
         visible={isReturnOrderPopupVisible}
