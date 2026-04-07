@@ -165,6 +165,13 @@ const [openMenuId, setOpenMenuId] = useState(null);
                         textOverflow: "ellipsis"
                       }} title={product.description}>
                         {product.description}
+
+                           {product.stockBatchId ? (
+                      <div className="text-[10px] sm:text-xs font-mono text-gray-200 w-fit bg-blue-700 px-1.5 py-0.5 rounded">
+                        Batch: {product.stockBatchId}
+                      </div>
+                    ):''}
+
                       </div>
 
                       {/* Unit Price */}
@@ -421,10 +428,19 @@ return (
                     <div className="text-[10px] sm:text-xs font-mono text-gray-200 bg-gray-700 px-1.5 py-0.5 rounded">
                       {product.sku}
                     </div>
+
+                 
                   )}
                   <div className="text-sm sm:text-base font-medium text-gray-700">
                     {formatCurrency(unitPrice)}
                   </div>
+
+                     {product.stockBatchId ? (
+                      <div className="text-[10px] sm:text-xs font-mono text-gray-200 bg-blue-700 px-1.5 py-0.5 rounded">
+                        Batch: {product.stockBatchId}
+                      </div>
+                    ):''}
+
                 </div>
               </div>
 

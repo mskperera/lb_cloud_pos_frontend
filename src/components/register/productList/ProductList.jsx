@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
+  getBatchedItems,
   getCategoryMenu,
   getProductExtraDetails,
   getProductsPosMenu,
   getVariationProductDetails,
 } from "../../../functions/register";
-import { useDispatch } from "react-redux";
-import { addOrder } from "../../../state/orderList/orderListSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addOrder, updateOrderBatchId } from "../../../state/orderList/orderListSlice";
 import ProductItem from "./productItem/ProductItem";
 import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
 import DialogModel from "../../model/DialogModel";
-import { formatCurrency } from "../../../utils/format";
+import BatchSelectionDialog from "../../BatchSelectionDialog";
+import { formatCurrency, formatDate } from "../../../utils/format";
 import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
-import { ChevronDownIcon, PackageIcon, XIcon } from "lucide-react";
+import { ChevronDownIcon, CopyIcon, PackageIcon, XIcon } from "lucide-react";
 
 
 
@@ -142,11 +144,18 @@ const ProductList = ({onMobClose}) => {
 
   const [saleType, setSaleType] = useState("products");
   const [productListLoading, setIsProductListLoading] = useState(false);
-  const [isVariationSelectionMenuShow, setIsVariationSelectionMenuShow] = useState(false);
 
   const store = JSON.parse(localStorage.getItem("selectedStore"));
   const terminalId = localStorage.getItem("terminalId");
   
+  const [addOrderTemp, setAddOrderTemp] = useState(null);
+
+  const [batchedItemList, setBatchedItemList] = useState([]);
+
+  const [isBatchedItemsModalOpen, setIsBatchedItemsModalOpen] = useState(false);
+
+const existingOrders=useSelector((state) => state.orderList.list);
+
 
   const handleCategorySelect = (c) => {
     setSelectedCategoryId(c.categoryId);
@@ -252,14 +261,17 @@ const ProductList = ({onMobClose}) => {
     const description = p.productName;
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
-console.log('produckkkkkkkkkkkkts');
+console.log('produckkkkkkkkkkkkts',p);
     if (p.productTypeId === 2) {
       const payload = { productId: p.productId, storeId: store.storeId };
       try {
         const details = await getVariationProductDetails(payload);
         const variations = details.data.results[0] || [];
+        const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
 
-console.log('product000000',p);
+        console.log('variationProducts', variationValueLevel);
+
+        
         if (!variations[0].variationValues) {
           // If no variations or variations is not an array, add directly to order
           const order = {
@@ -304,22 +316,23 @@ console.log('product000000',p);
         };
         dispatch(addOrder(order));
       }
-    } else if (p.productTypeId === 1 || p.productTypeId === 3) {
-      const order = {
-        productNo: p.productNo,
-        sku: p.sku,
-        description,
-        productId: p.productId,
-        productTypeId: p.productTypeId,
-        unitPrice,
-        lineTaxRate: p.taxPerc,
-        qty,
-        measurementUnitName: p.measurementUnitName,
-        stockQty: p.isStockTracked ? p.stockQty : undefined,
-             imageUrl:p.imageUrl
-      };
-      dispatch(addOrder(order));
-    }
+     } 
+    //else if (p.productTypeId === 1 || p.productTypeId === 3) {
+    //   const order = {
+    //     productNo: p.productNo,
+    //     sku: p.sku,
+    //     description,
+    //     productId: p.productId,
+    //     productTypeId: p.productTypeId,
+    //     unitPrice,
+    //     lineTaxRate: p.taxPerc,
+    //     qty,
+    //     measurementUnitName: p.measurementUnitName,
+    //     stockQty: p.isStockTracked ? p.stockQty : undefined,
+    //          imageUrl:p.imageUrl
+    //   };
+    //   dispatch(addOrder(order));
+    // }
   };
 
   const handleVariationSelect = (value, type) => {
@@ -376,10 +389,20 @@ console.log('product000000',p);
       // .map((v) => `${v.variationTypeName}: ${v.variationValue}`)
         .map((v) => ` ${v.variationValue}`)
       .join(" | ");
-    const order = {
+
+
+const batchedItemsRes=await getBatchedItems(p.allProductId,store.storeId);
+const batchedItems=batchedItemsRes.data.results[0];
+
+   const description=`${selectedProduct.productName} ${v}`;
+
+
+     const order = {
+      allProductId:p.allProductId,
+      storeId:store.storeId,
       productNo: selectedProduct.productNo,
       sku: p.sku,
-      description: `${selectedProduct.productName} ${v}`,
+      description,
       productId: p.variationProductId,
       productTypeId: selectedProduct.productTypeId,
       unitPrice: unitPrice,
@@ -389,12 +412,49 @@ console.log('product000000',p);
       stockQty: selectedProduct.isStockTracked ? p.stockQty : undefined,
              imageUrl:selectedProduct.imageUrl
     };
-    dispatch(addOrder(order));
+
+
+
+if(batchedItems.length>1){
+  
+  setBatchedItemList(batchedItems);
+  setIsBatchedItemsModalOpen(true);
+  setAddOrderTemp(order);
+  return;
+
+}
+else{
+
+  order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
+     dispatch(addOrder(order));
+}
+
+
     // Exit variation selection mode
     setSelectedVariationProducts([]);
     setVariationPath([]);
     setVariationLevel(0);
   };
+
+
+  const addItemstoOrderListFinal=(stockBatchId,order)=>{
+
+
+    const isOrderExtist=existingOrders.find(o=>o.allProductId===order.allProductId && o.storeId===order.storeId);
+
+    if(isOrderExtist){
+     dispatch(updateOrderBatchId({ allProductId: order.allProductId, storeId: order.storeId, stockBatchId }));
+    }
+
+    const orderFinal={...addOrderTemp,stockBatchId};
+
+     dispatch(addOrder(orderFinal));
+
+     setAddOrderTemp(null);
+              
+      setIsBatchedItemsModalOpen(false);
+
+  }
 
   function useContainerWidth(ref) {
   const [width, setWidth] = useState(0);
@@ -428,6 +488,16 @@ console.log('product000000',p);
   return (
 
     <>
+
+
+    <BatchSelectionDialog
+      visible={isBatchedItemsModalOpen}
+      onHide={() => setIsBatchedItemsModalOpen(false)}
+      selectedProduct={selectedProduct}
+      batchedItemList={batchedItemList}
+      onBatchSelect={(stockBatchId) => addItemstoOrderListFinal(stockBatchId, addOrderTemp)}
+    />
+
 
 
 
@@ -556,7 +626,7 @@ console.log('product000000',p);
                       onMouseEnter={(e)=>{e.currentTarget.style.borderColor="var(--lpos-accent)";e.currentTarget.style.backgroundColor="var(--lpos-accent-soft)";e.currentTarget.style.transform="scale(1.05)";}}
                       onMouseLeave={(e)=>{e.currentTarget.style.borderColor="var(--lpos-border)";e.currentTarget.style.backgroundColor="white";e.currentTarget.style.transform="scale(1)";}}
                     >
-                      <FaTag style={{fontSize:24,color:"var(--lpos-accent)",opacity:0.7}}/>
+                      <CopyIcon className="w-10 h-10" style={{color:"var(--lpos-accent)"}}/>
                       <span style={{fontSize:13,fontWeight:600,color:"var(--lpos-text-primary)"}}>{value}</span>
                     </div>
                   ))
@@ -568,22 +638,88 @@ console.log('product000000',p);
                       .join(" • ");
 
                     return (
-                      <div
-                      className="border text-md border-gray-200 bg-white rounded-lg p-3 cursor-pointer transition-all flex flex-col gap-4 relative"
+                      <button
+                        className="border text-md border-gray-200 bg-white rounded-lg p-3 cursor-pointer transition-all flex flex-col gap-4 relative disabled:cursor-not-allowed"
                         key={index}
-                        onClick={() => handleProductVariationClick(p, selectedProduct)}
-                    
-                        onMouseEnter={(e)=>{e.currentTarget.style.borderColor="var(--lpos-accent)";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.1)";}}
-                        onMouseLeave={(e)=>{e.currentTarget.style.borderColor="var(--lpos-border)";e.currentTarget.style.boxShadow="none";}}
+                        onClick={() =>
+                          handleProductVariationClick(p, selectedProduct)
+                        }
+                        disabled={
+                          selectedProduct.isStockTracked && p.stockQty <= 0
+                        }
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor =
+                            "var(--lpos-accent)";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 12px rgba(0,0,0,0.1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor =
+                            "var(--lpos-border)";
+                          e.currentTarget.style.boxShadow = "none";
+                        }}
                       >
-                        <p className="p-2 bg-gray-700 text-white rounded-lg text-sm" style={{color:"var(--lpos-text-tertiary)",fontWeight:600,fontFamily:"monospace"}}>{p.sku || "N/A"}</p>
+                        <p
+                          className="p-2 bg-gray-700 text-white rounded-lg text-sm"
+                          style={{
+                            color: "var(--lpos-text-tertiary)",
+                            fontWeight: 600,
+                            fontFamily: "monospace",
+                          }}
+                        >
+                          SKU:{p.sku || "N/A"}
+                        </p>
 
-                        <p style={{fontSize:12,fontWeight:600,color:"var(--lpos-text-primary)",lineHeight:1.3}}>{variationLabel}</p>
-                        <p style={{fontSize:14,fontWeight:700,color:"var(--lpos-accent)",marginTop:"auto"}}>{formatCurrency(p.unitPrice, true)}</p>
-                        {selectedProduct.isStockTracked && p.stockQty <= 0 ? (
-                          <span style={{fontSize:10,color:"var(--lpos-red)",fontWeight:600}}>Out of Stock</span>
-                        ):''}
-                      </div>
+                        <p
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: "var(--lpos-text-primary)",
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {variationLabel}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: "var(--lpos-accent)",
+                            marginTop: "auto",
+                          }}
+                        >
+                          {formatCurrency(p.unitPrice, true)}
+                        </p>
+
+                        {selectedProduct?.isStockTracked ? (
+                          <>
+                            {p.stockQty === 0 && (
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  color: "var(--lpos-red)",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Out of Stock
+                              </span>
+                            )}
+
+                            {p.stockQty > 0 && (
+                              <p
+                                style={{
+                                  fontSize: 12,
+                                  fontWeight: 700,
+                                  color: "var(--lpos-green)",
+                                  marginTop: "auto",
+                                }}
+                              >
+                                Qty: {p.stockQty}
+                              </p>
+                            )}
+                          </>
+                        ):null}
+                      </button>
                     );
                   })
                 )}
@@ -605,14 +741,12 @@ console.log('product000000',p);
         ) : (
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
             {products.map((p, i) => (
-                    <ProductItem key={i} p={p} handleProductClick={handleProductClick} />
+                    <ProductItem     disabled={
+                          selectedProduct.isStockTracked && p.stockQty <= 0
+                        }
+                         key={i} p={p} handleProductClick={handleProductClick} />
      
-              // <ProductItem
-              //   key={p.productId || i}
-              //   p={p}
-              //   handleProductClick={onProductClick}
-              //   inCart={cartQtyMap?.[p.productId] || 0}
-              // />
+       
             ))}
           </div>
         )}
