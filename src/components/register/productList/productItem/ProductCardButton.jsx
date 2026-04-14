@@ -72,7 +72,6 @@ const ProductCardButton = ({
                                 Out of Stock
                               </span>
                             )}
-
                             {stockQty > 0 && (
                               <p
                                 style={{
