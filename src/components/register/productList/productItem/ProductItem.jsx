@@ -2,14 +2,16 @@ import { CopyIcon, PackageIcon } from "lucide-react";
 import { formatCurrency } from "../../../../utils/format";
 
 const ProductItem = ({ p, handleProductClick }) => {
-  const isVariationProduct =JSON.parse(p.variationProducts).length > 1;
+  //const isVariationProduct =JSON.parse(p.variationProducts).length > 1;
+   const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
+   console.log("variationValueLevel", variationValueLevel);
   const hasImage = Boolean(p.imageUrl);
 
   const isDisabled = false;
 
   const variationProducts=JSON.parse(p.variationProducts);
   // === Variation Product ===
-  if (isVariationProduct) {
+  if (variationValueLevel) {
   
     return (
       <div
@@ -120,9 +122,9 @@ const ProductItem = ({ p, handleProductClick }) => {
         {p.productName}
       </p>
 
-        {/* <p className="mt-1 text-xs text-gray-500 text-center font-mono">
+        <p className="mt-1 text-xs text-gray-500 text-center font-mono">
           {variationProducts[0].sku}
-        </p> */}
+        </p>
 
 
 

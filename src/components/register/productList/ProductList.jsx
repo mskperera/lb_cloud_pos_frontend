@@ -196,6 +196,8 @@ const ProductList = ({onMobClose}) => {
     try {
       setIsProductListLoading(true);
       const _result = await getProductsPosMenu(filteredData, null);
+      console.log("getProductsPosMenu", _result);
+
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
       setProducts(_result.data.results[0] || []);
