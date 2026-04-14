@@ -1,5 +1,4 @@
-import { CopyIcon, PackageIcon } from "lucide-react";
-import { formatCurrency } from "../../../../utils/format";
+import { CopyIcon } from "lucide-react";
 import ProductCardButton from "./ProductCardButton";
 
 const ProductItem = ({ p, handleProductClick }) => {
