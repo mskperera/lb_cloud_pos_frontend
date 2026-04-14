@@ -92,7 +92,7 @@ const ProductItem = ({ p, handleProductClick }) => {
       onClick={() => !isDisabled && handleProductClick(p)}
     >
 
-     {JSON.stringify(variationProducts)}
+  
       <div className={`flex items-center z-10 justify-center`}>
         {/* Image or Empty Space */}
         <div className="w-14 h-14">

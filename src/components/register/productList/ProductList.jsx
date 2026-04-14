@@ -154,7 +154,11 @@ const ProductList = ({onMobClose}) => {
 
   const [isBatchedItemsModalOpen, setIsBatchedItemsModalOpen] = useState(false);
 
-const existingOrders=useSelector((state) => state.orderList.list);
+  const productListScrollTopRef = useRef(0);
+  const productListScrollRef = useRef(null);
+  const prevVariationCountRef = useRef(0);
+
+  const existingOrders = useSelector((state) => state.orderList.list);
 
 
   const handleCategorySelect = (c) => {
@@ -208,6 +212,16 @@ const existingOrders=useSelector((state) => state.orderList.list);
       loadProducts(selectedCategoryId, currentPage, rowsPerPage);
     }
   }, [selectedCategoryId, currentPage, rowsPerPage]);
+
+  useEffect(() => {
+    if (prevVariationCountRef.current > 0 && selectedVariationProducts.length === 0) {
+      const el = productListScrollRef.current;
+      if (el) {
+        el.scrollTop = productListScrollTopRef.current;
+      }
+    }
+    prevVariationCountRef.current = selectedVariationProducts.length;
+  }, [selectedVariationProducts.length]);
 
   const loadCategories = async () => {
     const filteredData = { skip: null, limit: null };
@@ -269,10 +283,11 @@ console.log('produckkkkkkkkkkkkts',p);
         const variations = details.data.results[0] || [];
         const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
 
-        console.log('variationProducts', variationValueLevel);
+        console.log('getVariationProductDetails',variations);
+        console.log('variationValueLevel', variationValueLevel);
 
         
-        if (!variations[0].variationValues) {
+        if (variationValueLevel===0) {
           // If no variations or variations is not an array, add directly to order
           const order = {
             productNo: p.productNo,
@@ -289,6 +304,9 @@ console.log('produckkkkkkkkkkkkts',p);
           };
           dispatch(addOrder(order));
         } else {
+          // Save the root list scroll position before switching to variation mode.
+          productListScrollTopRef.current = productListScrollRef.current?.scrollTop || 0;
+
           // If variations exist, show inline in main product list area
           setSelectedVariationProducts(variations);
           setSelectedProduct(p);
@@ -416,20 +434,15 @@ const batchedItems=batchedItemsRes.data.results[0];
 
 
 if(batchedItems.length>1){
-  
   setBatchedItemList(batchedItems);
   setIsBatchedItemsModalOpen(true);
   setAddOrderTemp(order);
   return;
-
 }
 else{
-
   order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
      dispatch(addOrder(order));
 }
-
-
     // Exit variation selection mode
     setSelectedVariationProducts([]);
     setVariationPath([]);
@@ -583,7 +596,7 @@ else{
 
 
 
-    <div className="lpos-scroll" style={{flex:1,overflowY:"auto",padding:"12px 20px 20px"}}>
+    <div className="lpos-scroll" ref={productListScrollRef} style={{flex:1,overflowY:"auto",padding:"12px 20px 20px"}}>
     
     
         {productListLoading ? (
