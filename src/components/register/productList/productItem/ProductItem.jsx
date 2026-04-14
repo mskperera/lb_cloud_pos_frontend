@@ -90,7 +90,7 @@ const ProductItem = ({ p, handleProductClick }) => {
       unitPrice={variationProducts?.[0]?.unitPrice ?? p.unitPrice}
       isStockTracked={p.isStockTracked}
       stockQty={p.stockQty}
-      sku={p.sku}
+      sku={JSON.parse(p.variationProducts)[0].sku}
       variationProducts={variationProducts}
       onClick={() => !isDisabled && handleProductClick(p)}
     />  
