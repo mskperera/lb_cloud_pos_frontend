@@ -16,7 +16,8 @@ const BatchSelectionDialog = ({
         <div className="flex items-center gap-2">
        
           <span className="font-semibold text-lg">
-            {selectedProduct?.productName} - Select Batch
+            {JSON.stringify(selectedProduct)}
+            {selectedProduct?.description} - Select Batch oooo
           </span>
         </div>
       }

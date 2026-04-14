@@ -15,6 +15,7 @@ import BatchSelectionDialog from "../../BatchSelectionDialog";
 import { formatCurrency, formatDate } from "../../../utils/format";
 import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
 import { ChevronDownIcon, CopyIcon, PackageIcon, XIcon } from "lucide-react";
+import ProductCardButton from "./productItem/ProductCardButton";
 
 
 
@@ -154,7 +155,11 @@ const ProductList = ({onMobClose}) => {
 
   const [isBatchedItemsModalOpen, setIsBatchedItemsModalOpen] = useState(false);
 
-const existingOrders=useSelector((state) => state.orderList.list);
+  const productListScrollTopRef = useRef(0);
+  const productListScrollRef = useRef(null);
+  const prevVariationCountRef = useRef(0);
+
+  const existingOrders = useSelector((state) => state.orderList.list);
 
 
   const handleCategorySelect = (c) => {
@@ -192,6 +197,8 @@ const existingOrders=useSelector((state) => state.orderList.list);
     try {
       setIsProductListLoading(true);
       const _result = await getProductsPosMenu(filteredData, null);
+      console.log("getProductsPosMenu", _result);
+
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
       setProducts(_result.data.results[0] || []);
@@ -208,6 +215,16 @@ const existingOrders=useSelector((state) => state.orderList.list);
       loadProducts(selectedCategoryId, currentPage, rowsPerPage);
     }
   }, [selectedCategoryId, currentPage, rowsPerPage]);
+
+  useEffect(() => {
+    if (prevVariationCountRef.current > 0 && selectedVariationProducts.length === 0) {
+      const el = productListScrollRef.current;
+      if (el) {
+        el.scrollTop = productListScrollTopRef.current;
+      }
+    }
+    prevVariationCountRef.current = selectedVariationProducts.length;
+  }, [selectedVariationProducts.length]);
 
   const loadCategories = async () => {
     const filteredData = { skip: null, limit: null };
@@ -257,6 +274,15 @@ const existingOrders=useSelector((state) => state.orderList.list);
     return Array.from(values);
   };
 
+  const getProductVariationLevel = (product) => {
+    try {
+      const parsed = JSON.parse(product.variationProducts || "[]");
+      return parsed?.[0]?.variationValueLevel ?? 0;
+    } catch (error) {
+      return 0;
+    }
+  };
+
   const handleProductClick = async (p) => {
     const description = p.productName;
     const qty = 1;
@@ -269,10 +295,11 @@ console.log('produckkkkkkkkkkkkts',p);
         const variations = details.data.results[0] || [];
         const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
 
-        console.log('variationProducts', variationValueLevel);
+        console.log('getVariationProductDetails',variations);
+        console.log('variationValueLevel', variationValueLevel);
 
         
-        if (!variations[0].variationValues) {
+        if (variationValueLevel===0) {
           // If no variations or variations is not an array, add directly to order
           const order = {
             productNo: p.productNo,
@@ -289,6 +316,9 @@ console.log('produckkkkkkkkkkkkts',p);
           };
           dispatch(addOrder(order));
         } else {
+          // Save the root list scroll position before switching to variation mode.
+          productListScrollTopRef.current = productListScrollRef.current?.scrollTop || 0;
+
           // If variations exist, show inline in main product list area
           setSelectedVariationProducts(variations);
           setSelectedProduct(p);
@@ -416,20 +446,15 @@ const batchedItems=batchedItemsRes.data.results[0];
 
 
 if(batchedItems.length>1){
-  
   setBatchedItemList(batchedItems);
   setIsBatchedItemsModalOpen(true);
   setAddOrderTemp(order);
   return;
-
 }
 else{
-
   order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
      dispatch(addOrder(order));
 }
-
-
     // Exit variation selection mode
     setSelectedVariationProducts([]);
     setVariationPath([]);
@@ -475,6 +500,8 @@ else{
 
  const activeCatLabel = selectedCategoryId === -1 ? "All Items" : (categories.find(c=>c.categoryId===selectedCategoryId)?.categoryName || "Products");
 
+  const topVariationProducts = products.filter((p) => getProductVariationLevel(p) > 0);
+  const rootVariationProducts = products.filter((p) => getProductVariationLevel(p) === 0);
 
   const containerRef = useRef();
   const width = useContainerWidth(containerRef);
@@ -583,7 +610,7 @@ else{
 
 
 
-    <div className="lpos-scroll" style={{flex:1,overflowY:"auto",padding:"12px 20px 20px"}}>
+    <div className="lpos-scroll" ref={productListScrollRef} style={{flex:1,overflowY:"auto",padding:"12px 20px 20px"}}>
     
     
         {productListLoading ? (
@@ -596,134 +623,108 @@ else{
           /* === INLINE VARIATION SELECTION VIEW === */
           <div>
             {currentVariations.length > 0 ? (
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
-                {variationLevel < getVariationTypes(selectedVariationProducts).length - 1 ? (
-                  /* === Option Level (e.g., Size, Color) === */
-                  currentVariations.map((value, index) => (
-                    <div
-                      key={index}
-                      onClick={() =>
-                        handleVariationSelect(
-                          value,
-                          getVariationTypes(selectedVariationProducts)[variationLevel]
-                        )
-                      }
-                      style={{
-                        backgroundColor:"white",
-                        border:"1.5px solid var(--lpos-border)",
-                        borderRadius:12,
-                        padding:16,
-                        cursor:"pointer",
-                        textAlign:"center",
-                        transition:"all 0.2s",
-                        display:"flex",
-                        flexDirection:"column",
-                        alignItems:"center",
-                        justifyContent:"center",
-                        gap:8,
-                        minHeight:120
-                      }}
-                      onMouseEnter={(e)=>{e.currentTarget.style.borderColor="var(--lpos-accent)";e.currentTarget.style.backgroundColor="var(--lpos-accent-soft)";e.currentTarget.style.transform="scale(1.05)";}}
-                      onMouseLeave={(e)=>{e.currentTarget.style.borderColor="var(--lpos-border)";e.currentTarget.style.backgroundColor="white";e.currentTarget.style.transform="scale(1)";}}
-                    >
-                      <CopyIcon className="w-10 h-10" style={{color:"var(--lpos-accent)"}}/>
-                      <span style={{fontSize:13,fontWeight:600,color:"var(--lpos-text-primary)"}}>{value}</span>
-                    </div>
-                  ))
-                ) : (
-                  /* === Final Variation Level (SKU, Price, Stock) === */
-                  currentVariations.map((p, index) => {
-                    const variationLabel = JSON.parse(p.variationValues)
-                      .map(v => v.variationValue)
-                      .join(" • ");
+           <div>
+  {variationLevel < getVariationTypes(selectedVariationProducts).length - 1 ? (
+    /* === Option Level (e.g., Size, Color) === */
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))",
+        gap: 12,
+      }}
+    >
+      {currentVariations.map((value, index) => (
+        <div
+          key={index}
+          onClick={() =>
+            handleVariationSelect(
+              value,
+              getVariationTypes(selectedVariationProducts)[variationLevel]
+            )
+          }
+          style={{
+            backgroundColor: "white",
+            border: "1.5px solid var(--lpos-border)",
+            borderRadius: 12,
+            padding: 16,
+            cursor: "pointer",
+            textAlign: "center",
+            transition: "all 0.2s",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            minHeight: 120,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "var(--lpos-accent)";
+            e.currentTarget.style.backgroundColor =
+              "var(--lpos-accent-soft)";
+            e.currentTarget.style.transform = "scale(1.05)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "var(--lpos-border)";
+            e.currentTarget.style.backgroundColor = "white";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          <CopyIcon
+            className="w-10 h-10"
+            style={{ color: "var(--lpos-accent)" }}
+          />
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--lpos-text-primary)",
+            }}
+          >
+            {value}
+          </span>
+        </div>
+      ))}
+    </div>
+  ) : (
+    /* === Final Variation Level (SKU, Price, Stock) === */
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))",
+        gap: 12,
+      }}
+    >
+      {currentVariations.map((p, index) => {
+        const variationLabel = JSON.parse(p.variationValues)
+          .map((v) => v.variationValue)
+          .join(" • ");
 
-                    return (
-                      <button
-                        className="border text-md border-gray-200 bg-white rounded-lg p-3 cursor-pointer transition-all flex flex-col gap-4 relative disabled:cursor-not-allowed"
-                        key={index}
-                        onClick={() =>
-                          handleProductVariationClick(p, selectedProduct)
-                        }
-                        disabled={
-                          selectedProduct.isStockTracked && p.stockQty <= 0
-                        }
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor =
-                            "var(--lpos-accent)";
-                          e.currentTarget.style.boxShadow =
-                            "0 4px 12px rgba(0,0,0,0.1)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor =
-                            "var(--lpos-border)";
-                          e.currentTarget.style.boxShadow = "none";
-                        }}
-                      >
-                        <p
-                          className="p-2 bg-gray-700 text-white rounded-lg text-sm"
-                          style={{
-                            color: "var(--lpos-text-tertiary)",
-                            fontWeight: 600,
-                            fontFamily: "monospace",
-                          }}
-                        >
-                          SKU:{p.sku || "N/A"}
-                        </p>
-
-                        <p
-                          style={{
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: "var(--lpos-text-primary)",
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {variationLabel}
-                        </p>
-                        <p
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 700,
-                            color: "var(--lpos-accent)",
-                            marginTop: "auto",
-                          }}
-                        >
-                          {formatCurrency(p.unitPrice, true)}
-                        </p>
-
-                        {selectedProduct?.isStockTracked ? (
-                          <>
-                            {p.stockQty === 0 && (
-                              <span
-                                style={{
-                                  fontSize: 10,
-                                  color: "var(--lpos-red)",
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Out of Stock
-                              </span>
-                            )}
-
-                            {p.stockQty > 0 && (
-                              <p
-                                style={{
-                                  fontSize: 12,
-                                  fontWeight: 700,
-                                  color: "var(--lpos-green)",
-                                  marginTop: "auto",
-                                }}
-                              >
-                                Qty: {p.stockQty}
-                              </p>
-                            )}
-                          </>
-                        ):null}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
+        return (
+          <ProductCardButton
+            key={index}
+            compact={true}
+            onClick={() =>
+              handleProductVariationClick(p, selectedProduct)
+            }
+            disabled={
+              selectedProduct.isStockTracked && p.stockQty <= 0
+            }
+            title={selectedProduct.productName}
+            productName={selectedProduct.productName}
+            imageUrl={selectedProduct.imageUrl}
+            hasImage={Boolean(selectedProduct.imageUrl)}
+            sku={p.sku}
+            unitPrice={p.unitPrice}
+            variationLabel={variationLabel}
+            isStockTracked={selectedProduct.isStockTracked}
+            stockQty={` ${p.stockQty} `}
+            measurementUnitName={selectedProduct.measurementUnitName}
+          />
+        );
+      })}
+    </div>
+  )}
+</div>
             ) : (
               <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:300,gap:12,color:"var(--lpos-text-tertiary)"}}>
                 <FaSearch style={{fontSize:48,opacity:0.3}}/>
@@ -739,15 +740,38 @@ else{
             <span style={{fontSize:13,color:"var(--lpos-text-tertiary)"}}>Try selecting a different category</span>
           </div>
         ) : (
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
-            {products.map((p, i) => (
-                    <ProductItem     disabled={
-                          selectedProduct.isStockTracked && p.stockQty <= 0
-                        }
-                         key={i} p={p} handleProductClick={handleProductClick} />
-     
-       
-            ))}
+          <div>
+            {topVariationProducts.length > 0 && (
+              <div style={{marginBottom:14}}>
+                {/* <div style={{marginBottom:10, color:"var(--lpos-text-secondary)", fontSize:13, fontWeight:600}}>
+                  Variation products
+                </div> */}
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
+                  {topVariationProducts.map((p, i) => (
+                    <ProductItem
+                      disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
+                      key={`top-${i}-${p.productId}`}
+                      p={p}
+                      handleProductClick={handleProductClick}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {rootVariationProducts.length > 0 && (
+              <div style={{marginTop:18, paddingTop:18, borderTop:"1px solid var(--lpos-border)"}}>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12}}>
+                  {rootVariationProducts.map((p, i) => (
+                    <ProductItem
+                      disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
+                      key={`root-${i}-${p.productId}`}
+                      p={p}
+                      handleProductClick={handleProductClick}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
     
