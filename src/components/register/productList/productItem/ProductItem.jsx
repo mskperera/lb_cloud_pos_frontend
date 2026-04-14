@@ -1,15 +1,22 @@
 import { CopyIcon, PackageIcon } from "lucide-react";
 import { formatCurrency } from "../../../../utils/format";
+import ProductCardButton from "./ProductCardButton";
 
 const ProductItem = ({ p, handleProductClick }) => {
   //const isVariationProduct =JSON.parse(p.variationProducts).length > 1;
-   const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
-   console.log("variationValueLevel", variationValueLevel);
+  let variationProducts = [];
+  let variationValueLevel = 0;
+  try {
+    variationProducts = JSON.parse(p.variationProducts || "[]");
+    variationValueLevel = variationProducts[0]?.variationValueLevel ?? 0;
+  } catch (error) {
+    variationProducts = [];
+    variationValueLevel = 0;
+  }
+
   const hasImage = Boolean(p.imageUrl);
 
   const isDisabled = false;
-
-  const variationProducts=JSON.parse(p.variationProducts);
   // === Variation Product ===
   if (variationValueLevel) {
   
@@ -76,102 +83,115 @@ const ProductItem = ({ p, handleProductClick }) => {
 
   // === Regular Product ===
   return (
-    <div
-      className={`
-        group relative overflow-hidden
-        flex flex-col justify-between
-        bg-white backdrop-blur-sm
-        rounded-xl cursor-pointer
-        p-3  border border-gray-200
-        min-h-[100px] w-full min-w-44
-        transition-all duration-300 ease-out
-        hover:scale-[1.02] hover:shadow-xl
-        hover:bg-gradient-to-br hover:from-sky-50 hover:to-white
-        hover:border-sky-400
-        active:scale-95
-        ${isDisabled ? "opacity-50 pointer-events-none" : ""}
-      `}
+
+    <ProductCardButton
+      productName={p.productName}
+      imageUrl={p.imageUrl}
+      hasImage={hasImage}
+      unitPrice={variationProducts?.[0]?.unitPrice ?? p.unitPrice}
+      isStockTracked={p.isStockTracked}
+      stockQty={p.stockQty}
+      sku={p.sku}
+      variationProducts={variationProducts}
       onClick={() => !isDisabled && handleProductClick(p)}
-    >
+    />  
+
+//     <div
+//       className={`
+//         group relative overflow-hidden
+//         flex flex-col justify-between
+//         bg-white backdrop-blur-sm
+//         rounded-xl cursor-pointer
+//         p-3  border border-gray-200
+//         min-h-[100px] w-full min-w-44
+//         transition-all duration-300 ease-out
+//         hover:scale-[1.02] hover:shadow-xl
+//         hover:bg-gradient-to-br hover:from-sky-50 hover:to-white
+//         hover:border-sky-400
+//         active:scale-95
+//         ${isDisabled ? "opacity-50 pointer-events-none" : ""}
+//       `}
+//       onClick={() => !isDisabled && handleProductClick(p)}
+//     >
 
   
-      <div className={`flex items-center z-10 justify-center`}>
-        {/* Image or Empty Space */}
-        <div className="w-14 h-14">
-          {hasImage ? (
-            <img
-              src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
-              alt={p.productName}
-              className="w-full h-full rounded-lg object-cover shadow-sm ring-1 ring-gray-200"
-            />
-          ) : (
-               <PackageIcon className="w-10 h-10 text-sky-600"  />
-          )}
-        </div>
+//       <div className={`flex items-center z-10 justify-center`}>
+//         {/* Image or Empty Space */}
+//         <div className="w-14 h-14">
+//           {hasImage ? (
+//             <img
+//               src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
+//               alt={p.productName}
+//               className="w-full h-full rounded-lg object-cover shadow-sm ring-1 ring-gray-200"
+//             />
+//           ) : (
+//                <PackageIcon className="w-10 h-10 text-sky-600"  />
+//           )}
+//         </div>
 
   
-      </div>
+//       </div>
 
-      <div className="flex-1" />
+//       <div className="flex-1" />
 
-      <p
-        className="mt-auto px-1 text-sm  text-gray-800 text-center mb-1
-                   group-hover:text-sky-700 transition-colors"
-        title={p.productName}
-      >
-        {p.productName}
-      </p>
+//       <p
+//         className="mt-auto px-1 text-sm  text-gray-800 text-center mb-1
+//                    group-hover:text-sky-700 transition-colors"
+//         title={p.productName}
+//       >
+//         {p.productName}
+//       </p>
 
-        <p className="mt-1 text-xs text-gray-500 text-center font-mono">
-          {variationProducts[0].sku}
-        </p>
-
-
-
-        <p className="mt-1 text-xs text-gray-500 text-center font-mono"
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 700,
-                            color: "var(--lpos-accent)",
-                            marginTop: "auto",
-                          }}
-                        >
-                          {formatCurrency(variationProducts[0].unitPrice, true)}
-                        </p>
+//         <p className="mt-1 text-xs text-gray-500 text-center font-mono">
+//           SKU: {variationProducts?.[0]?.sku || p.sku || "N/A"}
+//         </p>
 
 
-<div>
-        {p?.isStockTracked ? (
-                          <>
-                            {p.stockQty === 0 && (
-                              <span
-                                style={{
-                                  fontSize: 10,
-                                  color: "var(--lpos-red)",
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Out of Stock
-                              </span>
-                            )}
 
-                            {p.stockQty > 0 && (
-                              <p
-                                style={{
-                                  fontSize: 12,
-                                  fontWeight: 700,
-                                  color: "var(--lpos-green)",
-                                  marginTop: "auto",
-                                }}
-                              >
-                                Qty: {p.stockQty}
-                              </p>
-                            )}
-                          </>
-                        ):null}
-</div>
+//         <p className="mt-1 text-xs text-gray-500 text-center font-mono"
+//                           style={{
+//                             fontSize: 14,
+//                             fontWeight: 700,
+//                             color: "var(--lpos-accent)",
+//                             marginTop: "auto",
+//                           }}
+//                         >
+//                           {formatCurrency(variationProducts?.[0]?.unitPrice ?? p.unitPrice, true)}
+//                         </p>
 
-    </div>
+
+// <div>
+//         {p?.isStockTracked ? (
+//                           <>
+//                             {p.stockQty === 0 && (
+//                               <span
+//                                 style={{
+//                                   fontSize: 10,
+//                                   color: "var(--lpos-red)",
+//                                   fontWeight: 600,
+//                                 }}
+//                               >
+//                                 Out of Stock
+//                               </span>
+//                             )}
+
+//                             {p.stockQty > 0 && (
+//                               <p
+//                                 style={{
+//                                   fontSize: 12,
+//                                   fontWeight: 700,
+//                                   color: "var(--lpos-green)",
+//                                   marginTop: "auto",
+//                                 }}
+//                               >
+//                                 Qty: {p.stockQty}
+//                               </p>
+//                             )}
+//                           </>
+//                         ):null}
+// </div>
+
+//     </div>
   );
 };
 

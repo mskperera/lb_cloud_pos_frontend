@@ -15,6 +15,7 @@ import BatchSelectionDialog from "../../BatchSelectionDialog";
 import { formatCurrency, formatDate } from "../../../utils/format";
 import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
 import { ChevronDownIcon, CopyIcon, PackageIcon, XIcon } from "lucide-react";
+import ProductCardButton from "./productItem/ProductCardButton";
 
 
 
@@ -273,6 +274,15 @@ const ProductList = ({onMobClose}) => {
     return Array.from(values);
   };
 
+  const getProductVariationLevel = (product) => {
+    try {
+      const parsed = JSON.parse(product.variationProducts || "[]");
+      return parsed?.[0]?.variationValueLevel ?? 0;
+    } catch (error) {
+      return 0;
+    }
+  };
+
   const handleProductClick = async (p) => {
     const description = p.productName;
     const qty = 1;
@@ -490,6 +500,8 @@ else{
 
  const activeCatLabel = selectedCategoryId === -1 ? "All Items" : (categories.find(c=>c.categoryId===selectedCategoryId)?.categoryName || "Products");
 
+  const topVariationProducts = products.filter((p) => getProductVariationLevel(p) > 0);
+  const rootVariationProducts = products.filter((p) => getProductVariationLevel(p) === 0);
 
   const containerRef = useRef();
   const width = useContainerWidth(containerRef);
@@ -611,7 +623,7 @@ else{
           /* === INLINE VARIATION SELECTION VIEW === */
           <div>
             {currentVariations.length > 0 ? (
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:12}}>
                 {variationLevel < getVariationTypes(selectedVariationProducts).length - 1 ? (
                   /* === Option Level (e.g., Size, Color) === */
                   currentVariations.map((value, index) => (
@@ -653,8 +665,7 @@ else{
                       .join(" • ");
 
                     return (
-                      <button
-                        className="border text-md border-gray-200 bg-white rounded-lg p-3 cursor-pointer transition-all flex flex-col gap-4 relative disabled:cursor-not-allowed"
+                      <ProductCardButton
                         key={index}
                         onClick={() =>
                           handleProductVariationClick(p, selectedProduct)
@@ -662,79 +673,16 @@ else{
                         disabled={
                           selectedProduct.isStockTracked && p.stockQty <= 0
                         }
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor =
-                            "var(--lpos-accent)";
-                          e.currentTarget.style.boxShadow =
-                            "0 4px 12px rgba(0,0,0,0.1)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor =
-                            "var(--lpos-border)";
-                          e.currentTarget.style.boxShadow = "none";
-                        }}
-                      >
-                        <p
-                          className="p-2 bg-gray-700 text-white rounded-lg text-sm"
-                          style={{
-                            color: "var(--lpos-text-tertiary)",
-                            fontWeight: 600,
-                            fontFamily: "monospace",
-                          }}
-                        >
-                          SKU:{p.sku || "N/A"}
-                        </p>
-
-                        <p
-                          style={{
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: "var(--lpos-text-primary)",
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {variationLabel}
-                        </p>
-                        <p
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 700,
-                            color: "var(--lpos-accent)",
-                            marginTop: "auto",
-                          }}
-                        >
-                          {formatCurrency(p.unitPrice, true)}
-                        </p>
-
-                        {selectedProduct?.isStockTracked ? (
-                          <>
-                            {p.stockQty === 0 && (
-                              <span
-                                style={{
-                                  fontSize: 10,
-                                  color: "var(--lpos-red)",
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Out of Stock
-                              </span>
-                            )}
-
-                            {p.stockQty > 0 && (
-                              <p
-                                style={{
-                                  fontSize: 12,
-                                  fontWeight: 700,
-                                  color: "var(--lpos-green)",
-                                  marginTop: "auto",
-                                }}
-                              >
-                                Qty: {p.stockQty}
-                              </p>
-                            )}
-                          </>
-                        ):null}
-                      </button>
+                        title={selectedProduct.productName}
+                        productName={selectedProduct.productName}
+                        imageUrl={selectedProduct.imageUrl}
+                        hasImage={Boolean(selectedProduct.imageUrl)}
+                        sku={p.sku}
+                        unitPrice={p.unitPrice}
+                        variationLabel={variationLabel}
+                        isStockTracked={selectedProduct.isStockTracked}
+                        stockQty={p.stockQty}
+                      />
                     );
                   })
                 )}
@@ -754,15 +702,38 @@ else{
             <span style={{fontSize:13,color:"var(--lpos-text-tertiary)"}}>Try selecting a different category</span>
           </div>
         ) : (
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
-            {products.map((p, i) => (
-                    <ProductItem     disabled={
-                          selectedProduct.isStockTracked && p.stockQty <= 0
-                        }
-                         key={i} p={p} handleProductClick={handleProductClick} />
-     
-       
-            ))}
+          <div>
+            {topVariationProducts.length > 0 && (
+              <div style={{marginBottom:14}}>
+                {/* <div style={{marginBottom:10, color:"var(--lpos-text-secondary)", fontSize:13, fontWeight:600}}>
+                  Variation products
+                </div> */}
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
+                  {topVariationProducts.map((p, i) => (
+                    <ProductItem
+                      disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
+                      key={`top-${i}-${p.productId}`}
+                      p={p}
+                      handleProductClick={handleProductClick}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {rootVariationProducts.length > 0 && (
+              <div style={{marginTop:18, paddingTop:18, borderTop:"1px solid var(--lpos-border)"}}>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
+                  {rootVariationProducts.map((p, i) => (
+                    <ProductItem
+                      disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
+                      key={`root-${i}-${p.productId}`}
+                      p={p}
+                      handleProductClick={handleProductClick}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
     
