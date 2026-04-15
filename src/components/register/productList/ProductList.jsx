@@ -567,11 +567,12 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
                 setVariationPath([]);
                 setVariationLevel(0);
               }}
-         
-              style={{width:36,height:36,borderRadius:8,border:"none",background:"var(--lpos-bg)",color:"var(--lpos-text-secondary)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18}}
+         className="text-sky-700 hover:text-sky-800"
+              style={{borderRadius:8,border:"none",background:"var(--lpos-bg)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:14,padding:"10px 12px",gap:6}}
               title="Back to products"
             >
-              <ChevronDownIcon  style={{transform:"rotate(90deg)"}}/>
+              <ChevronDownIcon style={{transform:"rotate(90deg)",fontSize:16}} />
+              <span style={{fontWeight:600}}>Back</span>
             </button>
          
           </div>
