@@ -139,7 +139,7 @@ const ProductList = ({onMobClose}) => {
 
   const [selectedVariationProducts, setSelectedVariationProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
-    const [selectedProductDescription, setSelectedProductDescription] = useState("");
+    const [selectedVariationProduct, setSelectedVariationProduct] = useState("");
   const [variationLevel, setVariationLevel] = useState(0);
   const [variationPath, setVariationPath] = useState([]);
   const [currentVariations, setCurrentVariations] = useState([]);
@@ -396,24 +396,6 @@ console.log('produckkkkkkkkkkkkts',p);
     }
   };
 
-  const handleBack = () => {
-    const variationTypes = getVariationTypes(selectedVariationProducts);
-    if (variationLevel === 0) {
-      setVariationLevel(0);
-      setVariationPath([]);
-      setCurrentVariations(
-        getVariationValuesForType(selectedVariationProducts, variationTypes[0], [])
-      );
-    } else {
-      const newPath = variationPath.slice(0, variationLevel - 1);
-      setVariationPath(newPath);
-      setVariationLevel(variationLevel - 1);
-      const targetType = variationTypes[variationLevel - 1] || variationTypes[0];
-      setCurrentVariations(
-        getVariationValuesForType(selectedVariationProducts, targetType, newPath)
-      );
-    }
-  };
 
   const handleProductVariationClick = async (p, selectedProduct) => {
     const qty = 1;
@@ -429,7 +411,7 @@ const batchedItemsRes=await getBatchedItems(p.allProductId,store.storeId);
 const batchedItems=batchedItemsRes.data.results[0];
 
    const description=`${selectedProduct.productName} ${v}`;
-setSelectedProductDescription(description);
+setSelectedVariationProduct({description,p});
 
      const order = {
       allProductId:p.allProductId,
@@ -455,34 +437,54 @@ if(batchedItems.length>1){
   setAddOrderTemp(order);
   return;
 }
+else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
+  setBatchedItemList(batchedItems);
+  setIsBatchedItemsModalOpen(true);
+  setAddOrderTemp(order);
+  return;
+}
 else{
   order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
+ // order.batchNo=batchedItems[0]?.batchNo?batchedItems[0].batchNo:null;
      dispatch(addOrder(order));
 }
     // Exit variation selection mode
-    setSelectedVariationProducts([]);
-    setVariationPath([]);
-    setVariationLevel(0);
+    //setSelectedVariationProducts([]);
+   // setVariationPath([]);
+   // setVariationLevel(0);
   };
 
 
-  const addItemstoOrderListFinal=(stockBatchId,order)=>{
+const addItemstoOrderListFinal=(selectedBatch,order)=>{
+    const isOrderExist = existingOrders.find(
+      (o) => o.allProductId===order.allProductId && o.storeId===order.storeId
+    );
 
+    console.log('selectedBatch',selectedBatch);
+    const orderFinal = {
+      ...order,
+      stockBatchId: selectedBatch.stockBatchId,
+      batchNo: selectedBatch.batchNo,
+      unitPrice: selectedBatch.unitPrice ?? order.unitPrice,
+      lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+      stockQty: order.measurementUnitName ? selectedBatch.qty : order.stockQty,
+    };
 
-    const isOrderExtist=existingOrders.find(o=>o.allProductId===order.allProductId && o.storeId===order.storeId);
-
-    if(isOrderExtist){
-     dispatch(updateOrderBatchId({ allProductId: order.allProductId, storeId: order.storeId, stockBatchId }));
+    if (isOrderExist) {
+      dispatch(updateOrderBatchId({
+        allProductId: order.allProductId,
+        storeId: order.storeId,
+        stockBatchId: selectedBatch.stockBatchId,
+        batchNo: selectedBatch.batchNo,
+        unitPrice: selectedBatch.unitPrice,
+        lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+      }));
+    } else {
+      dispatch(addOrder(orderFinal));
     }
 
-    const orderFinal={...addOrderTemp,stockBatchId};
-
-     dispatch(addOrder(orderFinal));
-
-     setAddOrderTemp(null);
-              
-      setIsBatchedItemsModalOpen(false);
-
+    setAddOrderTemp(null);
+    setIsBatchedItemsModalOpen(false);
   }
 
   function useContainerWidth(ref) {
@@ -525,9 +527,9 @@ else{
       visible={isBatchedItemsModalOpen}
       onHide={() => setIsBatchedItemsModalOpen(false)}
       selectedProduct={selectedProduct}
-      productDescription={selectedProductDescription}
+      selectedVariationProduct={selectedVariationProduct}
       batchedItemList={batchedItemList}
-      onBatchSelect={(stockBatchId) => addItemstoOrderListFinal(stockBatchId, addOrderTemp)}
+      onBatchSelect={(selectedBatch) => addItemstoOrderListFinal(selectedBatch, addOrderTemp)}
     />
 
 

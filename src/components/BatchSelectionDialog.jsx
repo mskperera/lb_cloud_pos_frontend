@@ -7,7 +7,7 @@ const BatchSelectionDialog = ({
   visible,
   onHide,
   selectedProduct,
-  productDescription,
+  selectedVariationProduct,
   batchedItemList,
   onBatchSelect
 }) => {
@@ -17,7 +17,7 @@ const BatchSelectionDialog = ({
         <div className="flex items-center gap-2">
        
           <span className="font-semibold text-lg">
-           Select Batch - {productDescription}
+           Select Batch - {selectedVariationProduct?.description}
           </span>
         </div>
       }
@@ -31,7 +31,7 @@ const BatchSelectionDialog = ({
           {batchedItemList.map((p, index) => (
             <div
               key={index}
-              onClick={() => onBatchSelect(p.stockBatchId)}
+              onClick={() => onBatchSelect(p)}
               className="
                 group cursor-pointer bg-white rounded-xl p-4
                 border border-gray-200
@@ -52,10 +52,10 @@ const BatchSelectionDialog = ({
               </p>
 
               {/* Price */}
-              <p className="text-xs text-gray-400">Price</p>
+              {/* <p className="text-xs text-gray-400">Price</p>
               <p className="text-lg font-bold text-sky-600 mb-2">
-                {formatCurrency(p.unitPrice, true)}
-              </p>
+                {formatCurrency(selectedVariationProduct.unitPrice, true)}
+              </p> */}
 
               {/* Quantity */}
               <p className="text-xs text-gray-400">Available Qty</p>

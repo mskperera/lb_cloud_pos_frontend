@@ -161,10 +161,23 @@ const orderListSlice = createSlice({
 
 
         updateOrderBatchId:(state,action)=>{
-            const {allProductId,storeId,stockBatchId}=action.payload;
+            const {allProductId,storeId,stockBatchId,batchNo,unitPrice,lineTaxRate}=action.payload;
             state.list.forEach(order => {
                 if (allProductId===order.allProductId && order.storeId === storeId) {
                     order.stockBatchId = stockBatchId;
+                    order.batchNo=batchNo;
+                    if (unitPrice !== undefined) {
+                      order.unitPrice = unitPrice;
+                    }
+                    if (lineTaxRate !== undefined) {
+                      order.lineTaxRate = lineTaxRate;
+                    }
+                    const qty = new Decimal(order.qty || 0);
+                    const updatedGrossAmount = new Decimal(order.unitPrice || 0).times(qty);
+                    const updatedLineTaxAmount = updatedGrossAmount.times(new Decimal(order.lineTaxRate || 0).dividedBy(100));
+                    order.grossAmount = updatedGrossAmount.toNumber();
+                    order.lineTaxAmount = updatedLineTaxAmount.toNumber();
+                    order.netAmount = updatedGrossAmount.plus(updatedLineTaxAmount).toNumber();
                 }
             });
         },
