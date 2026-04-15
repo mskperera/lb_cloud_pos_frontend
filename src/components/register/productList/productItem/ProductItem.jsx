@@ -1,7 +1,7 @@
 import { CopyIcon } from "lucide-react";
 import ProductCardButton from "./ProductCardButton";
 
-const ProductItem = ({ p, handleProductClick }) => {
+const ProductItem = ({ p, handleProductClick, loading }) => {
   //const isVariationProduct =JSON.parse(p.variationProducts).length > 1;
   let variationProducts = [];
   let variationValueLevel = 0;
@@ -33,8 +33,15 @@ const ProductItem = ({ p, handleProductClick }) => {
         `}
         onClick={() => !isDisabled && handleProductClick(p)}
         title={p.productName}
-        
       >
+        {loading && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/80">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-2 text-sm font-semibold text-slate-700 shadow ring-1 ring-slate-200">
+              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              Waiting...
+            </div>
+          </div>
+        )}
         {/* Image (if exists) */}
         {hasImage && (
           <div className={`w-14 h-14 rounded-lg overflow-hidden ring-1 ring-gray-200 
@@ -93,6 +100,7 @@ const ProductItem = ({ p, handleProductClick }) => {
       sku={JSON.parse(p.variationProducts)[0].sku}
       variationProducts={variationProducts}
       onClick={() => !isDisabled && handleProductClick(p)}
+      loading={loading}
     />  
 
 //     <div

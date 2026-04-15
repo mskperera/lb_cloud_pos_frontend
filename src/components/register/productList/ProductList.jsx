@@ -151,6 +151,8 @@ const ProductList = ({onMobClose}) => {
   const terminalId = localStorage.getItem("terminalId");
   
   const [addOrderTemp, setAddOrderTemp] = useState(null);
+  const [loadingItemId, setLoadingItemId] = useState(null);
+  const loadingTimeoutRef = useRef();
 
   const [batchedItemList, setBatchedItemList] = useState([]);
 
@@ -285,87 +287,77 @@ const ProductList = ({onMobClose}) => {
   };
 
   const handleProductClick = async (p) => {
-    const description = p.productName;
-    const qty = 1;
-    const unitPrice = Number(p.unitPrice);
-console.log('produckkkkkkkkkkkkts',p);
-    if (p.productTypeId === 2) {
-      const payload = { productId: p.productId, storeId: store.storeId };
-      try {
-        const details = await getVariationProductDetails(payload);
-        const variations = details.data.results[0] || [];
-        const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
+    const loadingId = p.productId ?? p.allProductId;
+    let showLoading = false;
+    if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+    loadingTimeoutRef.current = setTimeout(() => {
+      setLoadingItemId(loadingId);
+      showLoading = true;
+    }, 500);
 
-        console.log('getVariationProductDetails',variations);
-        console.log('variationValueLevel', variationValueLevel);
+    try {
+      const description = p.productName;
+      const qty = 1;
+      const unitPrice = Number(p.unitPrice);
+      if (p.productTypeId === 2) {
+        const payload = { productId: p.productId, storeId: store.storeId };
+        try {
+          const details = await getVariationProductDetails(payload);
+          const variations = details.data.results[0] || [];
+          const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
 
-        
-        if (variationValueLevel===0) {
-          // If no variations or variations is not an array, add directly to order
+          if (variationValueLevel===0) {
+            // If no variations or variations is not an array, add directly to order
+            const order = {
+              productNo: p.productNo,
+              sku: variations[0].sku,
+              description,
+              productId: p.productId,
+              productTypeId: p.productTypeId,
+              unitPrice:variations[0].unitPrice,
+              lineTaxRate: variations[0].taxPerc,
+              qty,
+              measurementUnitName: p.measurementUnitName,
+              stockQty: p.isStockTracked ? p.stockQty : undefined,
+              imageUrl:p.imageUrl
+            };
+            dispatch(addOrder(order));
+          } else {
+            // Save the root list scroll position before switching to variation mode.
+            productListScrollTopRef.current = productListScrollRef.current?.scrollTop || 0;
+
+            // If variations exist, show inline in main product list area
+            setSelectedVariationProducts(variations);
+            setSelectedProduct(p);
+            setVariationLevel(0);
+            setVariationPath([]);
+            setCurrentVariations(
+              getVariationValuesForType(variations, getVariationTypes(variations)[0], [])
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching variation details:", error);
+          // Handle error by adding product as a single item
           const order = {
             productNo: p.productNo,
-            sku: variations[0].sku,
+            sku: p.sku,
             description,
             productId: p.productId,
             productTypeId: p.productTypeId,
-            unitPrice:variations[0].unitPrice,
-            lineTaxRate: variations[0].taxPerc,
+            unitPrice,
+            lineTaxRate: p.taxPerc,
             qty,
             measurementUnitName: p.measurementUnitName,
             stockQty: p.isStockTracked ? p.stockQty : undefined,
-            imageUrl:p.imageUrl
+                 imageUrl:p.imageUrl
           };
           dispatch(addOrder(order));
-        } else {
-          // Save the root list scroll position before switching to variation mode.
-          productListScrollTopRef.current = productListScrollRef.current?.scrollTop || 0;
-
-          // If variations exist, show inline in main product list area
-          setSelectedVariationProducts(variations);
-          setSelectedProduct(p);
-    //const [selectedProductDescription, setSelectedProductDescription] = useState("");
-
-          setVariationLevel(0);
-          setVariationPath([]);
-          setCurrentVariations(
-            getVariationValuesForType(variations, getVariationTypes(variations)[0], [])
-          );
         }
-      } catch (error) {
-        console.error("Error fetching variation details:", error);
-        // Handle error by adding product as a single item
-        const order = {
-          productNo: p.productNo,
-          sku: p.sku,
-          description,
-          productId: p.productId,
-          productTypeId: p.productTypeId,
-          unitPrice,
-          lineTaxRate: p.taxPerc,
-          qty,
-          measurementUnitName: p.measurementUnitName,
-          stockQty: p.isStockTracked ? p.stockQty : undefined,
-               imageUrl:p.imageUrl
-        };
-        dispatch(addOrder(order));
       }
-     } 
-    //else if (p.productTypeId === 1 || p.productTypeId === 3) {
-    //   const order = {
-    //     productNo: p.productNo,
-    //     sku: p.sku,
-    //     description,
-    //     productId: p.productId,
-    //     productTypeId: p.productTypeId,
-    //     unitPrice,
-    //     lineTaxRate: p.taxPerc,
-    //     qty,
-    //     measurementUnitName: p.measurementUnitName,
-    //     stockQty: p.isStockTracked ? p.stockQty : undefined,
-    //          imageUrl:p.imageUrl
-    //   };
-    //   dispatch(addOrder(order));
-    // }
+    } finally {
+      clearTimeout(loadingTimeoutRef.current);
+      setLoadingItemId(null);
+    }
   };
 
   const handleVariationSelect = (value, type) => {
@@ -398,60 +390,65 @@ console.log('produckkkkkkkkkkkkts',p);
 
 
   const handleProductVariationClick = async (p, selectedProduct) => {
-    const qty = 1;
-    const unitPrice = Number(p.unitPrice);
-    const v = JSON.parse(p.variationValues)
-      // .map((v) => `${v.variationTypeName}: ${v.variationValue}`)
-        .map((v) => ` ${v.variationValue}`)
-      .join(" | ");
+    const loadingId = p.variationProductId ?? p.allProductId;
+    setLoadingItemId(loadingId);
+    try {
+      const qty = 1;
+      const unitPrice = Number(p.unitPrice);
+      const v = JSON.parse(p.variationValues)
+        // .map((v) => `${v.variationTypeName}: ${v.variationValue}`)
+          .map((v) => ` ${v.variationValue}`)
+        .join(" | ");
 
-console.log('selectedProduct',selectedProduct);
-console.log('variation product clicked',p);
-const batchedItemsRes=await getBatchedItems(p.allProductId,store.storeId);
-const batchedItems=batchedItemsRes.data.results[0];
+      console.log('selectedProduct',selectedProduct);
+      console.log('variation product clicked',p);
+      const batchedItemsRes = await getBatchedItems(p.allProductId, store.storeId);
+      const batchedItems = batchedItemsRes.data.results[0];
 
-   const description=`${selectedProduct.productName} ${v}`;
-setSelectedVariationProduct({description,p});
+      const description = `${selectedProduct.productName} ${v}`;
+      setSelectedVariationProduct({description,p});
 
-     const order = {
-      allProductId:p.allProductId,
-      storeId:store.storeId,
-      productNo: selectedProduct.productNo,
-      sku: p.sku,
-      description,
-      productId: p.variationProductId,
-      productTypeId: selectedProduct.productTypeId,
-      unitPrice: unitPrice,
-      lineTaxRate: p.taxPerc,
-      qty,
-      measurementUnitName: selectedProduct.measurementUnitName,
-      stockQty: selectedProduct.isStockTracked ? p.stockQty : undefined,
-             imageUrl:selectedProduct.imageUrl
-    };
+      const order = {
+        allProductId:p.allProductId,
+        storeId:store.storeId,
+        productNo: selectedProduct.productNo,
+        sku: p.sku,
+        description,
+        productId: p.variationProductId,
+        productTypeId: selectedProduct.productTypeId,
+        unitPrice: unitPrice,
+        lineTaxRate: p.taxPerc,
+        qty,
+        measurementUnitName: selectedProduct.measurementUnitName,
+        stockQty: selectedProduct.isStockTracked ? p.stockQty : undefined,
+               imageUrl:selectedProduct.imageUrl
+      };
 
 
-
-if(batchedItems.length>1){
-  setBatchedItemList(batchedItems);
-  setIsBatchedItemsModalOpen(true);
-  setAddOrderTemp(order);
-  return;
-}
-else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
-  setBatchedItemList(batchedItems);
-  setIsBatchedItemsModalOpen(true);
-  setAddOrderTemp(order);
-  return;
-}
-else{
-  order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
- // order.batchNo=batchedItems[0]?.batchNo?batchedItems[0].batchNo:null;
-     dispatch(addOrder(order));
-}
+      if(batchedItems.length>1){
+        setBatchedItemList(batchedItems);
+        setIsBatchedItemsModalOpen(true);
+        setAddOrderTemp(order);
+        return;
+      }
+      else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
+        setBatchedItemList(batchedItems);
+        setIsBatchedItemsModalOpen(true);
+        setAddOrderTemp(order);
+        return;
+      }
+      else{
+        order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
+        // order.batchNo=batchedItems[0]?.batchNo?batchedItems[0].batchNo:null;
+        dispatch(addOrder(order));
+      }
+    } finally {
+      setLoadingItemId(null);
+    }
     // Exit variation selection mode
     //setSelectedVariationProducts([]);
-   // setVariationPath([]);
-   // setVariationLevel(0);
+    // setVariationPath([]);
+    // setVariationLevel(0);
   };
 
 
@@ -717,6 +714,7 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
             disabled={
               selectedProduct.isStockTracked && p.stockQty <= 0
             }
+            loading={loadingItemId === p.variationProductId}
             title={selectedProduct.productName}
             productName={selectedProduct.productName}
             imageUrl={selectedProduct.imageUrl}
@@ -761,6 +759,7 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
                       key={`top-${i}-${p.productId}`}
                       p={p}
                       handleProductClick={handleProductClick}
+                      loading={loadingItemId === p.productId}
                     />
                   ))}
                 </div>
@@ -775,6 +774,7 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
                       key={`root-${i}-${p.productId}`}
                       p={p}
                       handleProductClick={handleProductClick}
+                      loading={loadingItemId === p.productId}
                     />
                   ))}
                 </div>
