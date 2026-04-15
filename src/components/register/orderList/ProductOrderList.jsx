@@ -7,7 +7,7 @@ import {
 } from "../../../state/orderList/orderListSlice";
 import { DISCOUNT_TYPES, CURRENCY_DISPLAY_TYPE } from "../../../utils/constants";
 import { formatCurrency, getCurrency } from '../../../utils/format';
-import { PackageIcon, PercentCircle, PercentCircleIcon, XIcon, Trash2 } from "lucide-react";
+import { PackageIcon, PercentCircle,Trash2 } from "lucide-react";
 
 export default function ProductOrderList({ showDiscountPopup, isTraditionalMode = false }) {
   const orderList = useSelector((state) => state.orderList);

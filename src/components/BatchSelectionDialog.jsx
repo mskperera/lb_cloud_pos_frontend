@@ -1,6 +1,4 @@
-import React from "react";
-import { formatCurrency, formatDate } from "../utils/format";
-import { FaPalette } from "react-icons/fa";
+import {  formatDate } from "../utils/format";
 import DialogModel from "./model/DialogModel";
 
 const BatchSelectionDialog = ({

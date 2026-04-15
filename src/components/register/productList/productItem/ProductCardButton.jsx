@@ -1,5 +1,4 @@
-﻿import React from "react";
-import { formatCurrency } from "../../../../utils/format";
+﻿import { formatCurrency } from "../../../../utils/format";
 import { PackageIcon } from "lucide-react";
 
 const ProductCardButton = ({

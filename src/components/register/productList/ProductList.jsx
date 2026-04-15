@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   getBatchedItems,
   getCategoryMenu,
-  getProductExtraDetails,
   getProductsPosMenu,
   getVariationProductDetails,
 } from "../../../functions/register";
@@ -10,14 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { addOrder, updateOrderBatchId } from "../../../state/orderList/orderListSlice";
 import ProductItem from "./productItem/ProductItem";
 import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
-import DialogModel from "../../model/DialogModel";
 import BatchSelectionDialog from "../../BatchSelectionDialog";
-import { formatCurrency, formatDate } from "../../../utils/format";
-import { FaPalette, FaSearch, FaTag } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { ChevronDownIcon, CopyIcon, PackageIcon, XIcon } from "lucide-react";
 import ProductCardButton from "./productItem/ProductCardButton";
-
-
 
 
 const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
@@ -144,7 +139,6 @@ const ProductList = ({onMobClose}) => {
   const [variationPath, setVariationPath] = useState([]);
   const [currentVariations, setCurrentVariations] = useState([]);
 
-  const [saleType, setSaleType] = useState("products");
   const [productListLoading, setIsProductListLoading] = useState(false);
 
   const store = JSON.parse(localStorage.getItem("selectedStore"));
