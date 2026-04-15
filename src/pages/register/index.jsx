@@ -67,12 +67,13 @@ const Sidebar = ({
   isMobile,
 }) => {
   const navItems = [
+      { id: "home", icon: <HomeIcon />, label: "Home" },
     { id: "new", icon: <ShoppingCartIcon />, label: "New Sale" },
     { id: "lookup", icon: <SearchXIcon />, label: "Item Lookup" },
     { id: "history", icon: <HistoryIcon />, label: "Sales History" },
     { id: "custom", icon: <PlusIcon />, label: "Add Custom Item" },
     { id: "dayend", icon: <CalendarIcon />, label: "Day End" },
-    { id: "home", icon: <HomeIcon />, label: "Home" },
+  
   ];
 
   const cls = `lpos-sidebar${expanded ? " expanded" : ""}${isMobOpen ? " mob-open" : ""}`;
@@ -116,7 +117,7 @@ const Sidebar = ({
           <div key={item.id} className="lpos-si-wrap relative">
             <div
               onClick={() => onAction(item.id)}
-              className="flex items-center gap-10 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
+              className="flex items-center gap-4 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
             >
               <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                 {item.icon}
@@ -157,7 +158,7 @@ const Sidebar = ({
           <div className="lpos-si-wrap relative">
             <div
               onClick={() => onAction("toggleProducts")}
-              className="flex items-center gap-10 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
+              className="flex items-center gap-4 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
             >
               <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                 {hideProductList ? <GripIcon /> : <TableIcon />}
