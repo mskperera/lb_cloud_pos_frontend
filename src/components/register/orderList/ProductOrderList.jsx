@@ -7,7 +7,7 @@ import {
 } from "../../../state/orderList/orderListSlice";
 import { DISCOUNT_TYPES, CURRENCY_DISPLAY_TYPE } from "../../../utils/constants";
 import { formatCurrency, getCurrency } from '../../../utils/format';
-import { PackageIcon, PercentCircle, PercentCircleIcon, XIcon, Trash2 } from "lucide-react";
+import { PackageIcon, PercentCircle,Trash2 } from "lucide-react";
 
 export default function ProductOrderList({ showDiscountPopup, isTraditionalMode = false }) {
   const orderList = useSelector((state) => state.orderList);
@@ -28,7 +28,7 @@ export default function ProductOrderList({ showDiscountPopup, isTraditionalMode 
 
   const handleQtyChange = (product, newQty) => {
     const increment = newQty - product.qty;
-    if (!isNaN(increment)) {
+    if (!isNaN(increment) && increment !== 0 && product.qty + increment > 0) {
       dispatch(
         increaseQty({
           orderListId: product.orderListId,
@@ -166,9 +166,9 @@ const [openMenuId, setOpenMenuId] = useState(null);
                       }} title={product.description}>
                         {product.description}
 
-                           {product.stockBatchId ? (
+                           {product.batchNo ? (
                       <div className="text-[10px] sm:text-xs font-mono text-gray-200 w-fit bg-blue-700 px-1.5 py-0.5 rounded">
-                        Batch: {product.stockBatchId}
+                        Batch: {product.batchNo}
                       </div>
                     ):''}
 
@@ -435,9 +435,9 @@ return (
                     {formatCurrency(unitPrice)}
                   </div>
 
-                     {product.stockBatchId ? (
+                     {product.batchNo ? (
                       <div className="text-[10px] sm:text-xs font-mono text-gray-200 bg-blue-700 px-1.5 py-0.5 rounded">
-                        Batch: {product.stockBatchId}
+                        Batch: {product.batchNo}
                       </div>
                     ):''}
 

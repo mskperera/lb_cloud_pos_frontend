@@ -21,7 +21,6 @@ import {
   FaCalendarCheck,
   FaCompressAlt,
   FaHistory,
-  FaPalette,
   FaPlusCircle,
   FaSearch,
   FaTh,
@@ -41,19 +40,15 @@ import {
   HistoryIcon,
   HomeIcon,
   MenuIcon,
-  MenuSquareIcon,
   PlusIcon,
   RefreshCwIcon,
   SearchXIcon,
   ShoppingCartIcon,
-  SquareMenuIcon,
   StoreIcon,
   TableIcon,
-  ToiletIcon,
 } from "lucide-react";
 import AdvancedProductSearch from "../../components/AdvancedProductSearch";
 import { getBatchedItems } from "../../functions/register";
-import { formatCurrency, formatDate } from "../../utils/format";
 
 const Sidebar = ({
   expanded,
@@ -67,12 +62,12 @@ const Sidebar = ({
   isMobile,
 }) => {
   const navItems = [
+    { id: "home", icon: <HomeIcon />, label: "Home" },
     { id: "new", icon: <ShoppingCartIcon />, label: "New Sale" },
     { id: "lookup", icon: <SearchXIcon />, label: "Item Lookup" },
     { id: "history", icon: <HistoryIcon />, label: "Sales History" },
     { id: "custom", icon: <PlusIcon />, label: "Add Custom Item" },
     { id: "dayend", icon: <CalendarIcon />, label: "Day End" },
-    { id: "home", icon: <HomeIcon />, label: "Home" },
   ];
 
   const cls = `lpos-sidebar${expanded ? " expanded" : ""}${isMobOpen ? " mob-open" : ""}`;
@@ -105,9 +100,16 @@ const Sidebar = ({
           flexShrink: 0,
         }}
       >
-
         {isMobile && (
-          <div style={{display: "flex",  justifyContent: "center", alignItems: "center", padding: "8px 0", marginBottom: 4}}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "8px 0",
+              marginBottom: 4,
+            }}
+          >
             <img src={posLogo} alt="Legend POS" className=" w-auto h-6" />
           </div>
         )}
@@ -116,7 +118,7 @@ const Sidebar = ({
           <div key={item.id} className="lpos-si-wrap relative">
             <div
               onClick={() => onAction(item.id)}
-              className="flex items-center gap-10 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
+              className="flex items-center gap-4 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
             >
               <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                 {item.icon}
@@ -157,7 +159,7 @@ const Sidebar = ({
           <div className="lpos-si-wrap relative">
             <div
               onClick={() => onAction("toggleProducts")}
-              className="flex items-center gap-10 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
+              className="flex items-center gap-4 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
             >
               <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                 {hideProductList ? <GripIcon /> : <TableIcon />}
@@ -206,14 +208,14 @@ const Register = () => {
   const [showPayment, setShowPayment] = useState(false);
 
   const store = JSON.parse(localStorage.getItem("selectedStore"));
-    const [addOrderTemp, setAddOrderTemp] = useState(null);
-  
-    const [batchedItemList, setBatchedItemList] = useState([]);
-  
-    const [isBatchedItemsModalOpen, setIsBatchedItemsModalOpen] = useState(false);
-const existingOrders=useSelector((state) => state.orderList.list);
+  const [addOrderTemp, setAddOrderTemp] = useState(null);
 
-const [selectedProduct, setSelectedProduct] = useState(null);
+  const [batchedItemList, setBatchedItemList] = useState([]);
+
+  const [isBatchedItemsModalOpen, setIsBatchedItemsModalOpen] = useState(false);
+  const existingOrders = useSelector((state) => state.orderList.list);
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const PaymentScreen = () => {
     return (
@@ -268,10 +270,9 @@ const [selectedProduct, setSelectedProduct] = useState(null);
     const batchedItems = batchedItemsRes.data.results[0];
     console.log("batchedItems", batchedItems);
 
-    
     const order = {
-       allProductId:p.allProductId,
-      storeId:store.storeId,
+      allProductId: p.allProductId,
+      storeId: store.storeId,
       productNo: p.productNo,
       description,
       productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
@@ -294,25 +295,31 @@ const [selectedProduct, setSelectedProduct] = useState(null);
     }
   };
 
-
-   const addItemstoOrderListFinal=(stockBatchId,order)=>{
-  
-      const isOrderExtist=existingOrders.find(o=>o.allProductId===order.allProductId && o.storeId===order.storeId);
-   console.log('stockBatchId,order',stockBatchId,order);
-      console.log('isOrderExtist',isOrderExtist);
-      if(isOrderExtist){
-       dispatch(updateOrderBatchId({ allProductId: order.allProductId, storeId: order.storeId, stockBatchId }));
-      }
-  
-      const orderFinal={...addOrderTemp,stockBatchId};
-  
-       dispatch(addOrder(orderFinal));
-  
-       setAddOrderTemp(null);
-                
-        setIsBatchedItemsModalOpen(false);
-  
+  const addItemstoOrderListFinal = (stockBatchId, order) => {
+    const isOrderExtist = existingOrders.find(
+      (o) =>
+        o.allProductId === order.allProductId && o.storeId === order.storeId,
+    );
+    console.log("stockBatchId,order", stockBatchId, order);
+    console.log("isOrderExtist", isOrderExtist);
+    if (isOrderExtist) {
+      dispatch(
+        updateOrderBatchId({
+          allProductId: order.allProductId,
+          storeId: order.storeId,
+          stockBatchId,
+        }),
+      );
     }
+
+    const orderFinal = { ...addOrderTemp, stockBatchId };
+
+    dispatch(addOrder(orderFinal));
+
+    setAddOrderTemp(null);
+
+    setIsBatchedItemsModalOpen(false);
+  };
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -370,22 +377,21 @@ const [selectedProduct, setSelectedProduct] = useState(null);
     );
   };
 
-  const handleBarcodeEnter =async (p) => {
+  const handleBarcodeEnter = async (p) => {
     const description = `${p.productName}`;
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
 
-        const batchedItemsRes = await getBatchedItems(
+    const batchedItemsRes = await getBatchedItems(
       p.allProductId,
       store.storeId,
     );
     const batchedItems = batchedItemsRes.data.results[0];
     console.log("batchedItems", batchedItems);
 
-
     const order = {
-       allProductId:p.allProductId,
-      storeId:store.storeId,
+      allProductId: p.allProductId,
+      storeId: store.storeId,
       productNo: p.productNo,
       description,
       productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
@@ -406,7 +412,6 @@ const [selectedProduct, setSelectedProduct] = useState(null);
         : null;
       dispatch(addOrder(order));
     }
-    
   };
 
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -461,10 +466,9 @@ const [selectedProduct, setSelectedProduct] = useState(null);
         setMobSidebarOpen(false);
       }
 
-      if(mobile){
+      if (mobile) {
         setHideProductList(false); // Always show product list on mobile for better UX
       }
-
     };
 
     window.addEventListener("resize", handleResize);
@@ -502,7 +506,6 @@ const [selectedProduct, setSelectedProduct] = useState(null);
       setHideProductList((prev) => !prev);
     }
   };
-
 
   const Topbar = () => (
     <header className="lpos-topbar">
@@ -543,8 +546,6 @@ const [selectedProduct, setSelectedProduct] = useState(null);
           gap: 8,
         }}
       >
-
-
         {[<BellIcon />, <RefreshCwIcon />].map((ic, i) => (
           <button
             key={i}
@@ -594,18 +595,15 @@ const [selectedProduct, setSelectedProduct] = useState(null);
 
       <ActionButtonsPopup />
 
-
-
-    <BatchSelectionDialog
-      visible={isBatchedItemsModalOpen}
-      onHide={() => setIsBatchedItemsModalOpen(false)}
-      selectedProduct={selectedProduct}
-      batchedItemList={batchedItemList}
-      onBatchSelect={(stockBatchId) => addItemstoOrderListFinal(stockBatchId, addOrderTemp)}
-    />
-
-
-
+      <BatchSelectionDialog
+        visible={isBatchedItemsModalOpen}
+        onHide={() => setIsBatchedItemsModalOpen(false)}
+        selectedProduct={selectedProduct}
+        batchedItemList={batchedItemList}
+        onBatchSelect={(stockBatchId) =>
+          addItemstoOrderListFinal(stockBatchId, addOrderTemp)
+        }
+      />
 
       <DialogModel
         header="Return Order"
@@ -661,7 +659,7 @@ const [selectedProduct, setSelectedProduct] = useState(null);
           >
             <Topbar />
 
-            <div 
+            <div
               style={{
                 display: "flex",
                 flex: 1,
@@ -676,7 +674,7 @@ const [selectedProduct, setSelectedProduct] = useState(null);
                 isMobOpen={mobSidebarOpen}
                 onMobClose={() => setMobSidebarOpen(false)}
                 hideProductList={hideProductList}
-           isMobile={isMobile}
+                isMobile={isMobile}
               />
 
               {isMobile && mobSidebarOpen && (
@@ -686,27 +684,19 @@ const [selectedProduct, setSelectedProduct] = useState(null);
                 />
               )}
 
+              {!hideProductList ? (
+                <>
+                  <ProductList
+                    selectedCategoryId={selectedCategoryId}
+                    onProductClick={handleProductClick}
+                    onMobClose={() => setMobProductsOpen(false)}
+                  />
 
-{!hideProductList ?  <>
- <ProductList
-                selectedCategoryId={selectedCategoryId}
-                onProductClick={handleProductClick}
-                onMobClose={() => setMobProductsOpen(false)}
-              />
-
-     <OrderListAll />
-</>
-             :
-             
-
-             <OrderListAll isTraditionalMode={hideProductList} />
-
-             }
-
-             
-
-
-
+                  <OrderListAll />
+                </>
+              ) : (
+                <OrderListAll isTraditionalMode={hideProductList} />
+              )}
             </div>
           </div>
         </>
