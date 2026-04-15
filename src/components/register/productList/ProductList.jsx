@@ -139,6 +139,7 @@ const ProductList = ({onMobClose}) => {
 
   const [selectedVariationProducts, setSelectedVariationProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
+    const [selectedProductDescription, setSelectedProductDescription] = useState("");
   const [variationLevel, setVariationLevel] = useState(0);
   const [variationPath, setVariationPath] = useState([]);
   const [currentVariations, setCurrentVariations] = useState([]);
@@ -322,6 +323,8 @@ console.log('produckkkkkkkkkkkkts',p);
           // If variations exist, show inline in main product list area
           setSelectedVariationProducts(variations);
           setSelectedProduct(p);
+    //const [selectedProductDescription, setSelectedProductDescription] = useState("");
+
           setVariationLevel(0);
           setVariationPath([]);
           setCurrentVariations(
@@ -420,12 +423,13 @@ console.log('produckkkkkkkkkkkkts',p);
         .map((v) => ` ${v.variationValue}`)
       .join(" | ");
 
-
+console.log('selectedProduct',selectedProduct);
+console.log('variation product clicked',p);
 const batchedItemsRes=await getBatchedItems(p.allProductId,store.storeId);
 const batchedItems=batchedItemsRes.data.results[0];
 
    const description=`${selectedProduct.productName} ${v}`;
-
+setSelectedProductDescription(description);
 
      const order = {
       allProductId:p.allProductId,
@@ -521,6 +525,7 @@ else{
       visible={isBatchedItemsModalOpen}
       onHide={() => setIsBatchedItemsModalOpen(false)}
       selectedProduct={selectedProduct}
+      productDescription={selectedProductDescription}
       batchedItemList={batchedItemList}
       onBatchSelect={(stockBatchId) => addItemstoOrderListFinal(stockBatchId, addOrderTemp)}
     />

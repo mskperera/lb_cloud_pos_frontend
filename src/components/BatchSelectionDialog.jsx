@@ -7,6 +7,7 @@ const BatchSelectionDialog = ({
   visible,
   onHide,
   selectedProduct,
+  productDescription,
   batchedItemList,
   onBatchSelect
 }) => {
@@ -16,8 +17,7 @@ const BatchSelectionDialog = ({
         <div className="flex items-center gap-2">
        
           <span className="font-semibold text-lg">
-            {JSON.stringify(selectedProduct)}
-            {selectedProduct?.description} - Select Batch oooo
+           Select Batch - {productDescription}
           </span>
         </div>
       }
