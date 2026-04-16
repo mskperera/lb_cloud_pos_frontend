@@ -180,7 +180,6 @@ const ProductList = ({onMobClose}) => {
     const skip = page * limit;
     const filteredData = {
       productId: null,
-      productNo: null,
       productName: null,
       barcode: null,
       categoryId: categoryId,
@@ -303,11 +302,10 @@ const ProductList = ({onMobClose}) => {
           if (variationValueLevel===0) {
             // If no variations or variations is not an array, add directly to order
             const order = {
-             allProductId:p.allProductId,
+             allProductId:JSON.parse(p.allProductId)[0],
+              storeId: store.storeId,
               sku: variations[0].sku,
               description,
-              productId: p.productId,
-              productTypeId: p.productTypeId,
               unitPrice:variations[0].unitPrice,
               lineTaxRate: variations[0].taxPerc,
               qty,
@@ -333,11 +331,10 @@ const ProductList = ({onMobClose}) => {
           console.error("Error fetching variation details:", error);
           // Handle error by adding product as a single item
           const order = {
-            productNo: p.productNo,
+         allProductId:p.allProductId,
+          storeId: store.storeId,
             sku: p.sku,
             description,
-            productId: p.productId,
-            productTypeId: p.productTypeId,
             unitPrice,
             lineTaxRate: p.taxPerc,
             qty,
@@ -405,11 +402,8 @@ const ProductList = ({onMobClose}) => {
       const order = {
         allProductId:p.allProductId,
         storeId:store.storeId,
-        productNo: selectedProduct.productNo,
         sku: p.sku,
         description,
-        productId: p.variationProductId,
-        productTypeId: selectedProduct.productTypeId,
         unitPrice: unitPrice,
         lineTaxRate: p.taxPerc,
         qty,
@@ -772,7 +766,8 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
               <div style={{marginTop:18, paddingTop:18, borderTop:"1px solid var(--lpos-border)"}}>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12}}>
                   {rootVariationProducts.map((p, i) => {
-                    const order = existingOrders.find(o => o.allProductId === p.allProductId);
+                    const allProductId = JSON.parse(p.allProductId)[0];
+                    const order = existingOrders.find(o => o.allProductId === allProductId);
                     const orderQty = order ? order.qty : 0;
                     return (
                       <ProductItem
