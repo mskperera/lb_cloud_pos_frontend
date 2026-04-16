@@ -1,24 +1,20 @@
 import { CopyIcon } from "lucide-react";
 import ProductCardButton from "./ProductCardButton";
 
-const ProductItem = ({ p, handleProductClick, loading }) => {
-  //const isVariationProduct =JSON.parse(p.variationProducts).length > 1;
+const ProductItem = ({ p, handleProductClick, loading, orderQty }) => {
   let variationProducts = [];
   let variationValueLevel = 0;
   try {
-    variationProducts = JSON.parse(p.variationProducts || "[]");
+    variationProducts = JSON.parse(p.variationProducts || '[]');
     variationValueLevel = variationProducts[0]?.variationValueLevel ?? 0;
-  } catch (error) {
+  } catch (e) {
     variationProducts = [];
     variationValueLevel = 0;
   }
-
   const hasImage = Boolean(p.imageUrl);
-
   const isDisabled = false;
-  // === Variation Product ===
+
   if (variationValueLevel) {
-  
     return (
       <div
         className={`
@@ -54,11 +50,11 @@ const ProductItem = ({ p, handleProductClick, loading }) => {
               alt={p.productName}
               className="w-full h-full object-cover"
             />
-            
           </div>
         )}
 
- 
+     
+
         <div
           className={`
             ${hasImage 
@@ -68,12 +64,8 @@ const ProductItem = ({ p, handleProductClick, loading }) => {
             text-sky-600 group-hover:text-sky-700 transition-colors
           `}
         >
-          {/* <FaClone className="w-full h-full" /> */}
           <CopyIcon className="w-full h-full"  />
-              {/* <PackageIcon className="w-full h-full" strokeWidth={1.2} /> */}
         </div>
-    
-
         <div className="flex-1" />
         <p
           className="mt-4 text-sm font-bold text-gray-700 tracking-tight text-center
@@ -82,14 +74,12 @@ const ProductItem = ({ p, handleProductClick, loading }) => {
         >
           {p.productName}
         </p>
-
       </div>
     );
   }
 
   // === Regular Product ===
   return (
-
     <ProductCardButton
       productName={p.productName}
       imageUrl={p.imageUrl}
@@ -97,13 +87,14 @@ const ProductItem = ({ p, handleProductClick, loading }) => {
       unitPrice={variationProducts?.[0]?.unitPrice ?? p.unitPrice}
       isStockTracked={p.isStockTracked}
       stockQty={p.stockQty}
-      sku={JSON.parse(p.variationProducts)[0].sku}
+      sku={variationProducts?.[0]?.sku}
       variationProducts={variationProducts}
       onClick={() => !isDisabled && handleProductClick(p)}
       loading={loading}
-    />  
-
+      orderQty={orderQty}
+    />
   );
+  
 };
 
 export default ProductItem;
