@@ -138,7 +138,7 @@ const orderListSlice = createSlice({
 
             state.nextOrderListId += 1;
 
-            const existingOrderIndex = state.list.findIndex(order => order.productId === newOrder.productId);
+            const existingOrderIndex = state.list.findIndex(order => order.allProductId === newOrder.allProductId);
 
             if (existingOrderIndex !== -1) {
                 const existingOrder = state.list[existingOrderIndex];

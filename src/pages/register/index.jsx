@@ -273,13 +273,14 @@ const Register = () => {
     const order = {
       allProductId: p.allProductId,
       storeId: store.storeId,
-      productNo: p.productNo,
+         sku: p.sku,
       description,
-      productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
       unitPrice,
-      productTypeId: p.productTypeId,
       lineTaxRate: p.taxPerc,
       qty,
+      measurementUnitName: p.measurementUnitName,
+        stockQty: p.isStockTracked ? p.stockQty : undefined,
+               imageUrl:p.imageUrl
     };
 
     if (batchedItems.length > 0) {
@@ -394,9 +395,7 @@ const Register = () => {
       storeId: store.storeId,
       productNo: p.productNo,
       description,
-      productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
       unitPrice,
-      productTypeId: p.productTypeId,
       lineTaxRate: p.taxPerc,
       qty,
     };
