@@ -13,7 +13,8 @@ const ProductCardButton = ({
   variationLabel,
   stockQty,
   measurementUnitName,
-  loading
+  loading,
+  orderQty
 }) => {
   return (
     <button
@@ -44,6 +45,27 @@ const ProductCardButton = ({
 
       <div className="flex w-full min-h-[120px]">
         <div className="w-[40%] bg-sky-100 p-3 flex items-center justify-center relative">
+          {/* Badge for order quantity */}
+          {orderQty > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: 6,
+              right: 6,
+              background: '#2563eb',
+              color: 'white',
+              borderRadius: '50%',
+              minWidth: 22,
+              height: 22,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: 13,
+              zIndex: 10
+            }}>
+              {orderQty}
+            </div>
+          )}
           <div className="w-full h-full rounded-l-xl overflow-hidden flex items-center justify-center">
             {hasImage ? (
               <img

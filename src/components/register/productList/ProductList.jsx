@@ -303,7 +303,7 @@ const ProductList = ({onMobClose}) => {
           if (variationValueLevel===0) {
             // If no variations or variations is not an array, add directly to order
             const order = {
-              productNo: p.productNo,
+             allProductId:p.allProductId,
               sku: variations[0].sku,
               description,
               productId: p.productId,
@@ -694,9 +694,11 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
       }}
     >
       {currentVariations.map((p, index) => {
-        const variationLabel = JSON.parse(p.variationValues)
-          .map((v) => v.variationValue)
-          .join(" • ");
+        const variationLabel = JSON.parse(p.variationValues)[JSON.parse(p.variationValues).length - 1].variationValue
+     
+
+                 const order = existingOrders.find(o => o.allProductId === p.allProductId);
+                    const orderQty = order ? order.qty : 0;
 
         return (
           <ProductCardButton
@@ -710,15 +712,16 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
             }
             loading={loadingItemId === p.variationProductId}
             title={selectedProduct.productName}
-            productName={selectedProduct.productName}
+            productName={variationLabel}
             imageUrl={selectedProduct.imageUrl}
             hasImage={Boolean(selectedProduct.imageUrl)}
             sku={p.sku}
             unitPrice={p.unitPrice}
-            variationLabel={variationLabel}
+           // variationLabel={variationLabel}
             isStockTracked={selectedProduct.isStockTracked}
             stockQty={` ${p.stockQty} `}
             measurementUnitName={selectedProduct.measurementUnitName}
+                     orderQty={orderQty}
           />
         );
       })}
@@ -747,30 +750,41 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
                   Variation products
                 </div> */}
                 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:12}}>
-                  {topVariationProducts.map((p, i) => (
-                    <ProductItem
-                      disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
-                      key={`top-${i}-${p.productId}`}
-                      p={p}
-                      handleProductClick={handleProductClick}
-                      loading={loadingItemId === p.productId}
-                    />
-                  ))}
+                  {topVariationProducts.map((p, i) => {
+                    // Find order quantity for this product
+                    const order = existingOrders.find(o => o.allProductId === p.allProductId);
+                    const orderQty = order ? order.qty : 0;
+                    return (
+                      <ProductItem
+                        disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
+                        key={`top-${i}-${p.productId}`}
+                        p={p}
+                        handleProductClick={handleProductClick}
+                        loading={loadingItemId === p.productId}
+                        orderQty={orderQty}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
             {rootVariationProducts.length > 0 && (
               <div style={{marginTop:18, paddingTop:18, borderTop:"1px solid var(--lpos-border)"}}>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12}}>
-                  {rootVariationProducts.map((p, i) => (
-                    <ProductItem
-                      disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
-                      key={`root-${i}-${p.productId}`}
-                      p={p}
-                      handleProductClick={handleProductClick}
-                      loading={loadingItemId === p.productId}
-                    />
-                  ))}
+                  {rootVariationProducts.map((p, i) => {
+                    const order = existingOrders.find(o => o.allProductId === p.allProductId);
+                    const orderQty = order ? order.qty : 0;
+                    return (
+                      <ProductItem
+                        disabled={selectedProduct.isStockTracked && p.stockQty <= 0}
+                        key={`root-${i}-${p.productId}`}
+                        p={p}
+                        handleProductClick={handleProductClick}
+                        loading={loadingItemId === p.productId}
+                        orderQty={orderQty}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
