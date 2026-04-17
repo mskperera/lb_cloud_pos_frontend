@@ -262,6 +262,7 @@ const Register = () => {
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
 
+    console.log("Selected Productiiii", p);
     setSelectedProduct(p);
     const batchedItemsRes = await getBatchedItems(
       p.allProductId,
@@ -296,31 +297,37 @@ const Register = () => {
     }
   };
 
-  const addItemstoOrderListFinal = (stockBatchId, order) => {
-    const isOrderExtist = existingOrders.find(
-      (o) =>
-        o.allProductId === order.allProductId && o.storeId === order.storeId,
+const addItemstoOrderListFinal=(selectedBatch,order)=>{
+    const isOrderExist = existingOrders.find(
+      (o) => o.allProductId===order.allProductId && o.storeId===order.storeId
     );
-    console.log("stockBatchId,order", stockBatchId, order);
-    console.log("isOrderExtist", isOrderExtist);
-    if (isOrderExtist) {
-      dispatch(
-        updateOrderBatchId({
-          allProductId: order.allProductId,
-          storeId: order.storeId,
-          stockBatchId,
-        }),
-      );
+
+    console.log('selectedBatch',selectedBatch);
+    const orderFinal = {
+      ...order,
+      stockBatchId: selectedBatch.stockBatchId,
+      batchNo: selectedBatch.batchNo,
+      unitPrice: selectedBatch.unitPrice ?? order.unitPrice,
+      lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+      stockQty: order.measurementUnitName ? selectedBatch.qty : order.stockQty,
+    };
+
+    if (isOrderExist) {
+      dispatch(updateOrderBatchId({
+        allProductId: order.allProductId,
+        storeId: order.storeId,
+        stockBatchId: selectedBatch.stockBatchId,
+        batchNo: selectedBatch.batchNo,
+        unitPrice: selectedBatch.unitPrice,
+        lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+      }));
+    } else {
+      dispatch(addOrder(orderFinal));
     }
 
-    const orderFinal = { ...addOrderTemp, stockBatchId };
-
-    dispatch(addOrder(orderFinal));
-
     setAddOrderTemp(null);
-
     setIsBatchedItemsModalOpen(false);
-  };
+  }
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -593,6 +600,7 @@ const Register = () => {
       />
 
       <ActionButtonsPopup />
+
 
       <BatchSelectionDialog
         visible={isBatchedItemsModalOpen}

@@ -292,7 +292,7 @@ const ProductList = ({onMobClose}) => {
       const description = p.productName;
       const qty = 1;
       const unitPrice = Number(p.unitPrice);
-      if (p.productTypeId === 2) {
+
         const payload = { productId: p.productId, storeId: store.storeId };
         try {
           const details = await getVariationProductDetails(payload);
@@ -344,7 +344,7 @@ const ProductList = ({onMobClose}) => {
           };
           dispatch(addOrder(order));
         }
-      }
+      
     } finally {
       clearTimeout(loadingTimeoutRef.current);
       setLoadingItemId(null);
