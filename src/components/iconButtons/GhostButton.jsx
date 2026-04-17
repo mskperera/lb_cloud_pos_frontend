@@ -30,7 +30,8 @@ const GhostButton = ({
 
       {tooltip && !disabled && (
         <div
-          className="absolute z-50 left-1/2 -translate-x-1/2 mt-2 text-sm font-normal bg-white text-black rounded-lg shadow-md py-2 px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-48"
+          className="absolute left-1/2 bottom-full mb-2 z-50 w-max max-w-xs px-3 py-1 rounded bg-gray-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg transform -translate-x-1/2 transition-opacity duration-200"
+          role="tooltip"
         >
           {tooltip}
         </div>

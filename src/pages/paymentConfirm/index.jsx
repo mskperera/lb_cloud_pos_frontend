@@ -2,13 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearOrderList } from '../../state/orderList/orderListSlice';
-import { saveAs } from 'file-saver';
-import { exPrintReceipt } from '../../functions/exPrint';
-import { getTenantId } from '../../functions/authService';
 import { getOrderReceipt } from '../../functions/register';
 import ReceiptComponent from '../../components/register/printReceipt/ReceiptComponent';
 import { formatCurrency } from '../../utils/format';
-import { FaPrint, FaEnvelope, FaSms, FaGlobe, FaPrayingHands } from 'react-icons/fa';
+import { FaPrint, FaEnvelope, FaSms} from 'react-icons/fa';
 import html2canvas from 'html2canvas';
 
 import { invoke } from "@tauri-apps/api/core";
@@ -447,36 +444,11 @@ setIsPrintButtonLoading(true);
   };
 
   return (
-    <div className=" bg-gray-100 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
-{/* <ReceiptTestComp /> */}
+    <div className="bg-white flex items-center justify-center z-50">
+      <div className="rounded-xl w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <div className="p-6 rounded-l-xl">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-lg font-semibold text-gray-600">Loading receipt...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-red-600 font-medium">{error}</div>
-            </div>
-          ) : (
-            <>
-               <ReceiptComponent
-                orderHeader={orderHeader}
-                orderDetails={orderDetails}
-                payments={payments}
-                currency={currency}
-                setCashPaymentChage={setChange}
-                 ref={receiptRef} 
-              /> 
-               {/* <div style={{ position: 'absolute', left: '-9999px' }}> */}
-                {/* <SimpleReceipt ref={receiptRef} /> */}
-              {/* </div>  */}
-            </>
-          )}
-        </div>
-        <div className="p-8 flex flex-col justify-start">
+   
+        <div className="p-6 flex flex-col justify-start bg-white ">
           <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Payment Confirmation</h2>
           <div className="text-center mb-6">
             <label className="text-2xl font-semibold text-sky-700">Balance</label>
@@ -612,6 +584,42 @@ setIsPrintButtonLoading(true);
 
           </div>
         </div>
+
+     <div className="p-6 rounded-xl bg-white border border-gray-200">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-lg font-semibold text-gray-600">Loading receipt...</div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-red-600 font-medium">{error}</div>
+            </div>
+          ) : (
+              
+            <div 
+              style={{
+                maxHeight: '70vh', // Adjust as needed for your popup
+                overflowY: 'auto',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+              }}
+            >
+              <ReceiptComponent
+                orderHeader={orderHeader}
+                orderDetails={orderDetails}
+                payments={payments}
+                currency={currency}
+                setCashPaymentChage={setChange}
+                ref={receiptRef}
+              />
+            </div>
+       
+          )}
+        </div>
+
+
       </div>
     </div>
   );
