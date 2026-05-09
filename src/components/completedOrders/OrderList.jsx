@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
-import { validate } from "../../utils/formValidation";
 import { getOrders } from "../../functions/order";
-import { getDrpSession } from "../../functions/dropdowns";
 import OrderVoidRemark from "../register/OrderVoidRemark";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 import GhostButton from "../iconButtons/GhostButton";
 import PaymentConfirm from "../../pages/paymentConfirm";
-import LoadingPopup from "../LoadingPopup";
 import DaisyUIPaginator from "../../components/DaisyUIPaginator";
 import { FaTimes } from "react-icons/fa";
 import { XIcon } from "lucide-react";
+import CloseButton from "../buttons/CloseButton";
+import DialogModel2 from "../model/DialogModel2";
 
 export default function OrderList({ isVisible, setIsVisible }) {
   const [orders, setOrders] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -147,33 +145,12 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
     }
   };
 
-  if (!isVisible) return null;
-
   return (
     <>
-      {/* Backdrop + Panel */}
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        onClick={handleBackdropClick}
-      >
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+ 
+    <DialogModel2 onHide={() => setIsVisible(false)} title="Sales History"   isVisible={isVisible}>
 
-        {/* Panel */}
-        <div className="relative w-full max-w-6xl max-h-[92vh] bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between py-2 pl-6 pr-2 border-b border-gray-300 bg-gray-200 text-gray-600">
-            <h2 className="text-xl font-bold">Sales History</h2>
-            <button
-              onClick={() => setIsVisible(false)}
-              className="p-3 rounded-full hover:bg-slate-200 hover:text-red-500 transition-all duration-200"
-              aria-label="Close"
-            >
-              <FaTimes className="text-xl" />
-            </button>
-          </div>
-
-          {/* Filters */}
+   
 
           {/* Improved Filter/Search Panel Layout */}
           <div className="flex flex-col md:flex-row md:items-end gap-4 px-6 py-4 border-t border-gray-200">
@@ -305,7 +282,7 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
           {/* Body - Scrollable */}
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
       
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
@@ -397,6 +374,105 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
                 </table>
               </div>
             </div>
+
+            {/* Tablet Card View (md to lg) */}
+            <div className="hidden md:block lg:hidden space-y-2">
+              {orders.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-3xl mb-2">📦</div>
+                  <div className="text-sm font-medium">No orders found</div>
+                  <div className="text-xs mt-1">Try adjusting your search filters</div>
+                </div>
+              ) : isTableDataLoading ? (
+                <div className="text-center py-12">
+                  <div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
+                  <div className="text-xs text-gray-600 mt-2">Loading orders...</div>
+                </div>
+              ) : (
+                orders.map((item) => (
+                  <div
+                    key={item.orderId}
+                    className="bg-white rounded-lg border border-gray-200 p-3 transition-all hover:bg-gray-50 active:bg-gray-100 text-sm"
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-800 text-sm mb-1">
+                          {item.orderNo}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Customer: {item.customerName || "-"}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Date: {formatUtcToLocal(item.createdDate_UTC)}
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <div className="font-bold text-sky-600 text-sm">
+                          {formatCurrency(item.grandTotal)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Gross: {formatCurrency(item.grossAmount_total)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Tax: {formatCurrency(item.lineTaxAmount_total)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 justify-end">
+                      {actionButtons(item)}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-2 xs:space-y-2.5">
+              {orders.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <div className="text-3xl mb-2">📦</div>
+                  <div className="text-xs xs:text-sm font-medium">No orders found</div>
+                  <div className="text-xs mt-0.5">Try adjusting filters</div>
+                </div>
+              ) : isTableDataLoading ? (
+                <div className="text-center py-10">
+                  <div className="inline-block animate-spin w-7 h-7 border-3 border-sky-500 border-t-transparent rounded-full"></div>
+                  <div className="text-xs text-gray-600 mt-2">Loading...</div>
+                </div>
+              ) : (
+                orders.map((item) => (
+                  <div
+                    key={item.orderId}
+                    className="p-2.5 xs:p-3 transition-all active:bg-gray-100 bg-gray-50 text-xs xs:text-sm"
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-800 line-clamp-2">
+                          {item.orderNo}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          Customer: {item.customerName || "-"}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Date: {formatUtcToLocal(item.createdDate_UTC)}
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0 ml-1">
+                        <div className="font-bold text-sky-600">
+                          {formatCurrency(item.grandTotal)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Gross: {formatCurrency(item.grossAmount_total)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 justify-end">
+                      {actionButtons(item)}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
           {/* Pagination - fixed at bottom, outside scroll */}
           <div className="bg-gray-50 px-6 py-2 border-t border-gray-200">
@@ -413,8 +489,8 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
               />
             </div>
           </div>
-        </div>
-      </div>
+
+      </DialogModel2>
 
       {/* Reusable Modals */}
       <OrderVoidRemark
@@ -425,23 +501,10 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
       />
 
       {isPaymentConfirmShow && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-          onClick={(e) =>
-            e.target === e.currentTarget && setIsPaymentConfirmShow(false)
-          }
-        >
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
-            <div className="flex items-center justify-between py-2 pl-6 pr-2 border-b border-gray-200 bg-gradient-to-r from-slate-200 to-slate-200 text-gray-600">
-              <h3 className="text-xl font-bold">Payment Receipt</h3>
-              <button
-                onClick={() => setIsPaymentConfirmShow(false)}
-                className="p-3 rounded-full  hover:text-red-500 transition-all duration-200"
-              >
-                <FaTimes className="text-xl" />
-              </button>
-            </div>
+
+
+    <DialogModel2 onHide={() => setIsPaymentConfirmShow(false)} title="Payment Receipt"   isVisible={isPaymentConfirmShow}>
+
             <div className="p-4 overflow-y-auto">
               <PaymentConfirm
                 orderId={selectedOrderId}
@@ -449,8 +512,11 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
                 openBy="SalesHistory"
               />
             </div>
-          </div>
-        </div>
+</DialogModel2>
+
+
+
+          
       )}
     </>
   );

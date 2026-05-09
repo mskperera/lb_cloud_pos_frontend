@@ -448,8 +448,8 @@ setIsPrintButtonLoading(true);
       <div className="rounded-xl w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
 
    
-        <div className="p-6 flex flex-col justify-start bg-white ">
-          <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Payment Confirmation</h2>
+        <div className="relative p-6 flex flex-col justify-between bg-white ">
+          {/* <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Payment Confirmation</h2> */}
           <div className="text-center mb-6">
             <label className="text-2xl font-semibold text-sky-700">Balance</label>
             <div className="text-3xl font-semibold text-sky-700 mt-1">
@@ -459,7 +459,7 @@ setIsPrintButtonLoading(true);
           <h3 className="text-xl font-medium text-gray-700 text-center mb-6">
             How would you like to share the receipt?
           </h3>
-          <div className="flex justify-center gap-6 mb-6">
+          {/* <div className="flex justify-center gap-6 mb-6">
             <button
               className={`p-4 rounded-full ${actionOption === 'print' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-sky-500 hover:text-white transition-colors`}
               onClick={() => setActionOption('print')}
@@ -550,22 +550,34 @@ setIsPrintButtonLoading(true);
               />
               {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
             </div>
-          )}
-          <div className="flex flex-col md:flex-row justify-center gap-6 mt-8">
+          )} */}
+          <div className=" flex  gap-6 mt-8">
             {openBy !== 'SalesHistory' ? (
               <button
                 className="py-3 px-8 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-lg flex items-center gap-2"
                 onClick={handleNewOrder}
               >
-                <FaPrint className="h-6 w-6" />
                 New Order
               </button>
             ) : (
               <button
-                className="py-3 px-8 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-lg flex items-center gap-2"
-                onClick={handleClose}
+                  style={{
+              flex: 1,
+              padding: 13,
+              borderRadius: "var(--lpos-radius-sm)",
+              border: "1.5px solid var(--lpos-border)",
+              background: "var(--lpos-surface)",
+              fontFamily: "inherit",
+              fontSize: 14,
+              fontWeight: 700,
+              color: "var(--lpos-text-secondary)",
+              cursor: "pointer",
+              transition: "all .15s"
+            }}
+       
+               onClick={handleClose}
               >
-                <FaPrint className="h-6 w-6" />
+   
                 Close
               </button>
             )}

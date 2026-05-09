@@ -151,7 +151,7 @@ const Sidebar = ({
             padding: "6px 8px 2px",
           }}
         >
-          Settings
+         Layout Settings
         </div>
 
         {/* Toggle Products Settings Item */}
@@ -458,8 +458,13 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
-  const storeName = selectedStore?.storeName || null;
+  const [storeName, setStoreName] = useState(null);
   const [hideProductList, setHideProductList] = useState(false);
+
+useEffect(() => {
+  const selectedStore = JSON.parse(localStorage.getItem("selectedStore"));
+  setStoreName(selectedStore.storeName);
+}, [selectedStore]);
 
   // Better resize handler
   useEffect(() => {

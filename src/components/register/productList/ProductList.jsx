@@ -59,6 +59,8 @@ const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
         {visibleCats.map(c => (
           <button
             key={c.categoryId}
+            style={{fontFamily:"inherit",fontWeight:600}}
+
             className={`lpos-cat-tab${selectedCategoryId===c.categoryId?" active":""}`}
             onClick={() => onSelect(c)}
           >
@@ -70,16 +72,17 @@ const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
         <div ref={moreRef} style={{position:"relative",flexShrink:0}}>
           <button
             onClick={() => setDropOpen(v=>!v)}
+      
             style={{
               display:"flex",alignItems:"center",gap:5,padding:"8px 13px",
               borderRadius:"var(--lpos-radius-sm)",border:activeInOverflow?"1.5px solid var(--lpos-accent-medium)":"none",
               background:activeInOverflow?"var(--lpos-accent-soft)":"var(--lpos-surface)",
-              fontFamily:"inherit",fontSize:13.5,fontWeight:600,
+              fontFamily:"inherit",fontWeight:600,fontSize:13,
               color:activeInOverflow?"var(--lpos-accent)":"var(--lpos-text-secondary)",
               cursor:"pointer",boxShadow:"var(--lpos-shadow-sm)",flexShrink:0,
             }}
           >
-            More <span style={{background:"var(--lpos-accent)",color:"white",fontSize:10,fontWeight:700,padding:"1px 5px",borderRadius:10}}>{hiddenCats.length}</span>
+            More <span style={{background:"var(--lpos-accent)",color:"white",fontWeight:700,padding:"1px 5px",borderRadius:10}}>{hiddenCats.length}</span>
             <span style={{transform:dropOpen?"rotate(180deg)":"rotate(0)",transition:"transform .2s",display:"flex"}}><ChevronDownIcon /></span>
           </button>
           {dropOpen && (
@@ -96,7 +99,7 @@ const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
                   onClick={() => { onSelect(c); setDropOpen(false); }}
                   style={{
                     display:"flex",alignItems:"center",justifyContent:"space-between",
-                    padding:"9px 12px",borderRadius:9,cursor:"pointer",
+                    padding:"9px 12px",margin:"4px 0",borderRadius:9,cursor:"pointer",
                     fontSize:13.5,fontWeight:c.categoryId===selectedCategoryId?600:500,
                     color:c.categoryId===selectedCategoryId?"var(--lpos-accent)":"var(--lpos-text-secondary)",
                     background:c.categoryId===selectedCategoryId?"var(--lpos-accent-soft)":"transparent",
@@ -142,7 +145,7 @@ const ProductList = ({onMobClose}) => {
   const [productListLoading, setIsProductListLoading] = useState(false);
 
   const store = JSON.parse(localStorage.getItem("selectedStore"));
-  const terminalId = localStorage.getItem("terminalId");
+  const terminal = JSON.parse(localStorage.getItem("terminal"));
   
   const [addOrderTemp, setAddOrderTemp] = useState(null);
   const [loadingItemId, setLoadingItemId] = useState(null);
@@ -184,7 +187,7 @@ const ProductList = ({onMobClose}) => {
       barcode: null,
       categoryId: categoryId,
       storeId: store.storeId,
-      terminalId:terminalId,
+      terminalId: terminal?.terminalId,
       searchByKeyword: false,
        skip: skip,
        limit: limit,
@@ -299,6 +302,11 @@ const ProductList = ({onMobClose}) => {
           const variations = details.data.results[0] || [];
           const variationValueLevel = JSON.parse(p.variationProducts)[0].variationValueLevel;
 
+const allprouctIdParsed=JSON.parse(p.allProductId)[0];
+ const batchedItemsRes = await getBatchedItems(allprouctIdParsed, store.storeId);
+      const batchedItems = batchedItemsRes.data.results[0];
+
+
           if (variationValueLevel===0) {
             // If no variations or variations is not an array, add directly to order
             const order = {
@@ -313,7 +321,29 @@ const ProductList = ({onMobClose}) => {
               stockQty: p.isStockTracked ? p.stockQty : undefined,
               imageUrl:p.imageUrl
             };
-            dispatch(addOrder(order));
+
+
+            
+      if(batchedItems.length>1){
+        setBatchedItemList(batchedItems);
+        setIsBatchedItemsModalOpen(true);
+        setAddOrderTemp(order);
+        return;
+      }
+      else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
+        setBatchedItemList(batchedItems);
+        setIsBatchedItemsModalOpen(true);
+        setAddOrderTemp(order);
+        return;
+      }
+      else{
+        order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
+        // order.batchNo=batchedItems[0]?.batchNo?batchedItems[0].batchNo:null;
+        dispatch(addOrder(order));
+      }
+
+            
+          //  dispatch(addOrder(order));
           } else {
             // Save the root list scroll position before switching to variation mode.
             productListScrollTopRef.current = productListScrollRef.current?.scrollTop || 0;
@@ -563,15 +593,18 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
           </div>
         ) : null}
          <>
-            <span style={{fontSize:18,fontWeight:700,letterSpacing:"-.3px"}}>{activeCatLabel}</span>
-            <span style={{fontSize:13,color:"var(--lpos-text-tertiary)",fontWeight:500}}>{products.length} item{products.length!==1?"s":""}</span>
+            <span className="text-lg font-semibold text-gray-700">{activeCatLabel}</span>
+            <span className="text-sm text-gray-500" style={{fontWeight:500}}>
+              {products.length} item{products.length !== 1 ? "s" : ""}
+            </span>
           </>
       </div>
 
       {/* Breadcrumb Navigation for Variations */}
       {selectedVariationProducts.length > 0 && (
-        <div style={{padding:"12px 20px 8px",borderBottom:"1px solid var(--lpos-border)",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",fontSize:13}}>
+        <div style={{padding:"12px 20px 8px",borderBottom:"1px solid var(--lpos-border)",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
           <button
+          className="text-lg font-semibold text-gray-700"
             onClick={() => {
               setVariationLevel(0);
               setVariationPath([]);
@@ -591,6 +624,7 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
             <React.Fragment key={index}>
               <span style={{color:"var(--lpos-text-tertiary)"}}>/</span>
               <button
+              className="text-lg"
                 onClick={() => handleBreadcrumbClick(index)}
                 style={{color:"var(--lpos-accent)",fontWeight:500,background:"none",border:"none",cursor:"pointer",padding:0,textTransform:"capitalize"}}
               >

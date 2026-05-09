@@ -44,7 +44,7 @@ const ProductCardButton = ({
       )}
 
       <div className="flex w-full min-h-[120px]">
-        <div className="w-[40%] bg-sky-100 p-3 flex items-center justify-center relative">
+        <div className="w-[40%] bg-sky-600 p-3 flex items-center justify-center relative">
           {/* Badge for order quantity */}
           {orderQty > 0 && (
             <div style={{
@@ -74,7 +74,7 @@ const ProductCardButton = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <PackageIcon className="w-10 h-10 text-sky-600" />
+              <PackageIcon className="w-10 h-10 text-sky-200" />
             )}
           </div>
 
@@ -104,15 +104,21 @@ const ProductCardButton = ({
             {productName}
           </p>
 
-          <p
-            className="p-2 mb-2 bg-gray-700 w-min text-white rounded-lg text-sm font-semibold"
-            style={{
-              color: "var(--lpos-text-tertiary)",
+<div    className="p-2 mb-2 bg-gray-100 w-min  rounded-lg text-sm font-semibold"
+          >
+  <span className="text-gray-600"  style={{
+              fontFamily: "monospace",
+            }}
+            > SKU</span>
+      <p className="text-gray-700"
+           style={{
               fontFamily: "monospace",
             }}
           >
-            SKU:{sku || "N/A"}
+           {sku || "N/A"}
           </p>
+</div>
+      
 
           <p
             className="mb-2 text-xs text-gray-500 text-center font-mono"
