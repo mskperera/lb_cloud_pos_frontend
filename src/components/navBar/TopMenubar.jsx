@@ -37,6 +37,10 @@ export default function TopMenubar({ onToggleSidebar, isSidebarCollapsed, onTogg
 
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+
+const [store, setStore] = useState(selectedStore);
+
+
   // Fullscreen toggle + detection
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -68,11 +72,17 @@ export default function TopMenubar({ onToggleSidebar, isSidebarCollapsed, onTogg
 
   // Load selected store from localStorage if not in Redux
   useEffect(() => {
+
+
     if (!selectedStore) {
       const stored = JSON.parse(localStorage.getItem('selectedStore'));
       if (stored) {
         dispatch(setSelectedStore({ selectedStore: stored }));
       }
+    }
+    else{
+          const selectedStore = JSON.parse(localStorage.getItem("selectedStore"));
+           setStore(selectedStore);
     }
   }, [selectedStore, dispatch]);
 
@@ -139,8 +149,8 @@ export default function TopMenubar({ onToggleSidebar, isSidebarCollapsed, onTogg
           </button>
 
           {/* Store selector – name hidden on very small screens */}
-          {selectedStore && (
-            <StoreButton store={selectedStore} navigate={navigate} />
+          {store && (
+            <StoreButton store={store} navigate={navigate} />
           )}
 
           {/* Status indicators & Profile – keep compact */}

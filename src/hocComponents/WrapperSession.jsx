@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLatestSessionDetails } from "../functions/session";
 import { bufferToBoolean } from "../utils/utils";
+import { getTerminalDetailslByTerminalId } from "../functions/terminal";
 
 const HOCSession = ({terminalId, children }) => {
   //const terminalId = JSON.parse(localStorage.getItem('terminalId'));
@@ -9,10 +10,16 @@ const HOCSession = ({terminalId, children }) => {
   const [isSessionEnded, setIsSessionEnded] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // State to track loading state
 
+  const loadTerminalDetailslByTerminalId= async () => {
+    const result = await getTerminalDetailslByTerminalId(terminalId);
+    const terminalInfo = result.data.records;
+    localStorage.setItem('terminal',JSON.stringify(terminalInfo));
+  };
+
 
   useEffect(()=>{
-    localStorage.setItem('terminalId',terminalId);
-  },[terminalId])
+    loadTerminalDetailslByTerminalId();
+  },[terminalId]);
 
   const loadLatestSessionDetails = async () => {
     try {

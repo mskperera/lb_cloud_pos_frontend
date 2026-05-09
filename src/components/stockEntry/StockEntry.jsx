@@ -160,8 +160,10 @@ const StockEntry = () => {
 
     setIsSubmitting(true);
     const res = await stockAdd(payLoad);
-    setIsSubmitting(false);
+    console.log('stockAdd result', res);
 
+    setIsSubmitting(false);
+ 
     if (res.data.error) {
       showToast("danger", "Exception", res.data.error.message);
       return;

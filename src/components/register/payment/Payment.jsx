@@ -24,7 +24,7 @@ import ConfirmDialog from "../../dialog/ConfirmDialog";
 
 const Payment = ({showPaymentConfirm,setOrderId,handlePaymentClose}) => {
   const showToast = useToast();
-  const terminalId = JSON.parse(localStorage.getItem('terminalId'));
+  const terminal = JSON.parse(localStorage.getItem('terminal'));
   const sessionDetails = JSON.parse(localStorage.getItem('sessionDetails'));
   const store = JSON.parse(localStorage.getItem('selectedStore'));
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -199,7 +199,7 @@ const Payment = ({showPaymentConfirm,setOrderId,handlePaymentClose}) => {
     } = orderSummary;
     const payLoad = {
       customerId: customer?.contactId,
-      terminalId: terminalId,
+      terminalId: terminal.terminalId,
       sessionId: sessionDetails.sessionId,
       storeId: store.storeId,
       orderList: list,

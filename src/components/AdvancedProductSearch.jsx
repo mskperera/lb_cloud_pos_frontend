@@ -7,6 +7,7 @@ import { useToast } from "./useToast";
 import { FaSignInAlt, FaTimes } from "react-icons/fa";
 import { SignalHighIcon, XIcon } from "lucide-react";
 import CloseButton from "./buttons/CloseButton";
+import DialogModel2 from "./model/DialogModel2";
 
 const AdvancedProductSearch = ({ visible, onHide, onProductSelect, showOnlyProductItems }) => {
   const [products, setProducts] = useState([]);
@@ -151,23 +152,11 @@ useEffect(() => {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-1 xs:p-2 sm:p-4" onClick={(e) => e.target === e.currentTarget && onHide()}>
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
-      {/* Main Panel */}
-      <div className="relative w-full h-full lg:h-auto lg:max-w-7xl lg:max-h-[92vh] bg-white rounded-none lg:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
-        {/* Header - Responsive */}
-        <div className="flex items-center justify-between px-2 xs:px-3 sm:px-4 py-2.5 xs:py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600 flex-shrink-0">
-          <h2 className="text-base xs:text-lg sm:text-xl lg:text-lg font-bold truncate">Advanced Product Search</h2>
-     
-      <CloseButton onClick={onHide} />
-        </div>
-
-        {/* Body */}
+    <DialogModel2 onHide={onHide} title="Advanced Product Search">
+      {/* Body */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Filters - Responsive */}
-          <div className="px-2 xs:px-3 sm:px-4 lg:px-6 py-2.5 xs:py-3 sm:py-4 lg:py-5 space-y-2.5 xs:space-y-3 sm:space-y-4 lg:space-y-5 bg-gray-50 border-b flex-shrink-0 overflow-y-auto">
+          <div className="px-2 xs:px-3 sm:px-4 lg:px-6 py-2.5 xs:py-3 sm:py-4 lg:py-5 space-y-2.5 xs:space-y-3 sm:space-y-4 lg:space-y-5 bg-gray-50 border-b flex-shrink-0">
             
             {/* Mobile: Compact Filter Layout */}
             <div className="lg:hidden space-y-2.5 xs:space-y-3">
@@ -230,19 +219,6 @@ useEffect(() => {
               >
                 Search
               </button>
-
-              {/* Results Count - Mobile */}
-              <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center gap-2 text-xs xs:text-sm text-gray-600 font-medium">
-                <span>{totalRecords} found</span>
-                <div className="w-full xs:w-auto">
-                  <DaisyUIPaginator
-                    currentPage={currentPage}
-                    rowsPerPage={rowsPerPage}
-                    totalRecords={totalRecords}
-                    onPageChange={({page, rows}) => {setCurrentPage(page); setRowsPerPage(rows);}}
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Desktop: Full Filter Layout */}
@@ -311,19 +287,6 @@ useEffect(() => {
                   </button>
                 </div>
               </div>
-
-              {/* Results and Pagination - Desktop */}
-              <div className="flex justify-between items-center gap-5">
-                <span className="text-sm text-gray-600 font-medium">{totalRecords} products found</span>
-                <div className="w-auto">
-                  <DaisyUIPaginator
-                    currentPage={currentPage}
-                    rowsPerPage={rowsPerPage}
-                    totalRecords={totalRecords}
-                    onPageChange={({page, rows}) => {setCurrentPage(page); setRowsPerPage(rows);}}
-                  />
-                </div>
-              </div>
             </div>
           </div>
 
@@ -331,15 +294,16 @@ useEffect(() => {
           <div className="flex-1 overflow-y-auto px-2 xs:px-3 sm:px-4 lg:px-4 py-2 xs:py-3 sm:py-4">
             {/* Desktop Table View */}
             <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     {["SKU", "Description", "Price", "Stock", "Action"].map(h => (
-                      <th key={h} className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-200">
                   {products.length === 0 ? 
                     <tr>
                       <td colSpan={5} className="text-center py-16 lg:py-20 text-gray-500">
@@ -362,7 +326,7 @@ useEffect(() => {
     key={i}
     tabIndex={0}
     className={`
-      hover:bg-sky-50 transition cursor-pointer outline-none text-sm
+      hover:bg-gray-50 transition cursor-pointer outline-none
       ${selectedRowIndex === i ? 'bg-sky-100 ring-2 ring-sky-500 ring-inset' : ''}
     `}
     onClick={() => setSelectedRowIndex(i)}
@@ -379,11 +343,11 @@ useEffect(() => {
       }
     }}
   >
-    <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-600">{item.sku || "-"}</td>
-    <td className="px-4 lg:px-6 py-3 lg:py-4 font-medium text-gray-800 truncate">{item.productDescription}</td>
-    <td className="px-4 lg:px-6 py-3 lg:py-4 font-semibold text-sky-600">{formatCurrency(item.unitPrice)}</td>
-    <td className="px-4 lg:px-6 py-3 lg:py-4">{item.stockQty ?? "-"}</td>
-    <td className="px-4 lg:px-6 py-3 lg:py-4">
+    <td className="px-6 py-4 text-gray-600">{item.sku || "-"}</td>
+    <td className="px-6 py-4 font-medium text-gray-800 truncate">{item.productDescription}</td>
+    <td className="px-6 py-4 font-semibold text-sky-600">{formatCurrency(item.unitPrice)}</td>
+    <td className="px-6 py-4">{item.stockQty ?? "-"}</td>
+    <td className="px-6 py-4">
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -410,6 +374,7 @@ useEffect(() => {
 
               </tbody>
             </table>
+            </div>
             </div>
 
             {/* Tablet Card View (md to lg) */}
@@ -539,9 +504,26 @@ useEffect(() => {
               )}
             </div>
           </div>
+
+          {/* Pagination - fixed at bottom, outside scroll */}
+          <div className="bg-gray-50 px-6 py-2 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-sm text-gray-600">
+                {totalRecords} products found
+              </div>
+              <DaisyUIPaginator
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalRecords={totalRecords}
+                onPageChange={({page, rows}) => {setCurrentPage(page); setRowsPerPage(rows);}}
+                rowsPerPageOptions={[10, 20, 30, 50, 100]}
+              />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+
+    </DialogModel2>
+
     );
 };
 

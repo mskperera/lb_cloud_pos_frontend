@@ -151,7 +151,7 @@ const Sidebar = ({
             padding: "6px 8px 2px",
           }}
         >
-          Settings
+         Layout Settings
         </div>
 
         {/* Toggle Products Settings Item */}
@@ -262,6 +262,7 @@ const Register = () => {
     const qty = 1;
     const unitPrice = Number(p.unitPrice);
 
+    console.log("Selected Productiiii", p);
     setSelectedProduct(p);
     const batchedItemsRes = await getBatchedItems(
       p.allProductId,
@@ -296,31 +297,37 @@ const Register = () => {
     }
   };
 
-  const addItemstoOrderListFinal = (stockBatchId, order) => {
-    const isOrderExtist = existingOrders.find(
-      (o) =>
-        o.allProductId === order.allProductId && o.storeId === order.storeId,
+const addItemstoOrderListFinal=(selectedBatch,order)=>{
+    const isOrderExist = existingOrders.find(
+      (o) => o.allProductId===order.allProductId && o.storeId===order.storeId
     );
-    console.log("stockBatchId,order", stockBatchId, order);
-    console.log("isOrderExtist", isOrderExtist);
-    if (isOrderExtist) {
-      dispatch(
-        updateOrderBatchId({
-          allProductId: order.allProductId,
-          storeId: order.storeId,
-          stockBatchId,
-        }),
-      );
+
+    console.log('selectedBatch',selectedBatch);
+    const orderFinal = {
+      ...order,
+      stockBatchId: selectedBatch.stockBatchId,
+      batchNo: selectedBatch.batchNo,
+      unitPrice: selectedBatch.unitPrice ?? order.unitPrice,
+      lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+      stockQty: order.measurementUnitName ? selectedBatch.qty : order.stockQty,
+    };
+
+    if (isOrderExist) {
+      dispatch(updateOrderBatchId({
+        allProductId: order.allProductId,
+        storeId: order.storeId,
+        stockBatchId: selectedBatch.stockBatchId,
+        batchNo: selectedBatch.batchNo,
+        unitPrice: selectedBatch.unitPrice,
+        lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+      }));
+    } else {
+      dispatch(addOrder(orderFinal));
     }
 
-    const orderFinal = { ...addOrderTemp, stockBatchId };
-
-    dispatch(addOrder(orderFinal));
-
     setAddOrderTemp(null);
-
     setIsBatchedItemsModalOpen(false);
-  };
+  }
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -451,8 +458,13 @@ const Register = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
-  const storeName = selectedStore?.storeName || null;
+  const [storeName, setStoreName] = useState(null);
   const [hideProductList, setHideProductList] = useState(false);
+
+useEffect(() => {
+  const selectedStore = JSON.parse(localStorage.getItem("selectedStore"));
+  setStoreName(selectedStore.storeName);
+}, [selectedStore]);
 
   // Better resize handler
   useEffect(() => {
@@ -593,6 +605,7 @@ const Register = () => {
       />
 
       <ActionButtonsPopup />
+
 
       <BatchSelectionDialog
         visible={isBatchedItemsModalOpen}
