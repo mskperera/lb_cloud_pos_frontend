@@ -37,6 +37,14 @@ import customAxiosMain from "../utils/axiosMain";
           localStorage.removeItem('token');
           localStorage.removeItem('tenantId');
           localStorage.removeItem('selectedStore');
+          localStorage.removeItem('systemInfo');
+
+          localStorage.removeItem('assignedTerminals');
+          localStorage.removeItem('stores');
+
+          localStorage.removeItem('user');
+          localStorage.removeItem('userId');
+          
           return res;
         })
         .catch((err) => {
