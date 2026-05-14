@@ -526,8 +526,8 @@ const orderListSlice = createSlice({
             let balanceAmount = new Decimal(0); 
             console.log(' receivedAmountCash reduceer',receivedAmountCash.toNumber())
           
-            state.orderSummary.amountReceivedCash=receivedAmountCash;
-            state.orderSummary.amountReceivedCard=receivedAmountCard;
+            state.orderSummary.amountReceivedCash=receivedAmountCash.toNumber();
+            state.orderSummary.amountReceivedCard=receivedAmountCard.toNumber();
         
             if (receivedAmountCard.plus(receivedAmountCash).lessThan(grandTotal)) {
                 const shortfall = grandTotal.minus(receivedAmountCard.plus(receivedAmountCash));

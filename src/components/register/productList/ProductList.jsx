@@ -126,7 +126,7 @@ const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
 };
 
 
-const ProductList = ({onMobClose}) => {
+const ProductList = ({onMobClose, onOrderComplete}) => {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -160,6 +160,15 @@ const ProductList = ({onMobClose}) => {
   const prevVariationCountRef = useRef(0);
 
   const existingOrders = useSelector((state) => state.orderList.list);
+
+  // Refresh product quantities when order is completed
+  useEffect(() => {
+    if (onOrderComplete) {
+      // Update product quantities in current list without reloading
+      console.log('realoadddddding..............')
+      loadProducts(selectedCategoryId, currentPage, rowsPerPage);
+    }
+  }, [onOrderComplete]);
 
 
   const handleCategorySelect = (c) => {
