@@ -17,7 +17,7 @@ import AddCustomProduct from "../register/AddCustomProduct";
 import { ShoppingCartIcon, UserIcon } from "lucide-react";
 import DialogModel2 from "../model/DialogModel2";
 
-const OrderListAll = ({ isTraditionalMode = false }) => {
+const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
   const navigate = useNavigate();
   let { terminalId } = useParams();
   const dispatch = useDispatch();
@@ -153,9 +153,13 @@ const OrderListAll = ({ isTraditionalMode = false }) => {
       >
         <Payment
           key={paymentKey}
-          showPaymentConfirm={() => {
+          showPaymentConfirm={(value) => {
             setIsPaymentShow(false);
             setIsPaymentConfirmShow(true);
+            
+            if(value){
+                 onOrderSubmit();
+            }
           }}
           setOrderId={setOrderId}
           handlePaymentClose={handlePaymentClose}
@@ -167,7 +171,9 @@ const OrderListAll = ({ isTraditionalMode = false }) => {
         isVisible={isPaymentConfirmShow}
         onHide={() => setIsPaymentConfirmShow(false)}
       >
-        <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
+
+     <PaymentConfirm orderId={orderId} setIsPaymentConfirmShow={setIsPaymentConfirmShow} />
+
       </DialogModel2>
 
     <div style={{width: isTraditionalMode ? "100%" : "var(--lpos-cart-w)", background:"var(--lpos-surface)",borderLeft: isTraditionalMode ? "none" : "1px solid var(--lpos-border)",display:"flex",flexDirection:"column",overflow:"hidden",flexShrink:0, margin: isTraditionalMode ? "0 auto" : "0", maxWidth: isTraditionalMode ? "1200px" : "none"}} className="lpos-cart">

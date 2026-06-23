@@ -242,6 +242,7 @@ const Payment = ({showPaymentConfirm,setOrderId,handlePaymentClose}) => {
     setOrderId(orderId);
    // navigate(`/paymentConfirm?orderId=${orderId}`);
 
+   
     showToast("success", "Success", outputMessage);
     setIsSubmitting(false);
   };

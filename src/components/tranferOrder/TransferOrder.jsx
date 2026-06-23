@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import moment from "moment";
-import FormElementMessage from "../messges/FormElementMessage";
-import Input from "../inputField/InputField";
+import Input from "../inputField/Input";
 import ProductSearch from "../productSearch/ProductSearch";
 import { useToast } from "../useToast";
 import TextAreaField from "../inputField/TextAreaField";
@@ -11,6 +10,13 @@ import { validate } from "../../utils/formValidation";
 import Select from "../inputField/Select";
 import Field from "../inputField/Field";
 import { getUserAssignedStores } from "../../functions/store";
+import ReusableTable from "../ReusableTable";
+import { ListIcon } from "lucide-react";
+import SubmitButton from "../buttons/SubmitButton";
+import Button from "../buttons/Button";
+import { transferOrderAdd } from "../../functions/transferOrder";
+import { getBatchedItems } from "../../functions/register";
+import BatchSelectionDialog from "../BatchSelectionDialog";
 
 
 
@@ -19,10 +25,9 @@ import { getUserAssignedStores } from "../../functions/store";
 const TransferOrder = () => {
   const navigate = useNavigate();
   const showToast = useToast();
-    const store = JSON.parse(localStorage.getItem("stores")) || [];
-  const [transferNo] = useState("TO1012"); // simulating new TO number
-const user=JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem('user'));
 
+  const [isSaveAsDraft, setIsSaveAsDraft] = useState(false); // Optional: for future use if you want to implement "Save as Draft" functionality
   const [sourceStore, setSourceStore] = useState({
     label: "Source store",
     value: "",
@@ -55,27 +60,50 @@ const user=JSON.parse(localStorage.getItem('user'));
   });
 
   const [transferList, setTransferList] = useState([]);
-  
-  const [selectedItem, setSelectedItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [storeOptions, setStoreOptions] = useState([]);
 
-    const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+    const [batchedItemList, setBatchedItemList] = useState([]);
   
+    const [isBatchedItemsModalOpen, setIsBatchedItemsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState("");
+ const [addOrderTemp, setAddOrderTemp] = useState(null);
 
+  const store = JSON.parse(localStorage.getItem("selectedStore"));
 
-  const [storeOptions,setStoreOptions] = useState([]);
-
-  const loadDrpStores = async () => {
+  const loadDrpStores = useCallback(async () => {
     const objArr = await getUserAssignedStores(user.userId);
-    console.log('objArr',objArr,user.userId);
+    console.log('objArr', objArr, user.userId);
     setStoreOptions(objArr.data);
-  };
+  }, [user.userId]);
 
   useEffect(() => {
     loadDrpStores();
-  }, []);
+  }, [loadDrpStores]);
 
 
+  const addItemstoOrderListFinal=(selectedBatch,product)=>{
+
+  console.log('product;',product)
+      console.log('selectedBatch',selectedBatch);
+  
+    setTransferList((prev) => [
+      ...prev,
+      {
+        ...product,
+        id: Date.now(),
+        quantity: "",
+        stockBatchId: selectedBatch.stockBatchId,
+        // unitPrice:
+        // unitCost,
+        // taxPerc,
+        // allProductId,
+      },
+    ]);
+
+      setIsBatchedItemsModalOpen(false);
+    }
+    
 
   const handleInputChange = (setState, state, value) => {
     console.log('handd iinpu',value)
@@ -94,7 +122,7 @@ const user=JSON.parse(localStorage.getItem('user'));
   };
   
 
-  const onProductSelect = (product) => {
+  const onProductSelect = async (product) => {
  // if (!selectedItem || !selectedItem.quantity) {
     //   showToast("danger", "Exception", "Quantity is required");
     //   return;
@@ -104,16 +132,45 @@ const user=JSON.parse(localStorage.getItem('user'));
       return;
     }
 
+    if(product.stockQty==null){
+      showToast("danger", "Exception", "Stock Qty is Empty");
+      return;
+    }
+
+ const batchedItemsRes = await getBatchedItems(product.allProductId, store.storeId);
+        
+  console.log('product',product);
+    const {isBatchTracked}=batchedItemsRes.data.outputValues;
+     console.log('getBatchedItems',isBatchTracked);
+
+
+      const batchedItems = batchedItemsRes.data.results[0];
+  console.log('batchedItems',batchedItems);
+if(batchedItems.length>0){
+   if(!!isBatchTracked){
+        setBatchedItemList(batchedItems);
+        setIsBatchedItemsModalOpen(true);
+        setAddOrderTemp(product);
+        return;
+      }
+else
+{
     setTransferList((prev) => [
       ...prev,
       {
         ...product,
-        id: Date.now(),
-        quantity:null,
+        id: Date.now(), 
+        quantity: "",
+        stockBatchId: batchedItems[0].stockBatchId,
       },
     ]);
+  }
+
+}
+
+
   //  setSelectedItem(null);
-    showToast("success", "Success", "Item added to transfer list");
+
   };
 
 
@@ -124,28 +181,123 @@ const user=JSON.parse(localStorage.getItem('user'));
 
 const onSubmit = async (e) => {
   e.preventDefault();
-  if (!sourceStore.value || !destinationStore.value || transferList.length === 0) {
-    showToast("danger", "Error", "Please fill required fields and add items");
+  if (!sourceStore.value) {
+    showToast("danger", "Error", "Source store is required");
     return;
   }
+  if (!destinationStore.value) {
+    showToast("danger", "Error", "Destination store is required");
+    return;
+  }
+  if (transferList.length === 0) {
+    showToast("danger", "Error", "Please add items to the transfer list");
+    return;
+  }
+    
 
   setIsSubmitting(true);
 
-  // Simulate API → in real app → POST to backend
-  setTimeout(() => {
-    const newTransferNumber = "TO" + Math.floor(1000 + Math.random() * 9000); // or from backend
-    showToast("success", "Success", `Transfer order ${newTransferNumber} created successfully ✓`);
 
-    // Instead of list → go to detail view
-    navigate(`/inventory/transferorders/${newTransferNumber}`);
+  const payload={
+    status:"In Transit",
+    sourceStoreId: sourceStore.value,
+    destinationStoreId: destinationStore.value,
+    transferDate: transferDate.value,
+    notes: notes.value,
+    orderList_json:transferList.map(i=>({
+      allProductId:i.allProductId,
+      qty:i.quantity,
+      stockBatchId:i.stockBatchId
+    }))
+  }
 
+  const res=await transferOrderAdd(payload);
+
+  if(res.data.error){
+    showToast("danger", "Error", res.data.error.message || "Failed to create transfer order");
     setIsSubmitting(false);
-    // Optional: clearForm();
-  }, 900);
+    return;
+  }
+
+  const transferOrderId = res.data.outputValues.transferOrderId;
+   const responseStatus = res.data.outputValues.responseStatus;
+
+    if (responseStatus === "failed") {
+      showToast("danger", "Exception", res.data.outputValues.outputMessage);
+       setIsSubmitting(false);
+      return;
+    }
+
+  showToast("success", "Success", `Transfer order created successfully`);
+
+   navigate(`/inventory/transferorders/${transferOrderId}`);
+
+
 };
+
 
   const totalItems = transferList.length;
   const totalQuantity = transferList.reduce((sum, i) => sum + parseFloat(i.quantity) || 0, 0);
+
+  const transferColumns = [
+    {
+      key: "sku",
+      label: "SKU",
+      align: "left",
+      render: (row) => (
+        <div>
+          <div className="text-xs text-gray-700 font-mono">{row.sku}</div>
+        </div>
+      ),
+    },
+  {
+      key: "product",
+      label: "Product",
+      align: "left",
+      render: (row) => (
+        <div>
+          <div className="font-medium">{row.productDescription}</div>
+        </div>
+      ),
+    },
+    {
+      key: "quantity",
+      label: "Quantity",
+      align: "left",
+      render: (row) => {
+        const index = transferList.findIndex((i) => i.id === row.id);
+        return (
+          <div className="flex items-center gap-1.5">
+            <Input
+              type="number"
+             // placeholder="0"
+              value={row.quantity}
+              onChange={(e) => {
+                const updatedList = [...transferList];
+                updatedList[index].quantity = e.target.value;
+                setTransferList(updatedList);
+              }}
+            />
+            {row.measurementUnitName}
+          </div>
+        );
+      },
+    },
+    {
+      key: "actions",
+      label: "",
+      align: "right",
+      render: (row) => (
+        <button
+          onClick={() => removeItem(row.id)}
+          className="text-[#FF3B30] hover:bg-red-50 p-2 rounded-lg transition-colors"
+        >
+          <FaTrash />
+        </button>
+      ),
+    },
+  ];
+
 
   const clearForm = () => {
     setSourceStore({ ...sourceStore, value: "", isTouched: false, isValid: false });
@@ -173,19 +325,28 @@ const onSubmit = async (e) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate("/inventory/transferorders/list")}
-              className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-white border border-[#E5E5EA] rounded-[9999px] px-4 sm:px-3 md:px-4 py-3 sm:py-2 text-sm font-semibold text-[#007AFF] cursor-pointer hover:bg-[rgba(0,122,255,0.10)] active:bg-[rgba(0,122,255,0.15)] hover:border-[#007AFF] transition-colors touch-manipulation"
-            >
-              View All Transfers
-            </button>
+       
+             <Button variant="default"   onClick={() => navigate("/inventory/transferorders/list")} className="w-full sm:w-auto ">
+                 View All Transfers
+                        </Button>
           </div>
         </div>
 
+    <BatchSelectionDialog
+      visible={isBatchedItemsModalOpen}
+      onHide={() => setIsBatchedItemsModalOpen(false)}
+     // selectedProduct={selectedProduct}
+     // selectedVariationProduct={selectedVariationProduct}
+      batchedItemList={batchedItemList}
+      onBatchSelect={(selectedBatch) => addItemstoOrderListFinal(selectedBatch, addOrderTemp)}
+    />
+
+
+
         <form onSubmit={onSubmit} className="space-y-3 sm:space-y-4 md:space-y-6">
           {/* ── Transfer Details Card ── */}
-          <div className="bg-white rounded-lg md:rounded-[18px] border border-[#E5E5EA] overflow-hidden">
-            <div className="p-3 sm:p-4 md:p-5">
+           <div className="bg-white rounded-lg border border-gray-200">
+              <div className="p-3 sm:p-4 md:p-5">
               <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-10">
                 <Field label="Source store" required>
                   <Select
@@ -254,7 +415,7 @@ const onSubmit = async (e) => {
                       onChange={(e) =>
                         setNotes({ ...notes, value: e.target.value })
                       }
-                      className="min-h-[72px]"
+                      rows={2}
                       maxLength={500}
                     />
                     <div className="text-right text-xs text-[#AEAEB2] mt-0.5">
@@ -271,96 +432,40 @@ const onSubmit = async (e) => {
             <ProductSearch
               hideSearchBox={true}
               onProductSelect={onProductSelect}
-              showAdvancedSearcho={showAdvancedSearch}
+              onlyAllowToSelectStockTrackedProduct={true}
             />
           </div>
 
 
 
           {/* ── Line Items Card (matches both screenshots perfectly) ── */}
-          <div className="bg-white rounded-lg md:rounded-[18px] border border-[#E5E5EA] overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+           
+           
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center px-3 sm:px-4 md:px-5 py-3 sm:py-3 md:py-4 border-b gap-2">
               <div className="flex items-center gap-2 md:gap-2.5">
-                <div className="w-7 h-7 md:w-8 md:h-8 bg-[#34C759] bg-opacity-10 text-[#34C759] rounded-[6px] md:rounded-[8px] flex items-center justify-center text-sm md:text-lg">
-                  📋
-                </div>
-                <div className="font-semibold text-sm md:text-base">
-                  Items • {totalItems} selected
+                    <ListIcon className="w-4 h-4 text-gray-500" />
+                <div className="font-semibold text-gray-500">
+                 {totalItems}  Items 
+   
                 </div>
               </div>
-              <div className="text-xs text-[#6D6D72] sm:text-right">
+              <div className="font-semibold text-gray-500 sm:text-right">
                 Total qty: {totalQuantity}
               </div>
             </div>
 
             {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
+              <div className="overflow-x-auto p-4">
               {transferList.length > 0 ? (
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-[#F9F9FB] text-left">
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                        Item
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                        Source stock
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                        Destination stock
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                        Quantity
-                      </th>
-                      <th className="px-4 py-3 w-12"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transferList.map((item, index) => (
-                      <tr key={item.id} className="border-t hover:bg-[#F9F9FB]">
-                        <td className="px-4 py-3">
-                          <div className="font-medium">{item.productDescription}</div>
-                          <div className="text-xs text-[#6D6D72] font-mono">
-                            {item.sku}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 font-medium text-[#1C1C1E]">
-                          {item.sourceStock}
-                        </td>
-                        <td className="px-4 py-3 font-medium text-[#1C1C1E]">
-                          {item.destinationStock}
-                        </td>
-                        <td className="px-4 py-3 font-medium">
-                          <div className="flex items-center gap-1.5">
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              value={item.quantity}
-                              onChange={(e) => {
-                                const updatedList = [...transferList];
-                                updatedList[index].quantity = e.target.value;
-                                setTransferList(updatedList);
-                              }}
-                            />
-                            {item.measurementUnitName}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="text-[#FF3B30] hover:bg-red-50 p-2 rounded-lg transition-colors"
-                          >
-                            <FaTrash />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <ReusableTable
+                  columns={transferColumns}
+                  data={transferList}
+                  emptyMessage="No items yet"
+                />
               ) : (
-                <div className="py-16 text-center">
-                  <div className="text-4xl mb-3">📦</div>
-                  <div className="text-[#AEAEB2] text-sm font-medium">No items yet</div>
-                  <div className="text-[#AEAEB2] text-xs mt-1">Use search above to add products</div>
+              <div className="flex flex-col items-center justify-center py-10 gap-2 bg-white text-gray-700">
+                  <div className="text-gray-500 italic">No items added yet</div>
                 </div>
               )}
             </div>
@@ -402,8 +507,8 @@ const onSubmit = async (e) => {
                           <div className="flex-1">
                             <Input
                               type="number"
-                              placeholder="0"
-                              value={item.quantity || ''}
+                              //placeholder="0"
+                              value={item.quantity}
                               onChange={(e) => {
                                 const updatedList = [...transferList];
                                 updatedList[index].quantity = e.target.value;
@@ -435,20 +540,12 @@ const onSubmit = async (e) => {
 
           {/* ── Footer Actions ── */}
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-5 pt-4 pb-4 sm:pb-0">
-            <button
-              type="button"
-              onClick={clearForm}
-              className="w-full sm:w-auto btn-secondary bg-white hover:bg-gray-50 active:bg-gray-100 border border-[#E5E5EA] px-6 sm:px-10 font-semibold py-4 sm:py-3.5 rounded-[13px] flex items-center justify-center gap-2 shadow-sm touch-manipulation transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full sm:w-auto btn-primary font-semibold py-4 sm:py-3.5 rounded-[13px] flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 touch-manipulation transition-all active:scale-[0.98]"
-            >
-              {isSubmitting ? "Creating transfer..." : "Create Transfer Order"}
-            </button>
+            <Button variant="default" onClick={clearForm} className="w-full sm:w-auto ">
+              Clear
+            </Button>
+
+            <SubmitButton isSubmitting={isSubmitting} text={isSubmitting ? "Creating transfer..." : "Create Transfer Order"} />
+          
           </div>
         </form>
       </div>

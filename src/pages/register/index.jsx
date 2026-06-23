@@ -460,6 +460,13 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
 
   const [storeName, setStoreName] = useState(null);
   const [hideProductList, setHideProductList] = useState(false);
+  const [orderCompleteSignal, setOrderCompleteSignal] = useState(0);
+
+
+useEffect(() => {
+  console.log('Order complete signal received, refreshing product list...');
+}, [orderCompleteSignal]);
+
 
 useEffect(() => {
   const selectedStore = JSON.parse(localStorage.getItem("selectedStore"));
@@ -699,12 +706,11 @@ useEffect(() => {
               {!hideProductList ? (
                 <>
                   <ProductList
-                    selectedCategoryId={selectedCategoryId}
-                    onProductClick={handleProductClick}
                     onMobClose={() => setMobProductsOpen(false)}
+                    onOrderComplete={orderCompleteSignal}
                   />
 
-                  <OrderListAll />
+                  <OrderListAll onOrderSubmit={() => setOrderCompleteSignal(prev => prev + 1)} />
                 </>
               ) : (
                 <OrderListAll isTraditionalMode={hideProductList} />

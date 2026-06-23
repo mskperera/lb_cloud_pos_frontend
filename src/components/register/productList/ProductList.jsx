@@ -126,7 +126,7 @@ const CategoryBar = ({ categories, selectedCategoryId, onSelect }) => {
 };
 
 
-const ProductList = ({onMobClose}) => {
+const ProductList = ({onMobClose, onOrderComplete}) => {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -160,6 +160,15 @@ const ProductList = ({onMobClose}) => {
   const prevVariationCountRef = useRef(0);
 
   const existingOrders = useSelector((state) => state.orderList.list);
+
+  // Refresh product quantities when order is completed
+  useEffect(() => {
+    if (onOrderComplete) {
+      // Update product quantities in current list without reloading
+      console.log('realoadddddding..............')
+      loadProducts(selectedCategoryId, currentPage, rowsPerPage);
+    }
+  }, [onOrderComplete]);
 
 
   const handleCategorySelect = (c) => {
@@ -304,8 +313,15 @@ const ProductList = ({onMobClose}) => {
 
 const allprouctIdParsed=JSON.parse(p.allProductId)[0];
  const batchedItemsRes = await getBatchedItems(allprouctIdParsed, store.storeId);
+        
+
+    const {isBatchEnabled}=batchedItemsRes.data.outputValues;
+     console.log('getBatchedItems',isBatchEnabled);
+
+
       const batchedItems = batchedItemsRes.data.results[0];
 
+      console.log('orrrange',p)
 
           if (variationValueLevel===0) {
             // If no variations or variations is not an array, add directly to order
@@ -319,23 +335,24 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
               qty,
               measurementUnitName: p.measurementUnitName,
               stockQty: p.isStockTracked ? p.stockQty : undefined,
-              imageUrl:p.imageUrl
+              imageUrl:p.imageUrl,
+              inventoryId:p.inventoryId
             };
 
 
             
-      if(batchedItems.length>1){
+      if(batchedItems.length>0 && !!isBatchEnabled){
         setBatchedItemList(batchedItems);
         setIsBatchedItemsModalOpen(true);
         setAddOrderTemp(order);
         return;
       }
-      else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
-        setBatchedItemList(batchedItems);
-        setIsBatchedItemsModalOpen(true);
-        setAddOrderTemp(order);
-        return;
-      }
+      // else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
+      //   setBatchedItemList(batchedItems);
+      //   setIsBatchedItemsModalOpen(true);
+      //   setAddOrderTemp(order);
+      //   return;
+      // }
       else{
         order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
         // order.batchNo=batchedItems[0]?.batchNo?batchedItems[0].batchNo:null;
@@ -360,19 +377,19 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
         } catch (error) {
           console.error("Error fetching variation details:", error);
           // Handle error by adding product as a single item
-          const order = {
-         allProductId:p.allProductId,
-          storeId: store.storeId,
-            sku: p.sku,
-            description,
-            unitPrice,
-            lineTaxRate: p.taxPerc,
-            qty,
-            measurementUnitName: p.measurementUnitName,
-            stockQty: p.isStockTracked ? p.stockQty : undefined,
-                 imageUrl:p.imageUrl
-          };
-          dispatch(addOrder(order));
+        //   const order = {
+        //  allProductId:p.allProductId,
+        //   storeId: store.storeId,
+        //     sku: p.sku,
+        //     description,
+        //     unitPrice,
+        //     lineTaxRate: p.taxPerc,
+        //     qty,
+        //     measurementUnitName: p.measurementUnitName,
+        //     stockQty: p.isStockTracked ? p.stockQty : undefined,
+        //          imageUrl:p.imageUrl
+        //   };
+        //   dispatch(addOrder(order));
         }
       
     } finally {
@@ -424,6 +441,9 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
       console.log('selectedProduct',selectedProduct);
       console.log('variation product clicked',p);
       const batchedItemsRes = await getBatchedItems(p.allProductId, store.storeId);
+       const {isBatchEnabled}=batchedItemsRes.data.outputValues;
+
+      console.log('getBatchedItems',isBatchEnabled);
       const batchedItems = batchedItemsRes.data.results[0];
 
       const description = `${selectedProduct.productName} ${v}`;
@@ -439,22 +459,23 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
         qty,
         measurementUnitName: selectedProduct.measurementUnitName,
         stockQty: selectedProduct.isStockTracked ? p.stockQty : undefined,
-               imageUrl:selectedProduct.imageUrl
+               imageUrl:selectedProduct.imageUrl,
+        inventoryId:p.inventoryId
       };
 
 
-      if(batchedItems.length>1){
+       if(batchedItems.length>0 && !!isBatchEnabled){
         setBatchedItemList(batchedItems);
         setIsBatchedItemsModalOpen(true);
         setAddOrderTemp(order);
         return;
       }
-      else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
-        setBatchedItemList(batchedItems);
-        setIsBatchedItemsModalOpen(true);
-        setAddOrderTemp(order);
-        return;
-      }
+      // else if(batchedItems.length===1 && batchedItems[0].batchNo!=null){
+      //   setBatchedItemList(batchedItems);
+      //   setIsBatchedItemsModalOpen(true);
+      //   setAddOrderTemp(order);
+      //   return;
+      // }
       else{
         order.stockBatchId=batchedItems[0]?.stockBatchId?batchedItems[0].stockBatchId:null;
         // order.batchNo=batchedItems[0]?.batchNo?batchedItems[0].batchNo:null;

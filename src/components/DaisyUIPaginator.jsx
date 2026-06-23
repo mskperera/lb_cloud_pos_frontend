@@ -21,6 +21,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
       <>
         {/* Previous Button */}
         <button
+        type='button'
           className="px-3 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
           onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
           disabled={currentPage === 0}
@@ -38,6 +39,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
             for (let i = 0; i < totalPages; i++) {
               pageButtons.push(
                 <button
+                   type='button'
                   key={i}
                   className={`px-4 py-2 text-xs font-medium rounded-lg transition duration-200 ${
                     i === currentPage
@@ -54,6 +56,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
             // Always show first page
             pageButtons.push(
               <button
+                 type='button'
                 key={0}
                 className={`px-4 py-2 text-xs font-medium rounded-lg transition duration-200 ${
                   currentPage === 0
@@ -83,6 +86,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
             for (let i = start; i <= end; i++) {
               pageButtons.push(
                 <button
+                   type='button'
                   key={i}
                   className={`px-4 py-2 text-xs font-medium rounded-lg transition duration-200 ${
                     i === currentPage
@@ -104,6 +108,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
             // Always show last page
             pageButtons.push(
               <button
+                 type='button'
                 key={totalPages - 1}
                 className={`px-4 py-2 text-xs font-medium rounded-lg transition duration-200 ${
                   currentPage === totalPages - 1
@@ -121,6 +126,7 @@ const Paginator = ({ currentPage, rowsPerPage, totalRecords, onPageChange, rowsP
 
         {/* Next Button */}
         <button
+           type='button'
           className="px-3 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 hover:text-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
           onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
           disabled={(currentPage === totalPages - 1) || totalRecords === 0}
