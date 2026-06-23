@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import moment from "moment";
 import { getOrders } from "../../functions/order";
 import OrderVoidRemark from "../register/OrderVoidRemark";
@@ -6,10 +6,9 @@ import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 import GhostButton from "../iconButtons/GhostButton";
 import PaymentConfirm from "../../pages/paymentConfirm";
 import DaisyUIPaginator from "../../components/DaisyUIPaginator";
-import { FaTimes } from "react-icons/fa";
 import { XIcon } from "lucide-react";
-import CloseButton from "../buttons/CloseButton";
 import DialogModel2 from "../model/DialogModel2";
+import ReusableTable from "../ReusableTable";
 
 export default function OrderList({ isVisible, setIsVisible }) {
   const [orders, setOrders] = useState([]);
@@ -47,29 +46,24 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
     setRowsPerPage(event.rows);
   };
 
-  const loadOrders = async (_searchValue = null, fromDate = null, toDate = null,resetSkipAndLimit=false) => {
+  const loadOrders = useCallback(async (_searchValue = null, fromDate = null, toDate = null, resetSkipAndLimit = false) => {
     try {
+      if (_searchValue !== null) {
+        if (_searchValue.trim() === "") _searchValue = null;
+      }
 
-    if(_searchValue!==null )
-      {
-      if(_searchValue.trim()==="")
-        _searchValue=null;
-    }
+      if (fromDate !== null) {
+        if (fromDate.trim() === "") fromDate = null;
+      }
 
-    if(fromDate!==null){
-      if(fromDate.trim()==="")
-        fromDate=null;
-    }
+      if (toDate !== null) {
+        if (toDate.trim() === "") toDate = null;
+      }
 
-      if(toDate!==null){
-      if(toDate.trim()==="")
-        toDate=null;
-    }
-
-      console.log("searchValue",_searchValue,"fromDate",fromDate,"toDate",toDate);
+      console.log("searchValue", _searchValue, "fromDate", fromDate, "toDate", toDate);
 
       setIsTableDataLoading(true);
-      const skip =resetSkipAndLimit ? 0 : currentPage * rowsPerPage;
+      const skip = resetSkipAndLimit ? 0 : currentPage * rowsPerPage;
       const limit = rowsPerPage;
 
       const filteredData = {
@@ -94,16 +88,16 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
     } finally {
       setIsTableDataLoading(false);
     }
-  };
+  }, [currentPage, rowsPerPage, selectedFilterBy.value, selectedTerminaId]);
 
   useEffect(() => {
     if (isVisible) {
       loadOrders(searchValue.value, searchFromDate, searchToDate, false);
     }
-  }, [isVisible, currentPage, rowsPerPage]);
+  }, [isVisible, searchFromDate, searchToDate, loadOrders, searchValue.value]);
 
   const actionButtons = (o) => (
-    <div className="flex space-x-2">
+    <div className="flex space-x-2 justify-end">
       <GhostButton
         onClick={() => {
           setSelectedOrderId(o.orderId);
@@ -133,16 +127,20 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
     </div>
   );
 
+  const orderColumns = [
+    { key: "orderNo", label: "Invoice No", align: "left" },
+    { key: "customerName", label: "Customer", align: "left" },
+    { key: "grossAmount_total", label: "Gross", align: "right", render: (row) => formatCurrency(row.grossAmount_total, false) },
+    { key: "all_DiscountAmount_total", label: "Discount", align: "right", render: (row) => formatCurrency(row.all_DiscountAmount_total, false) },
+    { key: "lineTaxAmount_total", label: "Tax", align: "right", render: (row) => formatCurrency(row.lineTaxAmount_total, false) },
+    { key: "grandTotal", label: "Total", align: "right", render: (row) => formatCurrency(row.grandTotal, false) },
+    { key: "createdDate_UTC", label: "Date", align: "center", render: (row) => formatUtcToLocal(row.createdDate_UTC) },
+    { key: "actions", label: "Actions", align: "right", render: (row) => actionButtons(row) },
+  ];
+
   const updateOrderListHandler = (orderId) => {
     setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, isVoided: true } : o));
     setIsVoidRemarkShow(false);
-  };
-
-  // Close panel when clicking backdrop
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      setIsVisible(false);
-    }
   };
 
   return (
@@ -280,199 +278,13 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
           </div>
 
           {/* Body - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-6">
-      
-            <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Invoice No
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Customer
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Gross
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Discount
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Tax
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Total
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {!isTableDataLoading ? (
-                      orders.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan="8"
-                            className="text-center py-12 text-gray-500"
-                          >
-                            No orders found
-                          </td>
-                        </tr>
-                      ) : (
-                        orders.map((item) => (
-                          <tr
-                            key={item.orderId}
-                            className="hover:bg-gray-50 transition"
-                          >
-                            <td className="px-6 py-4 font-medium">
-                              {item.orderNo}
-                            </td>
-                            <td className="px-6 py-4">
-                              {item.customerName || "-"}
-                            </td>
-                            <td className="px-6 py-4">
-                              {formatCurrency(item.grossAmount_total, false)}
-                            </td>
-                            <td className="px-6 py-4">
-                              {formatCurrency(
-                                item.all_DiscountAmount_total,
-                                false,
-                              )}
-                            </td>
-                            <td className="px-6 py-4">
-                              {formatCurrency(item.lineTaxAmount_total, false)}
-                            </td>
-                            <td className="px-6 py-4 font-semibold">
-                              {formatCurrency(item.grandTotal, false)}
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              {formatUtcToLocal(item.createdDate_UTC)}
-                            </td>
-                            <td className="px-6 py-4">{actionButtons(item)}</td>
-                          </tr>
-                        ))
-                      )
-                    ) : (
-                      <tr>
-                        <td colSpan="8" className="py-12">
-                          <div className="flex justify-center">
-                            <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-2 text-sm font-semibold text-slate-700 shadow ring-1 ring-slate-200">
-                              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                              Waiting...
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Tablet Card View (md to lg) */}
-            <div className="hidden md:block lg:hidden space-y-2">
-              {orders.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <div className="text-3xl mb-2">📦</div>
-                  <div className="text-sm font-medium">No orders found</div>
-                  <div className="text-xs mt-1">Try adjusting your search filters</div>
-                </div>
-              ) : isTableDataLoading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
-                  <div className="text-xs text-gray-600 mt-2">Loading orders...</div>
-                </div>
-              ) : (
-                orders.map((item) => (
-                  <div
-                    key={item.orderId}
-                    className="bg-white rounded-lg border border-gray-200 p-3 transition-all hover:bg-gray-50 active:bg-gray-100 text-sm"
-                  >
-                    <div className="flex justify-between items-start gap-2 mb-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-800 text-sm mb-1">
-                          {item.orderNo}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Customer: {item.customerName || "-"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Date: {formatUtcToLocal(item.createdDate_UTC)}
-                        </div>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <div className="font-bold text-sky-600 text-sm">
-                          {formatCurrency(item.grandTotal)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Gross: {formatCurrency(item.grossAmount_total)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Tax: {formatCurrency(item.lineTaxAmount_total)}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2 justify-end">
-                      {actionButtons(item)}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Mobile Card View */}
-            <div className="md:hidden space-y-2 xs:space-y-2.5">
-              {orders.length === 0 ? (
-                <div className="text-center py-10 text-gray-500">
-                  <div className="text-3xl mb-2">📦</div>
-                  <div className="text-xs xs:text-sm font-medium">No orders found</div>
-                  <div className="text-xs mt-0.5">Try adjusting filters</div>
-                </div>
-              ) : isTableDataLoading ? (
-                <div className="text-center py-10">
-                  <div className="inline-block animate-spin w-7 h-7 border-3 border-sky-500 border-t-transparent rounded-full"></div>
-                  <div className="text-xs text-gray-600 mt-2">Loading...</div>
-                </div>
-              ) : (
-                orders.map((item) => (
-                  <div
-                    key={item.orderId}
-                    className="p-2.5 xs:p-3 transition-all active:bg-gray-100 bg-gray-50 text-xs xs:text-sm"
-                  >
-                    <div className="flex justify-between items-start gap-2 mb-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-800 line-clamp-2">
-                          {item.orderNo}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-0.5">
-                          Customer: {item.customerName || "-"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Date: {formatUtcToLocal(item.createdDate_UTC)}
-                        </div>
-                      </div>
-                      <div className="text-right flex-shrink-0 ml-1">
-                        <div className="font-bold text-sky-600">
-                          {formatCurrency(item.grandTotal)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Gross: {formatCurrency(item.grossAmount_total)}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2 justify-end">
-                      {actionButtons(item)}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <ReusableTable
+              columns={orderColumns}
+              data={orders}
+              loading={isTableDataLoading}
+              emptyMessage="No orders found"
+            />
           </div>
           {/* Pagination - fixed at bottom, outside scroll */}
           <div className="bg-gray-50 px-6 py-2 border-t border-gray-200">

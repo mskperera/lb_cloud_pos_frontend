@@ -2,23 +2,34 @@ import React from "react";
 
 /**
  * ReusableTable component
- * @param {Array} columns - [{ key: 'orderNo', label: 'Invoice No', render: (row) => ... }]
+ * @param {Array} columns - [{ key: 'orderNo', label: 'Invoice No', render: (row) => ..., align: 'right', headerAlign: 'center' }]
  * @param {Array} data - Array of row objects
  * @param {string} emptyMessage - Message to show when no data
  * @param {boolean} loading - Show loading spinner if true
  */
 export default function ReusableTable({ columns, data, emptyMessage = "No data found", loading = false }) {
+  const getTextAlignment = (align = "left") => {
+    switch (align) {
+      case "center":
+        return "text-center";
+      case "right":
+        return "text-right";
+      default:
+        return "text-left";
+    }
+  };
+
   return (
     <>
       {/* Table for md+ screens */}
-      <div className="w-full overflow-x-auto hidden md:block">
-        <table className="min-w-full text-xs md:text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
+      <div className="w-full hidden md:block overflow-x-auto border border-gray-200">
+            <table className="min-w-full text-left border-collapse">
+          <thead className="">
+                 <tr className="bg-gray-200 border-gray-200 ">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="px-2 py-3 md:px-6 md:py-4 text-left font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap"
+                  className={`px-2 py-2 md:px-6 md:py-3 font-semibold  text-gray-600  ${getTextAlignment(col.headerAlign ?? col.align ?? "left")}`}
                 >
                   {col.label}
                 </th>
@@ -47,7 +58,10 @@ export default function ReusableTable({ columns, data, emptyMessage = "No data f
               data.map((row, idx) => (
                 <tr key={row.id || row.orderId || idx} className="hover:bg-gray-50 transition">
                   {columns.map((col) => (
-                    <td key={col.key} className="px-2 py-3 md:px-6 md:py-4 whitespace-nowrap">
+                    <td
+                      key={col.key}
+                      className={`px-2 py-3 md:px-6 md:py-4 whitespace-nowrap ${getTextAlignment(col.align ?? "left")}`}
+                    >
                       {col.render ? col.render(row) : row[col.key]}
                     </td>
                   ))}
@@ -74,11 +88,14 @@ export default function ReusableTable({ columns, data, emptyMessage = "No data f
             {data.map((row, idx) => (
               <div key={row.id || row.orderId || idx} className="bg-white rounded-xl shadow border border-gray-200 p-4 flex flex-col gap-2">
                 {columns.map((col) => (
-                  <div key={col.key} className="flex justify-between items-center text-sm">
+                  <div
+                    key={col.key}
+                    className={`flex justify-between items-center text-sm ${col.align === "center" ? "text-center" : ""}`}
+                  >
                     <span className="font-semibold text-gray-500">{col.label}</span>
-                    <span className={col.key === 'actions' ? '' : 'text-gray-800'}>
+                    <div className={`${getTextAlignment(col.align ?? "left")} ${col.key === "actions" ? "flex justify-end gap-2" : "text-gray-800"}`}>
                       {col.render ? col.render(row) : row[col.key]}
-                    </span>
+                    </div>
                   </div>
                 ))}
               </div>

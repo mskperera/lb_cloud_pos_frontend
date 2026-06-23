@@ -33,6 +33,7 @@ import ProductSearch from "../productSearch/ProductSearch";
 import LoadingSpinner from "../LoadingSpinner";
 import SubProductList from "./SubProductList";
 import { FaTrash, FaPlus } from "react-icons/fa";
+import CheckBox from "../inputField/CheckBox";
 
 const CategoryItem = ({ onClick, category }) => {
   return (
@@ -62,6 +63,7 @@ export default function AddProduct({ saveType = SAVE_TYPE.ADD, id = 0 }) {
   const [isUnique, setIsUnique] = useState(false);
   const [isStockTracked, setIsStockTracked] = useState({ value: true, isDisabled: false });
   const [isAssemblyProduct, setIsAssemblyProduct] = useState({ value: false });
+    const [isBatchTracked, setIsBatchTracked] = useState({ value: false });
   const [comboIngredients, setComboIngredients] = useState([]);
   const [subProductsList, setSubProductsList] = useState([]);
   const [variations, setVariations] = useState([]);
@@ -268,6 +270,11 @@ const handleRemoveImage = () => {
       barcode: null,
       storeId: selectedStore.storeId,
       productCategoryId: null,
+      isProductItem: null,
+       isStockTracked:null,
+       isExpiringProduct:null,
+       isBatchTracked:null,
+
       searchByKeyword: false,
       skip: 0,
       limit: 1,
@@ -288,7 +295,8 @@ const handleRemoveImage = () => {
       isNotForSelling,
       imageUrl,
       isExpiringProduct,
-      allProductId
+      allProductId,
+      isBatchTracked
     } = res.data.results[0][0];
 
     setSelectedCategories(JSON.parse(categories).map((c) => c.id));
@@ -309,7 +317,7 @@ const handleRemoveImage = () => {
 
    setIsAssemblyProduct((prev) => ({ ...prev, value: isAssemblyProduct===1 }));
    setIsStockTracked((prev) => ({ ...prev, value: isStockTracked===1, isDisabled: false }));
-   
+   setIsBatchTracked((prev) => ({ ...prev, value: isBatchTracked===1, isDisabled: false }));
     setSubProductsList([]);
     const details = await getProductExtraDetails(id);
 
@@ -443,6 +451,7 @@ const handleRemoveImage = () => {
         isStockTracked: isStockTracked.value,
         isProductItem: isProductItem,
         isAssemblyProduct: isAssemblyProduct.value,
+        isBatchTracked:isBatchTracked.value,
         brandId: brand.value,
      //   unitCost: isNumeric(unitCost.value) ? unitCost.value : null,
       //  unitPrice: isNumeric(unitPrice.value) ? unitPrice.value : null,
@@ -729,36 +738,68 @@ const handleNewAddVariation = () => {
     setStores(stores);
   };
 
-  const getInstruction = (key) => {
-    switch (key) {
-      case "isProductItem":
-        return isProductItem
-          ? "Uncheck this if the item is a service, like installation or consulting."
-          : "Check this if the item is a physical product you can count, like goods.";
-      case "isNotForSelling":
-        return isNotForSelling
-          ? "Uncheck this to make the item available for sale to customers."
-          : "Check this to mark the item as 'Not for Sale' for internal use only.";
-      case "isUnique":
-        return isUnique
-          ? "Check this for one-of-a-kind items that can't be restocked."
-          : "Uncheck this for items you can restock and sell multiple times.";
-      case "isStockTracked":
-        return isStockTracked.value
-          ? "Uncheck this to manually manage stock. Inventory won't update automatically on sales."
-          : "Check this to automatically keep track of how many you have in stock. When you sell one, the count goes down.";
-      case "isAssemblyProduct":
-        return isAssemblyProduct
-          ? "Uncheck this if the item is a standalone product, not made from others."
-          : "Check this if the item is made from other products (an assembly).";
-      case "isExpiringProduct":
-        return isExpiringProduct
-          ? "Uncheck this if the item doesn't expire, like tools or clothes."
-          : "Check this if the item has an expiration date, like food or medicine.";
-      default:
-        return "";
-    }
-  };
+  // const getInstruction = (key) => {
+  //   switch (key) {
+  //     case "isProductItem":
+  //       return isProductItem
+  //         ? "Uncheck this if the item is a service, like installation or consulting."
+  //         : "Check this if the item is a physical product you can count, like goods.";
+  //     case "isNotForSelling":
+  //       return isNotForSelling
+  //         ? "Uncheck this to make the item available for sale to customers."
+  //         : "Check this to mark the item as 'Not for Sale' for internal use only.";
+  //     case "isUnique":
+  //       return isUnique
+  //         ? "Check this for one-of-a-kind items that can't be restocked."
+  //         : "Uncheck this for items you can restock and sell multiple times.";
+  //     case "isStockTracked":
+  //       return isStockTracked.value
+  //         ? "Uncheck this to manually manage stock. Inventory won't update automatically on sales."
+  //         : "Check this to automatically keep track of how many you have in stock. When you sell one, the count goes down.";
+  //     case "isAssemblyProduct":
+  //       return isAssemblyProduct
+  //         ? "Uncheck this if the item is a standalone product, not made from others."
+  //         : "Check this if the item is made from other products (an assembly).";
+  //     case "isExpiringProduct":
+  //       return isExpiringProduct
+  //         ? "Uncheck this if the item doesn't expire, like tools or clothes."
+  //         : "Check this if the item has an expiration date, like food or medicine.";
+  //     case "isExpiringProduct":
+  //       return isBatchTracked.value
+  //         ? "Uncheck this if the item doesn't expire, like tools or clothes."
+  //         : "Check this if the item has an expiration date, like food or medicine.";
+  //     default:
+  //       return "";
+  //   }
+  // };
+
+const getInstruction = (key) => {
+  switch (key) {
+    case "isProductItem":
+      return "Turn this on for physical items you can count (like goods). Turn it off for services (like installation or repairs).";
+      
+    case "isNotForSelling":
+      return "Hide this item from the sales screen. Use this for internal store supplies, raw materials, or business assets.";
+      
+    case "isUnique":
+      return "Use this for one-of-a-kind items with unique IDs that cannot be duplicated or restocked under the same code.";
+      
+    case "isStockTracked":
+      return "Automatically track quantities. The system will count down your stock every time you make a sale.";
+      
+    case "isAssemblyProduct":
+      return "Turn this on if this is a composite item—a bundle, kit, or recipe made by combining other products together.";
+
+    case "isExpiringProduct":
+      return "Track expiration dates for this item (best for food, drinks, or medicine).";
+      
+    case "isBatchTracked":
+      return "Track stock by batches or lots. Required for managing specific groups of inventory with separate expiry dates or costs.";
+      
+    default:
+      return "";
+  }
+};
 
   const handleProductClick = (p) => {
     handleInputChange(setSubProductSku, subProductSku, p.sku);
@@ -900,16 +941,8 @@ const handleNewAddVariation = () => {
               {/* <h3 className="text-lg font-semibold text-gray-700 mb-4">Product Options</h3> */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="autoDeductInventory"
-                      className="h-5 w-5 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
-                      onChange={(e) => setIsProductItem(e.target.checked)}
-                      checked={isProductItem}
-                    />
-                    <label htmlFor="autoDeductInventory" className="font-medium text-gray-700">Product Item</label>
-                  </div>
+                  <CheckBox onChange={(e) => setIsProductItem(e.target.checked)}  checked={isProductItem} 
+                  label="Product Item" />
                   <p className="text-gray-500">{getInstruction("isProductItem")}</p>
                 </div>
                 {/* <div className="flex flex-col gap-1">
@@ -965,6 +998,21 @@ const handleNewAddVariation = () => {
                       <label htmlFor="isAssemblyProduct" className="font-medium text-gray-700">Assembly Product</label>
                     </div>
                     <p className="text-gray-500">{getInstruction("isAssemblyProduct")}</p>
+                  </div>
+
+
+                    <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="isBatchTracked"
+                        className="h-5 w-5 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+                        onChange={(e) => setIsBatchTracked({ ...isBatchTracked, value: e.target.checked })}
+                        checked={isBatchTracked.value}
+                      />
+                      <label htmlFor="isBatchTracked" className="font-medium text-gray-700">Batch Tracked</label>
+                    </div>
+                    <p className="text-gray-500">{getInstruction("isBatchTracked")}</p>
                   </div>
                
               </div>

@@ -6,7 +6,7 @@ import AdvancedProductSearch from '../AdvancedProductSearch';
 import DialogModel from '../model/DialogModel';
 import Barcode from "./Barcode";
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, hideButton,showAdvancedSearcho,hideSearchBox }) => {
+const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, hideButton,showAdvancedSearcho,hideSearchBox,onlyAllowToSelectStockTrackedProduct }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -123,7 +123,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, 
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-5 w-full">
 
         <div className='flex-1'>
-    <Barcode onProductSelect={onProductSelect} onBarcodeEnter={onBarcodeEnter} />
+    <Barcode onProductSelect={onProductSelect} onBarcodeEnter={onBarcodeEnter} onlyAllowToSelectStockTrackedProduct={onlyAllowToSelectStockTrackedProduct} />
  </div>
 
         <div className='sm:w-auto'>
@@ -146,6 +146,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems, 
               setShowAdvancedSearch(false);
             }}
             showOnlyProductItems={showOnlyProductItems}
+            onlyAllowToSelectStockTrackedProduct={onlyAllowToSelectStockTrackedProduct}
           />
  
     </div>

@@ -9,7 +9,7 @@ import { SignalHighIcon, XIcon } from "lucide-react";
 import CloseButton from "./buttons/CloseButton";
 import DialogModel2 from "./model/DialogModel2";
 
-const AdvancedProductSearch = ({ visible, onHide, onProductSelect, showOnlyProductItems }) => {
+const AdvancedProductSearch = ({ visible, onHide, onProductSelect, showOnlyProductItems,onlyAllowToSelectStockTrackedProduct }) => {
   const [products, setProducts] = useState([]);
   const [isTableDataLoading, setIsTableDataLoading] = useState(false);
   const showToast = useToast();
@@ -107,6 +107,7 @@ const AdvancedProductSearch = ({ visible, onHide, onProductSelect, showOnlyProdu
       categoryId: selectedCategoryId === -1 ? null : selectedCategoryId,
       measurementUnitId: selectedMeasurementUnitId === -1 ? null : selectedMeasurementUnitId,
       isProductItem: showOnlyProductItems,
+  
       storeId: selectedStoreId,
       productTypeIds: productTypeIds.length > 0 ? productTypeIds : null,
       skip, limit,
@@ -215,6 +216,7 @@ useEffect(() => {
               {/* Search Button - Full Width Mobile */}
               <button
                 onClick={handleSearch}
+                type="button"
                 className="w-full px-3 xs:px-4 py-2.5 xs:py-3 bg-sky-600 text-white font-medium text-xs xs:text-sm rounded-lg xs:rounded-xl hover:bg-sky-700 active:bg-sky-800 transition touch-manipulation"
               >
                 Search
@@ -281,6 +283,7 @@ useEffect(() => {
                   )}
                   <button
                     onClick={handleSearch}
+                    type="button"
                     className="px-8 py-3 bg-sky-600 text-white font-medium text-sm rounded-xl hover:bg-sky-700 active:bg-sky-800 transition touch-manipulation flex-shrink-0"
                   >
                     Search
@@ -326,10 +329,29 @@ useEffect(() => {
     key={i}
     tabIndex={0}
     className={`
-      hover:bg-gray-50 transition cursor-pointer outline-none
-      ${selectedRowIndex === i ? 'bg-sky-100 ring-2 ring-sky-500 ring-inset' : ''}
+       transition cursor-pointer outline-none
+      ${selectedRowIndex === i ? 'bg-sky-100 ring-2 ring-sky-500 ring-inset' : ''} 
+
+        ${
+      onlyAllowToSelectStockTrackedProduct && !item.isStockTracked
+        ? 'opacity-50 cursor-not-allowed bg-gray-100'
+        : 'cursor-pointer hover:bg-sky-50'
+    }
     `}
-    onClick={() => setSelectedRowIndex(i)}
+
+    
+
+
+    onClick={() =>{
+
+            console.log("Clicked item:", item);
+
+    if (onlyAllowToSelectStockTrackedProduct && !item.isStockTracked) {
+      return;
+    }
+      setSelectedRowIndex(i)
+    
+    } }
     onKeyDown={(e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -343,18 +365,28 @@ useEffect(() => {
       }
     }}
   >
-    <td className="px-6 py-4 text-gray-600">{item.sku || "-"}</td>
+    <td className="px-6 py-4 text-gray-600">{item.sku}</td>
     <td className="px-6 py-4 font-medium text-gray-800 truncate">{item.productDescription}</td>
     <td className="px-6 py-4 font-semibold text-sky-600">{formatCurrency(item.unitPrice)}</td>
-    <td className="px-6 py-4">{item.stockQty ?? "-"}</td>
+    <td className="px-6 py-4">{item.stockQty}</td>
     <td className="px-6 py-4">
       <button
+      type="button"
         onClick={(e) => {
           e.stopPropagation();
+
+            if (onlyAllowToSelectStockTrackedProduct && !item.isStockTracked) {
+      return;
+    }
+
+
           onProductSelect(item);
           onHide();
+              
+
         }}
-        className="px-4 py-1.5 lg:py-2 bg-sky-600 text-white font-medium text-xs lg:text-sm rounded-lg hover:bg-sky-700 active:scale-95 transition whitespace-nowrap"
+        className="px-4 py-1.5 lg:py-2 bg-sky-600 text-white font-medium text-xs lg:text-sm rounded-lg
+         hover:bg-sky-700 active:scale-95 transition whitespace-nowrap"
       >
         Select
       </button>
@@ -468,8 +500,26 @@ useEffect(() => {
                     className={`
                       p-2.5 xs:p-3 cursor-pointer transition-all active:bg-gray-100 text-xs xs:text-sm
                       ${selectedRowIndex === i ? 'ring-2 ring-sky-500 bg-sky-50' : ''}
+
+    ${
+      onlyAllowToSelectStockTrackedProduct && !item.isStockTracked
+        ? 'opacity-50 cursor-not-allowed bg-gray-100'
+        : 'cursor-pointer hover:bg-sky-50'
+    }
+
+
                     `}
-                    onClick={() => setSelectedRowIndex(i)}
+                    onClick={() => 
+                        { 
+                          
+                            if (onlyAllowToSelectStockTrackedProduct && !item.isStockTracked) {
+      return;
+    }
+
+                      setSelectedRowIndex(i);
+                          
+                        }
+                    }
                   >
                     <div className="flex justify-between items-start gap-2 mb-2">
                       <div className="flex-1 min-w-0">
@@ -491,9 +541,16 @@ useEffect(() => {
                     </div>
                     <button
                       onClick={(e) => {
+
+                          if (onlyAllowToSelectStockTrackedProduct && !item.isStockTracked) {
+      return;
+    }
+
+
                         e.stopPropagation();
                         onProductSelect(item);
                         onHide();
+    
                       }}
                       className="w-full px-3 py-2 bg-sky-600 text-white  text-xs rounded-lg hover:bg-sky-700 active:scale-95 transition touch-manipulation"
                     >

@@ -7,7 +7,7 @@ import { FaBarcode, FaSearch } from 'react-icons/fa';
 import { formatCurrency } from '../../utils/format';
 import { XIcon } from 'lucide-react';
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile }) => {
+const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectStockTrackedProduct }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(() => {
     const saved = localStorage.getItem('barcodeMode');
@@ -163,6 +163,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile }) => {
             {/* Mode Toggle Button */}
             <div ref={buttonRef}>
               <button
+              type='button'
                 onClick={handleToggleClick}
                 className="flex items-center gap-3 px-5 py-4 font-semibold text-gray-800 hover:bg-black/5 transition-all rounded-l-2xl"
               >
@@ -234,15 +235,30 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile }) => {
                   </thead>
                   <tbody>
                     {products.map((item, i) => (
-                      <tr
-                        key={i}
-                        onClick={() => {
-                          onProductSelect(item);
-                          setSearchTerm('');
-                          setProducts([]);
-                        }}
-                        className={`cursor-pointer hover:bg-sky-50 transition-all ${selectedIndex === i ? 'bg-sky-100' : ''}`}
-                      >
+          <tr
+  key={i}
+  onClick={() => {
+    console.log("Clicked item:", item.isStockTracked);
+    // Prevent selecting non-stock-tracked products
+    if (onlyAllowToSelectStockTrackedProduct && !item.isStockTracked) {
+      return;
+    }
+
+    onProductSelect(item);
+    setSearchTerm('');
+    setProducts([]);
+  }}
+  className={`
+    transition-all
+    ${selectedIndex === i ? 'bg-sky-100' : ''}
+    
+    ${
+      onlyAllowToSelectStockTrackedProduct && !item.isStockTracked
+        ? 'opacity-50 cursor-not-allowed bg-gray-100'
+        : 'cursor-pointer hover:bg-sky-50'
+    }
+  `}
+>
                         <td className="px-5 py-4 font-mono text-sm text-gray-600">{item.sku || '-'}</td>
                         <td className="px-5 py-4 text-sm font-medium text-gray-800">{item.productDescription || item.productName}</td>
                         <td className="px-5 py-4 font-semibold text-sky-600">{formatCurrency(item.unitPrice)}</td>

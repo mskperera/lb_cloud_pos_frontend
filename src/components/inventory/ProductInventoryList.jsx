@@ -16,6 +16,7 @@ import { validate } from "../../utils/formValidation";
 import FormElementMessage from "../messges/FormElementMessage";
 import DaisyUIPaginator from "../DaisyUIPaginator";
 import ConfirmDialog from "../dialog/ConfirmDialog";
+import TriStateSelect from "../inputField/TriStateSelect";
 
 import { getStockInfo } from "../../functions/stockEntry";
 import ProductVariationDetails from "./ProductVariationDetails";
@@ -134,6 +135,10 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
   const [isVariationProductChecked, setIsVariationProductChecked] =
     useState(false);
   const [isComboProductChecked, setIsComboProductChecked] = useState(false);
+  const [isStockTrackedFilter, setIsStockTrackedFilter] = useState(null);
+  const [isExpiringProductFilter, setIsExpiringProductFilter] = useState(null);
+  const [isBatchTrackedFilter, setIsBatchTrackedFilter] = useState(null);
+  const [isProductItemFilter, setIsProductItemFilter] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
@@ -177,15 +182,19 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
 
       const filteredData = {
         productId: null,
-        sku:selectedFilterBy.value === 6 ? searchValue.value : null,
+        sku: selectedFilterBy.value === 6 ? searchValue.value : null,
         productNo: selectedFilterBy.value === 1 ? searchValue.value : null,
         productName: selectedFilterBy.value === 2 ? searchValue.value : null,
-            productDescription: selectedFilterBy.value === 7 ? searchValue.value : null,
+        productDescription: selectedFilterBy.value === 7 ? searchValue.value : null,
         barcode: selectedFilterBy.value === 3 ? searchValue.value : null,
         categoryId: selectedCategoryId,
         measurementUnitId: selectedMeasurementUnitId,
         storeId: selectedStoreId === -1 ? null : selectedStoreId,
         productTypeIds: productTypeIds.length > 0 ? productTypeIds : null,
+        isProductItem: isProductItemFilter,
+        isStockTracked: isStockTrackedFilter,
+        isExpiringProduct: isExpiringProductFilter,
+        isBatchTracked: isBatchTrackedFilter,
         searchByKeyword: false,
         skip: skip,
         limit: limit,
@@ -215,6 +224,10 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
     isSingleProductChecked,
     isVariationProductChecked,
     isComboProductChecked,
+    isStockTrackedFilter,
+    isExpiringProductFilter,
+    isBatchTrackedFilter,
+    isProductItemFilter,
     currentPage,
     rowsPerPage,
   ]);
@@ -483,7 +496,7 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
     <div className="flex flex-col md:flex-row justify-between items-end py-4 gap-4 bg-white rounded-xl border p-6 mt-4">
 
 
-       <div className="flex flex-col md:flex-row w-full gap-6">
+       <div className="flex flex-col md:flex-row w-full gap-6 items-center ">
            
             {/* <div className="flex flex-col w-full md:w-1/5">
               <label className="text-sm font-medium text-gray-700 mb-2">Store</label>
@@ -500,81 +513,140 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
                 ))}
               </select>
             </div> */}
-            <div className="flex flex-col w-full md:w-1/5">
-              <label className="text-sm font-medium text-gray-700 mb-2">Filter By</label>
-              <select
-                value={selectedFilterBy.value}
-                onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
-                className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-              >
-                <option value="" disabled>Select Filter</option>
-                {filterByOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.displayName}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {[1, 2, 3, 6,7].includes(selectedFilterBy.value) && (
-              <div className="flex flex-col w-full md:w-full">
-                <label className="text-sm font-medium text-gray-700 mb-2">Search Value</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    ref={searchInputRef} // ✅ ref added
-                    value={searchValue.value}
-                    onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
-                   onKeyDown={handleKeyDown} // ✅ Enter key handler
-                    className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-                    placeholder="Enter search value"
+            <div className="flex flex-col gap-4 w-full mt-4">
+              <div className="flex flex-wrap gap-4 w-full">
+                <div className="w-full sm:w-[180px]">
+                  <TriStateSelect
+                    id="isProductItemFilter"
+                    label="Product Item"
+                    value={isProductItemFilter}
+                    onChange={setIsProductItemFilter}
+                    allLabel="All"
+                    trueLabel="Product Item"
+                    falseLabel="Non-Product Item"
+                    className="w-full"
                   />
-                  <button
-                    type="button"
-                    onClick={loadProducts}
-                    className="px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200"
-                  >
-                    Search
-                  </button>
+                </div>
+                <div className="w-full sm:w-[180px]">
+                  <TriStateSelect
+                    id="isStockTrackedFilter"
+                    label="Stock Tracked"
+                    value={isStockTrackedFilter}
+                    onChange={setIsStockTrackedFilter}
+                    allLabel="All"
+                    trueLabel="Stock Tracked"
+                    falseLabel="Non-Stock Tracked"
+                    className="w-full"
+                  />
+                </div>
+                <div className="w-full sm:w-[180px]">
+                  <TriStateSelect
+                    id="isExpiringProductFilter"
+                    label="Expiring Product"
+                    value={isExpiringProductFilter}
+                    onChange={setIsExpiringProductFilter}
+                    allLabel="All"
+                    trueLabel="Expiring Product"
+                    falseLabel="Non-Expiring Product"
+                    className="w-full"
+                  />
+                </div>
+                <div className="w-full sm:w-[180px]">
+                  <TriStateSelect
+                    id="isBatchTrackedFilter"
+                    label="Batch Tracked"
+                    value={isBatchTrackedFilter}
+                    onChange={setIsBatchTrackedFilter}
+                    allLabel="All"
+                    trueLabel="Batch Tracked"
+                    falseLabel="Non-Batch Tracked"
+                    className="w-full"
+                  />
                 </div>
               </div>
-            )}
-            {selectedFilterBy.value === 4 && (
-              <div className="flex flex-col w-full md:w-1/5">
-                <label className="text-sm font-medium text-gray-700 mb-2">Category</label>
-                <select
-                  value={selectedCategoryId}
-                  onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-                >
-                  <option value="" disabled>Select Category</option>
-                  {categoryOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.displayName}
-                    </option>
-                  ))}
-                </select>
+
+              <div className="flex flex-wrap gap-4 w-full items-end">
+                <div className="w-full sm:w-[260px]">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Filter By</label>
+                  <select
+                    value={selectedFilterBy.value}
+                    onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
+                    className="w-full px-2 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                  >
+                    <option value="" disabled>Select Filter</option>
+                    {filterByOptions.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.displayName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {[1, 2, 3, 6, 7].includes(selectedFilterBy.value) && (
+                  <div className="flex flex-1 flex-wrap gap-2 min-w-[220px]">
+                    <div className="flex-1 min-w-[180px]">
+                       <label className="text-sm font-medium text-gray-700 mb-2 block">Search</label>
+                      <input
+                        type="text"
+                        ref={searchInputRef}
+                        value={searchValue.value}
+                        onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                        placeholder="Enter search value"
+                      />
+                    </div>
+                    <div>
+                   
+                    <button
+                      type="button"
+                      onClick={loadProducts}
+                      className="h-[40px] px-4 py-2 mt-6 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200"
+                    >
+                      Search
+                    </button>
+                    </div>
+                  </div>
+                )}
+
+                {selectedFilterBy.value === 4 && (
+                  <div className="w-full sm:w-[220px]">
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">Category</label>
+                    <select
+                      value={selectedCategoryId}
+                      onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
+                      className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                    >
+                      <option value="" disabled>Select Category</option>
+                      {categoryOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.displayName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {selectedFilterBy.value === 5 && (
+                  <div className="w-full sm:w-[220px]">
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">Measurement Unit</label>
+                    <select
+                      value={selectedMeasurementUnitId}
+                      onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
+                      className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
+                    >
+                      <option value="" disabled>Select Measurement Unit</option>
+                      {measurementUnitOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.displayName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
-            )}
-            {selectedFilterBy.value === 5 && (
-              <div className="flex flex-col w-full md:w-1/5">
-                <label className="text-sm font-medium text-gray-700 mb-2">Measurement Unit</label>
-                <select
-                  value={selectedMeasurementUnitId}
-                  onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"
-                >
-                  <option value="" disabled>Select Measurement Unit</option>
-                  {measurementUnitOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.displayName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            </div>
           </div>
-        
-</div>
+        </div>
       <div className="flex justify-between w-full items-center">
         <div className="pl-3">
           <span className=" text-gray-500">{totalRecords} items found</span>

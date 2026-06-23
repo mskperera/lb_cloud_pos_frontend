@@ -3,8 +3,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaPlus } from "react-icons/fa";
 
-import { format } from "date-fns"; // optional – better than moment for new projects
 import BackButton from "../../components/BackButton";
+import ReusableTable from "../../components/ReusableTable";
+import { getTransferOrders } from "../../functions/transferOrder";
+import moment from "moment";
+import { XIcon } from "lucide-react";
+
+import DaisyUIPaginator from "../../components/DaisyUIPaginator"
 
 const TransferOrderList = () => {
   const navigate = useNavigate();
@@ -13,56 +18,37 @@ const TransferOrderList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate API delay + demo data
-    setTimeout(() => {
-      const mockOrders = [
-        {
-          number: "TO1008",
-          date: "2021-06-18",
-          status: "In transit",
-          source: "Pizzerria",
-          destination: "Coffee shop",
-          itemsCount: 3,
-          totalQuantity: 261,
-          orderedBy: "Owner",
-        },
-        {
-          number: "TO1012",
-          date: "2025-03-15",
-          status: "Received",
-          source: "Main Warehouse",
-          destination: "Downtown Store",
-          itemsCount: 5,
-          totalQuantity: 450,
-          orderedBy: "Manager",
-        },
-        {
-          number: "TO1015",
-          date: "2025-04-02",
-          status: "Draft",
-          source: "Pizzerria",
-          destination: "Uptown Cafe",
-          itemsCount: 2,
-          totalQuantity: 80,
-          orderedBy: "Staff",
-        },
-        {
-          number: "TO1021",
-          date: "2026-02-28",
-          status: "Sent",
-          source: "Central Kitchen",
-          destination: "Branch 3",
-          itemsCount: 4,
-          totalQuantity: 320,
-          orderedBy: "Owner",
-        },
-      ];
-      setOrders(mockOrders);
-      setLoading(false);
-    }, 600);
-  }, []);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(30);
+    const [totalRecords, setTotalRecords] = useState(0);
 
+  const [selectedFilterBy, setSelectedFilterBy] = useState({
+    label: "Filter by",
+    value: 1,
+    isTouched: false,
+    isValid: false,
+    rules: { required: false, dataType: "integer" },
+  });
+
+  const [searchValue, setSearchValue] = useState({
+    label: "Search Value",
+    value: "",
+    isTouched: false,
+    isValid: false,
+    rules: { required: false, dataType: "string" },
+  });
+
+  const [searchFromDate, setSearchFromDate] = useState("");
+  const [searchToDate, setSearchToDate] = useState("");
+
+
+
+  useEffect(() => {
+    loadTranferOrders(searchValue.value, searchFromDate, searchToDate, false);
+  }, [currentPage, rowsPerPage]);
+
+
+  
   const getStatusStyle = (status) => {
     switch (status.toLowerCase()) {
       case "in transit":
@@ -81,13 +67,118 @@ const TransferOrderList = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F2F2F7] p-7 flex items-center justify-center">
-        <div className="text-[#6D6D72] text-lg">Loading transfer orders...</div>
-      </div>
-    );
-  }
+
+  const orderColumns = [
+    {
+      key: "transferNo",
+      label: "Transfer Order No",
+      align: "left",
+    },
+    {
+      key: "createdDate_UTC",
+      label: "Date",
+      align: "left",
+      render: (order) => moment(order.createdDate_UTC).format("yyyy MMM DD hh:mm A"),
+    },
+    {
+      key: "route",
+      label: "Source → Destination",
+      align: "left",
+      render: (order) => (
+        <div>
+          <div className="font-medium">{order.sourceStoreName}</div>
+          <div className="text-sm text-gray-500 mt-0.5">→ {order.destinationStoreName}</div>
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      align: "left",
+      render: (order) => (
+        <span className={`inline-flex px-2 md:px-3 py-1 rounded-full text-xs font-semibold border ${getStatusStyle(order.status)}`}>
+          {order.status}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      align: "right",
+      render: (order) => (
+        <button
+          onClick={() => navigate(`/inventory/transferorders/${order.transferOrderId}`)}
+          className="inline-flex items-center gap-1 px-3 md:px-4 py-1.5 md:py-2 bg-white border border-[#E5E5EA] rounded-lg text-[#007AFF] font-medium hover:bg-blue-50 hover:border-blue-300 transition shadow-sm text-xs md:text-sm"
+          title="View Details"
+        >
+          <FaEye className="w-3 h-3 md:w-4 md:h-4" />
+          <span className="hidden md:inline">View</span>
+        </button>
+      ),
+    },
+  ];
+
+  const onPageChange = (event) => {
+
+    console.log('event.page',event.page);
+    setCurrentPage(event.page);
+    setRowsPerPage(event.rows);
+  };
+
+  const loadTranferOrders = async (_searchValue = null, fromDate = null, toDate = null, resetSkipAndLimit = false) => {
+
+
+      try {
+        if (_searchValue !== null) {
+          if (_searchValue.trim() === "") _searchValue = null;
+        }
+  
+        if (fromDate !== null) {
+          if (fromDate.trim() === "") fromDate = null;
+        }
+  
+        if (toDate !== null) {
+          if (toDate.trim() === "") toDate = null;
+        }
+  
+        console.log("searchValue", _searchValue, "fromDate", fromDate, "toDate", toDate);
+  
+        setLoading(true);
+        const skip = resetSkipAndLimit ? 0 : currentPage * rowsPerPage;
+        const limit = rowsPerPage;
+  
+        const filteredData = {
+        
+          sourceStoreId: selectedFilterBy.value === 1 ? _searchValue : null,
+          destinationStoreId: selectedFilterBy.value === 2 ? _searchValue : null,
+          status: selectedFilterBy.value === 3 ? _searchValue : null,
+          fromDate: fromDate,
+          toDate: toDate,
+          skip,
+          limit,
+        };
+  
+        const _result = await getTransferOrders(filteredData);
+
+
+        const { totalRows } = _result.data.outputValues;
+        setTotalRecords(totalRows);
+        setOrders(_result.data.results[0] || []);
+      } catch (err) {
+        console.error("Error loading transfer orders:", err);
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+
+
+
+}
+
+
+
+
+
 
   return (
     <div className="min-h-screen bg-[#F2F2F7] p-4 md:p-6 lg:p-7 pb-20 font-sans">
@@ -100,7 +191,7 @@ const TransferOrderList = () => {
               onClick={() => navigate("/inventory/list")}
               title="Back to Inventory"
             />
-            <h1 className="text-xl md:text-2xl lg:text-[26px] font-bold text-[#1C1C1E] tracking-[-0.4px]">
+            <h1 className="text-xl md:text-2xl lg:text-[26px] font-bold text-gray-700">
               Transfer Orders
             </h1>
           </div>
@@ -116,142 +207,149 @@ const TransferOrderList = () => {
 
         {/* Table Card - Desktop View */}
         <div className="hidden md:block bg-white rounded-xl md:rounded-2xl border border-[#E5E5EA] shadow-sm overflow-hidden">
-          <div className="p-4 md:p-5 border-b bg-gray-50/70">
-            <h2 className="text-base md:text-lg font-semibold text-[#1C1C1E]">
-              All Transfer Orders
-            </h2>
-            <p className="text-xs md:text-sm text-[#6D6D72] mt-1">
-              {orders.length} orders found
-            </p>
+         
+                 <div className="flex flex-col md:flex-row md:items-end gap-4 px-6 py-4 border-t border-gray-200">
+            {/* Filter Dropdown */}
+            <div className="w-full md:w-56">
+              <select
+                value={selectedFilterBy.value}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  setSelectedFilterBy((prev) => ({ ...prev, value: val }));
+                  setCurrentPage(0);
+                  setSearchValue({ ...searchValue, value: "" });
+                  setSearchFromDate("");
+                  setSearchToDate("");
+                }}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              >
+                <option value={1}>Transfer Order No</option>
+                <option value={5}>Order Date</option>
+              </select>
+            </div>
+
+            {/* Search Field (text) */}
+            {[1, 2, 3].includes(selectedFilterBy.value) && (
+              <div className="flex-1 min-w-[180px] relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchValue.value}
+                  onChange={(e) => {
+                    setSearchValue((prev) => ({
+                      ...prev,
+                      value: e.target.value,
+                    }));
+
+                    if (
+                      e.target.value.trim() === "" &&
+                      searchValue.value.trim() !== ""
+                    ) {
+                      setSearchFromDate("");
+                      setSearchToDate("");
+                      loadTranferOrders(null, null, null, true);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    e.key === "Enter" && loadTranferOrders(searchValue.value);
+                  }}
+                  className="w-full py-3 pl-4 pr-10 text-base font-medium bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 placeholder-gray-500 shadow-sm"
+                />
+                {searchValue.value && (
+                  <button
+                    onClick={() => {
+                      setSearchValue((prev) => ({ ...prev, value: "" }));
+                      setSearchFromDate("");
+                      setSearchToDate("");
+                      loadTranferOrders(null, null, null, true);
+                    }}
+                    className="absolute right-2 p-1 text-gray-500 hover:text-red-600 transition"
+                    tabIndex={-1}
+                  >
+                    <XIcon size={20} strokeWidth={3} />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Date Range Fields */}
+            {selectedFilterBy.value === 5 && (
+              <div className="flex gap-3 flex-1 min-w-[180px]">
+                <input
+                  type="date"
+                  value={
+                    searchFromDate
+                      ? moment(searchFromDate).format("YYYY-MM-DD")
+                      : ""
+                  }
+                  onChange={(e) => setSearchFromDate(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300"
+                />
+                <input
+                  type="date"
+                  value={
+                    searchToDate
+                      ? moment(searchToDate).format("YYYY-MM-DD")
+                      : ""
+                  }
+                  onChange={(e) => setSearchToDate(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300"
+                />
+              </div>
+            )}
+
+            {/* Search Button */}
+            <div className="w-full md:w-auto flex justify-end">
+              <button
+                onClick={() => {
+                  if (
+                    selectedFilterBy.value === 5 ||
+                    (searchValue.value?.trim() !== "" &&
+                      selectedFilterBy.value !== 5)
+                  ) {
+                    console.log("serchbalue", searchValue.value);
+                    loadTranferOrders(
+                      searchValue.value,
+                      searchFromDate
+                        ? moment(searchFromDate).format("YYYY-MM-DD")
+                        : null,
+                      searchToDate
+                        ? moment(searchToDate).format("YYYY-MM-DD")
+                        : null,
+                      true,
+                    );
+                  }
+                }}
+                className="px-6 py-3 bg-sky-600 text-white rounded-xl hover:bg-sky-700 font-medium transition w-full md:w-auto"
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                    Transfer No
-                  </th>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                    Date
-                  </th>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                    Source → Destination
-                  </th>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-xs font-bold uppercase tracking-wider text-[#6D6D72] text-center">
-                    Items
-                  </th>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-xs font-bold uppercase tracking-wider text-[#6D6D72] text-center">
-                    Total Qty
-                  </th>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-xs font-bold uppercase tracking-wider text-[#6D6D72]">
-                    Status
-                  </th>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-xs font-bold uppercase tracking-wider text-[#6D6D72] text-right">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {orders.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="py-12 md:py-16 text-center text-[#AEAEB2] text-sm md:text-lg">
-                      No transfer orders found • Create one to get started
-                    </td>
-                  </tr>
-                ) : (
-                  orders.map((order) => (
-                    <tr key={order.number} className="hover:bg-[#F9F9FB] transition-colors group">
-                      <td className="px-4 md:px-6 py-3 md:py-4 font-medium text-[#1C1C1E] text-sm">
-                        {order.number}
-                      </td>
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-[#6D6D72] text-sm">
-                        {format(new Date(order.date), "MMM dd, yyyy")}
-                      </td>
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-sm">
-                        <div className="font-medium">{order.source}</div>
-                        <div className="text-xs text-[#6D6D72] mt-0.5">→ {order.destination}</div>
-                      </td>
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-center font-medium text-sm">{order.itemsCount}</td>
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-center font-medium text-sm">{order.totalQuantity}</td>
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-sm">
-                        <span className={`inline-flex px-2 md:px-3 py-1 rounded-full text-xs font-semibold border ${getStatusStyle(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-right">
-                        <button
-                          onClick={() => navigate(`/inventory/transferorders/${order.number}`)}
-                          className="inline-flex items-center gap-1 px-3 md:px-4 py-1.5 md:py-2 bg-white border border-[#E5E5EA] rounded-lg text-[#007AFF] font-medium hover:bg-blue-50 hover:border-blue-300 transition shadow-sm text-xs md:text-sm"
-                          title="View Details"
-                        >
-                          <FaEye className="w-3 h-3 md:w-4 md:h-4" />
-                          <span className="hidden md:inline">View</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+            <ReusableTable
+              columns={orderColumns}
+              data={orders}
+              loading={loading}
+              emptyMessage="No transfer orders found • Create one to get started"
+            />
           </div>
-          <div className="p-4 md:p-5 border-t bg-gray-50/50 text-xs md:text-sm text-[#6D6D72] text-center">
-            Showing {orders.length} of {orders.length} orders
-          </div>
-        </div>
-
-        {/* Mobile Card View */}
-        <div className="md:hidden space-y-3">
-          {orders.length === 0 ? (
-            <div className="text-center py-12 text-[#AEAEB2]">
-              No transfer orders found • Create one to get started
+          <div className="p-4 md:p-5 border-t bg-gray-50/50 text-xs md:text-sm flex flex-col md:flex-row md:justify-between items-center gap-3">
+            <div className=" text-gray-500 text-center">
+              Showing {orders.length} of {totalRecords} Items
             </div>
-          ) : (
-            orders.map((order) => (
-              <div key={order.number} className="bg-white rounded-lg border border-[#E5E5EA] p-4 shadow-sm hover:shadow-md transition">
-                <div className="flex justify-between items-start gap-2 mb-3">
-                  <div>
-                    <div className="font-bold text-[#1C1C1E] text-sm">{order.number}</div>
-                    <div className="text-xs text-[#6D6D72] mt-0.5">{format(new Date(order.date), "MMM dd, yyyy")}</div>
-                  </div>
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusStyle(order.status)}`}>
-                    {order.status}
-                  </span>
-                </div>
-
-                <div className="text-xs text-[#6D6D72] space-y-1.5 mb-3">
-                  <div className="flex justify-between">
-                    <span>From:</span>
-                    <span className="font-medium text-[#1C1C1E]">{order.source}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>To:</span>
-                    <span className="font-medium text-[#1C1C1E]">{order.destination}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Items:</span>
-                    <span className="font-medium text-[#1C1C1E]">{order.itemsCount}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Total Qty:</span>
-                    <span className="font-medium text-[#1C1C1E]">{order.totalQuantity}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => navigate(`/inventory/transferorders/${order.number}`)}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#007AFF] text-white rounded-lg font-semibold hover:bg-blue-600 transition text-sm"
-                >
-                  <FaEye className="w-4 h-4" />
-                  View Details
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+            <DaisyUIPaginator
+              currentPage={currentPage}
+              rowsPerPage={rowsPerPage}
+              totalRecords={totalRecords}
+              onPageChange={onPageChange}
+              rowsPerPageOptions={[10, 20, 30, 50, 100]}
+            />
+          </div>
         </div>
       </div>
-
+</div>
   );
 };
 

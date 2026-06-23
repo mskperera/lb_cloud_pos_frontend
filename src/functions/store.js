@@ -47,3 +47,32 @@ export const setUserAssignedStores=async(userId)=>{
     return err;
   }
 };
+
+
+
+ export const getInventoryLastPricing = async (inventoryId) => {
+  try {
+ 
+    const tenantId = getTenantId();
+       const token = getToken();
+
+    return await customAxios
+      .get(`/product/inventoryLastPricing?inventoryId=${inventoryId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          "authorization":`Bearer ${token}`,
+         'tenantid':tenantId
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
