@@ -1,5 +1,6 @@
 // src/routes/PublicRoutes.jsx
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 
 import LandingPage from "../pages/landing";          // adjust path if needed
 import PricingPage from "../pages/landing/PricingPage";
@@ -12,6 +13,7 @@ import ScrollToHash from "../pages/landing/ScrollToHash";
 import CookiePolicy from "../pages/CookiePolicy";
 
 // Optional: a simple layout wrapper just for these pages (Navbar + content)
+const isTauriApp = typeof window !== 'undefined' && 'isTauri' in window && !!window.isTauri;
 
 
 const PublicLayout = ({ children }) => {
@@ -26,9 +28,8 @@ const PublicLayout = ({ children }) => {
 const PublicRoutes = () => {
   return (
     <Routes>
-  
       {/* Landing & marketing pages – no sidebar/topbar */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={isTauriApp ? <Navigate replace to="/signin" /> : <LandingPage />} />
 
       {/* Legal & pricing pages – can share same simple layout */}
       <Route

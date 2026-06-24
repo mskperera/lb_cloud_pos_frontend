@@ -315,8 +315,8 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
  const batchedItemsRes = await getBatchedItems(allprouctIdParsed, store.storeId);
         
 
-    const {isBatchEnabled}=batchedItemsRes.data.outputValues;
-     console.log('getBatchedItems',isBatchEnabled);
+    const {isBatchTracked}=batchedItemsRes.data.outputValues;
+     console.log('getBatchedItems',batchedItemsRes);
 
 
       const batchedItems = batchedItemsRes.data.results[0];
@@ -341,7 +341,7 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
 
 
             
-      if(batchedItems.length>0 && !!isBatchEnabled){
+      if(batchedItems.length>0 && !!isBatchTracked){
         setBatchedItemList(batchedItems);
         setIsBatchedItemsModalOpen(true);
         setAddOrderTemp(order);
@@ -441,9 +441,9 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
       console.log('selectedProduct',selectedProduct);
       console.log('variation product clicked',p);
       const batchedItemsRes = await getBatchedItems(p.allProductId, store.storeId);
-       const {isBatchEnabled}=batchedItemsRes.data.outputValues;
+       const {isBatchTracked}=batchedItemsRes.data.outputValues;
 
-      console.log('getBatchedItems',isBatchEnabled);
+      console.log('getBatchedItems',batchedItemsRes);
       const batchedItems = batchedItemsRes.data.results[0];
 
       const description = `${selectedProduct.productName} ${v}`;
@@ -464,7 +464,7 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
       };
 
 
-       if(batchedItems.length>0 && !!isBatchEnabled){
+       if(batchedItems.length>0 && !!isBatchTracked){
         setBatchedItemList(batchedItems);
         setIsBatchedItemsModalOpen(true);
         setAddOrderTemp(order);

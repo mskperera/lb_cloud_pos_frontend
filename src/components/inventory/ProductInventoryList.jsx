@@ -21,7 +21,7 @@ import TriStateSelect from "../inputField/TriStateSelect";
 import { getStockInfo } from "../../functions/stockEntry";
 import ProductVariationDetails from "./ProductVariationDetails";
 import GhostButton from "../iconButtons/GhostButton";
-import { FaAngleDown, FaAngleRight, FaWrench } from "react-icons/fa";
+import { FaAngleDown, FaAngleRight, FaPlus, FaWrench } from "react-icons/fa";
 
 const ProductDetails = ({ selectedProduct }) => {
   const [stores, setStores] = useState([]);
@@ -563,6 +563,18 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
                     className="w-full"
                   />
                 </div>
+
+
+      <button
+            onClick={() => navigate("/products/add")}
+            className="flex text-sm items-center justify-center gap-2 px-4 py-2 bg-green-700 text-white font-semibold 
+            rounded-lg md:rounded-xl shadow-md hover:bg-green-800 ml-auto"
+          >
+            <FaPlus className="w-4 h-4" />
+            <span>Create New Product</span>
+          </button>
+
+
               </div>
 
               <div className="flex flex-wrap gap-4 w-full items-end">
@@ -663,7 +675,7 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
       <div className="flex flex-col h-[65vh] overflow-hidden">
       <div className="flex-1 overflow-y-auto bg-white">
        <table className="w-full border-collapse">
-  <thead className="sticky top-0 bg-gray-50 text-sm font-medium text-gray-700 border-b border-gray-200 z-10">
+  <thead className="relative bg-gray-50 text-sm font-medium text-gray-700 border-b border-gray-200" style={{position: 'sticky', top: 0}}>
     <tr>
       <th className="px-4 py-3 text-left"></th>
       {/* <th className="px-4 py-3 text-left">Product No</th> */}

@@ -187,10 +187,10 @@ const TransferOrderList = () => {
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 md:gap-4">
-            <BackButton
+            {/* <BackButton
               onClick={() => navigate("/inventory/list")}
               title="Back to Inventory"
-            />
+            /> */}
             <h1 className="text-xl md:text-2xl lg:text-[26px] font-bold text-gray-700">
               Transfer Orders
             </h1>

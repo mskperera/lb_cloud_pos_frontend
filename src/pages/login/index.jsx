@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
  import logo_long from '../../assets/pos_logo_long.png';
  import pos_logo_long_inv from '../../assets/pos_logo_long_inv.png';
@@ -18,81 +18,128 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [saveCredentials, setSaveCredentials] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
+  const [autoSigningIn, setAutoSigningIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
    const isTauriApp = 'isTauri' in window && !!window.isTauri;
  const navigate = useNavigate();
-  const signIn = async () => {
-    try {
-      localStorage.clear();
-      setIsLoading(true);
-      setErrorMessage('');
-
-      const payload = { userName: email, password };
-
-      const authRes = await userLogin(payload);
-
-      if (authRes.status === 422 || authRes.status === 401) {
-        setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
-        setIsLoading(false);
-        return;
-      }
-
-      const accessToken = authRes.data.accessToken;
-      localStorage.setItem('token', accessToken);
-      const plaindata = parseJwt(accessToken);
-
-      //console.log('plaindata', plaindata);
-
-      localStorage.setItem('tenantId', plaindata.tenantId);
-      localStorage.setItem('userId', plaindata.userId);
-      localStorage.setItem('user', JSON.stringify(plaindata));
-
-      await setUserAssignedStores(plaindata.userId);
-
-      if (isTauriApp) {
-        try {
-          const db = await Database.load('sqlite:credentials.db');
-          await db.execute('DELETE FROM credentials');
-
-          if (saveCredentials) {
-            await db.execute(
-              'INSERT INTO credentials (email, password) VALUES ($1, $2)',
-              [email, password]
-            );
-          }
-          await db.close();
-        } catch (error) {
-          console.error('Failed to save credentials:', error);
-        }
-      }
-
-   
-
-        const systeminfo=await getSystemInfoFromLocalStorageOpti();
-
-               console.log('systeminfo llll',systeminfo);
-       if(systeminfo){
-        navigate('/home');
-       }
-       else{
-       navigate('/systemDataInitialization');
-       }
 
 
-      
-    } catch (error) {
-      setErrorMessage('An error occurred. Please try again.');
+useEffect(()=>{
+
+  if (isTauriApp) {
+    signInUsingSavedCredientials();
+  }
+
+  console.log('rrrooiuouorr');
+
+}, [isTauriApp])
+
+const signInUsingSavedCredientials = async () => {
+  try {
+    const db = await Database.load('sqlite:credentials.db');
+    const result = await db.select('select email, password from credentials limit 1');
+    await db.close();
+
+    const rows = Array.isArray(result) ? result : [];
+    const credential = rows.length ? rows[0] : null;
+    if (!credential) return;
+
+    const storedEmail = credential.email ?? credential.userName;
+    const storedPassword = credential.password;
+
+    if (!storedEmail || !storedPassword) return;
+
+    setEmail(storedEmail);
+    setPassword(storedPassword);
+    setSaveCredentials(true);
+
+    if(isTauriApp)
+    setInfoMessage('Signing in with saved credentials...');
+
+    setAutoSigningIn(true);
+
+    await signInWithCredentials(storedEmail, storedPassword, true);
+  } catch (error) {
+    console.error('Failed to load saved credentials:', error);
+  }
+};
+
+const signInWithCredentials = async (loginEmail, loginPassword, remember = false) => {
+  try {
+    localStorage.clear();
+    setIsLoading(true);
+    setErrorMessage('');
+    setInfoMessage('Signing in with saved credentials...');
+
+    const payload = { userName: loginEmail, password: loginPassword };
+    const authRes = await userLogin(payload);
+
+    if (authRes.status === 422 || authRes.status === 401) {
+      setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
+      setInfoMessage('');
+      setAutoSigningIn(false);
       setIsLoading(false);
+      return;
     }
-  };
 
+    const accessToken = authRes.data.accessToken;
+    localStorage.setItem('token', accessToken);
+    const plaindata = parseJwt(accessToken);
+
+    localStorage.setItem('tenantId', plaindata.tenantId);
+    localStorage.setItem('userId', plaindata.userId);
+    localStorage.setItem('user', JSON.stringify(plaindata));
+
+    await setUserAssignedStores(plaindata.userId);
+
+    if (isTauriApp) {
+      try {
+        const db = await Database.load('sqlite:credentials.db');
+        await db.execute('DELETE FROM credentials');
+
+        if (remember) {
+          await db.execute(
+            'INSERT INTO credentials (email, password) VALUES ($1, $2)',
+            [loginEmail, loginPassword]
+          );
+          console.log('Saved credentials to SQLite database...');
+        }
+
+        await db.close();
+      } catch (error) {
+        console.error('Failed to save credentials:', error);
+      }
+    }
+
+    const systeminfo = await getSystemInfoFromLocalStorageOpti();
+    console.log('systeminfo llll', systeminfo);
+
+    if (systeminfo) {
+      navigate('/home');
+    } else {
+      navigate('/systemDataInitialization');
+    }
+  } catch (error) {
+    setErrorMessage('An error occurred. Please try again.');
+    setInfoMessage('');
+    setAutoSigningIn(false);
+    setIsLoading(false);
+  }
+};
+
+const signIn = async () => {
+    await signInWithCredentials(email, password, saveCredentials);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload
     if (!isLoading) {
       await signIn();
     }
   };
+
+     
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -174,9 +221,9 @@ const Login = () => {
 </Link>
                   </div>
 
-                  {errorMessage && (
-                    <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-                      {errorMessage}
+                  {(errorMessage || infoMessage) && (
+                    <div className={`text-sm p-3 rounded-lg border ${errorMessage ? 'text-red-600 bg-red-50 border-red-200' : 'text-sky-700 bg-sky-50 border-sky-200'}`}>
+                      {errorMessage || infoMessage}
                     </div>
                   )}
 
