@@ -253,25 +253,27 @@ const Sidebar = ({ isCollapsed = false, onToggle }) => {
           label="Inventory"
           iconName={Boxes}
           submenuItems={[
-            { label: "Add Product", to: "/products/add", icon: PlusCircle },
+            // { label: "Add Product", to: "/products/add", icon: PlusCircle },
             { label: "Product Inventory", to: "/inventory/list", icon: Boxes },
-            { label: "Transfer Orders", to: "/inventory/transferorders/create", icon: List },
+            { label: "Transfer Orders", to: "/inventory/transferorders/list", icon: List },
+              //  { label: "Stock Entry", to: "/inventory/stockentry/add", icon: PlusCircle },
+                { label: "Stock Entries", to: "/inventory/stockentry/list", icon: List },
             { label: "Categories", to: "/categories", icon: List },
             { label: "Measurement Units", to: "/measurementUnits", icon: List },
           ]}
           isCollapsed={isCollapsed}
         />
 
-
+{/* 
          <SidebarMenu
           label="Stock"
           iconName={BarChart3}
           submenuItems={[
-            { label: "Stock Entry", to: "/inventory/stockentry/add", icon: PlusCircle },
+         
             { label: "Stock Entries", to: "/inventory/stockentry/list", icon: List },
           ]}
           isCollapsed={isCollapsed}
-        />
+        /> */}
 
         <SidebarMenu
           label="Reports"

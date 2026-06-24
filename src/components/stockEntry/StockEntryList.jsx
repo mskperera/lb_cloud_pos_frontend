@@ -6,7 +6,9 @@ import DaisyUIPaginator from "../../components/DaisyUIPaginator";
 import { getStockEntries } from "../../functions/stockEntry";
 import StockEntryVoid from "./StockEntryVoid";
 import { validate } from "../../utils/formValidation";
-import { FaEye, FaStop } from "react-icons/fa";
+import { FaEye, FaPlus, FaStop } from "react-icons/fa";
+import BackButton from "../BackButton";
+import { useNavigate } from "react-router-dom";
 
 export default function StockEntryList({ selectingMode }) {
   const store = JSON.parse(localStorage.getItem("selectedStore"));
@@ -19,6 +21,10 @@ export default function StockEntryList({ selectingMode }) {
   const [totalRecords, setTotalRecords] = useState(10);
   const [isVoidRemarkShow, setIsVoidRemarkShow] = useState(false);
   const [selectedStockEntryId, setSelectedOrderId] = useState("");
+
+
+  const navigate = useNavigate();
+
 
   const onPageChange = (event) => {
     setCurrentPage(event.page);
@@ -179,9 +185,30 @@ export default function StockEntryList({ selectingMode }) {
       />
 
       <div className="flex flex-col justify-between p-5 gap-2 px-10">
-        <div className="col-span-2">
-          <h3 className="text-center font-bold text-xl">Stock Entry List</h3>
+
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* <BackButton
+              onClick={() => navigate("/inventory/list")}
+              title="Back to Inventory"
+            /> */}
+            <h1 className="text-xl md:text-2xl lg:text-[26px] font-bold text-gray-700">
+             Stock Entry List
+            </h1>
+          </div>
+
+          <button
+            onClick={() => navigate("/inventory/stockentry/add")}
+            className="w-full sm:w-auto inline-flex items-center justify-center sm:justify-start gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-green-700 text-white font-semibold rounded-lg md:rounded-xl shadow-md hover:bg-green-800 transition text-sm md:text-base"
+          >
+            <FaPlus className="w-4 h-4" />
+            <span>Create New Stock Entry</span>
+          </button>
         </div>
+
+
+
         <div className="flex space-x-4 w-full">
           <div className="flex flex-col space-y-2 w-1/5">
             <label className="text-sm font-medium text-gray-700">Filter By</label>

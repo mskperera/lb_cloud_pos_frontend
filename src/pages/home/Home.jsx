@@ -82,17 +82,13 @@ const HomeMenuButton = ({ to, label, icon: Icon }) => {
   return (
     <Link
       to={to}
-      className="group relative flex flex-col items-center justify-center 
-                 min-w-[180px] h-40 p-6 bg-white rounded-2xl border border-gray-200
-                 hover:shadow-md hover:border-sky-500 hover:-translate-y-1 
-                 transition-all duration-300 ease-out overflow-hidden"
+      className="flex flex-col items-center justify-center  
+                h-40  bg-white rounded-2xl border border-gray-200
+                 hover:shadow-md hover:border-sky-500"
     >
-      {/* Gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-sky-50/0 to-sky-100/0 
-                      group-hover:from-sky-50 group-hover:to-sky-100 transition-opacity duration-300" />
 
-      <div className="relative z-10 flex flex-col items-center gap-4">
-        <div className="w-16 h-16 rounded-xl bg-sky-100 flex items-center justify-center 
+      <div className=" flex flex-col items-center gap-4">
+        <div className="p-4 rounded-xl bg-sky-100 flex items-center justify-center 
                         group-hover:bg-sky-200 transition-colors duration-300">
           <Icon className="w-8 h-8 text-sky-600 group-hover:text-sky-700 transition-colors" />
         </div>
@@ -100,11 +96,7 @@ const HomeMenuButton = ({ to, label, icon: Icon }) => {
           {label}
         </span>
       </div>
-
-      {/* Arrow indicator */}
-      <ArrowRight className="absolute bottom-4 right-4 w-5 h-5 text-gray-400 
-                            group-hover:text-sky-600 group-hover:translate-x-1 transition-all duration-300" />
-    </Link>
+ </Link>
   );
 };
 
