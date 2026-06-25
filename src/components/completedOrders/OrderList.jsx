@@ -20,7 +20,7 @@ export default function OrderList({ isVisible, setIsVisible }) {
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [isPaymentConfirmShow, setIsPaymentConfirmShow] = useState(false);
 
-const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
+const selectedTerminal=JSON.parse(localStorage.getItem('terminal'));
 
   const [selectedFilterBy, setSelectedFilterBy] = useState({
     label: "Filter by",
@@ -66,8 +66,9 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
       const skip = resetSkipAndLimit ? 0 : currentPage * rowsPerPage;
       const limit = rowsPerPage;
 
+      //console.log('selectedTerminaId',selectedTerminaId)
       const filteredData = {
-        terminalId:selectedTerminaId,
+        terminalId:selectedTerminal.terminalId,
         orderId: null,
         orderNo: selectedFilterBy.value === 1 ? _searchValue : null,
         customerCode: selectedFilterBy.value === 2 ? _searchValue : null,
@@ -88,7 +89,7 @@ const selectedTerminaId=JSON.parse(localStorage.getItem('terminalId'));
     } finally {
       setIsTableDataLoading(false);
     }
-  }, [currentPage, rowsPerPage, selectedFilterBy.value, selectedTerminaId]);
+  }, [currentPage, rowsPerPage, selectedFilterBy.value]);
 
   useEffect(() => {
     if (isVisible) {
