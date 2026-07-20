@@ -118,3 +118,51 @@ export const getSessionMismatchCheck = async (sessionId,terminalId) => {
   }
 };
 
+export const getSessionEndProcessedDetails = async (data) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios     
+   .post(`session/getSessionEndProcessedDetails`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+
+
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getSessionEndZReport = async (sessionId) => {
+  try {
+    const tenantId = getTenantId();
+    console.log("Fetching Z-report details for sessionId:", sessionId);
+    const token = getToken();
+    return await customAxios
+      .get(`session/sessionEndZReport?sessionId=${sessionId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};

@@ -17,6 +17,7 @@ import {
   CalendarPlus,
   LayoutGrid,
   HomeIcon,
+  CalendarCheck,
 } from "lucide-react";
 
 const Rightsidebar = ({
@@ -108,7 +109,7 @@ const LeftSidebarMenu = ({
         /> */}
         <LeftSidebarMenu
           label="Dayend"
-          icon={CalendarPlus}
+          icon={CalendarCheck}
           onClick={() => {
             setIsDayEndPopupVisible(true);
            // navigate("/dayend");

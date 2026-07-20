@@ -21,6 +21,7 @@ import {
   FaCalendarCheck,
   FaCompressAlt,
   FaHistory,
+  FaMoneyBillWave,
   FaPlusCircle,
   FaSearch,
   FaTh,
@@ -46,9 +47,11 @@ import {
   ShoppingCartIcon,
   StoreIcon,
   TableIcon,
+  HandCoins
 } from "lucide-react";
 import AdvancedProductSearch from "../../components/AdvancedProductSearch";
 import { getBatchedItems } from "../../functions/register";
+import PaidInOutActivity from "../../components/paidInOut/PaidInOut";
 
 const Sidebar = ({
   expanded,
@@ -67,6 +70,7 @@ const Sidebar = ({
     { id: "lookup", icon: <SearchXIcon />, label: "Item Lookup" },
     { id: "history", icon: <HistoryIcon />, label: "Sales History" },
     { id: "custom", icon: <PlusIcon />, label: "Add Custom Item" },
+    { id: "paidinout", icon: <HandCoins />, label: "Paid In/Out" },
     { id: "dayend", icon: <CalendarIcon />, label: "Day End" },
   ];
 
@@ -205,6 +209,8 @@ const Register = () => {
 
   const [isAddCustomProductShow, setIsAddCustomProductShow] = useState(false);
 
+    const [isPaidInOutShow, setIsPaidInOutShow] = useState(false);
+
   const [showPayment, setShowPayment] = useState(false);
 
   const store = JSON.parse(localStorage.getItem("selectedStore"));
@@ -250,6 +256,12 @@ const Register = () => {
       icon: <FaPlusCircle className="text-orange-500 text-xl" />,
       onClick: () => setIsAddCustomProductShow(true),
     },
+        {
+      label: "Paid In/Out",
+      icon: <FaMoneyBillWave className="text-teal-600 text-xl" />,
+      onClick: () => setIsPaidInOutShow(true),
+    },
+
     {
       label: "Day End",
       icon: <FaCalendarCheck className="text-rose-600 text-xl" />,
@@ -517,6 +529,11 @@ useEffect(() => {
     if (id === "custom") {
       setIsAddCustomProductShow(true);
     }
+
+ if (id === "paidinout") {
+      setIsPaidInOutShow(true);
+    }
+
     if (id === "lookup") {
       setShowAdvancedSearch(Math.random());
     }
@@ -648,6 +665,14 @@ useEffect(() => {
         />
       </DialogModel>
 
+{isPaidInOutShow && (
+        <PaidInOutActivity
+          isVisible={isPaidInOutShow}
+          setIsVisible={setIsPaidInOutShow}
+        />
+      )}
+
+
       {isSalesHistoryPopupVisible && (
         <OrderList
           isVisible={isSalesHistoryPopupVisible}
@@ -715,6 +740,7 @@ useEffect(() => {
               ) : (
                 <OrderListAll isTraditionalMode={hideProductList} />
               )}
+              
             </div>
           </div>
         </>

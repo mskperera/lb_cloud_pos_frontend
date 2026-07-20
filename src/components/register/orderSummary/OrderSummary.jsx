@@ -25,13 +25,13 @@ const OrderSummary = () => {
     }}>
       {/* Summary Items */}
       {[
-        { label: "Subtotal", val: formatCurrency(subtotal) },
+        { label: "Subtotal", val: formatCurrency(subtotal,false) },
         { 
           label: "Discount", 
-          val: `- ${formatCurrency(totalDiscounts)}`, 
+          val: ` ${formatCurrency(totalDiscounts,false)}`, 
           color: "var(--lpos-green)" 
         },
-        { label: "Tax", val: formatCurrency(totalTax) },
+        { label: "Tax", val: formatCurrency(totalTax,false) },
       ].map(({ label, val, color }) => (
         <div 
           key={label} 
@@ -65,9 +65,10 @@ const OrderSummary = () => {
         paddingTop: 10,
         borderTop: "1px solid var(--lpos-border)"
       }}>
-        <span>Grand Total</span>
         <span style={{ 
-          color: "var(--lpos-accent)", 
+          fontSize: "17px" 
+        }}>Grand Total</span>
+        <span style={{ 
           fontSize: "17px" 
         }}>
           {formatCurrency(grandTotal)}

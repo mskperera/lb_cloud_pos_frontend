@@ -1,3 +1,31 @@
+.receipt-details {
+    margin: 5px 0;
+
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 2px 0;
+}
+
+.detail-row span{
+    font-size: 12px;
+}
+
+.detail-row span:first-child {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.detail-row span:last-child {
+    text-align: right;
+    word-break: break-word;
+}
+
+
 .receipt {
   font-family: Arial, sans-serif; /* Matches C# Arial font */
   width: 300px; /* Approx 80mm at 96dpi */
@@ -112,6 +140,9 @@ justify-content: space-between;
   font-size: 14px; /* Matches C# boldOrderSummaryFont */
 }
 
+
+
+
 .payments {
   font-size: 10px; /* Matches C# printFont */
 }
@@ -122,6 +153,90 @@ justify-content: space-between;
   justify-content: end;
   margin: 5px 0;
 }
+
+
+
+
+
+
+/* ===========================
+   Payments
+=========================== */
+
+.payments {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.payments-title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.payment-block {
+  margin-bottom: 8px;
+}
+
+.payment-block:last-child {
+  margin-bottom: 0;
+}
+
+.payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  border-bottom: 1px dashed #000;
+  padding-bottom: 2px;
+}
+
+.payment-method {
+    font-size: 12px;
+  text-transform: uppercase;
+}
+
+.payment-amount {
+    font-size: 12px;
+  text-align: right;
+  min-width: 70px;
+}
+
+.payment-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+  padding-left: 10px;
+
+}
+
+.payment-detail span {
+    font-size: 12px;
+}
+
+.payment-detail span:last-child {
+  text-align: right;
+  min-width: 70px;
+}
+
+.payment-info {
+  padding-left: 10px;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+
+
+
+
+
+
+
+
 
 .card-details, .cash-details {
   font-size: 12px;
@@ -142,6 +257,18 @@ margin-top: 2px;
    background-color: #000;
    color: white;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 .print-date{
@@ -265,6 +392,7 @@ margin-top: 2px;
 
 
 .receipt-footer {
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
   align-items: center; /* Centers content horizontally */
@@ -300,3 +428,7 @@ margin-top: 2px;
     border: none;
   }
 }
+
+
+
+

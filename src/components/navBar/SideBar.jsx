@@ -20,6 +20,10 @@ import {
   PanelLeftClose,
   PanelLeft,
   ChevronRight,
+  ArrowRightLeft,
+  ClipboardList,
+  Layers,
+  Ruler,
 } from "lucide-react";
 
 
@@ -128,7 +132,7 @@ const SidebarMenu = ({
 
 
       {!isCollapsed && isOpen && submenuItems?.length > 0 && (
-        <ul className="submenu-list mt-1.5 space-y-1 pl-11">
+        <ul className="submenu-list mt-1.5 space-y-1 pl-2">
           {submenuItems.map((item, idx) => (
             <li key={idx}>
               {item.submenuItems ? (
@@ -142,7 +146,7 @@ const SidebarMenu = ({
                     hover:bg-sky-600/60 rounded-md transition-colors
                   `}
                 >
-                  <item.icon className="w-4.5 h-4.5 shrink-0" />
+                  <item.icon className="w-4 h-4 shrink-0" />
                   <span className="truncate">{item.label}</span>
                 </Link>
               )}
@@ -254,12 +258,13 @@ const Sidebar = ({ isCollapsed = false, onToggle }) => {
           iconName={Boxes}
           submenuItems={[
             // { label: "Add Product", to: "/products/add", icon: PlusCircle },
-            { label: "Product Inventory", to: "/inventory/list", icon: Boxes },
-            { label: "Transfer Orders", to: "/inventory/transferorders/list", icon: List },
+            { label: "Products", to: "/inventory/list", icon: Boxes },
+                          { label: "Stock Entries", to: "/inventory/stockentry/list", icon: ClipboardList },
+            { label: "Transfer Orders", to: "/inventory/transferorders/list", icon: ArrowRightLeft },
               //  { label: "Stock Entry", to: "/inventory/stockentry/add", icon: PlusCircle },
-                { label: "Stock Entries", to: "/inventory/stockentry/list", icon: List },
-            { label: "Categories", to: "/categories", icon: List },
-            { label: "Measurement Units", to: "/measurementUnits", icon: List },
+  
+            { label: "Categories", to: "/categories", icon: Layers },
+            { label: "Measurement Units", to: "/measurementUnits", icon: Ruler },
           ]}
           isCollapsed={isCollapsed}
         />

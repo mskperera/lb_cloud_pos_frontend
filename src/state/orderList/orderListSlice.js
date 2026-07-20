@@ -540,7 +540,7 @@ const orderListSlice = createSlice({
                 state.orderSummary.shortfall='';
         
                 errorMessage = 'Overpayment. Card payment exceeds the total amount.'+'grnd:'+ grandTotal.toNumber()+', rec Am:'+receivedAmountCard.toNumber();
-            } else if (receivedAmountCash.greaterThan(grandTotal.minus(receivedAmountCard))) {
+            } else if (receivedAmountCash.greaterThanOrEqualTo(grandTotal.minus(receivedAmountCard))) {
                 console.log('calculae blance reduceer',balanceAmount.toNumber())
                 balanceAmount = receivedAmountCard.plus(receivedAmountCash).minus(grandTotal);
                 state.orderSummary.cashBalance = balanceAmount.toNumber();

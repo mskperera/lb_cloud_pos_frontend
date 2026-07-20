@@ -2,7 +2,8 @@ import FormElementMessage from "../../messges/FormElementMessage";
 import { validate } from "../../../utils/formValidation";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import { FaMoneyBillAlt } from "react-icons/fa";
+import { FaCreditCard, FaMoneyBillAlt } from "react-icons/fa";
+import { Coins } from "lucide-react";
 
 const CashDemomination = ({ currency, amount, isSelected, onClick }) => {
   return (
@@ -85,33 +86,93 @@ const CashPaymentMulti = ({ onAddPayment }) => {
     onAddPayment({ allValid, fields: { payAmount: amountReceived.value } });
   };
 
-  return (
-    <div className="flex flex-col gap-4 border-2 border-gray-200 p-6 rounded-lg bg-white shadow-sm">
-      <div className="flex justify-center gap-2 items-center">
-        {/* <FontAwesomeIcon icon={faMoneyBillAlt} className="text-2xl text-sky-600" /> */}
-          <FaMoneyBillAlt className="text-2xl text-sky-600" />
-        <span className="text-lg font-semibold text-gray-700">New Cash Payment</span>
+return (
+  <div
+    className="
+      flex-1
+      rounded-2xl
+      border
+      border-slate-200
+      bg-slate-50
+      px-5
+      py-4
+      shadow-sm
+    "
+  >
+    {/* Header */}
+    <div className="mb-4 flex items-center gap-2">
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-100">
+        <Coins className="text-lg text-sky-600" />
       </div>
-      <div className="flex flex-col gap-4 items-center">
-        <div className="flex items-center gap-4 w-full">
-          <label className="font-semibold text-gray-700">Pay Amount</label>
-          <input
-            type="number"
-            value={amountReceived.value}
-            onChange={(e) => handleInputChange(setAmountReceived, amountReceived, e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500"
-          />
-        </div>
-        {validationMessages(amountReceived)}
-        <button
-          className="w-full md:w-1/2 py-2 px-4 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors"
-          onClick={splitPaymentHandler}
-        >
-          Add Payment
-        </button>
-      </div>
+
+      <h3 className="text-base font-bold text-slate-800">
+        New Cash Payment
+      </h3>
     </div>
-  );
+
+    {/* Payment Row */}
+    <div className="flex items-center justify-center gap-3">
+
+      <label className="whitespace-nowrap text-sm font-semibold text-slate-700">
+        Amount Received
+      </label>
+
+      <input
+        type="number"
+        value={amountReceived.value}
+        placeholder="0.00"
+        onChange={(e) =>
+          handleInputChange(
+            setAmountReceived,
+            amountReceived,
+            e.target.value
+          )
+        }
+        className="
+          h-10
+          w-44
+          rounded-lg
+          border
+          border-slate-300
+          bg-white
+          px-3
+          text-right
+          text-base
+          font-bold
+          text-slate-800
+          outline-none
+          transition
+          focus:border-sky-500
+          focus:ring-2
+          focus:ring-sky-100
+        "
+      />
+
+      <button
+        className="
+          h-10
+          rounded-lg
+          bg-sky-600
+          px-5
+          text-sm
+          font-semibold
+          text-white
+          shadow-sm
+          transition
+          hover:bg-sky-700
+        "
+        onClick={splitPaymentHandler}
+      >
+        Add Payment
+      </button>
+
+    </div>
+
+    <div className="mt-2 flex justify-center">
+      {validationMessages(amountReceived)}
+    </div>
+  </div>
+);
 };
 
 export default CashPaymentMulti;

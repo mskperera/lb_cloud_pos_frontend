@@ -250,6 +250,9 @@ const handleRemoveImage = () => {
     setSubProductQty({ ...subProductQty, value: "", isTouched: false, isValid: false });
     setVariationType({ ...variationType, value: "", isTouched: false, isValid: false });
     setVariationValue({ ...variationValue, value: "", isTouched: false, isValid: false });
+
+
+    handleRemoveImage();
   };
 
   const loadDrpStores = async () => {
@@ -1575,7 +1578,9 @@ const getInstruction = (key) => {
 </div>
 
             {/* Submit Button */}
+            
             <div className="flex justify-center mt-8">
+              
               <button
                 type="submit"
                 className={`w-56 py-3 px-6 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors duration-200 font-semibold ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -1589,7 +1594,7 @@ const getInstruction = (key) => {
                     </svg>
                     Submitting...
                   </span>
-                ) : saveType === SAVE_TYPE.UPDATE ? "Update" : "Add"}
+                ) : saveType === SAVE_TYPE.UPDATE ? "Update" : "Create"}
               </button>
             </div>
           </form>

@@ -322,6 +322,8 @@ const allprouctIdParsed=JSON.parse(p.allProductId)[0];
       const batchedItems = batchedItemsRes.data.results[0];
 
       console.log('orrrange',p)
+      const description=p.productName;
+         setSelectedVariationProduct({description});
 
           if (variationValueLevel===0) {
             // If no variations or variations is not an array, add directly to order

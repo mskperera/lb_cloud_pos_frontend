@@ -1,29 +1,27 @@
-
-
-function ExpirationDateInput({ value, onChange }) {
+function ExpirationDateInput({ value, onChange, className = "" }) {
   const handleExpirationChange = (e) => {
-    let inputValue = e.target.value.replace(/\D/g, ''); // Remove all non-digit characters
+    let inputValue = e.target.value.replace(/\D/g, "");
+
     if (inputValue.length > 4) {
-      inputValue = inputValue.slice(0, 4); // Limit to 4 characters
+      inputValue = inputValue.slice(0, 4);
     }
 
     if (inputValue.length > 2) {
-      inputValue = `${inputValue.slice(0, 2)}/${inputValue.slice(2)}`; // Insert slash
+      inputValue = `${inputValue.slice(0, 2)}/${inputValue.slice(2)}`;
     }
 
     onChange(inputValue);
   };
 
   return (
-      <input
-        type="text"
-        className="border p-2 rounded"
-        placeholder="MM/YY"
-        value={value}
-        onChange={handleExpirationChange}
-        maxLength="5" // Limit the input length to 5 characters (MM/YY)
-      />
-
+    <input
+      type="text"
+      className={className}
+      placeholder="MM/YY"
+      value={value}
+      onChange={handleExpirationChange}
+      maxLength="5"
+    />
   );
 }
 

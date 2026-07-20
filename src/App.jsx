@@ -30,6 +30,7 @@ import PublicRoutes from './routes/PublicRoutes';
 import ScrollToHash from './pages/landing/ScrollToHash';
 import TransferOrderDetail from './pages/transferOrderDetail';
 import RegisterPage from './pages/register/register_redesigned';
+import DayendListAll from './components/dayendList/DayendListAll';
 
 
 const Register = React.lazy(() => import("./pages/register"));
@@ -160,7 +161,8 @@ function AppContent() {
               <Route path="/reports/salesByProductMonthlyReport" element={<SalesByProductMonthlyReport />} />
     <Route path="/reports/dailySalesSummaryReport" element={<DailySalesSummaryReport />} />
    <Route path="/reports/low-stock" element={<LowStockReport />} />
-
+   <Route path="/reports/zReportHistory" element={<DayendListAll />} />
+   <Route path="/reports/zReport" element={<DayendListAll />} />
 
 
               <Route
