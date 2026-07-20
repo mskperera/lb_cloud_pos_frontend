@@ -44,7 +44,7 @@ const ProductCardButton = ({
       )}
 
       <div className="flex w-full min-h-[120px]">
-        <div className="w-[40%] bg-sky-600 p-3 flex items-center justify-center relative">
+        <div className="w-[40%] bg-sky-600 flex items-center justify-center relative overflow-hidden rounded-l-xl">
           {/* Badge for order quantity */}
           {orderQty > 0 && (
             <div style={{
@@ -66,7 +66,7 @@ const ProductCardButton = ({
               {orderQty}
             </div>
           )}
-          <div className="w-full h-full rounded-l-xl overflow-hidden flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center">
             {hasImage ? (
               <img
                 src={`${process.env.REACT_APP_API_CDN}/${imageUrl}?width=200&height=200&quality=80`}
@@ -104,7 +104,7 @@ const ProductCardButton = ({
             {productName}
           </p>
 
-<div    className="p-2 mb-2 bg-gray-100 w-min  rounded-lg text-sm font-semibold"
+<div    className="p-2 mb-2 bg-gray-100 rounded-lg text-sm font-semibold"
           >
   <span className="text-gray-600"  style={{
               fontFamily: "monospace",

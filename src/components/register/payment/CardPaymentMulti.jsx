@@ -74,22 +74,29 @@ const CardPaymentMulti = ({ onAddPayment }) => {
   });
 
   const validationMessages = (state) => {
-    // Ensure that the function returns JSX or null
-    return (
-      !state.isValid &&
-      state.isTouched && (
+    if (!state.isValid && state.isTouched) {
+      const messages =
+        state.label === "Card Type"
+          ? ["Please choose Visa, Mastercard, or AMEX before completing the payment."]
+          : state.validationMessages?.length
+          ? state.validationMessages
+          : [`${state.label} is required`];
+
+      return (
         <div>
-          {state.validationMessages.map((message, index) => (
+          {messages.map((message, index) => (
             <FormElementMessage
               key={index}
               className="mt-2 w-full"
               severity="error"
-              text={`Validation: ${message}`}
+              text={message}
             />
           ))}
         </div>
-      )
-    );
+      );
+    }
+
+    return null;
   };
 
   const handleInputChange = (setState, state, value) => {
@@ -190,106 +197,272 @@ const CardPaymentMulti = ({ onAddPayment }) => {
 
   return (
     <>
-        <div className="flex flex-col gap-4 border-2 p-5 rounded-md">
-        <div className="flex justify-center gap-2 items-center">
-          {/* <FontAwesomeIcon icon={faCreditCard} className="text-2xl" /> */}
-                   <FaCreditCard className="text-2xl" />
-          <span className="text-md font-semibold">New Card Payment</span>
+     <div className="flex-1 p-6 shadow-sm rounded-2xl border border-slate-200 bg-slate-50">
+
+  {/* Header */}
+  <div className="flex items-center gap-2 mb-6">
+    <FaCreditCard className="text-2xl text-sky-600" />
+
+    <span className="text-base font-semibold text-slate-800">
+      New Card Payment
+    </span>
+  </div>
+
+
+  <div className="space-y-5">
+
+
+    {/* Card Type + Last 4 Digits */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+
+      {/* Card Type */}
+      <div className="lg:col-span-2 space-y-2">
+
+        <label className="text-sm font-semibold text-slate-600">
+          Card Type
+        </label>
+
+
+        <div className="flex gap-3 flex-wrap">
+          {cardTypes.map((type) => (
+            <CardType
+              key={type.id}
+              type={type}
+              isSelected={cardType.value === type.id}
+              onClick={() =>
+                handleInputChange(
+                  setCardType,
+                  cardType,
+                  type.id
+                )
+              }
+            />
+          ))}
         </div>
 
-        <div className="flex flex-col gap-4 items-center">
-          <div className="grid lg:grid-cols-2 gap-4 mt-4 w-full items-center">
-            <div className="lg:col-span-2 flex flex-col justify-center items-center mb-7">
-              <div className="flex gap-2">
-                {cardTypes.map((type) => (
-                  <CardType
-                    key={type.id}
-                    type={type}
-                    isSelected={cardType.value === type.id}
-                    onClick={() => {
-                      handleInputChange(setCardType, cardType, type.id);
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="col-12">{validationMessages(cardType)}</div>
-            </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="w-full"> Card Number (Last 4 digits)</label>
-              <input
-                type="text"
-                className="border p-2 rounded"
-                maxLength="4"
-                value={cardNo.value}
-                placeholder="Enter last 4 digits"
-                onChange={(e) =>
-                  handleInputChange(setCardNo, cardNo, e.target.value)
-                }
-              />
-              {validationMessages(cardNo)}
-            </div>
+        {validationMessages(cardType)}
 
-            <div className="flex flex-col gap-2">
-              <label className="w-full">Card Holder</label>
-              <input
-                type="text"
-                className="border p-2 rounded"
-                placeholder=""
-                value={cardHolderName.value}
-                onChange={(e) => {
-                  handleInputChange(
-                    setCardHolderName,
-                    cardHolderName,
-                    e.target.value
-                  );
-                }}
-              />
-              {validationMessages(cardHolderName)}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="w-full"> Expiration MM/YY</label>
-              <ExpirationDateInput
-                type="text"
-                className="border p-2 rounded"
-                placeholder=""
-                value={cardExpirationMonth.value}
-                onChange={(value) => {
-                  handleInputChange(
-                    setCardExpirationMonth,
-                    cardExpirationMonth,
-                    value
-                  );
-                }}
-              />
-              {validationMessages(cardExpirationMonth)}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="w-32"> Pay Amount </label>
-              <input
-                type="number"
-                className="border p-2 rounded"
-                placeholder=""
-                value={payAmount.value}
-                onChange={(e) => {
-                  handleInputChange(setPayAmount, payAmount, e.target.value);
-                }}
-              />
-              {validationMessages(payAmount)}
-            </div>
-
-<div className="flex justify-center col-span-2">
-            <button
-           className="w-full md:w-1/2 py-2 px-4 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors"
-             onClick={splitPaymentHandler}
-            >
-              Add Payment
-            </button>
-          </div></div>
-        </div>
       </div>
+
+
+
+      {/* Last 4 Digits */}
+      <div className="space-y-2">
+
+        <label className="text-sm font-semibold text-slate-600">
+          Card Last 4 Digits
+        </label>
+
+
+        <input
+          type="text"
+          maxLength="4"
+          value={cardNo.value}
+          placeholder="1234"
+          onChange={(e) =>
+            handleInputChange(
+              setCardNo,
+              cardNo,
+              e.target.value
+            )
+          }
+          className="
+            w-full
+            h-11
+            border
+            border-slate-300
+            rounded-lg
+            px-3
+            text-center
+            tracking-widest
+            font-semibold
+            focus:outline-none
+            focus:ring-2
+            focus:ring-sky-500
+          "
+        />
+
+
+        {validationMessages(cardNo)}
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+    {/* Card Holder + Expiration */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+
+      {/* Card Holder */}
+      <div className="lg:col-span-2 space-y-2">
+
+
+        <label className="text-sm font-semibold text-slate-600">
+          Card Holder Name
+        </label>
+
+
+        <input
+          type="text"
+          value={cardHolderName.value}
+          placeholder="Enter card holder name"
+          onChange={(e) =>
+            handleInputChange(
+              setCardHolderName,
+              cardHolderName,
+              e.target.value
+            )
+          }
+          className="
+            w-full
+            h-11
+            border
+            border-slate-300
+            rounded-lg
+            px-3
+            focus:outline-none
+            focus:ring-2
+            focus:ring-sky-500
+          "
+        />
+
+
+        {validationMessages(cardHolderName)}
+
+
+      </div>
+
+
+
+
+      {/* Expiration */}
+      <div className="space-y-2">
+
+
+        <label className="text-sm font-semibold text-slate-600">
+          Expiration (MM/YY)
+        </label>
+
+
+        <ExpirationDateInput
+          value={cardExpirationMonth.value}
+          onChange={(value) =>
+            handleInputChange(
+              setCardExpirationMonth,
+              cardExpirationMonth,
+              value
+            )
+          }
+          className="
+            w-full
+            h-11
+            border
+            border-slate-300
+            rounded-lg
+            px-3
+            text-center
+            focus:outline-none
+            focus:ring-2
+            focus:ring-sky-500
+          "
+        />
+
+
+        {validationMessages(cardExpirationMonth)}
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+
+    {/* Amount + Button */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-end">
+
+
+      {/* Pay Amount */}
+      <div className="space-y-2">
+
+
+        <label className="text-sm font-semibold text-slate-600">
+          Pay Amount
+        </label>
+
+
+        <input
+          type="number"
+          value={payAmount.value}
+          onChange={(e) =>
+            handleInputChange(
+              setPayAmount,
+              payAmount,
+              e.target.value
+            )
+          }
+          className="
+            w-full
+            h-11
+            border
+            border-slate-300
+            rounded-lg
+            px-3
+            focus:outline-none
+            focus:ring-2
+            focus:ring-sky-500
+          "
+        />
+
+
+        {validationMessages(payAmount)}
+
+      </div>
+
+
+
+
+      {/* Add Button */}
+      <div className="lg:col-span-2">
+
+        <button
+              className="
+          px-2
+          
+          h-11
+          rounded-lg
+          bg-sky-600
+          text-sm
+          font-semibold
+          text-white
+          shadow-sm
+          transition
+          hover:bg-sky-700
+          active:scale-[0.98]
+        "
+          onClick={splitPaymentHandler}
+        >
+          Add Payment
+        </button>
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+</div>
     </>
   );
 };

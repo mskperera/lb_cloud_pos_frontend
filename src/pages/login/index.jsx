@@ -322,8 +322,8 @@ const signIn = async () => {
 
               <div className="relative z-10">
                 {/* Logo/Brand */}
-                <div className="mb-8">
-                  <div className="flex items-center space-x-3 mb-4">
+                <div className="mb-0">
+                  <div className="flex items-center space-x-3 mb-2">
                     {/* <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
                       <Store className="w-8 h-8" />
                     </div>
@@ -341,10 +341,10 @@ const signIn = async () => {
                 </div>
 
                 {/* Main Headline */}
-                <div className="mb-8">
-                  <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
+                <div className="mb-8 ml-3">
+                  {/* <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
                     Your Cloud POS,<br />
-                  </h2>
+                  </h2> */}
                   <p className="text-2xl text-blue-100 font-medium">
                     Simple, Fast, Reliable
                   </p>

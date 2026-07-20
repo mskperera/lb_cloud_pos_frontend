@@ -307,7 +307,7 @@ const [openMenuId, setOpenMenuId] = useState(null);
                             e.currentTarget.style.background = "white";
                             e.currentTarget.style.color = "var(--lpos-text-secondary)";
                           }}
-                          title="Remove Item"
+                          title="Remove"
                         >
                           <Trash2 size={14} strokeWidth={2} />
                         </button>

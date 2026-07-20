@@ -23,6 +23,7 @@ const [receivedAmount,setReceivedAmount] = useState({
 const dispatch=useDispatch();
 
 useEffect(()=>{
+  console.log('receivedAmount:',receivedAmount)
   const isRecevedAmountTouched=receivedAmount.isTouched;
   dispatch(calculateBalance({receivedAmountCard:0,receivedAmountCash:receivedAmount.value,isRecevedAmountTouched}));
 },[receivedAmount])
@@ -156,8 +157,8 @@ console.log('run validation',validation)
                     </button>
                   ))}
                 </div>
-                <div className='flex justify-end items-center gap-2 mt-4'>
-                  <div className='text-lg font-semibold'>Pay amount</div>
+                <div className='flex justify-between items-center gap-2 mt-4'>
+                  <div className=' font-semibold'>Pay amount</div>
                   <input
                     type='number'
                     value={receivedAmount && receivedAmount.value}
@@ -168,7 +169,8 @@ console.log('run validation',validation)
                         e.target.value
                       );
                     }}
-                    className='border p-4 rounded'
+                  className=' rounded-xl font-semibold border border-slate-300 bg-white py-3 pl-4 pr-4 text-slate-700 shadow-sm transition-all duration-200 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200'
+                      placeholder='0.00'
                   />
                 </div>
 

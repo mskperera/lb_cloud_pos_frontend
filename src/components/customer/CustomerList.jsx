@@ -190,7 +190,7 @@ export default function CustomerList({ selectingMode = false, onselect }) {
             <table className="w-full">
               <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
                 <tr>
-                  {["Type", "Code", "Name", "Email", "Mobile", "Tel", "Modified", "Actions"].map(h => (
+                  {["Type", "Customer Id", "Name", "Email", "Mobile", "Tel", "Modified", "Actions"].map(h => (
                     <th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>

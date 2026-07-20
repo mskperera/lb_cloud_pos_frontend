@@ -572,7 +572,7 @@ function Dashboard() {
         });
       } else {
         setInventoryExpirationData({
-          labels: ["Non-Expired Stock", "Expiring Soon", "Expired Stock"],
+          labels: ["Safe Stock ", "Expiring Soon", "Expired Stock"],
           datasets: [
             {
               data: [nonExpiredSafeStock, expiringSoon, expiredStock],
@@ -775,7 +775,7 @@ function Dashboard() {
                 monthlyRevenueData={monthlyRevenueData}
                 dailyRevenueData={dailyRevenueData}
                 activeTab="daily"
-                title="Revenue & Profit"
+                title="Daily Earnings Summary"
                 subTitle={` ${moment().format("MMMM")} ${moment().format("YYYY")}`}
               />:null}
 
@@ -783,7 +783,7 @@ function Dashboard() {
                 monthlyRevenueData={monthlyRevenueData}
                 dailyRevenueData={dailyRevenueData}
                 activeTab="monthly"
-                title="Revenue & Profit"
+                title="Monthly Earnings Summary"
                 subTitle={` ${moment().format("YYYY")}`}
               />:null}
             </div>
@@ -861,14 +861,14 @@ function Dashboard() {
                 {inventoryStatus ?
                <>
                   <div className="border-green-300 border rounded-lg bg-green-50 p-4 flex justify-between px-4 hover:bg-green-100 hover:cursor-pointer hover:text-green-700">
-                    <p className="text-gray-700">SafeStock</p>
+                    <p className="text-gray-700">Safe Stock</p>
                     <p className="font-semibold text-green-700">
                       {inventoryStatus?.nonExpiredSafeStock}
                     </p>
                   </div>
 
                   <div className="border-[#FFA239] border rounded-lg bg-orange-50 p-4 flex justify-between px-4 hover:bg-orange-100 hover:cursor-pointer hover:text-orange-700">
-                    <p className="text-orange-700">Expiring Soon</p>
+                    <p className="text-orange-700">Expiring Soon (Next 14 Days) </p>
                     <p className="font-semibold text-orange-700">
                       {inventoryStatus?.expiringSoon}
                     </p>

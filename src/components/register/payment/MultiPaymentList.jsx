@@ -1,69 +1,217 @@
 
 import { FaCreditCard, FaMoneyBillAlt, FaTimes } from "react-icons/fa";
 import { PAYMENT_METHODS } from "../../../utils/constants";
+import { Coins } from "lucide-react";
 
 const PaymentMethodCard = ({ payment, onRemove }) => {
   let icon, title, details;
 
+
   switch (payment.methodId) {
+
     case PAYMENT_METHODS.CASH:
-      icon = <FaMoneyBillAlt className="text-3xl text-sky-600" />;
+
+      icon = (
+        <Coins className="text-lg text-emerald-600" />
+      );
+
       title = "Cash";
+
+
       details = (
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between">
-            <p className="font-semibold text-gray-700">Pay Amount:</p>
-            <p className="text-gray-600">{payment.amountPaid}</p>
+        <div className="mt-3 border-t border-slate-200 pt-3">
+
+          <div className="flex items-center justify-between">
+
+            <span className="text-sm font-medium text-slate-600">
+              Amount
+            </span>
+
+
+            <span className="text-base font-bold text-slate-900">
+              Rs. {Number(payment.amountPaid).toLocaleString()}
+            </span>
+
           </div>
+
         </div>
       );
+
       break;
+
+
+
     case PAYMENT_METHODS.CARD:
-      icon = <FaCreditCard className="text-3xl text-sky-600" />;
-      title = "Card";
-      details = (
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between">
-            <p className="font-semibold text-gray-700">Card Type:</p>
-            <p className="text-gray-600">{payment.cardPayment.cardTypeId}</p>
-          </div>
-          <div className="flex justify-between">
-            <p className="font-semibold text-gray-700">Card Number:</p>
-            <p className="text-gray-600">**** **** **** {payment.cardPayment.cardLastFourDigits}</p>
-          </div>
-          <div className="flex justify-between">
-            <p className="font-semibold text-gray-700">Amount:</p>
-            <p className="text-gray-600">{payment.amountPaid}</p>
-          </div>
-        </div>
+
+      icon = (
+        <FaCreditCard className="text-lg text-sky-600" />
       );
+
+      title = "Card";
+
+
+    details = (
+  <div className="mt-3 border-t border-slate-200 pt-3 space-y-2">
+
+    <div className="flex items-center justify-between">
+      <span className="text-sm font-medium text-slate-600">
+        Card Type
+      </span>
+
+      <span className="text-sm font-semibold text-slate-900">
+        {payment.cardPayment.cardTypeId === 1
+          ? "VISA"
+          : payment.cardPayment.cardTypeId === 2
+          ? "MASTER"
+          : "AMEX"}
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between">
+      <span className="text-sm font-medium text-slate-600">
+        Card Number
+      </span>
+
+      <span className="text-sm font-semibold tracking-widest text-slate-900">
+        **** {payment.cardPayment.cardLastFourDigits}
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between">
+      <span className="text-sm font-medium text-slate-600">
+        Card Holder
+      </span>
+
+      <span
+        className="max-w-[180px] truncate text-sm font-semibold text-slate-900"
+        title={payment.cardPayment.cardHolderName}
+      >
+        {payment.cardPayment.cardHolderName}
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between">
+      <span className="text-sm font-medium text-slate-600">
+        Amount
+      </span>
+
+      <span className="text-base font-bold text-slate-700">
+        Rs. {Number(payment.amountPaid).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
+      </span>
+    </div>
+
+  </div>
+);
+
       break;
+
+
     default:
       return null;
   }
 
+
+
   return (
-    <div className="flex flex-col bg-white rounded-lg shadow-sm p-4 hover:shadow-sm transition-shadow duration-300">
+    <div
+      className="
+        rounded-xl
+        border
+        border-slate-200
+        bg-white
+        px-4
+        py-3
+        transition
+        hover:shadow-sm
+      "
+    >
+
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {icon}
-          <p className="text-lg font-semibold text-gray-700">{title}</p>
+
+
+        <div className="flex items-center gap-3">
+
+
+          <div
+            className="
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-lg
+              bg-slate-100
+            "
+          >
+            {icon}
+          </div>
+
+
+
+          <div>
+
+            <p className="
+              text-[11px]
+              uppercase
+              tracking-wide
+              font-semibold
+              text-slate-500
+            ">
+              Payment Method
+            </p>
+
+
+            <p className="
+              text-sm
+              font-bold
+              text-slate-900
+            ">
+              {title}
+            </p>
+
+          </div>
+
+
         </div>
+
+
+
+
         <button
-          className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+          className="
+            flex
+            h-7
+            w-7
+            items-center
+            justify-center
+            rounded-full
+            bg-red-50
+            text-red-600
+            hover:bg-red-100
+            transition
+          "
           onClick={() => onRemove(payment.id)}
         >
-          <FaTimes />
+          <FaTimes className="text-xs" />
         </button>
+
+
       </div>
+
+
       {details}
+
     </div>
   );
 };
 
 const MultiPaymentList = ({ paymentList, onRemovePayment }) => {
   return (
-    <div className="flex flex-col gap-4 mt-4">
+    <div className="mt-4 flex flex-col gap-3">
       {paymentList.map((payment) => (
         <PaymentMethodCard
           key={payment.id}

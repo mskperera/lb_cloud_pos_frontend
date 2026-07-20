@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { formatUtcToLocal } from '../../../utils/format';
 import { getContacts } from '../../../functions/contacts';
 import { useToast } from '../../useToast';
 import DaisyUIPaginator from '../../DaisyUIPaginator';
 
-import { FaSignInAlt } from 'react-icons/fa';
+import { FaSignInAlt, FaSearch, FaUserPlus } from 'react-icons/fa';
 import { CONTACT_TYPE } from '../../../utils/constants';
 import CloseButton from '../../buttons/CloseButton';
 
@@ -26,6 +27,7 @@ export default function CustomerSelectionModal({
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
 
   const searchInputRef = useRef(null);
+  const navigate = useNavigate();
 
   const filterByOptions = [
     { id: 1, displayName: 'Customer Code' },
@@ -120,9 +122,18 @@ export default function CustomerSelectionModal({
       <div className="relative w-full h-full lg:h-auto lg:max-w-6xl lg:max-h-[92vh] bg-white rounded-none lg:rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-3 xs:px-4 sm:px-6 py-3 xs:py-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600 flex-shrink-0">
+        <div className="flex items-center justify-between gap-3 px-3 xs:px-4 sm:px-6 py-3 xs:py-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-50 text-gray-600 flex-shrink-0">
           <h2 className="text-lg xs:text-xl font-bold">Select Customer</h2>
-          <CloseButton onClick={() => setShowCustomerList(false)} />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/customers/add')}
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
+            >
+              <FaUserPlus className="h-4 w-4" />
+              <span>Create</span>
+            </button>
+            <CloseButton onClick={() => setShowCustomerList(false)} />
+          </div>
         </div>
 
         {/* Filters */}
@@ -152,8 +163,9 @@ export default function CustomerSelectionModal({
 
             <button
               onClick={handleSearch}
-              className="w-full py-3 bg-sky-600 text-white font-medium rounded-xl hover:bg-sky-700 active:bg-sky-800 transition"
+              className="w-full inline-flex items-center justify-center gap-2 py-3 bg-sky-600 text-white font-semibold rounded-2xl shadow-sm hover:bg-sky-700 active:bg-sky-800 transition"
             >
+              <FaSearch className="h-4 w-4" />
               Search
             </button>
 
@@ -200,8 +212,9 @@ export default function CustomerSelectionModal({
               <div className="col-span-2 flex items-end">
                 <button
                   onClick={handleSearch}
-                  className="w-full py-3.5 bg-sky-600 text-white font-medium rounded-2xl hover:bg-sky-700 active:bg-sky-800 transition"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3.5 bg-sky-600 text-white font-semibold rounded-2xl shadow-sm hover:bg-sky-700 active:bg-sky-800 transition"
                 >
+                  <FaSearch className="h-4 w-4" />
                   Search
                 </button>
               </div>
@@ -220,12 +233,12 @@ export default function CustomerSelectionModal({
         </div>
 
         {/* Table / List */}
-        <div className="flex-1 overflow-y-auto px-3 xs:px-4 lg:px-6 py-4 bg-white">
+        <div className="flex-1 overflow-y-auto px-3 xs:px-4 lg:px-6 py-4 bg-white min-h-[320px]">
           <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b sticky top-0">
                 <tr>
-                  {["Code", "Name", "Email", "Mobile", "Modified", "Action"].map(h => (
+                  {["Customer Id", "Name", "Email", "Mobile", "Modified", "Action"].map(h => (
                     <th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -252,9 +265,9 @@ export default function CustomerSelectionModal({
                       <td className="px-6 py-4">
                         <button
                           onClick={(e) => { e.stopPropagation(); onCustomerSelectHandler(c); setShowCustomerList(false); }}
-                          className="px-6 py-2 bg-sky-600 text-white font-medium rounded-xl hover:bg-sky-700 active:scale-95 transition flex items-center gap-2"
+                          className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 active:scale-95"
                         >
-                          <FaSignInAlt /> Select
+                          <FaSignInAlt className="h-4 w-4" /> Select
                         </button>
                       </td>
                     </tr>
@@ -288,8 +301,9 @@ export default function CustomerSelectionModal({
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); onCustomerSelectHandler(c); setShowCustomerList(false); }}
-                    className="mt-4 w-full py-3 bg-sky-600 text-white rounded-xl hover:bg-sky-700"
+                    className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700"
                   >
+                    <FaSignInAlt className="h-4 w-4" />
                     Select Customer
                   </button>
                 </div>

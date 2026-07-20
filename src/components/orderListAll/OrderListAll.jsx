@@ -14,7 +14,7 @@ import Payment from "../register/payment/Payment";
 import PaymentConfirm from "../../pages/paymentConfirm";
 import AddCustomProduct from "../register/AddCustomProduct";
 
-import { ShoppingCartIcon, UserIcon } from "lucide-react";
+import { ShoppingCartIcon, UserIcon, Wallet } from "lucide-react";
 import DialogModel2 from "../model/DialogModel2";
 
 const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
@@ -146,7 +146,7 @@ const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
       />
 
       <DialogModel
-        header="Payment"
+        header="Pay"
         visible={isPaymentShow}
         onHide={() => setIsPaymentShow(false)}
         style={{ width: "60vw", maxWidth: "800px" }}
@@ -167,7 +167,7 @@ const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
       </DialogModel>
 
       <DialogModel2
-        title="Payment Confirm"
+        title="Payment Receipt"
         isVisible={isPaymentConfirmShow}
         onHide={() => setIsPaymentConfirmShow(false)}
       >
@@ -239,44 +239,58 @@ const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
             New
           </button>
 
-          <button 
-            onClick={() => setIsPaymentShow(true)}
-            disabled={list.length === 0}
-            className="lpos-btn-proceed"
-            style={{
-              flex: 2,
-              padding: 13,
-              borderRadius: "var(--lpos-radius-sm)",
-              border: "none",
-              fontFamily: "inherit",
-              fontSize: 14,
-              fontWeight: 700,
-              color: "white",
-              cursor: list.length === 0 ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              opacity: list.length === 0 ? 0.7 : 1
-            }}
-          >
-            <ShoppingCartIcon size={18} />
-            Charge 
-      
-            {totalItems > 0 && (
-              <span style={{
-                marginLeft: 6,
-                background: "rgba(255,255,255,0.25)",
-                color: "white",
-                fontSize: 11,
-                fontWeight: 700,
-                padding: "2px 7px",
-                borderRadius: 20
-              }}>
-                {totalItems} Items
-              </span>
-            )}
-          </button>
+      <button 
+  onClick={() => setIsPaymentShow(true)}
+  disabled={list.length === 0}
+  className="lpos-btn-proceed"
+  style={{
+    flex: 2,
+    padding: 13,
+    borderRadius: "var(--lpos-radius-sm)",
+    border: "none",
+    fontFamily: "inherit",
+    fontSize: 14,
+    fontWeight: 700,
+    color: "white",
+    cursor: list.length === 0 ? "not-allowed" : "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    opacity: list.length === 0 ? 0.7 : 1
+  }}
+>
+  {/* Main button content */}
+  <span
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }}
+  >
+    <Wallet size={18} />
+    PAY
+  </span>
+
+  {/* Item count badge */}
+  {totalItems > 0 && (
+    <span
+      style={{
+        position: "absolute",
+        right: 12,
+        background: "rgba(255,255,255,0.25)",
+        color: "white",
+        fontSize: 11,
+        fontWeight: 700,
+        padding: "2px 7px",
+        borderRadius: 20,
+        lineHeight: "16px"
+      }}
+    >
+      {totalItems} Items
+    </span>
+  )}
+</button>
         </div>
       </div>
 </>

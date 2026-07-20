@@ -5,8 +5,11 @@ import { clearOrderList } from '../../state/orderList/orderListSlice';
 import { getOrderReceipt } from '../../functions/register';
 import ReceiptComponent from '../../components/register/printReceipt/ReceiptComponent';
 import { formatCurrency } from '../../utils/format';
-import { FaPrint, FaEnvelope, FaSms} from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
+import PrintFeature from '../../components/receipt/features/PrintFeature';
+import EmailFeature from '../../components/receipt/features/EmailFeature';
+import SmsFeature from '../../components/receipt/features/SmsFeature';
 
 import { invoke } from "@tauri-apps/api/core";
 import { getPrinters } from "tauri-plugin-printer-v2";
@@ -420,7 +423,7 @@ setIsPrintButtonLoading(true);
       }
       console.log(`Sending receipt to email: ${email}`);
       // Implement sendReceiptEmail(email, receiptData) here
-    } else if (actionOption === 'sms') {
+    } else if (actionOption === 'sms' || actionOption === 'whatsapp') {
       if (!phone) {
         setPhoneError('Please enter a phone number.');
         return;
@@ -429,8 +432,8 @@ setIsPrintButtonLoading(true);
         setPhoneError('Please enter a valid phone number (10-15 digits).');
         return;
       }
-      console.log(`Sending receipt to phone: ${phone}`);
-      // Implement sendReceiptSMS(phone, receiptData) here
+      console.log(`Sending receipt via ${actionOption}: ${phone}`);
+      // Implement sendReceiptSMS/WhatsApp here
     }
   };
 
@@ -447,153 +450,82 @@ setIsPrintButtonLoading(true);
     <div className="bg-white flex items-center justify-center z-50">
       <div className="rounded-xl w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
 
-   
-        <div className="relative p-6 flex flex-col justify-between bg-white ">
-          {/* <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Payment Confirmation</h2> */}
-          <div className="text-center mb-6">
-            <label className="text-2xl font-semibold text-sky-700">Balance</label>
-            <div className="text-3xl font-semibold text-sky-700 mt-1">
-              {change ? formatCurrency(change) : 'No change'}
+        <div className="relative p-6 flex flex-col justify-between bg-white">
+          <div className="w-full rounded-3xl bg-sky-700 text-white p-4">
+            <div className="flex flex-col gap-2 px-4 items-center">
+              <label className="text-sm uppercase font-semibold text-sky-100/80">Balance / Give Change to Customer</label>
+              <div className="text-xl font-semibold">
+                {change ? formatCurrency(change) : 'No change'}
+              </div>
             </div>
           </div>
-          <h3 className="text-xl font-medium text-gray-700 text-center mb-6">
-            How would you like to share the receipt?
-          </h3>
-          {/* <div className="flex justify-center gap-6 mb-6">
-            <button
-              className={`p-4 rounded-full ${actionOption === 'print' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-sky-500 hover:text-white transition-colors`}
-              onClick={() => setActionOption('print')}
-              title={isPrintButtonLoading?"Printing...":"Print Receipt"} 
-              disabled={isPrintButtonLoading}
-            >
-              <FaPrint className="h-8 w-8" />
-            </button>
-            <button
-              className={`p-4 rounded-full ${actionOption === 'email' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-sky-500 hover:text-white transition-colors`}
-              onClick={() => setActionOption('email')}
-              title="Send via Email"
-            >
-              <FaEnvelope className="h-8 w-8" />
-            </button>
-            <button
-              className={`p-4 rounded-full ${actionOption === 'sms' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-sky-500 hover:text-white transition-colors`}
-              onClick={() => setActionOption('sms')}
-              title="Send via SMS"
-            >
-              <FaSms className="h-8 w-8" />
-            </button>
-          </div>
-          {actionOption === 'print' && (
-            <div className="flex flex-col gap-4 mb-4">    
-              {isTauriApp && (
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="printer" className="font-semibold text-gray-700">
-                    Select Printer
-                  </label>
-                  <select
-                    id="printer"
-                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white text-gray-700 transition duration-200"
-                    value={selectedPrinter}
-                    onChange={(e) => setSelectedPrinter(e.target.value)}
-                    disabled={!tauriPrinterList?.length}
-                  >
-                    {tauriPrinterList?.length > 0 ? (
-                      tauriPrinterList.map((printer, index) => (
-                        <option key={index} value={printer.Name}>
-                          {printer.Name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="">No printers available</option>
-                    )}
-                  </select>
+
+          <div className="relative p-6 flex flex-col justify-between bg-white">
+            <div className="rounded-2xl p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-slate-800">Send invoice / bill</p>
+                  <p className="text-sm text-slate-500">Choose how the customer should receive it</p>
                 </div>
+              </div>
+
+              <div className="space-y-3">
+                <PrintFeature
+                  isSelected={actionOption === 'print'}
+                  onSelect={() => setActionOption('print')}
+                  itemName="Receipt"
+                />
+
+                <EmailFeature
+                  isSelected={actionOption === 'email'}
+                  onSelect={() => setActionOption('email')}
+                  email={email}
+                  setEmail={setEmail}
+                  emailError={emailError}
+                  setEmailError={setEmailError}
+                  placeholder={orderHeader?.customerEmail ? `e.g., ${orderHeader.customerEmail}` : 'Enter email address'}
+                />
+
+                <SmsFeature
+                  isSelected={actionOption === 'sms'}
+                  onSelect={() => setActionOption('sms')}
+                  phone={phone}
+                  setPhone={setPhone}
+                  phoneError={phoneError}
+                  setPhoneError={setPhoneError}
+                  placeholder={orderHeader?.customerPhone ? `e.g., ${orderHeader.customerPhone}` : 'Enter phone number'}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              {openBy !== 'SalesHistory' ? (
+                <button
+                  className="flex-1 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-300 transition hover:bg-gray-50"
+                  onClick={handleNewOrder}
+                >
+                  New Order
+                </button>
+              ) : (
+                <button
+                  className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                  onClick={handleClose}
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <FaTimes className="h-4 w-4" />
+                    Close
+                  </span>
+                </button>
               )}
-            </div>
-          )}
-          {actionOption === 'email' && (
-            <div className="flex flex-col gap-2 mb-4">
-              <label htmlFor="email" className="font-semibold text-gray-700">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                className={`w-full p-2.5 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white text-gray-700 transition duration-200`}
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError('');
-                }}
-                placeholder={orderHeader?.customerEmail ? `e.g., ${orderHeader.customerEmail}` : 'Enter email address'}
-                autoComplete="email"
-              />
-              {emailError && <p className="text-sm text-red-600">{emailError}</p>}
-            </div>
-          )}
-          {actionOption === 'sms' && (
-            <div className="flex flex-col gap-2 mb-4">
-              <label htmlFor="phone" className="font-semibold text-gray-700">
-                Phone Number
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                className={`w-full p-2.5 border ${phoneError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white text-gray-700 transition duration-200`}
-                value={phone}
-                onChange={(e) => {
-                  setPhone(e.target.value);
-                  setPhoneError('');
-                }}
-                placeholder={orderHeader?.customerPhone ? `e.g., ${orderHeader.customerPhone}` : 'Enter phone number'}
-                autoComplete="tel"
-              />
-              {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
-            </div>
-          )} */}
-          <div className=" flex  gap-6 mt-8">
-            {openBy !== 'SalesHistory' ? (
-              <button
-                className="py-3 px-8 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-lg flex items-center gap-2"
-                onClick={handleNewOrder}
-              >
-                New Order
-              </button>
-            ) : (
-              <button
-                  style={{
-              flex: 1,
-              padding: 13,
-              borderRadius: "var(--lpos-radius-sm)",
-              border: "1.5px solid var(--lpos-border)",
-              background: "var(--lpos-surface)",
-              fontFamily: "inherit",
-              fontSize: 14,
-              fontWeight: 700,
-              color: "var(--lpos-text-secondary)",
-              cursor: "pointer",
-              transition: "all .15s"
-            }}
-       
-               onClick={handleClose}
-              >
-   
-                Close
-              </button>
-            )}
-<button
-  className="py-3 px-8 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-all duration-150 ease-in-out 
-             active:scale-95 active:shadow-inner font-medium text-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-  onClick={handleAction}
-  disabled={isPrintButtonLoading}
->
-  {actionOption === 'print' ? <FaPrint className="h-6 w-6" /> : actionOption === 'email' ? <FaEnvelope className="h-6 w-6" /> : <FaSms className="h-6 w-6" />}
 
-  {actionOption === 'print' && 'Print Receipt'}
-  {actionOption === 'email' && 'Send Email'}
-  {actionOption === 'sms' && 'Send SMS'}
-</button>
-
+              <button
+                className="flex-1 rounded-lg bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-sky-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handleAction}
+                disabled={isPrintButtonLoading}
+              >
+                {actionOption === 'print' ? 'Print Receipt' : actionOption === 'email' ? 'Send Email' : actionOption === 'sms' ? 'Send SMS' : actionOption === 'whatsapp' ? 'Send WhatsApp' : 'Send Receipt'}
+              </button>
+            </div>
           </div>
         </div>
 

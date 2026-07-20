@@ -1,7 +1,7 @@
 import CloseButton from "../buttons/CloseButton";
 
 
-const DialogModel2 = ({ onHide, children, title, isVisible }) => {
+const DialogModel2 = ({ onHide, children, title, isVisible, hideCloseButton = false }) => {
   
   if (isVisible === false) return null;
     return (
@@ -16,7 +16,7 @@ const DialogModel2 = ({ onHide, children, title, isVisible }) => {
              <div className="flex items-center justify-between py-1 pl-6 pr-2 border-b border-gray-300 bg-gray-200 text-gray-600">
           <h2 className="text-base xs:text-lg sm:text-xl lg:text-lg font-bold truncate">{title}</h2>
      
-      <CloseButton onClick={onHide} />
+      {!hideCloseButton && <CloseButton onClick={onHide} />}
         </div>
 
   

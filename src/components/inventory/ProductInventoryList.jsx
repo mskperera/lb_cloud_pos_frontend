@@ -567,8 +567,8 @@ const selectedStore= JSON.parse(localStorage.getItem("selectedStore"));
 
       <button
             onClick={() => navigate("/products/add")}
-            className="flex text-sm items-center justify-center gap-2 px-4 py-2 bg-green-700 text-white font-semibold 
-            rounded-lg md:rounded-xl shadow-md hover:bg-green-800 ml-auto"
+            className="flex text-sm items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold 
+            rounded-lg md:rounded-xl shadow-md hover:bg-green-700 ml-auto"
           >
             <FaPlus className="w-4 h-4" />
             <span>Create New Product</span>
