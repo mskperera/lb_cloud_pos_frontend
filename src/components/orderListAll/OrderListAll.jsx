@@ -205,18 +205,150 @@ const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
           <OrderSummary totalItems={totalItems} />
 
 
-{/* Action Buttons */}
-        <div style={{
-          padding: isTraditionalMode ? "14px 16px" : "14px 18px",
-          display: "flex",
-          gap: 10,
-          flexShrink: 0
-        }}>
+
+{
+isTraditionalMode ? (
+
+  // ==============================
+  // Traditional POS Footer
+  // ==============================
+
+  <div
+    className="
+      flex
+      items-center
+      justify-end
+      gap-3
+      px-4
+      py-3
+      flex-shrink-0
+      bg-white
+      border-t
+      border-slate-200
+    "
+  >
+
+    <button
+      onClick={newOrderHandler}
+
+      className="
+        w-28
+        h-11
+        rounded-lg
+        border
+        border-slate-300
+        bg-white
+        text-slate-700
+        text-sm
+        font-bold
+
+        hover:bg-slate-50
+        hover:border-slate-400
+
+        transition-all
+      "
+    >
+      New
+    </button>
+
+
+
+    <button
+      onClick={() => setIsPaymentShow(true)}
+
+      disabled={list.length === 0}
+
+      className="
+        relative
+
+        w-40
+        h-11
+
+        rounded-lg
+
+        bg-sky-600
+
+        text-white
+
+        text-sm
+
+        font-bold
+
+        flex
+        items-center
+        justify-center
+        gap-2
+
+        disabled:opacity-50
+        disabled:cursor-not-allowed
+
+        hover:bg-sky-700
+
+        transition-all
+      "
+    >
+
+      <Wallet size={17}/>
+
+      PAY
+
+
+      {
+      totalItems > 0 &&
+      <span
+        className="
+          absolute
+          right-3
+
+          bg-white/25
+
+          px-2
+          py-0.5
+
+          rounded-full
+
+          text-[11px]
+        "
+      >
+        {totalItems}
+      </span>
+      }
+
+
+    </button>
+
+
+  </div>
+
+
+) : (
+
+
+  // ==============================
+  // Card POS Footer
+  // ==============================
+
+
+<div
+  className={`
+    flex
+    items-center
+    gap-3
+    flex-shrink-0
+    ${
+      isTraditionalMode
+      ? "justify-end px-4 py-3"
+      : "px-5 py-3"
+    }
+  `}
+>
+
+
           <button 
             onClick={newOrderHandler}
             style={{
               flex: 1,
-              padding: 13,
+              padding: 12,
               borderRadius: "var(--lpos-radius-sm)",
               border: "1.5px solid var(--lpos-border)",
               background: "var(--lpos-surface)",
@@ -245,7 +377,7 @@ const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
   className="lpos-btn-proceed"
   style={{
     flex: 2,
-    padding: 13,
+    padding: 12,
     borderRadius: "var(--lpos-radius-sm)",
     border: "none",
     fontFamily: "inherit",
@@ -292,6 +424,9 @@ const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
   )}
 </button>
         </div>
+
+)
+}
       </div>
 </>
   );

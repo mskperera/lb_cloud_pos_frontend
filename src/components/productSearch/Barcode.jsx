@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { debounce } from 'lodash';
-import { getProducts } from '../../functions/register';
+import { getProducts, getProductsByBarcode } from '../../functions/register';
 import { useToast } from '../useToast';
 import { FaBarcode, FaSearch } from 'react-icons/fa';
 import { formatCurrency } from '../../utils/format';
 import { XIcon } from 'lucide-react';
 
-const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectStockTrackedProduct }) => {
+const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectStockTrackedProduct,uomType }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [barcodeMode, setBarcodeMode] = useState(() => {
     const saved = localStorage.getItem('barcodeMode');
@@ -43,11 +43,18 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToS
         const filteredData = {
           productDescription: term,
           storeId: store.storeId,
+          uomType:uomType,
           skip: 0,
           limit: 100,
         };
 
-        const result = await getProducts(filteredData, null);
+        const result = await getProducts(filteredData);
+
+      if(result.data.outputValues.responseStatus==="failed"){
+           showToast("danger", result.data.outputValues.outputMessage);
+           return;
+      }
+
         const results = result.data.results[0] || [];
         setProducts(results.slice(0, 10));
         setSelectedIndex(results.length > 0 ? 0 : -1);
@@ -82,15 +89,22 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToS
       // ... your existing Enter logic remains unchanged ...
       if (barcodeMode && searchTerm) {
         // barcode logic here
-        const filteredData = { barcode: searchTerm, storeId: store.storeId, skip: 0, limit: 100 };
+   const filteredData = { 
+  barcode: searchTerm, 
+  storeId: store.storeId, 
+  uomType: 'SALES' 
+};
         try {
-          const result = await getProducts(filteredData, null);
-          const results = result.data.results[0] || [];
-          if (results.length === 1) {
-            onBarcodeEnter({ ...results[0] });
+          const result = await getProductsByBarcode(filteredData, null);
+             
+          const results = result.results[0][0];
+             console.log('bbbbbarrrr ccc re:',results)
+          if (results) {
+            onBarcodeEnter(results,searchTerm);
             setSearchTerm('');
           }
         } catch (err) {
+                       console.log('bbbbbarrrr ccc re err:',err)
           showToast('danger', 'Error', 'Failed to lookup barcode');
         }
       } else if (!barcodeMode && products.length > 0 && selectedIndex >= 0) {
@@ -150,11 +164,11 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToS
     : 'var(--lpos-search-bg, #0284c7)';   // Warm Blue for Search
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full border-gray-400 ">
       <div className="flex items-center gap-3 w-full">
         <div className="relative flex-1">
           <div 
-            className="relative flex items-center w-full border shadow-sm rounded-2xl overflow-hidden transition-all duration-200"
+            className="relative flex items-center  w-full border shadow-sm rounded-2xl overflow-hidden transition-all duration-200"
             style={{
               background: inputBgColor,
               borderColor: barcodeMode ? '#34c759' : '#0284c7',
@@ -213,7 +227,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToS
           {/* Results Dropdown - Already styled in previous response */}
           {!barcodeMode && (loading || products.length > 0) && (
             <div 
-              className="absolute top-full mt-2 w-full shadow-2xl z-40 max-h-96 overflow-hidden"
+              className="absolute  top-full mt-2 w-full shadow-2xl z-40 max-h-96 overflow-hidden"
               style={{
                 background: "var(--lpos-bg)",
                 borderRadius: "var(--lpos-radius-md)",
@@ -225,47 +239,108 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToS
                   <div className="inline-block animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
                 </div>
               ) : (
-                <table className="w-full">
-                  <thead className="bg-[var(--lpos-surface)] border-b sticky top-0">
-                    <tr>
-                      <th className="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase">SKU</th>
-                      <th className="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase">Description</th>
-                      <th className="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase">Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((item, i) => (
-          <tr
-  key={i}
-  onClick={() => {
-    console.log("Clicked item:", item.isStockTracked);
-    // Prevent selecting non-stock-tracked products
-    if (onlyAllowToSelectStockTrackedProduct && !item.isStockTracked) {
-      return;
-    }
+<table className="w-full text-left border-collapse">
+  <thead className="bg-[var(--lpos-surface)] border-b sticky top-0 z-10">
+    <tr>
+      <th className="px-4 py-2.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Item Details</th>
+      <th className="px-4 py-2.5 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Stock</th>
+      <th className="px-4 py-2.5 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Unit Price</th>
+    </tr>
+  </thead>
+  <tbody className="divide-y divide-gray-100">
+    {products.map((item, i) => {
+      const isSelectDisabled = onlyAllowToSelectStockTrackedProduct && !item.isStockTracked;
+      const isSelected = selectedIndex === i;
+      const isPhysicalProduct = item.isProductItem === 1 || item.isProductItem === true;
 
-    onProductSelect(item);
-    setSearchTerm('');
-    setProducts([]);
-  }}
-  className={`
-    transition-all
-    ${selectedIndex === i ? 'bg-sky-100' : ''}
-    
-    ${
-      onlyAllowToSelectStockTrackedProduct && !item.isStockTracked
-        ? 'opacity-50 cursor-not-allowed bg-gray-100'
-        : 'cursor-pointer hover:bg-sky-50'
-    }
-  `}
->
-                        <td className="px-5 py-4 font-mono text-sm text-gray-600">{item.sku || '-'}</td>
-                        <td className="px-5 py-4 text-sm font-medium text-gray-800">{item.productDescription || item.productName}</td>
-                        <td className="px-5 py-4 font-semibold text-sky-600">{formatCurrency(item.unitPrice)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      return (
+        <tr
+          key={item.variationProductId || i}
+          onClick={() => {
+            if (isSelectDisabled) return;
+            onProductSelect(item);
+            setSearchTerm('');
+            setProducts([]);
+          }}
+          className={`
+            transition-colors duration-150
+            ${isSelected ? 'bg-sky-50' : 'hover:bg-gray-50'}
+            ${isSelectDisabled ? 'opacity-50 cursor-not-allowed bg-gray-50/50' : 'cursor-pointer'}
+          `}
+        >
+          {/* Main Details (SKU, Description & Badges) */}
+          <td className="px-4 py-3">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {/* SKU Badge */}
+              <span className="font-mono text-xs font-semibold text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                {item.sku || 'NO-SKU'}
+              </span>
+
+              {/* Item Type Badge: Service vs Physical Product */}
+              {!isPhysicalProduct && (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+                  Service / Non-Product
+                </span>
+              )}
+
+              {/* Multi-UOM Badge */}
+              {item.isMultiUom === 1 && (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                  Multi-UOM
+                </span>
+              )}
+
+              {/* Barcode Scan Badge */}
+              {item.barcodeSource === 'UOM' && (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                  UOM Scan
+                </span>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="text-sm font-medium text-gray-900 mt-1 line-clamp-1">
+              {item.productDescription || item.productName}
+            </div>
+          </td>
+
+          {/* Stock Availability */}
+          <td className="px-4 py-3 text-right whitespace-nowrap align-middle">
+            {item.isStockTracked ? (
+              <div className="inline-flex flex-col items-end">
+                <span
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    item.stockQty > 0
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-rose-50 text-rose-700 border border-rose-200'
+                  }`}
+                >
+                  {item.formattedQty || `${item.stockQtyDisplay ?? 0} ${item.measurementUnitName || ''}`}
+                </span>
+              </div>
+            ) : (
+              <span className="text-xs font-medium text-gray-400 italic">
+                {!isPhysicalProduct ? 'N/A (Service)' : 'Non-Tracked'}
+              </span>
+            )}
+          </td>
+
+          {/* Price & Unit Combination */}
+          <td className="px-4 py-3 text-right whitespace-nowrap align-middle">
+            <div className="text-sm font-bold text-sky-700">
+              {formatCurrency(item.unitPrice)}
+              {item.measurementUnitName && (
+                <span className="text-xs font-normal text-gray-500 ml-1">
+                  / {item.measurementUnitName}
+                </span>
+              )}
+            </div>
+          </td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
               )}
             </div>
           )}
@@ -315,4 +390,4 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToS
   );
 };
 
-export default ProductSearch;
+export default Barcode;

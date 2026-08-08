@@ -50,8 +50,9 @@ import {
   HandCoins
 } from "lucide-react";
 import AdvancedProductSearch from "../../components/AdvancedProductSearch";
-import { getBatchedItems } from "../../functions/register";
 import PaidInOutActivity from "../../components/paidInOut/PaidInOut";
+import UOMSelectionDialog from "../../components/UOMSelectionDialog";
+import {getBatchedItems, getBatchUomDetailsByUomBarcode, getProductUomList } from "../../functions/register";
 
 const Sidebar = ({
   expanded,
@@ -223,6 +224,11 @@ const Register = () => {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+// UOM Modal States
+const [isUomDialogOpen, setIsUomDialogOpen] = useState(false);
+const [uomList, setUomList] = useState([]);
+const [pendingOrder, setPendingOrder] = useState(null);
+
   const PaymentScreen = () => {
     return (
       <div className="flex flex-1 align-item-center justify-content-center m-5">
@@ -269,77 +275,174 @@ const Register = () => {
     },
   ];
 
-  const handleProductClick = async (p) => {
-    const description = `${p.productDescription}`;
-    const qty = 1;
-    const unitPrice = Number(p.unitPrice);
 
-    console.log("Selected Productiiii", p);
-    setSelectedProduct(p);
-    const batchedItemsRes = await getBatchedItems(
-      p.allProductId,
+
+// Helper method to route order through UOM check or directly dispatch
+const processUomOrDispatchOrder = async (order, prod) => {
+  if (prod?.isMultiUom) {
+    const batchedItemsRes = await getProductUomList(
+      order.allProductId,
       store.storeId,
+      order.stockBatchId
     );
-    const batchedItems = batchedItemsRes.data.results[0];
-    console.log("batchedItems", batchedItems);
+    const uomData = batchedItemsRes.data.results[0];
+console.log('UOM Data:', uomData);
+    setPendingOrder(order);
+    setUomList(uomData);
+    setIsUomDialogOpen(true);
+  } else {
+    dispatch(addOrder(order));
+  }
+};
 
-    const order = {
-      allProductId: p.allProductId,
-      storeId: store.storeId,
-         sku: p.sku,
-      description,
-      unitPrice,
-      lineTaxRate: p.taxPerc,
-      qty,
-      measurementUnitName: p.measurementUnitName,
-        stockQty: p.isStockTracked ? p.stockQty : undefined,
-               imageUrl:p.imageUrl
-    };
+const handleUomSelect = (selectedUom, qty) => {
+  if (!pendingOrder) return;
 
-    if (batchedItems.length > 0) {
-      setBatchedItemList(batchedItems);
-      setIsBatchedItemsModalOpen(true);
-      setAddOrderTemp(order);
-      return;
-    } else {
-      order.stockBatchId = batchedItems[0]?.stockBatchId
-        ? batchedItems[0].stockBatchId
-        : null;
-      dispatch(addOrder(order));
-    }
+  const finalOrder = {
+    ...pendingOrder,
+    productUomId: selectedUom ? selectedUom.productUomId : null,
+    measurementUnitName: selectedUom ? selectedUom.measurementUnitName : null,
+    qty: qty,
+    unitPrice: selectedUom.sellingPrice,
   };
 
-const addItemstoOrderListFinal=(selectedBatch,order)=>{
-    const isOrderExist = existingOrders.find(
-      (o) => o.allProductId===order.allProductId && o.storeId===order.storeId
-    );
+  dispatch(addOrder(finalOrder));
+  setIsUomDialogOpen(false);
+  setPendingOrder(null);
+};
 
-    console.log('selectedBatch',selectedBatch);
-    const orderFinal = {
-      ...order,
-      stockBatchId: selectedBatch.stockBatchId,
-      batchNo: selectedBatch.batchNo,
-      unitPrice: selectedBatch.unitPrice ?? order.unitPrice,
-      lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
-      stockQty: order.measurementUnitName ? selectedBatch.qty : order.stockQty,
-    };
 
-    if (isOrderExist) {
-      dispatch(updateOrderBatchId({
-        allProductId: order.allProductId,
-        storeId: order.storeId,
-        stockBatchId: selectedBatch.stockBatchId,
-        batchNo: selectedBatch.batchNo,
-        unitPrice: selectedBatch.unitPrice,
-        lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
-      }));
-    } else {
-      dispatch(addOrder(orderFinal));
-    }
+const handleProductClick = async (p) => {
+  const description = `${p.productDescription}`;
+  const qty = 1;
+  const unitPrice = Number(p.unitPrice);
 
-    setAddOrderTemp(null);
-    setIsBatchedItemsModalOpen(false);
+  setSelectedProduct(p);
+  const batchedItemsRes = await getBatchedItems(
+    p.allProductId,
+    store.storeId
+  );
+  const batchedItems = batchedItemsRes.data.results[0];
+console.log('batchedItems:',batchedItems)
+  const order = {
+    allProductId: p.allProductId,
+    storeId: store.storeId,
+    sku: p.sku,
+    description,
+    unitPrice,
+    lineTaxRate: p.taxPerc,
+    qty,
+    measurementUnitName: p.measurementUnitName,
+    stockQty: p.isStockTracked ? p.stockQty : undefined,
+    imageUrl: p.imageUrl,
+  };
+
+  if (batchedItems.length > 0) {
+    setBatchedItemList(batchedItems);
+    setIsBatchedItemsModalOpen(true);
+    setAddOrderTemp(order);
+    return;
+  } else {
+    order.stockBatchId = batchedItems[0]?.stockBatchId
+      ? batchedItems[0].stockBatchId
+      : null;
+    
+    processUomOrDispatchOrder(order, p);
   }
+};
+
+  // const handleProductClick = async (p) => {
+  //   const description = `${p.productDescription}`;
+  //   const qty = 1;
+  //   const unitPrice = Number(p.unitPrice);
+
+  //   console.log("Selected Productiiii", p);
+  //   setSelectedProduct(p);
+  //   const batchedItemsRes = await getBatchedItems(
+  //     p.allProductId,
+  //     store.storeId,
+  //   );
+  //   const batchedItems = batchedItemsRes.data.results[0];
+  //   console.log("batchedItems", batchedItems);
+
+  //   const order = {
+  //     allProductId: p.allProductId,
+  //     storeId: store.storeId,
+  //        sku: p.sku,
+  //     description,
+  //     unitPrice,
+  //     lineTaxRate: p.taxPerc,
+  //     qty,
+  //     measurementUnitName: p.measurementUnitName,
+  //       stockQty: p.isStockTracked ? p.stockQty : undefined,
+  //              imageUrl:p.imageUrl
+  //   };
+
+  //   if (batchedItems.length > 0) {
+  //     setBatchedItemList(batchedItems);
+  //     setIsBatchedItemsModalOpen(true);
+  //     setAddOrderTemp(order);
+  //     return;
+  //   } else {
+  //     order.stockBatchId = batchedItems[0]?.stockBatchId
+  //       ? batchedItems[0].stockBatchId
+  //       : null;
+  //     dispatch(addOrder(order));
+  //   }
+  // };
+
+
+
+const addItemstoOrderListFinal = (selectedBatch, order) => {
+  const orderFinal = {
+    ...order,
+    stockBatchId: selectedBatch.stockBatchId,
+    batchNo: selectedBatch.batchNo,
+    unitPrice: selectedBatch.unitPrice ?? order.unitPrice,
+    lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+    stockQty: order.measurementUnitName ? selectedBatch.qty : order.stockQty,
+    formattedQty: selectedBatch.formattedQty,
+  };
+
+  setAddOrderTemp(null);
+  setIsBatchedItemsModalOpen(false);
+
+  processUomOrDispatchOrder(orderFinal, selectedProduct);
+};
+
+
+
+// const addItemstoOrderListFinal=(selectedBatch,order)=>{
+//     const isOrderExist = existingOrders.find(
+//       (o) => o.allProductId===order.allProductId && o.storeId===order.storeId
+//     );
+
+//     console.log('selectedBatch',selectedBatch);
+//     const orderFinal = {
+//       ...order,
+//       stockBatchId: selectedBatch.stockBatchId,
+//       batchNo: selectedBatch.batchNo,
+//       unitPrice: selectedBatch.unitPrice ?? order.unitPrice,
+//       lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+//       stockQty: order.measurementUnitName ? selectedBatch.qty : order.stockQty,
+//     };
+
+//     if (isOrderExist) {
+//       dispatch(updateOrderBatchId({
+//         allProductId: order.allProductId,
+//         storeId: order.storeId,
+//         stockBatchId: selectedBatch.stockBatchId,
+//         batchNo: selectedBatch.batchNo,
+//         unitPrice: selectedBatch.unitPrice,
+//         lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
+//       }));
+//     } else {
+//       dispatch(addOrder(orderFinal));
+//     }
+
+//     setAddOrderTemp(null);
+//     setIsBatchedItemsModalOpen(false);
+//   }
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -397,40 +500,183 @@ const addItemstoOrderListFinal=(selectedBatch,order)=>{
     );
   };
 
-  const handleBarcodeEnter = async (p) => {
-    const description = `${p.productName}`;
-    const qty = 1;
-    const unitPrice = Number(p.unitPrice);
 
-    const batchedItemsRes = await getBatchedItems(
-      p.allProductId,
-      store.storeId,
-    );
-    const batchedItems = batchedItemsRes.data.results[0];
-    console.log("batchedItems", batchedItems);
+// const handleBarcodeEnter = async (p) => {
+//   const description = `${p.productName}`;
+//   const qty = 1;
+//   const unitPrice = Number(p.unitPrice);
 
-    const order = {
-      allProductId: p.allProductId,
-      storeId: store.storeId,
-      productNo: p.productNo,
-      description,
-      unitPrice,
-      lineTaxRate: p.taxPerc,
-      qty,
-    };
+//   setSelectedProduct(p);
 
-    if (batchedItems.length > 0) {
-      setBatchedItemList(batchedItems);
-      setIsBatchedItemsModalOpen(true);
-      setAddOrderTemp(order);
+//   const batchedItemsRes = await getBatchedItems(
+//     p.allProductId,
+//     store.storeId
+//   );
+//   const batchedItems = batchedItemsRes.data.results[0];
+
+//   // const order = {
+//   //   allProductId: p.allProductId,
+//   //   storeId: store.storeId,
+//   //   productNo: p.productNo,
+//   //   description,
+//   //   unitPrice,
+//   //   lineTaxRate: p.taxPerc,
+//   //   qty,
+//   //   measurementUnitName: p.measurementUnitName,
+//   // };
+
+//   const order = {
+//     allProductId: p.allProductId,
+//     storeId: store.storeId,
+//     sku: p.sku,
+//     description,
+//     unitPrice,
+//     lineTaxRate: p.taxPerc,
+//     qty,
+//     measurementUnitName: p.measurementUnitName,
+//     stockQty: p.isStockTracked ? p.stockQty : undefined,
+//     imageUrl: p.imageUrl,
+//   };
+
+
+
+
+//   if (batchedItems.length > 0) {
+//     setBatchedItemList(batchedItems);
+//     setIsBatchedItemsModalOpen(true);
+//     setAddOrderTemp(order);
+//     return;
+//   } else {
+//     order.stockBatchId = batchedItems[0]?.stockBatchId
+//       ? batchedItems[0].stockBatchId
+//       : null;
+
+//     processUomOrDispatchOrder(order, p);
+//   }
+// };
+
+  // const handleBarcodeEnter = async (p) => {
+  //   const description = `${p.productName}`;
+  //   const qty = 1;
+  //   const unitPrice = Number(p.unitPrice);
+
+  //   const batchedItemsRes = await getBatchedItems(
+  //     p.allProductId,
+  //     store.storeId,
+  //   );
+  //   const batchedItems = batchedItemsRes.data.results[0];
+  //   console.log("batchedItems", batchedItems);
+
+  //   const order = {
+  //     allProductId: p.allProductId,
+  //     storeId: store.storeId,
+  //     productNo: p.productNo,
+  //     description,
+  //     unitPrice,
+  //     lineTaxRate: p.taxPerc,
+  //     qty,
+  //   };
+
+  //   if (batchedItems.length > 0) {
+  //     setBatchedItemList(batchedItems);
+  //     setIsBatchedItemsModalOpen(true);
+  //     setAddOrderTemp(order);
+  //     return;
+  //   } else {
+  //     order.stockBatchId = batchedItems[0]?.stockBatchId
+  //       ? batchedItems[0].stockBatchId
+  //       : null;
+  //     dispatch(addOrder(order));
+  //   }
+  // };
+
+const handleBarcodeEnter = async (p, scannedBarcode) => {
+  setSelectedProduct(p);
+    console.log('handle barcode enter:',p)
+  // STEP 1: First Priority — Check direct Batch/UOM Barcode match
+  try {
+   
+
+    // if (uomBatchRes.data.result?.status === "WRONG_STORE") {
+    //   showToastWarning(`මෙම Barcode එක ${result.belongsToStoreName} වෙළඳසැලට අයිති එකකි!`);
+    //   // හෝ Dialog popup එකක් පෙන්වා Current Store එකේ Stock/Price එකෙන් Add කරන්න අහන්න.
+    //   return;
+    // }
+  
+
+    // If direct UOM/Batch barcode match exists for this store
+    if (p && p.productUomId) {
+      const directOrder = {
+        allProductId: p.allProductId,
+        storeId: store.storeId,
+        sku: p.sku,
+        description: p.productDescription,
+        unitPrice: Number(p.unitPrice),
+        lineTaxRate: p?.taxPerc,
+        qty: 1,
+        measurementUnitName: p.measurementUnitName,
+        stockQty: p.stockQty,
+        imageUrl: p?.imageUrl,
+        stockBatchId: p.stockBatchId,
+        productUomId: p.productUomId,
+      };
+
+      if (p.barcodeSource==="UOM"){
+      // Direct addition to order list
+      dispatch(addOrder(directOrder));
       return;
-    } else {
-      order.stockBatchId = batchedItems[0]?.stockBatchId
-        ? batchedItems[0].stockBatchId
-        : null;
-      dispatch(addOrder(order));
+      }
     }
+
+
+  // STEP 2: Fallback — Process using the product object (p)
+  if (p.barcodeSource==="SKU_LEVEL") {
+  const description = `${p.productName}`;
+  const qty = 1;
+  const unitPrice = Number(p.unitPrice);
+
+  const batchedItemsRes = await getBatchedItems(
+    p.allProductId,
+    store.storeId
+  );
+  const batchedItems = batchedItemsRes?.data?.results?.[0] || [];
+
+  const order = {
+    allProductId: p.allProductId,
+    storeId: store.storeId,
+    sku: p.sku,
+    description,
+    unitPrice,
+    lineTaxRate: p.taxPerc,
+    qty,
+    measurementUnitName: p.measurementUnitName,
+    stockQty: p.isStockTracked ? p.stockQty : undefined,
+    imageUrl: p.imageUrl,
   };
+
+  if (batchedItems.length > 0) {
+    setBatchedItemList(batchedItems);
+    setIsBatchedItemsModalOpen(true);
+    setAddOrderTemp(order);
+    return;
+  } else {
+    order.stockBatchId = batchedItems[0]?.stockBatchId
+      ? batchedItems[0].stockBatchId
+      : null;
+
+    processUomOrDispatchOrder(order, p);
+  }
+
+  }
+
+    } catch (error) {
+    console.warn("Direct UOM barcode lookup missed/failed, falling back to product logic:", error);
+  }
+};
+
+
+
+
 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const { selectedStore } = useSelector((state) => state.store);
@@ -569,6 +815,7 @@ useEffect(() => {
           onProductSelect={handleProductClick}
           onBarcodeEnter={handleBarcodeEnter}
           isMobile={isMobile}
+          uomType={"SALES"}
         />
       </div>
 
@@ -640,6 +887,15 @@ useEffect(() => {
           addItemstoOrderListFinal(stockBatchId, addOrderTemp)
         }
       />
+
+      <UOMSelectionDialog
+  visible={isUomDialogOpen}
+  onHide={() => setIsUomDialogOpen(false)}
+  uomList={uomList}
+  onUomSelect={handleUomSelect}
+  selectedProduct={selectedProduct}
+  selectedBatch={pendingOrder}
+/>
 
       <DialogModel
         header="Return Order"

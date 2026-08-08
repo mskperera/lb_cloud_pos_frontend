@@ -150,7 +150,7 @@ const Payment = ({showPaymentConfirm,setOrderId,handlePaymentClose}) => {
       customerId: customer?.contactId,
       terminalId: terminal.terminalId,
       sessionId: sessionDetails.sessionId,
-      storeId: store.storeId,
+     // storeId: store.storeId,
       orderList: list,
       isConfirm: true,
     };
