@@ -37,7 +37,7 @@ const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
 const Payment = React.lazy(() => import("./pages/payment"));
 const PaymentConfirm = React.lazy(() => import("./pages/paymentConfirm"));
-const Products = React.lazy(() => import("./pages/products"));
+// const Products = React.lazy(() => import("./pages/products"));
 const AddProduct = React.lazy(() => import("./pages/products/addProduct"));
 const EditProduct = React.lazy(() => import("./pages/products/editProduct"));
 const OrdersCompleted = React.lazy(() => import("./pages/ordersCompleted"));
@@ -117,7 +117,7 @@ function AppContent() {
               <Route path="/userReg/edit" element={<EditUserReg />} />
               <Route path="/userReg/list" element={<UserRegList />} />
 
-              <Route path="/products/list" element={<Products />} />
+              {/* <Route path="/products/list" element={<Products />} /> */}
               <Route path="/products/add" element={<AddProduct />} />
               <Route path="/products/edit" element={<EditProduct />} />
 

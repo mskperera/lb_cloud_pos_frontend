@@ -376,9 +376,14 @@ const StockEntry = () => {
             </div>
           </div>
 
-          {/* ── Product Search ── */}
-               <ProductSearch onProductSelect={handleProductClick} showOnlyProductItems={true} onlyAllowToSelectStockTrackedProduct={true} />
-
+      {/* ── Product Search ── */}
+<ProductSearch 
+  onProductSelect={handleProductClick} 
+  onBarcodeEnter={handleProductClick} 
+  showOnlyProductItems={true} 
+  onlyAllowToSelectStockTrackedProduct={true} 
+/>
+{JSON.stringify(stockEntry)}
           {/* ── Selected Product Panel ── */}
           {stockEntry && (
             <div className="bg-white rounded-lg p-5 transition-all">

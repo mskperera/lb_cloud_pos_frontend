@@ -403,3 +403,79 @@ export const getBatchedItems = async (allProductId,storeIdId) => {
     return err;
   }
 };
+
+
+
+export const getProductUomList = async (allProductId,storeId, stockBatchId = null) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+
+    let url = `/product/uomList?allProductId=${allProductId}&storeId=${storeId}`;
+    if (stockBatchId !== null && stockBatchId !== undefined) {
+      url += `&stockBatchId=${stockBatchId}`;
+    }
+
+    return await customAxios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => res)
+      .catch((err) => err.response);
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const getBatchUomDetailsByUomBarcode = async (barcode,storeIdId) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .get(`/multiuom/batchUomDetailsByUomBarcode?barcode=${barcode}&storeId=${storeIdId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+
+
+export const getProductsByBarcode = async (data) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+
+    const response = await customAxios.post('/products/search/barcode', data, {
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+        tenantid: tenantId,
+      },
+    });
+
+    return response.data; // Returning response payload directly
+  } catch (err) {
+    // Return or throw error response depending on your global error handling strategy
+    return err.response || err;
+  }
+};

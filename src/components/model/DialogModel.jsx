@@ -1,4 +1,5 @@
 import React from 'react';
+import CloseButton from '../buttons/CloseButton';
 
 const DialogModel = ({
   header,
@@ -9,6 +10,7 @@ const DialogModel = ({
   height = 'fit-content', // Default height to fit content
   fullWidth = false, // New prop for full width
   fullHeight = false, // New prop for full height
+  hideCloseButton
 }) => {
   return (
     <div
@@ -31,7 +33,7 @@ const DialogModel = ({
           }}
         >
           {/* Header */}
-          <DialogHeader header={header} onHide={onHide} />
+          <DialogHeader header={header} onHide={onHide} hideCloseButton={hideCloseButton} />
 
           {/* Content with auto-scroll */}
           <div
@@ -49,12 +51,13 @@ const DialogModel = ({
   );
 };
 
-const DialogHeader = ({ header, onHide }) => {
+const DialogHeader = ({ header, onHide,hideCloseButton }) => {
   return (
-    <div className="flex justify-between items-center px-5 py-2 bg-gradient-to-r from-sky-700 to-sky-600 text-white">
-      <DialogHeaderTitle title={header} />
-      <DialogCloseButton onHide={onHide} />
-    </div>
+          <div className="flex items-center justify-between py-1 pl-6 pr-2 border-b border-gray-300 bg-gray-200 text-gray-600">
+          <h2 className="text-base xs:text-lg sm:text-xl lg:text-lg font-bold truncate">{header}</h2>
+     
+      {!hideCloseButton && <CloseButton onClick={onHide} />}
+        </div>
   );
 };
 

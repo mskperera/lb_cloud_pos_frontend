@@ -108,7 +108,7 @@ const ProductSearch = ({ onProductSelect, onBarcodeEnter, showOnlyProductItems,h
 
       {showAdvancedSearch && (
         <DialogModel
-          header="Advanced Product Search"
+          header="Item Lookup"
           visible={showAdvancedSearch}
           onHide={() => setShowAdvancedSearch(false)}
         >

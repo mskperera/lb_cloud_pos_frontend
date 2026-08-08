@@ -1,108 +1,75 @@
 import React from "react";
 
-/**
- * ReusableTable component
- * @param {Array} columns - [{ key: 'orderNo', label: 'Invoice No', render: (row) => ..., align: 'right', headerAlign: 'center' }]
- * @param {Array} data - Array of row objects
- * @param {string} emptyMessage - Message to show when no data
- * @param {boolean} loading - Show loading spinner if true
- */
-export default function ReusableTable({ columns, data, emptyMessage = "No data found", loading = false }) {
-  const getTextAlignment = (align = "left") => {
-    switch (align) {
-      case "center":
-        return "text-center";
-      case "right":
-        return "text-right";
-      default:
-        return "text-left";
-    }
-  };
+export default function ReusableTable({
+  data = [],
+  isLoading = false,
+  columns = [], // Array of column definitions
+  customActions,
+}) {
+  // Safely fallback to an empty array if columns is null or undefined
+  const activeColumns = columns || [];
+  const totalColSpan = Math.max(activeColumns.length + (customActions ? 1 : 0), 1);
 
   return (
-    <>
-      {/* Table for md+ screens */}
-      <div className="w-full hidden md:block overflow-x-auto border border-gray-200">
-            <table className="min-w-full text-left border-collapse">
-          <thead className="">
-                 <tr className="bg-gray-200 border-gray-200 ">
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className={`px-2 py-2 md:px-6 md:py-3 font-semibold  text-gray-600  ${getTextAlignment(col.headerAlign ?? col.align ?? "left")}`}
-                >
-                  {col.label}
+    <div className="flex flex-col h-[65vh] overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+      <div className="flex-1 overflow-y-auto bg-white">
+        <table className="w-full border-collapse text-left">
+          <thead className="relative bg-slate-50 text-xs font-semibold text-slate-600 border-b border-slate-200 sticky top-0 z-10 uppercase tracking-wider">
+            <tr>
+              {/* Dynamic Headers */}
+              {activeColumns.map((col, idx) => (
+                <th key={col.key || idx} className={`px-4 py-3.5 ${col.headerClass || ""}`}>
+                  {col.header}
                 </th>
               ))}
+
+              {customActions && <th className="px-4 py-3.5 text-center">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {loading ? (
+            {isLoading ? (
               <tr>
-                <td colSpan={columns.length} className="py-12">
-                  <div className="flex justify-center">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-2 text-sm font-semibold text-slate-700 shadow ring-1 ring-slate-200">
-                      <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Waiting...
-                    </div>
+                <td colSpan={totalColSpan} className="px-4 py-8 text-center text-gray-500">
+                  <div className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5 text-sky-600" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Loading data...</span>
                   </div>
                 </td>
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="text-center py-12 text-gray-500">
-                  {emptyMessage}
+                <td colSpan={totalColSpan} className="px-4 py-8 text-center text-gray-400 text-sm">
+                  No records found matching your search criteria.
                 </td>
               </tr>
             ) : (
-              data.map((row, idx) => (
-                <tr key={row.id || row.orderId || idx} className="hover:bg-gray-50 transition">
-                  {columns.map((col) => (
-                    <td
-                      key={col.key}
-                      className={`px-2 py-3 md:px-6 md:py-4 whitespace-nowrap ${getTextAlignment(col.align ?? "left")}`}
-                    >
-                      {col.render ? col.render(row) : row[col.key]}
+              data.map((item, index) => (
+                <tr
+                  key={item.id || item.orderId || item.allProductId || index}
+                  className="text-sm hover:bg-slate-50/80 transition-colors duration-150"
+                >
+                  {/* Dynamic Cells */}
+                  {activeColumns.map((col, idx) => (
+                    <td key={col.key || idx} className={`px-4 py-3 ${col.cellClass || ""}`}>
+                      {col.render ? col.render(item, index) : item[col.accessor || col.key]}
                     </td>
                   ))}
+
+                  {/* Optional Actions Cell */}
+                  {customActions && (
+                    <td className="px-4 py-3 text-center">
+                      {customActions(item, index)}
+                    </td>
+                  )}
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
-
-      {/* Card view for mobile screens */}
-      <div className="block md:hidden">
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-2 text-sm font-semibold text-slate-700 shadow ring-1 ring-slate-200">
-              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              Waiting...
-            </div>
-          </div>
-        ) : data.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">{emptyMessage}</div>
-        ) : (
-          <div className="space-y-4">
-            {data.map((row, idx) => (
-              <div key={row.id || row.orderId || idx} className="bg-white rounded-xl shadow border border-gray-200 p-4 flex flex-col gap-2">
-                {columns.map((col) => (
-                  <div
-                    key={col.key}
-                    className={`flex justify-between items-center text-sm ${col.align === "center" ? "text-center" : ""}`}
-                  >
-                    <span className="font-semibold text-gray-500">{col.label}</span>
-                    <div className={`${getTextAlignment(col.align ?? "left")} ${col.key === "actions" ? "flex justify-end gap-2" : "text-gray-800"}`}>
-                      {col.render ? col.render(row) : row[col.key]}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+    </div>
   );
 }

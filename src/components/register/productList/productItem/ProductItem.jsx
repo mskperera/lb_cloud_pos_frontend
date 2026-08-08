@@ -38,37 +38,8 @@ const ProductItem = ({ p, handleProductClick, loading, orderQty }) => {
             </div>
           </div>
         )}
-        {/* Image (if exists) */}
-        {/* {hasImage && (
-          <div className={`w-24 h-24 rounded-lg overflow-hidden
-             ${hasImage 
-              ? "flex justify-center items-center w-14 h-14 mx-auto" 
-              : ""
-            }`}>
-            <img
-              src={`${process.env.REACT_APP_API_CDN}/${p.imageUrl}?width=200&height=200&quality=80`}
-              alt={p.productName}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )} */}
-
      
-
-
-
-
-     
-
         <div
-          // className={`
-          //   ${hasImage 
-          //     ? "absolute top-2 right-2 w-8 h-8" 
-          //     : "flex justify-center items-center w-12 h-12 mx-auto"
-          //   }
-          //   text-sky-600 group-hover:text-sky-700 transition-colors
-          // `}
-
             className={`
             flex justify-center items-center w-12 h-12 mx-auto
             text-sky-600 group-hover:text-sky-700 transition-colors`}
@@ -101,6 +72,7 @@ const ProductItem = ({ p, handleProductClick, loading, orderQty }) => {
       onClick={() => !isDisabled && handleProductClick(p)}
       loading={loading}
       orderQty={orderQty}
+      product={p}
     />
   );
   

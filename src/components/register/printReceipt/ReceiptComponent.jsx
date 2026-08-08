@@ -144,7 +144,7 @@ const ReceiptComponent = forwardRef(
                   <div className="item-header-row2">
                     <span className="item-qty">
                       {" "}
-                      {item.qty} {item.measurementUnitName}
+                      {item.displayQty} {item.displayMeasurementUnitName}
                     </span>
                     <span className="item-price">
                       {" "}
@@ -165,7 +165,7 @@ const ReceiptComponent = forwardRef(
         <hr className="thin-border" />
 
         {/* Totals */}
-        <div className="totals">
+        <div className="totals font-semibold">
           <div className="total-row">
             <div>Total :</div>
             <div>{totals.subtotal.toFixed(2)}</div>

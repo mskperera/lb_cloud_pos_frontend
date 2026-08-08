@@ -128,17 +128,45 @@ const selectedTerminal=JSON.parse(localStorage.getItem('terminal'));
     </div>
   );
 
-  const orderColumns = [
-    { key: "orderNo", label: "Invoice No", align: "left" },
-    { key: "customerName", label: "Customer", align: "left" },
-    { key: "grossAmount_total", label: "Gross", align: "right", render: (row) => formatCurrency(row.grossAmount_total, false) },
-    { key: "all_DiscountAmount_total", label: "Discount", align: "right", render: (row) => formatCurrency(row.all_DiscountAmount_total, false) },
-    { key: "lineTaxAmount_total", label: "Tax", align: "right", render: (row) => formatCurrency(row.lineTaxAmount_total, false) },
-    { key: "grandTotal", label: "Total", align: "right", render: (row) => formatCurrency(row.grandTotal, false) },
-    { key: "createdDate_UTC", label: "Date", align: "center", render: (row) => formatUtcToLocal(row.createdDate_UTC) },
-    { key: "actions", label: "Actions", align: "right", render: (row) => actionButtons(row) },
+const orderColumns = [
+    { key: "orderNo", header: "Invoice No" },
+    { key: "customerName", header: "Customer" },
+    {
+      key: "grossAmount_total",
+      header: "Gross",
+      headerClass: "text-right",
+      cellClass: "text-right font-mono",
+      render: (item) => formatCurrency(item.grossAmount_total, false),
+    },
+    {
+      key: "all_DiscountAmount_total",
+      header: "Discount",
+      headerClass: "text-right",
+      cellClass: "text-right font-mono",
+      render: (item) => formatCurrency(item.all_DiscountAmount_total, false),
+    },
+    {
+      key: "lineTaxAmount_total",
+      header: "Tax",
+      headerClass: "text-right",
+      cellClass: "text-right font-mono",
+      render: (item) => formatCurrency(item.lineTaxAmount_total, false),
+    },
+    {
+      key: "grandTotal",
+      header: "Total",
+      headerClass: "text-right",
+      cellClass: "text-right font-mono font-semibold text-sky-600",
+      render: (item) => formatCurrency(item.grandTotal, false),
+    },
+    {
+      key: "createdDate_UTC",
+      header: "Date",
+      headerClass: "text-center",
+      cellClass: "text-center",
+      render: (item) => formatUtcToLocal(item.createdDate_UTC),
+    },
   ];
-
   const updateOrderListHandler = (orderId) => {
     setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, isVoided: true } : o));
     setIsVoidRemarkShow(false);
@@ -279,13 +307,16 @@ const selectedTerminal=JSON.parse(localStorage.getItem('terminal'));
           </div>
 
           {/* Body - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4">
+       {/* Body - Scrollable */}
+          <div className="flex-1 p-4">
             <ReusableTable
-              columns={orderColumns}
               data={orders}
-              loading={isTableDataLoading}
+              isLoading={isTableDataLoading}
+              columns={orderColumns}
               emptyMessage="No orders found"
+              customActions={(item) => actionButtons(item)}
             />
+       
           </div>
           {/* Pagination - fixed at bottom, outside scroll */}
           <div className="bg-gray-50 px-6 py-2 border-t border-gray-200">

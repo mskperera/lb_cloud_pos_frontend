@@ -714,7 +714,7 @@ return (
                 disabled={isLoading}
                 className="w-full lg:w-auto px-10 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-sm shadow-md shadow-sky-500/10 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
               >
-                {isLoading ? "Finalizing..." : "Verify & Close Day End"}
+                {isLoading ? "Finalizing..." : "Verify & Close Session"}
               </button>
             ) : (
               <div className="bg-emerald-100 border border-emerald-200 rounded-xl px-4 py-2 flex items-center gap-4 animate-fade-in text-sm">

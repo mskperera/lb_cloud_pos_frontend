@@ -13,7 +13,7 @@ import { getSystemInfoFromLocalStorage } from "../functions/systemSettings";
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(value);
-    return  showSymbol ? `${symbol} ${formattedNumber}` : formattedNumber;
+    return  showSymbol ? `${symbol}. ${formattedNumber}` : formattedNumber;
   };
 
   export const getCurrency = (displayType) => {

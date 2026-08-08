@@ -245,9 +245,7 @@ input {
   .lpos-scroll { scrollbar-width:thin; scrollbar-color: var(--lpos-border) transparent; }
   .lpos-scroll::-webkit-scrollbar { width:4px; }
   .lpos-scroll::-webkit-scrollbar-thumb { background: var(--lpos-border); border-radius:4px; }
-  /* Qty btn */
-  .lpos-qty-btn { width:24px; height:24px; border-radius:6px; border:none; background:white; color: var(--lpos-text-secondary); cursor:pointer; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; transition:all .15s; box-shadow: var(--lpos-shadow-sm); line-height:1; }
-  .lpos-qty-btn:hover { background: var(--lpos-accent); color:white; }
+
   /* Proceed btn */
   .lpos-btn-proceed { background: linear-gradient(135deg, var(--lpos-accent), #0a84ff); box-shadow: 0 4px 14px rgba(0,113,227,.35); transition: all .2s; }
   .lpos-btn-proceed:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,113,227,.4); }
@@ -373,7 +371,7 @@ input {
 }
 
 .lpos-search-container {
-  min-width: 280px;
+  width:85%;
 }
 
 .lpos-topbar-right {
@@ -480,7 +478,6 @@ textarea,
 .lpos-menu-btn,
 .lpos-si-wrap > div,
 .lpos-product-card,
-.lpos-qty-btn,
 .lpos-btn-proceed {
   touch-action: manipulation;           /* Best modern fix */
   -webkit-tap-highlight-color: transparent;   /* Removes highlight + helps zoom */
@@ -547,3 +544,28 @@ button, [role="button"], .lpos-menu-btn, .lpos-product-card {
 .lpos-toggle-btn:active {
   transform: scale(0.96);
 }
+
+
+
+.lpos-qty-btn {
+
+  border:1px solid #CBD5E1;
+
+  background:#FFFFFF;
+
+  color:#334155;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  transition:all .15s ease;
+
+}
+

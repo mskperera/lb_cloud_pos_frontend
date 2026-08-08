@@ -101,9 +101,9 @@ const loadTauriPrinters=async()=>{
         sku: o.sku ? `${o.sku}` : '',
         productDescription: o.productDescription || '',
         productName: o.productName || '',
-        qty: parseFloat(o.qty) || 0,
+        displayQty: parseFloat(o.displayQty) || 0,
         netAmount: parseFloat(o.netAmount) || 0,
-        measurementUnitName: o.measurementUnitName || '',
+        displayMeasurementUnitName: o.displayMeasurementUnitName || '',
       }));
       setOrderDetails(orderDetals);
       setPayments(result.data.results[2] || []);
