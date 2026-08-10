@@ -31,7 +31,10 @@ import ScrollToHash from './pages/landing/ScrollToHash';
 import TransferOrderDetail from './pages/transferOrderDetail';
 import RegisterPage from './pages/register/register_redesigned';
 import DayendListAll from './components/dayendList/DayendListAll';
-
+import { useEffect } from 'react';
+import { loadAppConfig } from './utils/tauri/appConfig';
+import { invoke } from '@tauri-apps/api/core';
+import Database from '@tauri-apps/plugin-sql';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
@@ -57,6 +60,60 @@ function AppContent() {
   const location = useLocation();
 
   const shouldShowNavBar = location.pathname !== '/login' && location.pathname !== '/';
+
+
+useEffect(() => {
+    // Generates config.json on first launch
+    
+    loadAppConfig().then(config => {
+      console.log('App initialized with runtime config:', config);
+      //verifyDeviceLicense();
+    });
+  }, []);
+
+
+//  const verifyDeviceLicense = async () => {
+//   if (!('isTauri' in window && !!window.isTauri)) return true;
+
+//   try {
+//     // 1. Get current physical hardware identifier
+//     const currentMachineId = await invoke('get_machine_id');
+
+//     // 2. Read saved activation token from SQLite
+//     const db = await Database.load('sqlite:credentials.db');
+//     await db.execute(`
+//       CREATE TABLE IF NOT EXISTS settings (
+//         key TEXT PRIMARY KEY,
+//         value TEXT
+//       )
+//     `);
+
+//     const result = await db.select(
+//       "SELECT value FROM settings WHERE key = 'license_token' LIMIT 1"
+//     );
+
+//     const savedToken = result?.length > 0 ? result[0].value : null;
+
+//     if (!savedToken) {
+//       return { status: 'UNREGISTERED', machineId: currentMachineId };
+//     }
+
+//     // 3. Decode or decrypt token to compare Machine IDs
+//     const payload = parseJwt(savedToken);
+
+//     if (payload.machineId !== currentMachineId) {
+//       console.error('License Mismatch: Application files were copied to an unauthorized computer.');
+//       return { status: 'INVALID_HARDWARE', machineId: currentMachineId };
+//     }
+
+//     return { status: 'VALID', machineId: currentMachineId };
+//   } catch (error) {
+//     console.error('Failed device license verification:', error);
+//     return { status: 'ERROR', error };
+//   }
+// };
+
+
 
   const value = {
     appendTo: 'self',

@@ -66,19 +66,53 @@ const finalDiffDiscrepancy = actualTotal - expectedTotal;
   const doubleDividerStyle = { borderBottom: '3px double #000', margin: '8px 0' };
 
   return (
-    <div 
-      className="receipt z-report-print" 
-      ref={ref} 
-      style={{ 
-        width: '80mm', 
-        padding: '12px', 
-        background: '#fff', 
-        fontFamily: '"Courier New", Courier, monospace', 
-        color: '#000',
+    <>
+    <style>{`
+        @media print {
+          /* Hide all UI controls, sidebars, buttons, and backgrounds */
+          body * {
+            visibility: hidden !important;
+          }
+          
+          /* Make ONLY the printable receipt and its children visible */
+          .z-report-print, .z-report-print * {
+            visibility: visible !important;
+          }
+
+          /* Position the receipt at the top left of the printed page */
+          .z-report-print {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 80mm !important;
+            max-width: 80mm !important;
+            margin: 0 !important;
+            padding: 8px !important;
+            box-shadow: none !important;
+            border: none !important;
+          }
+
+          /* Ensure proper page bounds and hide margins */
+          @page {
+            size: auto;
+            margin: 0mm;
+          }
+        }
+      `}</style>
+ 
+ <div 
+        className="receipt z-report-print" 
+        ref={ref} 
+        style={{ 
+          width: '80mm', 
+          padding: '12px', 
+          background: '#fff', 
+          fontFamily: '"Courier New", Courier, monospace', 
+          color: '#000',
+          lineHeight: '1.4'
+        }}
+      >
     
-        lineHeight: '1.4'
-      }}
-    >
       {/* Header Profile Section */}
       <div style={{ textAlign: 'center', marginBottom: '10px' }}>
         <h1 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 2px 0' }}>
@@ -299,6 +333,8 @@ const finalDiffDiscrepancy = actualTotal - expectedTotal;
         <div style={{ color: '#666', marginTop: '4px' }}>System by legendbyte.com</div>
       </div>
     </div>
+
+       </>
   );
 });
 

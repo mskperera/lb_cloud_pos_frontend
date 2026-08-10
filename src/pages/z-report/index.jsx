@@ -11,6 +11,7 @@ import { getPrinters } from "tauri-plugin-printer-v2";
 import ZReportComponent from '../../components/register/zReport/ZReportComponent';
 import { getSessionEndZReport } from '../../functions/session';
 import { useNavigate } from 'react-router-dom';
+import Database from '@tauri-apps/plugin-sql';
 
 function ZReportIndex({ sessionId,setIsZReportVisible, reload,opendBy }) {
    const navigate = useNavigate();
@@ -44,28 +45,119 @@ const [sessionDetails, setSessionDetails] = useState(null);
 
   const terminal =  JSON.parse(localStorage.getItem('terminal'));
 
+const [isPrinterLoading, setIsPrinterLoading] = useState(false);
+const [isPrinterListFetched, setIsPrinterListFetched] = useState(false);
 
-useEffect(()=>{
-  if(isTauriApp){
-  loadTauriPrinters();
-
+useEffect(() => {
+  if (isTauriApp) {
+    initPrinterFromSQLite();
   }
-},[])
+}, [isTauriApp]);
+
+const initPrinterFromSQLite = async () => {
+  try {
+    const db = await Database.load('sqlite:credentials.db');
+
+    // 1. Ensure settings table exists
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT
+      )
+    `);
+
+    // 2. Try fetching the saved printer from SQLite
+    const result = await db.select(
+      "SELECT value FROM settings WHERE key = 'selected_printer' LIMIT 1"
+    );
+
+    // REMOVED: await db.close(); <-- Do not close the pool here!
+
+    const savedPrinter = result?.length > 0 ? result[0].value : null;
+
+    if (savedPrinter) {
+      console.log('Loaded printer from SQLite cache:', savedPrinter);
+      setSelectedPrinter(savedPrinter);
+      setTauriPrinterList([savedPrinter]); 
+    } else {
+      // 3. Fallback: If no printer was saved, fetch system printers
+      await fetchSystemPrinters();
+    }
+  } catch (error) {
+    console.error('SQLite printer fetch error:', error);
+    await fetchSystemPrinters();
+  }
+};
+
+const fetchSystemPrinters = async () => {
+  if (isPrinterListFetched) return; // Prevent duplicate queries
+
+  try {
+    setIsPrinterLoading(true);
+    const rawResult = await invoke('get_system_printers');
+    const parsed = rawResult ? JSON.parse(rawResult) : [];
+    const printers = Array.isArray(parsed) ? parsed : [parsed];
+
+    setTauriPrinterList(printers);
+    setIsPrinterListFetched(true);
+
+    if (printers.length > 0 && !selectedPrinter) {
+      const firstPrinter = printers[0]?.Name || printers[0]?.name || printers[0];
+      setSelectedPrinter(firstPrinter);
+      await savePrinterToSQLite(firstPrinter);
+    }
+  } catch (err) {
+    console.error('Failed to load system printers from Rust:', err);
+  } finally {
+    setIsPrinterLoading(false);
+  }
+};
+
+const savePrinterToSQLite = async (printerName) => {
+  try {
+    const db = await Database.load('sqlite:credentials.db');
+    await db.execute(
+      `INSERT INTO settings (key, value) VALUES ('selected_printer', $1)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+      [printerName]
+    );
+    await db.close();
+    console.log('Printer saved to SQLite:', printerName);
+  } catch (err) {
+    console.error('Failed to save printer to SQLite:', err);
+  }
+};
+
+const handlePrinterChange = async (newPrinter) => {
+  setSelectedPrinter(newPrinter);
+  if (isTauriApp && newPrinter) {
+    await savePrinterToSQLite(newPrinter);
+  }
+};
 
 
 
-const loadTauriPrinters=async()=>{
-                         const printers = JSON.parse(await getPrinters());
-    console.log('getPrinters:',printers);
-      // set selected printer to the first one if available
-      setTauriPrinterList(printers);
-      if (printers?.length > 0) {
-        setSelectedPrinter(printers[0].Name);
-      }
+// useEffect(()=>{
+//   if(isTauriApp){
+//   loadTauriPrinters();
+
+//   }
+// },[])
 
 
 
-}
+// const loadTauriPrinters=async()=>{
+//                          const printers = JSON.parse(await getPrinters());
+//     console.log('getPrinters:',printers);
+//       // set selected printer to the first one if available
+//       setTauriPrinterList(printers);
+//       if (printers?.length > 0) {
+//         setSelectedPrinter(printers[0].Name);
+//       }
+
+
+
+// }
   useEffect(() => {
     if (sessionId) {
       loadOrderReceipt();
@@ -332,11 +424,18 @@ setIsPrintButtonLoading(true);
             </div>
 
             <div className="space-y-3">
-              <PrintFeature
-                isSelected={actionOption === 'print'}
-                onSelect={() => setActionOption('print')}
-                itemName="Z Report"
-              />
+         
+                <PrintFeature
+  isSelected={actionOption === 'print'}
+  onSelect={() => setActionOption('print')}
+  itemName="Receipt"
+  isTauriApp={isTauriApp}
+  isPrinterLoading={isPrinterLoading}
+  tauriPrinterList={tauriPrinterList}
+  selectedPrinter={selectedPrinter}
+  onPrinterChange={handlePrinterChange}
+  onDropdownFocus={fetchSystemPrinters} // Lazy loads full system printers when user clicks the dropdown
+/>
 
               <EmailFeature
                 isSelected={actionOption === 'email'}
@@ -402,12 +501,15 @@ setIsPrintButtonLoading(true);
                 alignItems: 'flex-start',
               }}
             >
-           <ZReportComponent
-                sessionDetails={sessionDetails}
-                dayendDetails={dayendDetails}
-                cashDenominationTotal={cashDenominationTotal}
-                ref={zReportRef}
-              />
+       {/* In ZReportIndex.jsx around line 430 */}
+<div className="printable-container">
+  <ZReportComponent
+    sessionDetails={sessionDetails}
+    dayendDetails={dayendDetails}
+    cashDenominationTotal={cashDenominationTotal}
+    ref={zReportRef}
+  />
+</div>
             </div>
        
           )}
