@@ -1,39 +1,32 @@
 
 import Customer from "../register/customer/CustomerInfoPanel";
 import OrderSummary from "../register/orderSummary/OrderSummary";
-import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { addOrder, cancelOverallDiscount, clearOrderList, clearPayment, setCustomer } from "../../state/orderList/orderListSlice";
-import { CONTACT_TYPE, DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/constants";
+import { cancelOverallDiscount, clearOrderList, clearPayment, setCustomer } from "../../state/orderList/orderListSlice";
+import {DISCOUNT_SCOPE, DISCOUNT_TYPES } from "../../utils/constants";
 import ProductOrderList from "../register/orderList/ProductOrderList";
 import ApplyDiscount from "../register/ApplyDiscount";
 import { FaTimesCircle } from 'react-icons/fa';
 import DialogModel from "../model/DialogModel";
 import Payment from "../register/payment/Payment";
 import PaymentConfirm from "../../pages/paymentConfirm";
-import AddCustomProduct from "../register/AddCustomProduct";
 
-import { ShoppingCartIcon, UserIcon, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import DialogModel2 from "../model/DialogModel2";
 
 const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
-  const navigate = useNavigate();
-  let { terminalId } = useParams();
-  const dispatch = useDispatch();
 
-  const orderList=useSelector((state) => state.orderList.list);
+  const dispatch = useDispatch();
 
   const [loadCount, setLoadCount] = useState(0);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isDiscountPopupVisible, setIsDiscountPopupVisible] = useState(false);
-  const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [isPaymentConfirmShow, setIsPaymentConfirmShow] = useState(false);
 
   const [isPaymentShow, setIsPaymentShow] = useState(false);
   const [paymentKey, setPaymentKey] = useState(0);
-  const [isItemLookupShow, setIsItemLookupShow] = useState(false);
 
   
   const { list, orderSummary } = useSelector((state) => state.orderList);
@@ -55,67 +48,12 @@ const OrderListAll = ({ isTraditionalMode = false, onOrderSubmit }) => {
     setIsDiscountPopupVisible(true);
   };
 
-  const changeVisibilityHandler = (value) => {
-    setIsRightSidebarVisible(value);
-  };
-
-  const handleBarcodeEnter = (p) => {
-    const description = `${p.productName}`;
-    const qty = 1;
-    const unitPrice = Number(p.unitPrice);
-
-    const order = {
-      productNo: p.productNo,
-      description,
-      productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
-      unitPrice,
-      productTypeId: p.productTypeId,
-      lineTaxRate: p.taxPerc,
-      qty,
-    };
-    dispatch(addOrder(order));
-  };
-
-  const handleProductClick = (p) => {
-    const description = `${p.productDescription}`;
-    const qty = 1;
-    const unitPrice = Number(p.unitPrice);
-
-    const order = {
-      productNo: p.productNo,
-      description,
-      productId: p.productTypeId === 2 ? p.variationProductId : p.productId,
-      unitPrice,
-      productTypeId: p.productTypeId,
-      lineTaxRate: p.taxPerc,
-      qty,
-    };
-    dispatch(addOrder(order));
-  };
-
-
-
-
 
   const newOrderHandler = () => {
     dispatch(clearOrderList({}));
     dispatch(setCustomer({ customer: null }));
   };
 
-  const handleCustomItem = async () => {
-    const order = {
-      productNo: "custom",
-      sku: "",
-      description: `item test`,
-      productId: 0,
-      productTypeId: 1,
-      unitPrice: "1000",
-      lineTaxRate: "0",
-      qty: 1,
-      measurementUnitName: "custom",
-    };
-    dispatch(addOrder(order));
-  };
 
   const overallDiscountData = [
     {

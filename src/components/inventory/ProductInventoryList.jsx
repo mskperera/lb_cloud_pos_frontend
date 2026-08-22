@@ -25,7 +25,7 @@ import DialogModel from "../model/DialogModel";
 import { FaPlus, FaBoxes, FaTags, FaLayerGroup, FaBarcode, FaInfoCircle, FaEye } from "react-icons/fa";
 import ProductInventoryActionMenu from "./ProductInventoryActionMenu";
 import { CURRENCY_DISPLAY_TYPE } from "../../utils/constants";
-import { Eye } from "lucide-react";
+import { Eye, Boxes } from "lucide-react";
 import ReusableTable from "../ReusableTable";
 import moment from "moment";
 
@@ -1646,15 +1646,31 @@ export default function ProductInventoryList({}) {
         </DialogModel>
       )}
 
-      <div>
-        <h3 className="text-center font-bold text-xl text-slate-800">Product Inventory</h3>
-      </div>
+         <div className="px-6  flex items-center justify-between">
+         <div className="flex items-center gap-2.5">
+  {/* Icon with styled background badge */}
+  <div className="p-2 text-gray-600  flex items-center justify-center">
+    <Boxes className="w-7 h-7" />
+  </div>
+        <h2 className="text-xl font-bold text-gray-600 tracking-tight">Product Inventory</h2>
+     </div>
+
+        <button
+                onClick={() => navigate("/products/add")}
+                className="flex text-sm items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold 
+                rounded-lg md:rounded-xl shadow-md hover:bg-emerald-700 transition ml-auto"
+              >
+                <FaPlus className="w-4 h-4" />
+                <span>Create New Product</span>
+              </button>
+     </div>
+      
 
       {/* Filter Section */}
-      <div className="flex flex-col md:flex-row justify-between items-end py-4 gap-4 bg-white rounded-xl border p-6 mt-4 shadow-sm">
+      {/* <div className="flex flex-col md:flex-row justify-between items-end py-4 mb-4 gap-4 bg-white rounded-xl border p-6 mt-4 shadow-sm">
         <div className="flex flex-col md:flex-row w-full gap-6 items-center">
           <div className="flex flex-col gap-4 w-full">
-            <div className="flex flex-wrap gap-4 w-full items-center">
+            <div className="flex flex-wrap gap-6 w-full items-center">
               <div className="w-full sm:w-[180px]">
                 <TriStateSelect
                   id="isProductItemFilter"
@@ -1707,14 +1723,7 @@ export default function ProductInventoryList({}) {
                 />
               </div>
 
-              <button
-                onClick={() => navigate("/products/add")}
-                className="flex text-sm items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold 
-                rounded-lg md:rounded-xl shadow-md hover:bg-emerald-700 transition ml-auto"
-              >
-                <FaPlus className="w-4 h-4" />
-                <span>Create New Product</span>
-              </button>
+           
             </div>
 
             <div className="flex flex-wrap gap-4 w-full items-end">
@@ -1798,27 +1807,153 @@ export default function ProductInventoryList({}) {
             </div>
           </div>
         </div>
+      </div> */}
+
+
+
+<div className="bg-white rounded-xl border border-slate-200 p-4 my-4 shadow-sm">
+  <div className="flex flex-col gap-3">
+    
+    {/* Row 1: TriState Selects Grid */}
+    <div className="flex justify-between gap-4 flex-wrap">
+      <TriStateSelect
+        id="isProductItemFilter"
+        label="Product Item"
+        value={isProductItemFilter}
+        onChange={setIsProductItemFilter}
+        allLabel="All"
+        trueLabel="Product Item"
+        falseLabel="Non-Product Item"
+      />
+      <TriStateSelect
+        id="isStockTrackedFilter"
+        label="Stock Tracked"
+        value={isStockTrackedFilter}
+        onChange={setIsStockTrackedFilter}
+        allLabel="All"
+        trueLabel="Stock Tracked"
+        falseLabel="Non-Stock Tracked"
+      />
+      <TriStateSelect
+        id="isExpiringProductFilter"
+        label="Expiring Product"
+        value={isExpiringProductFilter}
+        onChange={setIsExpiringProductFilter}
+        allLabel="All"
+        trueLabel="Expiring Product"
+        falseLabel="Non-Expiring Product"
+      />
+      <TriStateSelect
+        id="isBatchTrackedFilter"
+        label="Batch Tracked"
+        value={isBatchTrackedFilter}
+        onChange={setIsBatchTrackedFilter}
+        allLabel="All"
+        trueLabel="Batch Tracked"
+        falseLabel="Non-Batch Tracked"
+      />
+    </div>
+
+    {/* Row 2: Dynamic Search & Dropdowns */}
+    <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-slate-100">
+      
+      {/* Filter By Selection */}
+      <div className="flex items-center gap-2 min-w-[240px]">
+        <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Filter By:</label>
+        <select
+          value={selectedFilterBy.value}
+          onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
+          className="w-full px-2.5 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+        >
+          <option value="" disabled>Select Filter</option>
+          {filterByOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.displayName}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="flex justify-between w-full items-center my-2">
-        <div className="pl-1">
-          <span className="text-sm font-medium text-gray-500">{totalRecords} items found</span>
+      {/* Dynamic Text Search */}
+      {[1, 2, 3, 6, 7].includes(selectedFilterBy.value) && (
+        <div className="flex items-center gap-2 flex-1 min-w-[280px]">
+          <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Search:</label>
+          <input
+            type="text"
+            ref={searchInputRef}
+            value={searchValue.value}
+            onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full px-3 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+            placeholder="Enter search value..."
+          />
+          <button
+            type="button"
+            onClick={loadProducts}
+            className="px-4 py-1.5 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none transition whitespace-nowrap"
+          >
+            Search
+          </button>
         </div>
+      )}
 
-        <DaisyUIPaginator
-          currentPage={currentPage}
-          rowsPerPage={rowsPerPage}
-          totalRecords={totalRecords}
-          onPageChange={onPageChange}
-          rowsPerPageOptions={[10, 30, 50, 100]}
-        />
-      </div>
+      {/* Category Dropdown */}
+      {selectedFilterBy.value === 4 && (
+        <div className="flex items-center gap-2 min-w-[240px]">
+          <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Category:</label>
+          <select
+            value={selectedCategoryId}
+            onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
+            className="w-full px-2.5 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+          >
+            <option value="" disabled>Select Category</option>
+            {categoryOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Unit Dropdown */}
+      {selectedFilterBy.value === 5 && (
+        <div className="flex items-center gap-2 min-w-[240px]">
+          <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Unit:</label>
+          <select
+            value={selectedMeasurementUnitId}
+            onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
+            className="w-full px-2.5 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+          >
+            <option value="" disabled>Select Unit</option>
+            {measurementUnitOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+    </div>
+  </div>
+</div>
+
 
       {/* Main Table Structure */}
       <ReusableTable
         data={products}
         isLoading={isTableDataLoading}
         columns={productColumns}
+
+  currentPage={currentPage}
+  rowsPerPage={rowsPerPage}
+  totalRecords={totalRecords}
+  onPageChange={onPageChange}
+  rowsPerPageOptions={[10, 30, 50, 100]}
+  paginationPosition="top"
+
+
         customActions={(item) => (
           <ProductInventoryActionMenu
             item={item}

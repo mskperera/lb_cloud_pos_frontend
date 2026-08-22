@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect } from 'react';
 import moment from 'moment';
 import './ReceiptComponent.css';
 import { PAYMENT_METHODS } from '../../../utils/constants';
+import { formatUtcToLocal } from '../../../utils/format';
 
 const ReceiptComponent = forwardRef(
   ({ orderHeader, orderDetails, payments, currency, setCashPaymentChage }, ref) => {
@@ -43,12 +44,7 @@ const ReceiptComponent = forwardRef(
   <div className="detail-row">
     <span>Date</span>
     <span>
-      {orderHeader?.createdDate_UTC
-        ? moment
-            .utc(orderHeader.createdDate_UTC)
-            .local()
-            .format("YYYY-MMM-DD hh:mm A")
-        : "N/A"}
+      {formatUtcToLocal(orderHeader?.createdDate_UTC)}
     </span>
   </div>
 

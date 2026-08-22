@@ -19,8 +19,10 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const store = JSON.parse(localStorage.getItem('selectedStore'));
+  const searchContainerRef = useRef(null);
   const inputRef = useRef(null);
   const buttonRef = useRef(null);
   const showToast = useToast();
@@ -73,12 +75,17 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
     const value = e.target.value;
     setSearchTerm(value);
 
-    if (barcodeMode) return;
+    if (barcodeMode) {
+      setIsDropdownOpen(false);
+      return;
+    }
 
     if (value.trim() === '') {
       setProducts([]);
       setSelectedIndex(-1);
+      setIsDropdownOpen(false);
     } else {
+      setIsDropdownOpen(true);
       fetchKeywordProducts(value);
     }
   };
@@ -112,6 +119,7 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
         setSearchTerm('');
         setProducts([]);
         setSelectedIndex(-1);
+        setIsDropdownOpen(false);
       }
     }
 
@@ -130,6 +138,7 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
     setSearchTerm('');
     setProducts([]);
     setSelectedIndex(-1);
+    setIsDropdownOpen(false);
     inputRef.current?.focus();
   };
 
@@ -138,6 +147,7 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
     setSearchTerm('');
     setProducts([]);
     setSelectedIndex(-1);
+    setIsDropdownOpen(false);
     setShowModeMenu(false);
     inputRef.current?.focus();
   };
@@ -158,13 +168,30 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (!searchContainerRef.current?.contains(event.target)) {
+        fetchKeywordProducts.cancel();
+        setProducts([]);
+        setSelectedIndex(-1);
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      fetchKeywordProducts.cancel();
+    };
+  }, [fetchKeywordProducts]);
+
   // Dynamic background color based on mode
   const inputBgColor = barcodeMode 
     ? 'var(--lpos-barcode-bg, #34c759)'   // Light Green for Barcode
     : 'var(--lpos-search-bg, #0284c7)';   // Warm Blue for Search
 
   return (
-    <div className="relative w-full border-gray-400 ">
+    <div ref={searchContainerRef} className="relative w-full border-gray-400 ">
       <div className="flex items-center gap-3 w-full">
         <div className="relative flex-1">
           <div 
@@ -225,7 +252,7 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
           </div>
 
           {/* Results Dropdown - Already styled in previous response */}
-          {!barcodeMode && (loading || products.length > 0) && (
+          {!barcodeMode && isDropdownOpen && (loading || products.length > 0) && (
             <div 
               className="absolute  top-full mt-2 w-full shadow-2xl z-40 max-h-96 overflow-hidden"
               style={{
@@ -346,7 +373,7 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
           )}
 
           {/* No Results */}
-          {!barcodeMode && searchTerm && !loading && products.length === 0 && searchTerm.length > 1 && (
+          {!barcodeMode && isDropdownOpen && searchTerm && !loading && products.length === 0 && searchTerm.length > 1 && (
             <div 
               className="absolute top-full mt-2 w-full text-center py-10 text-gray-500"
               style={{
