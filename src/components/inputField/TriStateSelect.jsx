@@ -22,7 +22,7 @@ const TriStateSelect = ({
     <div className={`flex items-center justify-between gap-2 ${className}`}>
       <label 
         htmlFor={id} 
-        className="text-xs font-semibold text-slate-700 whitespace-nowrap min-w-[90px]"
+        className="text-sm font-semibold text-slate-700 whitespace-nowrap w-auto"
       >
         {label}
       </label>
@@ -30,7 +30,7 @@ const TriStateSelect = ({
         id={id}
         value={selectedValue}
         onChange={handleChange}
-        className="w-full px-2.5 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded-lg shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-100 transition duration-200"
+        className="w-full px-2.5 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-100 transition duration-200"
       >
         <option value="">{allLabel}</option>
         <option value="true">{trueLabel}</option>

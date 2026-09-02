@@ -21,18 +21,18 @@ export default function ReusableTable({
     if (!onPageChange) return null;
     
     return (
-      <div className="py-2 px-6 bg-white border-t border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-        <div className="text-xs text-gray-500 font-medium">
-           <span className="font-bold text-gray-900">
+      <div className="py-2 px-6 bg-white border-t border-gray-300 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className=" ">
+           <span className="font-bold text-gray-900 text-sm">
    
 
-    {data.length ? (currentPage * rowsPerPage) + 1 : 0}</span> - <span className="font-bold text-gray-800">{Math.min((currentPage + 1) * rowsPerPage, totalRecords)}
+    {data.length ? (currentPage * rowsPerPage) + 1 : 0}</span> - <span className="font-bold text-gray-800 text-sm">{Math.min((currentPage + 1) * rowsPerPage, totalRecords)}
 
    
    </span>
-          <span> of </span>
-          <span className="font-bold text-gray-900">{totalRecords}</span>
-          <span> items found</span>
+          <span className="text-sm"> of </span>
+          <span className="font-bold text-gray-900 text-sm">{totalRecords}</span>
+          <span > items found</span>
         </div>
 
         <div className="flex items-center">
