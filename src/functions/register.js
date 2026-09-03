@@ -93,6 +93,53 @@ export const getProducts = async (data) => {
     return err;
   }
 };
+export const getInventoryProducts = async (data) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .post(`/products/inventory/get`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const getProductsByProductId = async (productId,storeId) => {
+  try {
+    const tenantId = getTenantId();
+    const token = getToken();
+    return await customAxios
+      .get(`/products/get/byProductId?productId=${productId}&storeId=${storeId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
 
 
 export const getProductDetailsByInventoryId = async (inventoryId) => {

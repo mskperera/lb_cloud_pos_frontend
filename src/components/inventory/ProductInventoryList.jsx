@@ -5,9 +5,11 @@ import { formatCurrency, formatUtcToLocal, getCurrency } from "../../utils/forma
 import {
   deleteProduct,
   getBatchedItems,
+  getInventoryProducts,
   getProductExtraDetails,
-  getProducts,
+
   getProductUomList,
+  getProductsByProductId
 } from "../../functions/register";
 import { useToast } from "../useToast";
 import {
@@ -21,11 +23,12 @@ import DaisyUIPaginator from "../DaisyUIPaginator";
 import ConfirmDialog from "../dialog/ConfirmDialog";
 import TriStateSelect from "../inputField/TriStateSelect";
 import DialogModel from "../model/DialogModel";
+import AddProduct from "../product/AddProduct";
 
 import { FaPlus, FaBoxes, FaTags, FaLayerGroup, FaBarcode, FaInfoCircle, FaEye } from "react-icons/fa";
 import ProductInventoryActionMenu from "./ProductInventoryActionMenu";
-import { CURRENCY_DISPLAY_TYPE } from "../../utils/constants";
-import { Eye } from "lucide-react";
+import { CURRENCY_DISPLAY_TYPE, SAVE_TYPE } from "../../utils/constants";
+import { Eye, Boxes } from "lucide-react";
 import ReusableTable from "../ReusableTable";
 import moment from "moment";
 
@@ -769,7 +772,7 @@ const ProductDetails = ({ selectedProduct }) => {
           <div className="flex items-center justify-between mb-3 border-b pb-2">
             <div className="flex items-center gap-2 text-slate-800 font-semibold text-sm">
               <FaBarcode className="text-blue-600" />
-              <span>Extra Details</span>
+              <span>Variations</span>
             </div>
             {variations.length > 1 && selectedProduct.isBatchTracked && (
               <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium border border-blue-200">
@@ -783,7 +786,7 @@ const ProductDetails = ({ selectedProduct }) => {
     <table className="w-full text-xs text-left text-slate-600">
       <thead className="bg-slate-50 text-slate-700 uppercase font-bold text-[10px] border-b">
         <tr>
-          <th className="py-2 px-2">SKU / Variation</th>
+          <th className="py-2 px-2">SKU</th>
           <th className="py-2 px-2 text-center">Barcode</th>
 
           {/* Hide Cost header if batchTracked */}
@@ -1234,6 +1237,8 @@ export default function ProductInventoryList({}) {
   // Modal State for Product Details
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedProductDetails, setSelectedProductDetails] = useState(null);
+  const [showAddProductDialog, setShowAddProductDialog] = useState(false);
+  const [productToEdit, setProductToEdit] = useState(null);
 
   const handleOpenProductDetails = (product) => {
     setSelectedProductDetails(product);
@@ -1258,7 +1263,78 @@ export default function ProductInventoryList({}) {
   };
 
   const handleEdit = (item) => {
-    navigate(`/products/edit?saveType=update&id=${item.productId}`);
+    setProductToEdit(item);
+    setShowAddProductDialog(true);
+  };
+
+  const handleCloseProductDialog = () => {
+    setShowAddProductDialog(false);
+    setProductToEdit(null);
+  };
+
+
+  
+  const handleProductSaved = async ({ id, payload }) => {
+    try {
+      const storeId = selectedStoreId !== -1 ? selectedStoreId : selectedStore?.storeId ?? -1;
+      const res = await getProductsByProductId(id, storeId);
+      const refreshedProducts = Array.isArray(res?.data?.results?.[0]) ? res.data.results[0] : [];
+
+      if (!refreshedProducts.length) {
+        handleCloseProductDialog();
+        return;
+      }
+
+      setProducts((currentProducts) =>
+        currentProducts.map((product) => {
+          const matchingProduct = refreshedProducts.find((item) => {
+            if (product.variationProductId && item.variationProductId) {
+              return Number(product.variationProductId) === Number(item.variationProductId);
+            }
+
+            return Number(product.productId) === Number(item.productId) &&
+              Number(product.allProductId ?? product.productId) === Number(item.allProductId ?? item.productId);
+          });
+
+          if (!matchingProduct) return product;
+
+          return {
+            ...product,
+            ...matchingProduct,
+            productName: matchingProduct.productName ?? product.productName,
+            productDescription: matchingProduct.productDescription ?? product.productDescription,
+            measurementUnitId: matchingProduct.measurementUnitId ?? product.measurementUnitId,
+            measurementUnitName: matchingProduct.measurementUnitName ?? product.measurementUnitName,
+            reorderLevel: matchingProduct.reorderLevel ?? product.reorderLevel,
+            isNotForSelling: Number(matchingProduct.isNotForSelling ?? product.isNotForSelling ?? 0),
+            isUnique: Number(matchingProduct.isUnique ?? product.isUnique ?? 0),
+            isMultiUom: Number(matchingProduct.isMultiUom ?? product.isMultiUom ?? 0),
+            isStockTracked: Number(matchingProduct.isStockTracked ?? product.isStockTracked ?? 0),
+            isProductItem: Number(matchingProduct.isProductItem ?? product.isProductItem ?? 0),
+            isAssemblyProduct: Number(matchingProduct.isAssemblyProduct ?? product.isAssemblyProduct ?? 0),
+            isBatchTracked: Number(matchingProduct.isBatchTracked ?? product.isBatchTracked ?? 0),
+            isExpiringProduct: Number(matchingProduct.isExpiringProduct ?? product.isExpiringProduct ?? 0),
+            sku: matchingProduct.sku ?? product.sku,
+            unitCost: matchingProduct.unitCost ?? product.unitCost,
+            unitPrice: matchingProduct.unitPrice ?? product.unitPrice,
+            taxPerc: matchingProduct.taxPerc ?? product.taxPerc,
+            barcode: matchingProduct.barcode ?? product.barcode,
+            barcodeSkuLevel: matchingProduct.barcodeSkuLevel ?? product.barcodeSkuLevel,
+            barcodeSource: matchingProduct.barcodeSource ?? product.barcodeSource,
+            categories: matchingProduct.categories ?? product.categories,
+            imageUrl: matchingProduct.imageUrl ?? product.imageUrl,
+            brandId: matchingProduct.brandId ?? product.brandId,
+            brandName: matchingProduct.brandName ?? product.brandName,
+            productTypeId: matchingProduct.productTypeId ?? product.productTypeId,
+            productTypeName: matchingProduct.productTypeName ?? product.productTypeName,
+          };
+        })
+      );
+    } catch (error) {
+      console.error("Error refreshing product from API after save:", error);
+    } finally {
+      handleCloseProductDialog();
+    }
   };
 
   const handleManage = (item) => {
@@ -1324,7 +1400,7 @@ export default function ProductInventoryList({}) {
         limit: limit,
       };
 
-      const _result = await getProducts(filteredData, null);
+      const _result = await getInventoryProducts(filteredData, null);
       const { totalRows } = _result.data.outputValues;
       setTotalRecords(totalRows);
       setProducts(_result.data.results[0] || []);
@@ -1461,102 +1537,708 @@ export default function ProductInventoryList({}) {
     setProductIdToDelete("");
   };
 
+const cleanString = (val) => {
+  if (val === null || val === undefined) return "";
+  return String(val)
+    .replace(/^["']|["']$/g, "") // remove surrounding quotes
+    .replace(/\\"/g, '"')       // clean escaped quotes
+    .trim();
+};
 
+// Helper function to extract cleanly formatted items from arrays or CSV strings
+const parseValuesList = (rawInput) => {
+  if (!rawInput) return [];
+  
+  if (Array.isArray(rawInput)) {
+    return rawInput.map(cleanString).filter(Boolean);
+  }
+  
+  return String(rawInput)
+    .split(",")
+    .map(cleanString)
+    .filter(Boolean);
+};
+
+
+const parseRangeItems = (rawInput) => {
+  if (!rawInput) return [];
+
+  // Convert to string and strip [, ], quotes, and escaped quotes
+  let cleaned = String(rawInput)
+    .replace(/[\[\]"']/g, "")
+    .replace(/\\"/g, "")
+    .trim();
+
+  // If items are separated by double dots ".." or commas ",", split them
+  const parts = cleaned
+    .split(/\.\.|,/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  return parts;
+};
+
+const [hoveredImage, setHoveredImage] = useState({
+    visible: false,
+    url: "",
+    x: 0,
+    y: 0,
+  });
+
+  const handleMouseEnter = (e, imageUrl) => {
+    if (!imageUrl) return;
+    setHoveredImage({
+      visible: true,
+      url: `${process.env.REACT_APP_API_CDN}/${imageUrl}?width=800&height=800&quality=90`,
+      x: e.clientX + 15, // Offset 15px right of cursor
+      y: e.clientY + 15, // Offset 15px below cursor
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!hoveredImage.visible) return;
+    setHoveredImage((prev) => ({
+      ...prev,
+      x: e.clientX + 15,
+      y: e.clientY + 15,
+    }));
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredImage({ visible: false, url: "", x: 0, y: 0 });
+  };
+
+
+
+
+
+  
   // Define table columns configuration
   const productColumns = [
-    {
+    // {
+    //   header: "Product Information",
+    //   key: "productInformation",
+    //   render: (item) => {
+    //     const isPhysicalProduct = item.isProductItem === 1;
+    //     return (
+    //       <>
+    //         <div className="flex items-center gap-1.5 flex-wrap">
+    //           <span className="font-mono text-xs font-semibold text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+    //             {item.sku || "NO-SKU"}
+    //           </span>
+    //           {!isPhysicalProduct && (
+    //             <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+    //               Service / Non-Product
+    //             </span>
+    //           )}
+    //           {item.isAssemblyProduct === 1 && (
+    //             <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+    //               Assembly
+    //             </span>
+    //           )}
+    //           {item.isMultiUom === 1 && (
+    //             <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+    //               Multi-UOM
+    //             </span>
+    //           )}
+    //           {item.barcodeSource === "UOM" && (
+    //             <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+    //               UOM Scan
+    //             </span>
+    //           )}
+    //         </div>
+    //         <div className="text-sm font-medium text-gray-900 mt-1 line-clamp-1">
+    //           {item.productName}
+    //         </div>
+    //       </>
+    //     );
+    //   },
+    // },
+ 
+
+//     {
+//     header: "Product Information",
+//     key: "productInformation",
+//     render: (item) => {
+//       const isPhysicalProduct = item.isProductItem === 1;
+
+//       // Safely parse variation details
+//       let parsedVariations = [];
+//       if (item.variationDetails) {
+//         try {
+//           parsedVariations = typeof item.variationDetails === "string"
+//             ? JSON.parse(item.variationDetails)
+//             : item.variationDetails;
+//         } catch (e) {
+//           console.error("Failed to parse variationDetails", e);
+//         }
+//       }
+
+//       return (
+//         <div className="flex flex-col gap-1 py-1">
+//           {/* Top Row: System Meta & Status Badges */}
+//           <div className="flex items-center gap-1.5 flex-wrap">
+//             {/* <span className="font-mono text-xs font-semibold text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+//               {item.sku || "NO-SKU"}
+//             </span> */}
+//             {!isPhysicalProduct && (
+//               <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+//                 Service / Non-Product
+//               </span>
+//             )}
+//             {item.isAssemblyProduct === 1 && (
+//               <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+//                 Assembly
+//               </span>
+//             )}
+//             {item.isMultiUom === 1 && (
+//               <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+//                 Multi-UOM
+//               </span>
+//             )}
+//             {item.barcodeSource === "UOM" && (
+//               <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+//                 UOM Scan
+//               </span>
+//             )}
+//           </div>
+
+//           {/* Primary Identifier: Product Name */}
+//           <div className="text-sm font-semibold text-gray-900 line-clamp-1">
+//             {item.productName}
+//           </div>
+
+//       {!isNaN(Number(item.variationDisplay)) && Number(item.variationDisplay) > 1 && (
+//   <div className="flex items-center gap-1.5">
+//     <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+//       <span className="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+//       {item.variationDisplay} Variations
+//     </span>
+//   </div>
+// )}
+
+//           {/* Bottom Row: Dynamic Variation Details */}
+//           {/* {Array.isArray(parsedVariations) && parsedVariations.length > 0 && (() => {
+//             const groupedVariations = parsedVariations.reduce((acc, item) => {
+//               const typeName = String(item?.typeName || item?.variationTypeName || "Option").trim() || "Option";
+//               const value = item?.value ?? "-";
+
+//               if (!acc[typeName]) {
+//                 acc[typeName] = [];
+//               }
+
+//               if (!acc[typeName].includes(value)) {
+//                 acc[typeName].push(value);
+//               }
+
+//               return acc;
+//             }, {});
+
+//             const entries = Object.entries(groupedVariations);
+//             const accentColors = [
+//               "bg-sky-50 text-sky-700 border-sky-200",
+//               "bg-violet-50 text-violet-700 border-violet-200",
+//               "bg-emerald-50 text-emerald-700 border-emerald-200",
+//               "bg-amber-50 text-amber-700 border-amber-200",
+//               "bg-rose-50 text-rose-700 border-rose-200",
+//             ];
+
+//             return (
+//               <div className="mt-1 flex flex-wrap items-center gap-1.5">
+//                 {entries.map(([typeName, values], index) => {
+//                   const colorClass = accentColors[index % accentColors.length];
+//                   const displayValue = values.join(", ");
+
+//                   return (
+//                     <span
+//                       key={`${typeName}-${index}`}
+//                       className={`inline-flex max-w-full items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium shadow-sm ${colorClass}`}
+//                       title={`${typeName}: ${displayValue}`}
+//                     >
+//                       <span className="opacity-80 whitespace-nowrap">{typeName}</span>
+//                       <span className="h-1 w-1 rounded-full bg-current opacity-70"></span>
+//                       <span className="font-semibold whitespace-nowrap">{displayValue}</span>
+//                     </span>
+//                   );
+//                 })}
+//               </div>
+//             );
+//           })()} */}
+//         </div>
+//       );
+//     },
+//   },
+
+
+// {
+//       header: "Product Information",
+//       key: "productInformation",
+//       render: (item) => {
+//         const isPhysicalProduct = item.isProductItem === 1;
+
+//         return (
+//           <div className="flex items-center gap-3 py-1">
+//             {/* Thumbnail Image Container */}
+//             <div className="w-10 h-10 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+//               {item.imageUrl ? (
+//                 <img
+//                   src={`${process.env.REACT_APP_API_CDN}/${item.imageUrl}?width=200&height=200&quality=80`}
+//                   alt={item.productName || "Product image"}
+//                   className="w-full h-full object-cover"
+//                   onError={(e) => {
+//                     // Fallback to default icon if the CDN URL fails to load
+//                     e.target.style.display = "none";
+//                     if (e.target.nextSibling) {
+//                       e.target.nextSibling.style.display = "flex";
+//                     }
+//                   }}
+//                 />
+//               ) : null}
+//               {/* Fallback Box Icon (shows when imageUrl is missing or broken) */}
+//               <div
+//                 className={`w-full h-full items-center justify-center text-slate-400 bg-slate-100 ${
+//                   item.imageUrl ? "hidden" : "flex"
+//                 }`}
+//               >
+//                 <FaBoxes className="w-4 h-4" />
+//               </div>
+//             </div>
+
+//             {/* Existing Product Meta Info */}
+//             <div className="flex flex-col gap-1 min-w-0 flex-1">
+//               {/* Top Row: System Meta & Status Badges */}
+//               <div className="flex items-center gap-1.5 flex-wrap">
+//                 {!isPhysicalProduct && (
+//                   <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+//                     Service / Non-Product
+//                   </span>
+//                 )}
+//                 {item.isAssemblyProduct === 1 && (
+//                   <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+//                     Assembly
+//                   </span>
+//                 )}
+//                 {item.isMultiUom === 1 && (
+//                   <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+//                     Multi-UOM
+//                   </span>
+//                 )}
+//                 {item.barcodeSource === "UOM" && (
+//                   <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+//                     UOM Scan
+//                   </span>
+//                 )}
+//               </div>
+
+//               {/* Primary Identifier: Product Name */}
+//               <div className="text-sm font-semibold text-gray-900 line-clamp-1">
+//                 {item.productName}
+//               </div>
+
+//               {!isNaN(Number(item.variationDisplay)) && Number(item.variationDisplay) > 1 && (
+//                 <div className="flex items-center gap-1.5">
+//                   <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+//                     <span className="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+//                     {item.variationDisplay} Variations
+//                   </span>
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+//         );
+//       },
+//     },
+
+
+
+{
       header: "Product Information",
       key: "productInformation",
       render: (item) => {
         const isPhysicalProduct = item.isProductItem === 1;
+
         return (
-          <>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-mono text-xs font-semibold text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
-                {item.sku || "NO-SKU"}
-              </span>
-              {!isPhysicalProduct && (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
-                  Service / Non-Product
-                </span>
-              )}
-              {item.isAssemblyProduct === 1 && (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  Assembly
-                </span>
-              )}
-              {item.isMultiUom === 1 && (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
-                  Multi-UOM
-                </span>
-              )}
-              {item.barcodeSource === "UOM" && (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                  UOM Scan
-                </span>
+          <div className="flex items-center gap-3 py-1">
+            {/* Thumbnail Image Container */}
+            <div
+              className={`w-10 h-10 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs ${
+                item.imageUrl ? "cursor-pointer" : ""
+              }`}
+              onMouseEnter={(e) => handleMouseEnter(e, item.imageUrl)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              {item.imageUrl ? (
+                <img
+                  src={`${process.env.REACT_APP_API_CDN}/${item.imageUrl}?width=200&height=200&quality=80`}
+                  alt={item.productName || "Product image"}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    if (e.target.nextSibling) {
+                      e.target.nextSibling.style.display = "flex";
+                    }
+                  }}
+                />
+              ) : null}
+              {/* Fallback Box Icon */}
+              <div
+                className={`w-full h-full items-center justify-center text-slate-400 bg-slate-100 ${
+                  item.imageUrl ? "hidden" : "flex"
+                }`}
+              >
+                <FaBoxes className="w-4 h-4" />
+              </div>
+            </div>
+
+            {/* Existing Product Meta Info */}
+            <div className="flex flex-col gap-1 min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {!isPhysicalProduct && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+                    Service / Non-Product
+                  </span>
+                )}
+                {item.isAssemblyProduct === 1 && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    Assembly
+                  </span>
+                )}
+                {item.isMultiUom === 1 && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                    Multi-UOM
+                  </span>
+                )}
+                {item.barcodeSource === "UOM" && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                    UOM Scan
+                  </span>
+                )}
+              </div>
+
+              <div className="text-sm font-semibold text-gray-900 line-clamp-1">
+                {item.productName}
+              </div>
+
+              {!isNaN(Number(item.variationDisplay)) && Number(item.variationDisplay) > 1 && (
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+                    {item.variationDisplay} Variations
+                  </span>
+                </div>
               )}
             </div>
-            <div className="text-sm font-medium text-gray-900 mt-1 line-clamp-1">
-              {item.productDescription || item.productName}
-            </div>
-          </>
+          </div>
         );
       },
     },
-    {
-      header: "Stock Qty",
-      key: "stockQty",
-      headerClass: "text-center",
-      cellClass: "text-center",
-      render: (item) => {
-        const isPhysicalProduct = item.isProductItem === 1;
-        const stockVal = Number(item.stockQty ?? 0);
-        const reorderVal = item.reorderLevel ? Number(item.reorderLevel) : null;
-        const isOutOfStock = item.isStockTracked && stockVal <= 0;
-        const isReorderWarning = item.isStockTracked && reorderVal !== null && stockVal <= reorderVal;
 
-        const getStockBadgeStyle = () => {
-          if (isOutOfStock) return "bg-rose-100 text-rose-700 border-rose-300 font-bold animate-pulse";
-          if (isReorderWarning) return "bg-amber-100 text-amber-800 border-amber-300 font-semibold";
-          return "bg-emerald-50 text-emerald-700 border-emerald-200";
-        };
+  {
+  header: "SKU",
+  key: "sku",
+  headerClass: "text-left",
+  cellClass: "text-left font-mono text-slate-700",
+  render: (item) => {
+    const skuList = parseRangeItems(item.skus);
 
-        if (item.isStockTracked) {
-          return (
-            <span
-              className={`text-xs font-mono px-2.5 py-0.5 rounded-full border inline-flex items-center gap-1.5 ${getStockBadgeStyle()}`}
-              title={
-                isOutOfStock
-                  ? "Out of stock!"
-                  : isReorderWarning
-                  ? "Stock is at or below reorder level!"
-                  : "Stock healthy"
-              }
-            >
-              {item.formattedQty}
+    if (skuList.length === 0) {
+      return <span className="text-xs text-gray-400 italic">NO-SKU</span>;
+    }
+
+    // Single SKU
+    if (skuList.length === 1) {
+      return (
+        <div className="flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-mono font-semibold text-slate-700 shadow-2xs">
+            {/* <span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span> */}
+            {skuList[0]}
+          </span>
+        </div>
+      );
+    }
+
+    const firstSku = skuList[0];
+    const lastSku = skuList[skuList.length - 1];
+
+    return (
+      <div className="relative group inline-block">
+        {/* Separated Batch Badges */}
+        <div className="cursor-pointer flex items-center gap-1.5">
+          
+          {/* First SKU Badge */}
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-mono font-semibold text-slate-700 shadow-2xs">
+           {/* <span className="h-1.5 w-1.5 rounded-full bg-sky-500"></span> */}
+            {firstSku}
+          </span><span className="text-xs font-light">..</span>
+
+          {/* <span className="text-[10px] font-extrabold text-slate-400">..</span> */}
+
+          {/* Last SKU Badge */}
+            {/* <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-mono font-semibold text-slate-700 shadow-2xs">
+      
+            {lastSku}
+          </span> */}
+
+          {/* Count Badge */}
+          {/* <span className="text-[10px] font-extrabold text-slate-500 bg-slate-200 rounded-full px-1.5 py-0.2 ml-0.5">
+            +{skuList.length}
+          </span> */}
+        </div>
+
+        {/* Hover Popover Listing All Items */}
+        <div className="pointer-events-none group-hover:pointer-events-auto opacity-0 group-hover:opacity-100 transition-all duration-150 ease-out translate-y-1 group-hover:translate-y-0 absolute left-0 top-full mt-1.5 z-50 min-w-[200px] max-w-[280px] bg-white rounded-xl shadow-xl border border-slate-200 p-3 backdrop-blur-md">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-1.5 mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+               SKUs
             </span>
-          );
-        }
+            <span className="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200 rounded-full px-2 py-0.5">
+              {skuList.length} Items
+            </span>
+          </div>
+          <div className="max-h-48 overflow-y-auto flex flex-col gap-1 pr-1 custom-scrollbar">
+            {skuList.map((sku, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between font-mono text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md hover:bg-sky-50 hover:border-sky-200 hover:text-sky-800 transition-colors"
+              >
+                <span className="text-sm font-sans text-slate-400 font-bold">
+                  #{idx + 1}
+                </span>
+                <span className="font-sans text-[11px] font-semibold text-slate-600 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-2xs truncate max-w-[130px]">
+                    {sku}
+                  </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  },
+},
 
+{
+    header: "Category",
+    key: "categories",
+    headerClass: "text-left",
+    cellClass: "text-left",
+    render: (item) => {
+      // Safely parse JSON string or handle pre-parsed array
+      const categoriesList = (() => {
+        const raw = item.categories;
+        if (!raw) return [];
+        if (Array.isArray(raw)) return raw;
+        try {
+          return typeof raw === "string" ? JSON.parse(raw) : [];
+        } catch (err) {
+          console.error("Failed to parse categories", err);
+          return [];
+        }
+      })();
+
+      if (categoriesList.length === 0) {
+        return <span className="text-xs text-slate-400 italic">-</span>;
+      }
+
+      const firstCategory = categoriesList[0]?.displayName || categoriesList[0]?.name || "Uncategorized";
+
+      // Single Category Display
+      if (categoriesList.length === 1) {
         return (
-          <span className="text-xs font-medium text-gray-400 italic">
-            {!isPhysicalProduct ? "N/A (Service)" : "Non-Tracked"}
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700 shadow-2xs">
+            {/* <span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span> */}
+            {firstCategory}
           </span>
         );
-      },
-    },
-    {
-      header: "Reorder Level",
-      key: "reorderLevel",
-      headerClass: "text-center",
-      cellClass: "text-center",
-      render: (item) => {
-        const stockVal = Number(item.stockQty ?? 0);
-        const reorderVal = item.reorderLevel ? Number(item.reorderLevel) : null;
-        const isReorderWarning = item.isStockTracked && reorderVal !== null && stockVal <= reorderVal;
+      }
 
-        if (reorderVal !== null) {
-          return (
+      // Multiple Categories Display with Popover
+      return (
+        <div className="relative group inline-block text-left">
+          <div className="cursor-pointer flex items-center gap-1.5">
+            {/* Primary Category Badge */}
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700 shadow-2xs">
+              {/* <span className="h-1.5 w-1.5 rounded-full bg-indigo-500"></span> */}
+              {firstCategory} 
+            </span><span className="text-xs font-light">..</span>
+
+            {/* Overflow Counter Badge */}
+            <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-1.5 py-0.5">
+            +{categoriesList.length-1}
+            </span>
+          </div>
+
+          {/* Hover Popover listing all categories */}
+          <div className="pointer-events-none group-hover:pointer-events-auto opacity-0 group-hover:opacity-100 transition-all duration-150 ease-out translate-y-1 group-hover:translate-y-0 absolute left-0 top-full mt-1.5 z-50 min-w-[180px] max-w-[240px] bg-white rounded-xl shadow-xl border border-slate-200 p-2.5 backdrop-blur-md">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-1.5 mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Categories
+              </span>
+              {/* <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5">
+                {categoriesList.length} Total
+              </span> */}
+            </div>
+
+            <div className="max-h-40 overflow-y-auto flex flex-col gap-1 pr-1 custom-scrollbar">
+              {categoriesList.map((cat, idx) => (
+                <div
+                  key={cat.id || idx} className="font-sans  font-semibold text-slate-600 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-2xs w-fit">
+                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 shrink-0"></span>
+                  <span className="truncate text-xs">{cat.displayName || cat.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    },
+  },
+
+{
+  header: `Unit Price (${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)})`,
+  key: "unitPrice",
+  headerClass: "text-right",
+  cellClass: "text-right font-mono font-semibold text-sm text-sky-600",
+  render: (item) => {
+    // Safely parse JSON array or handle pre-parsed array from backend
+    const itemsList = (() => {
+      const rawDetails = item.skuPriceDetails;
+      if (!rawDetails) return [];
+      if (Array.isArray(rawDetails)) return rawDetails;
+      try {
+        return typeof rawDetails === "string" ? JSON.parse(rawDetails) : [];
+      } catch (err) {
+        return [];
+      }
+    })();
+
+    const formatPrice = (val) => {
+      const num = Number(val);
+      if (!isNaN(num) && val !== "" && val !== null && val !== undefined) {
+        return `${formatCurrency(num, false)}`;
+      }
+      return `${val || "-"}`;
+    };
+
+    if (itemsList.length === 0) {
+      return <span className="text-gray-400 font-normal italic">-</span>;
+    }
+
+    // Single Price Display
+    if (itemsList.length === 1) {
+      return (
+        <div className="flex items-center justify-end">
+          <span className="text-sm font-semibold text-sky-700">
+            {formatPrice(itemsList[0]?.unitPrice)}
+          </span>
+        </div>
+      );
+    }
+
+    const firstPrice = formatPrice(itemsList[0]?.unitPrice);
+    const lastPrice = formatPrice(itemsList[itemsList.length - 1]?.unitPrice);
+
+    return (
+      <div className="relative group inline-block text-right">
+        {/* Separated Batch Badges for Multiple Prices */}
+        <div className="cursor-pointer flex items-center gap-1.5">
+          {/* First Price Badge */}
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-sky-200 bg-sky-50 px-2 py-0.5 text-xs font-mono font-bold text-sky-700 shadow-2xs">
+            {firstPrice}
+          </span><span className="text-xs font-light">..</span>
+
+          {/* Show '..' separator only when there are more than 2 variations */}
+          {/* {itemsList.length > 2 && ( */}
+            {/* <span className="text-[10px] font-extrabold text-slate-400">..</span> */}
+          {/* )} */}
+
+          {/* Last Price Badge */}
+          {/* <span className="inline-flex items-center gap-1.5 rounded-md border border-sky-200 bg-sky-50 px-2 py-0.5 text-xs font-mono font-bold text-sky-700 shadow-2xs">
+            {lastPrice}
+          </span> */}
+
+          {/* Count Badge reflecting full variations length */}
+          {/* <span className="text-[10px] font-extrabold text-slate-500 bg-slate-200 rounded-full px-1.5 py-0.2 ml-0.5">
+            +{itemsList.length}
+          </span> */}
+        </div>
+
+        {/* Hover Popover Displaying SKU & Price from skuPriceDetails */}
+        <div className="pointer-events-none group-hover:pointer-events-auto opacity-0 group-hover:opacity-100 transition-all duration-150 ease-out translate-y-1 group-hover:translate-y-0 absolute right-0 top-full mt-1.5 z-50 min-w-[250px] max-w-[320px] bg-white rounded-xl shadow-xl border border-slate-200 p-3 backdrop-blur-md text-left">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-1.5 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              SKU & Price Breakdown
+            </span>
+            <span className="text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 rounded-full px-2 py-0.5">
+              {itemsList.length} Items
+            </span>
+          </div>
+
+          <div className="max-h-52 overflow-y-auto flex flex-col gap-1.5 pr-1 custom-scrollbar">
+            {itemsList.map((entry, idx) => {
+              const matchedSku = entry?.sku || `Item ${idx + 1}`;
+
+              return (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between gap-3 font-mono text-xs bg-slate-50 border border-slate-100 px-2.5 py-1.5 rounded-lg hover:bg-sky-50/60 hover:border-sky-200 transition-colors"
+                >
+                  {/* SKU Badge */}
+                  <span className="font-sans text-[11px] font-semibold text-slate-600 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-2xs truncate max-w-[130px]">
+                    {matchedSku}
+                  </span>
+
+                  {/* Price */}
+                  <span className="text-xs font-bold text-sky-700 whitespace-nowrap">
+                    {formatPrice(entry?.unitPrice)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  },
+},
+ 
+{
+  header: "Stock Qty",
+  key: "stockQty",
+  headerClass: "text-center",
+  cellClass: "text-center",
+  render: (item) => {
+    const isPhysicalProduct = item.isProductItem === 1;
+    const stockVal = Number(item.stockQty ?? 0);
+    const reorderVal = item.reorderLevel ? Number(item.reorderLevel) : null;
+    const isOutOfStock = item.isStockTracked && stockVal <= 0;
+    const isReorderWarning = item.isStockTracked && reorderVal !== null && stockVal <= reorderVal;
+
+    const getStockBadgeStyle = () => {
+      if (isOutOfStock) return "bg-rose-100 text-rose-700 border-rose-300 font-bold animate-pulse";
+      if (isReorderWarning) return "bg-amber-100 text-amber-800 border-amber-300 font-semibold";
+      return "bg-emerald-50 text-emerald-700 border-emerald-200 font-medium";
+    };
+
+    if (item.isStockTracked) {
+      return (
+        <div className="flex flex-col items-center gap-1.5 py-0.5">
+          {/* Main Stock Qty Badge */}
+          <span
+            className={`text-xs font-mono px-2.5 py-0.5 rounded border inline-flex items-center gap-1 ${getStockBadgeStyle()}`}
+            title={
+              isOutOfStock
+                ? "Out of stock!"
+                : isReorderWarning
+                ? "Stock is at or below reorder level!"
+                : "Stock healthy"
+            }
+          >
+            {item.formattedQty}
+          </span>
+
+          {/* Reorder Level View (Matching your snippet formatting) */}
+          {reorderVal !== null ? (
             <span
               className={`text-xs font-mono px-2 py-0.5 rounded border inline-flex items-center gap-1 ${
                 isReorderWarning
@@ -1566,44 +2248,64 @@ export default function ProductInventoryList({}) {
               title={isReorderWarning ? "Stock is at or below reorder level!" : "Reorder Level"}
             >
               {isReorderWarning && <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>}
-              {reorderVal.toFixed(2)}
+              Reorder Level: {reorderVal.toFixed(2)}
             </span>
-          );
-        }
-
-        return <span className="text-xs text-slate-300 italic">-</span>;
-      },
-    },
-    {
-      header: "Cost Price",
-      key: "unitCost",
-      headerClass: "text-right",
-      cellClass: "text-right font-mono text-slate-700",
-      render: (item) => formatCurrency(item.unitCost, false),
-    },
-    {
-      header: `Unit Price (${getCurrency(CURRENCY_DISPLAY_TYPE.SYMBOL)})`,
-      key: "unitPrice",
-      headerClass: "text-right",
-      cellClass: "text-right font-mono font-semibold text-sm text-sky-600",
-      render: (item) => (
-        <>
-          {formatCurrency(item.unitPrice, false)}
-          {item.measurementUnitName && (
-            <span className="text-xs font-normal text-gray-500 ml-1">
-              / {item.measurementUnitName}
-            </span>
+          ) : (
+            <span className="text-xs text-slate-300 italic">-</span>
           )}
-        </>
+        </div>
+      );
+    }
+
+    return (
+      <span className="text-xs font-medium text-gray-400 italic">
+        {!isPhysicalProduct ? "N/A (Service)" : "Non-Tracked"}
+      </span>
+    );
+  },
+},
+    
+    {
+      header: "Unit",
+      key: "measurementUnitName",
+      headerClass: "text-center",
+      cellClass: "text-center",
+      render: (item) => (
+       <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-mono font-bold text-amber-700 shadow-2xs">
+            {item.measurementUnitName}
+        </span>
       ),
     },
-    {
-      header: "Tax (%)",
-      key: "taxPerc",
-      headerClass: "text-center",
-      cellClass: "text-center text-slate-600 font-mono",
-      render: (item) => (item.taxPerc ? `${item.taxPerc}%` : "0%"),
-    },
+    // {
+    //   header: "Reorder Level",
+    //   key: "reorderLevel",
+    //   headerClass: "text-center",
+    //   cellClass: "text-center",
+    //   render: (item) => {
+    //     const stockVal = Number(item.stockQty ?? 0);
+    //     const reorderVal = item.reorderLevel ? Number(item.reorderLevel) : null;
+    //     const isReorderWarning = item.isStockTracked && reorderVal !== null && stockVal <= reorderVal;
+
+    //     if (reorderVal !== null) {
+    //       return (
+    //         <span
+    //           className={`text-xs font-mono px-2 py-0.5 rounded border inline-flex items-center gap-1 ${
+    //             isReorderWarning
+    //               ? "bg-amber-50 text-amber-800 border-amber-300 font-bold"
+    //               : "bg-slate-50 text-slate-600 border-slate-200 font-medium"
+    //           }`}
+    //           title={isReorderWarning ? "Stock is at or below reorder level!" : "Reorder Level"}
+    //         >
+    //           {isReorderWarning && <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>}
+    //           {reorderVal.toFixed(2)}
+    //         </span>
+    //       );
+    //     }
+
+    //     return <span className="text-xs text-slate-300 italic">-</span>;
+    //   },
+    // },
+
     {
       header: "View",
       key: "viewAction",
@@ -1622,6 +2324,9 @@ export default function ProductInventoryList({}) {
   ];
 
 
+
+
+
   return (
     <div className="px-10 py-4">
       {showDialog && (
@@ -1638,7 +2343,7 @@ export default function ProductInventoryList({}) {
       {/* Product Details Modal Dialog */}
       {showDetailsDialog && selectedProductDetails && (
         <DialogModel
-          header={`Product Details: ${selectedProductDetails.productDescription || selectedProductDetails.productName}`}
+          header={`Product Details: ${selectedProductDetails.productName}`}
           visible={showDetailsDialog}
           onHide={handleCloseProductDetails}
         >
@@ -1646,15 +2351,74 @@ export default function ProductInventoryList({}) {
         </DialogModel>
       )}
 
-      <div>
-        <h3 className="text-center font-bold text-xl text-slate-800">Product Inventory</h3>
-      </div>
+      <DialogModel
+        header={productToEdit ? "Edit Product" : "Create New Product"}
+        visible={showAddProductDialog}
+        onHide={handleCloseProductDialog}
+        width="1200px"
+        height="calc(90vh - 60px)"
+      >
+        <AddProduct
+          key={productToEdit?.productId || "new-product"}
+          saveType={productToEdit ? SAVE_TYPE.UPDATE : SAVE_TYPE.ADD}
+          id={productToEdit?.productId || 0}
+          onSaved={productToEdit ? handleProductSaved : handleCloseProductDialog}
+        />
+      </DialogModel>
+
+
+
+{/* 5. Conditionally Rendered Floating Image Popover */}
+      {hoveredImage.visible && (
+        <div
+          className="fixed z-50 pointer-events-none p-1 bg-white border border-slate-200 rounded-xl shadow-2xl transition-all duration-75"
+          style={{
+            left: `${hoveredImage.x}px`,
+            top: `${hoveredImage.y}px`,
+            transform:
+              hoveredImage.x > window.innerWidth - 300
+                ? "translateX(-100%)"
+                : "none",
+          }}
+        >
+          <img
+            src={hoveredImage.url}
+            alt="Product Preview"
+            className="w-64 h-64 object-cover rounded-lg"
+          />
+        </div>
+      )}
+    
+
+
+         <div className="px-6  flex items-center justify-between">
+         <div className="flex items-center gap-2.5">
+  {/* Icon with styled background badge */}
+  <div className="p-2 text-gray-600  flex items-center justify-center">
+    <Boxes className="w-7 h-7" />
+  </div>
+        <h2 className="text-xl font-bold text-gray-600 tracking-tight">Product Inventory</h2>
+     </div>
+
+        <button
+          onClick={() => {
+            setProductToEdit(null);
+            setShowAddProductDialog(true);
+          }}
+                className="flex text-sm items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold 
+                rounded-lg md:rounded-xl shadow-md hover:bg-emerald-700 transition ml-auto"
+              >
+                <FaPlus className="w-4 h-4" />
+                <span>Create New Product</span>
+              </button>
+     </div>
+      
 
       {/* Filter Section */}
-      <div className="flex flex-col md:flex-row justify-between items-end py-4 gap-4 bg-white rounded-xl border p-6 mt-4 shadow-sm">
+      {/* <div className="flex flex-col md:flex-row justify-between items-end py-4 mb-4 gap-4 bg-white rounded-xl border p-6 mt-4 shadow-sm">
         <div className="flex flex-col md:flex-row w-full gap-6 items-center">
           <div className="flex flex-col gap-4 w-full">
-            <div className="flex flex-wrap gap-4 w-full items-center">
+            <div className="flex flex-wrap gap-6 w-full items-center">
               <div className="w-full sm:w-[180px]">
                 <TriStateSelect
                   id="isProductItemFilter"
@@ -1707,14 +2471,7 @@ export default function ProductInventoryList({}) {
                 />
               </div>
 
-              <button
-                onClick={() => navigate("/products/add")}
-                className="flex text-sm items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white font-semibold 
-                rounded-lg md:rounded-xl shadow-md hover:bg-emerald-700 transition ml-auto"
-              >
-                <FaPlus className="w-4 h-4" />
-                <span>Create New Product</span>
-              </button>
+           
             </div>
 
             <div className="flex flex-wrap gap-4 w-full items-end">
@@ -1798,27 +2555,153 @@ export default function ProductInventoryList({}) {
             </div>
           </div>
         </div>
+      </div> */}
+
+
+
+<div className="bg-white rounded-xl border border-slate-200 p-4 my-4 shadow-sm">
+  <div className="flex flex-col gap-3">
+    
+    {/* Row 1: TriState Selects Grid */}
+    <div className="flex justify-between gap-4 flex-wrap">
+      <TriStateSelect
+        id="isProductItemFilter"
+        label="Product Item"
+        value={isProductItemFilter}
+        onChange={setIsProductItemFilter}
+        allLabel="All"
+        trueLabel="Product Item"
+        falseLabel="Non-Product Item"
+      />
+      <TriStateSelect
+        id="isStockTrackedFilter"
+        label="Stock Tracked"
+        value={isStockTrackedFilter}
+        onChange={setIsStockTrackedFilter}
+        allLabel="All"
+        trueLabel="Stock Tracked"
+        falseLabel="Non-Stock Tracked"
+      />
+      <TriStateSelect
+        id="isExpiringProductFilter"
+        label="Expiring Product"
+        value={isExpiringProductFilter}
+        onChange={setIsExpiringProductFilter}
+        allLabel="All"
+        trueLabel="Expiring Product"
+        falseLabel="Non-Expiring Product"
+      />
+      <TriStateSelect
+        id="isBatchTrackedFilter"
+        label="Batch Tracked"
+        value={isBatchTrackedFilter}
+        onChange={setIsBatchTrackedFilter}
+        allLabel="All"
+        trueLabel="Batch Tracked"
+        falseLabel="Non-Batch Tracked"
+      />
+    </div>
+
+    {/* Row 2: Dynamic Search & Dropdowns */}
+    <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-slate-100">
+      
+      {/* Filter By Selection */}
+      <div className="flex items-center gap-2 min-w-[240px]">
+        <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Filter By:</label>
+        <select
+          value={selectedFilterBy.value}
+          onChange={(e) => handleInputChange(setSelectedFilterBy, selectedFilterBy, parseInt(e.target.value))}
+          className="w-full px-2.5 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+        >
+          <option value="" disabled>Select Filter</option>
+          {filterByOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.displayName}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="flex justify-between w-full items-center my-2">
-        <div className="pl-1">
-          <span className="text-sm font-medium text-gray-500">{totalRecords} items found</span>
+      {/* Dynamic Text Search */}
+      {[1, 2, 3, 6, 7].includes(selectedFilterBy.value) && (
+        <div className="flex items-center gap-2 flex-1 min-w-[280px]">
+          <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Search:</label>
+          <input
+            type="text"
+            ref={searchInputRef}
+            value={searchValue.value}
+            onChange={(e) => handleInputChange(setSearchValue, searchValue, e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full px-3 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+            placeholder="Enter search value..."
+          />
+          <button
+            type="button"
+            onClick={loadProducts}
+            className="px-4 py-1.5 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none transition whitespace-nowrap"
+          >
+            Search
+          </button>
         </div>
+      )}
 
-        <DaisyUIPaginator
-          currentPage={currentPage}
-          rowsPerPage={rowsPerPage}
-          totalRecords={totalRecords}
-          onPageChange={onPageChange}
-          rowsPerPageOptions={[10, 30, 50, 100]}
-        />
-      </div>
+      {/* Category Dropdown */}
+      {selectedFilterBy.value === 4 && (
+        <div className="flex items-center gap-2 min-w-[240px]">
+          <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Category:</label>
+          <select
+            value={selectedCategoryId}
+            onChange={(e) => setSelectedCategoryId(parseInt(e.target.value))}
+            className="w-full px-2.5 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+          >
+            <option value="" disabled>Select Category</option>
+            {categoryOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Unit Dropdown */}
+      {selectedFilterBy.value === 5 && (
+        <div className="flex items-center gap-2 min-w-[240px]">
+          <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Unit:</label>
+          <select
+            value={selectedMeasurementUnitId}
+            onChange={(e) => setSelectedMeasurementUnitId(parseInt(e.target.value))}
+            className="w-full px-2.5 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+          >
+            <option value="" disabled>Select Unit</option>
+            {measurementUnitOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+    </div>
+  </div>
+</div>
+
 
       {/* Main Table Structure */}
       <ReusableTable
         data={products}
         isLoading={isTableDataLoading}
         columns={productColumns}
+
+  currentPage={currentPage}
+  rowsPerPage={rowsPerPage}
+  totalRecords={totalRecords}
+  onPageChange={onPageChange}
+  rowsPerPageOptions={[10, 30, 50, 100]}
+  paginationPosition="top"
+
+
         customActions={(item) => (
           <ProductInventoryActionMenu
             item={item}

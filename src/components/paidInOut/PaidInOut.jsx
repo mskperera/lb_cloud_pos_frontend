@@ -58,6 +58,7 @@ export default function PaidInOutActivity({ isVisible, setIsVisible }) {
   // Modal State
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [isDeletingPending, setIsDeletingPending] = useState(false);
 
   // Calculate Summary Totals for the current view safely handling both key mappings
   const totalPaidIn = activities.reduce((sum, item) => {
@@ -184,24 +185,32 @@ export default function PaidInOutActivity({ isVisible, setIsVisible }) {
 
   // Integrated Delete Action
   const handleDelete = async () => {
-    if (!deletingId) return;
-    
-    // Corrected to use deletePaidInOutLog passing required id and isConfirm flag
-    const response = await deletePaidInOutLog(deletingId, true);
-    if (response && response.status === 200) {
-      showToast("success", "Deleted", "Entry removed successfully");
-      
-      // Fallback page recalculation routine if the last item on current page is removed
-      if (activities.length === 1 && currentPage > 0) {
-        setCurrentPage(prev => prev - 1);
+    if (!deletingId || isDeletingPending) return;
+
+    setIsDeletingPending(true);
+
+    try {
+      // Corrected to use deletePaidInOutLog passing required id and isConfirm flag
+      const response = await deletePaidInOutLog(deletingId, true);
+      if (response && response.status === 200) {
+        showToast("success", "Deleted", "Entry removed successfully");
+
+        // Fallback page recalculation routine if the last item on current page is removed
+        if (activities.length === 1 && currentPage > 0) {
+          setCurrentPage(prev => prev - 1);
+        } else {
+          loadActivities();
+        }
       } else {
-        loadActivities();
+        showToast("error", "Error", response?.data?.message || "Delete failed");
       }
-    } else {
-      showToast("error", "Error", response?.data?.message || "Delete failed");
+    } catch (error) {
+      showToast("error", "Error", error?.response?.data?.message || "Delete failed");
+    } finally {
+      setShowDeleteDialog(false);
+      setDeletingId(null);
+      setIsDeletingPending(false);
     }
-    setShowDeleteDialog(false);
-    setDeletingId(null);
   };
 
   return (
@@ -222,8 +231,29 @@ export default function PaidInOutActivity({ isVisible, setIsVisible }) {
                   <p className="text-gray-600 mt-2">This change will alter the current cash session balances.</p>
                 </div>
                 <div className="flex gap-4 justify-center">
-                  <button type="button" onClick={() => setShowDeleteDialog(false)} className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 font-medium transition">Cancel</button>
-                  <button type="button" onClick={handleDelete} className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium transition">Delete</button>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteDialog(false)}
+                    disabled={isDeletingPending}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 font-medium transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={isDeletingPending}
+                    className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[140px]"
+                  >
+                    {isDeletingPending ? (
+                      <>
+                        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Deleting...
+                      </>
+                    ) : (
+                      "Delete"
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
@@ -407,7 +437,7 @@ export default function PaidInOutActivity({ isVisible, setIsVisible }) {
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        setDeletingId(item.id);
+                                        setDeletingId(item.paidInOutId);
                                         setShowDeleteDialog(true);
                                       }}
                                       className="p-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:scale-95 transition"

@@ -154,24 +154,28 @@ const signIn = async () => {
       <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
         <div className="w-full  bg-white rounded-3xl overflow-hidden">
           <div className="grid lg:grid-cols-2 ">
-                {/* Right Side - Login Form */}
+            {/* Right Side - Login Form */}
             <div className="p-8 lg:p-12 flex flex-col justify-center bg-white">
               <div className="max-w-md mx-auto w-full">
-             
-        <div className='flex justify-center mb-4'>
-               <img src={logo_long} className='h-12' />
+                <div className="flex justify-center mb-4">
+                  <img src={logo_long} className="h-12" />
                 </div>
 
                 <div className="mb-8 text-center">
-
-                 
-                  <h3 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h3>
-                  <p className="text-gray-600 text-xl">Sign in to access your POS</p>
+                  <h3 className="text-3xl font-bold text-gray-800 mb-2">
+                    Welcome Back
+                  </h3>
+                  <p className="text-gray-600 text-xl">
+                    Sign in to access your POS
+                  </p>
                 </div>
 
                 <div className="space-y-5">
                   <div>
-                    <label htmlFor="email" className="block font-semibold text-gray-700 mb-2">
+                    <label
+                      htmlFor="email"
+                      className="block font-semibold text-gray-700 mb-2"
+                    >
                       Email Address
                     </label>
                     <input
@@ -186,7 +190,10 @@ const signIn = async () => {
                   </div>
 
                   <div>
-                    <label htmlFor="password" className="block font-semibold text-gray-700 mb-2">
+                    <label
+                      htmlFor="password"
+                      className="block font-semibold text-gray-700 mb-2"
+                    >
                       Password
                     </label>
                     <input
@@ -209,20 +216,25 @@ const signIn = async () => {
                         checked={saveCredentials}
                         onChange={(e) => setSaveCredentials(e.target.checked)}
                       />
-                      <label htmlFor="saveCredentials" className="ml-2 text-md text-gray-700">
+                      <label
+                        htmlFor="saveCredentials"
+                        className="ml-2 text-md text-gray-700"
+                      >
                         Remember me
                       </label>
                     </div>
-                <Link
-  to="/forgot-password"
-  className="text-sky-600 font-semibold hover:text-sky-700 transition-colors"
->
-  Forgot password?
-</Link>
+                    <Link
+                      to="/forgot-password"
+                      className="text-sky-600 font-semibold hover:text-sky-700 transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
                   </div>
 
                   {(errorMessage || infoMessage) && (
-                    <div className={`text-sm p-3 rounded-lg border ${errorMessage ? 'text-red-600 bg-red-50 border-red-200' : 'text-sky-700 bg-sky-50 border-sky-200'}`}>
+                    <div
+                      className={`text-sm p-3 rounded-lg border ${errorMessage ? "text-red-600 bg-red-50 border-red-200" : "text-sky-700 bg-sky-50 border-sky-200"}`}
+                    >
                       {errorMessage || infoMessage}
                     </div>
                   )}
@@ -230,7 +242,7 @@ const signIn = async () => {
                   <button
                     onClick={handleSubmit}
                     className={`w-full py-3 px-6 font-bold text-white bg-sky-600 rounded-lg shadow-lg hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-500 focus:ring-opacity-50 transition-all duration-200 ${
-                      isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                      isLoading ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                     disabled={isLoading}
                   >
@@ -259,58 +271,54 @@ const signIn = async () => {
                         Signing In...
                       </span>
                     ) : (
-                      'Sign In'
+                      "Sign In"
                     )}
                   </button>
                 </div>
 
-                  <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="mt-8 pt-6 border-t border-gray-200">
                   <p className="text-center text-xl text-gray-600 mb-4">
-                    Don't have an account?{' '}
-                    <a href="/signup" className="text-sky-600 font-semibold hover:text-sky-700">
+                    Don't have an account?{" "}
+                    <a
+                      href="/signup"
+                      className="text-sky-600 font-semibold hover:text-sky-700"
+                    >
                       Sign up
                     </a>
                   </p>
-                  
 
+                  <div className="flex flex-wrap justify-center gap-3 text-md text-gray-500">
+                    <Link
+                      to="/privacy"
+                      className="hover:text-sky-600 transition-colors"
+                    >
+                      Privacy Policy
+                    </Link>
 
-<div className="flex flex-wrap justify-center gap-3 text-md text-gray-500">
-  <Link 
-    to="/privacy" 
-    className="hover:text-sky-600 transition-colors"
-  >
-    Privacy Policy
-  </Link>
-  
-  <span>•</span>
-  
-  <Link 
-    to="/terms" 
-    className="hover:text-sky-600 transition-colors"
-  >
-    Terms of Service
-  </Link>
-  
-  <span>•</span>
-  
-  <Link 
-    to="/refund" 
-    className="hover:text-sky-600 transition-colors"
-  >
-    Refund Policy
-  </Link>
-</div>
-                  
+                    <span>•</span>
+
+                    <Link
+                      to="/terms"
+                      className="hover:text-sky-600 transition-colors"
+                    >
+                      Terms of Service
+                    </Link>
+
+                    <span>•</span>
+
+                    <Link
+                      to="/refund"
+                      className="hover:text-sky-600 transition-colors"
+                    >
+                      Refund Policy
+                    </Link>
+                  </div>
+
                   <p className="text-center text-gray-400 mt-4">
                     © 2026 Legend POS by Legendbyte
                   </p>
                 </div>
               </div>
-
-              
-
-       
-
             </div>
             {/* Left Side - Marketing Content */}
             <div className="bg-gradient-to-br from-sky-600 to-sky-700 p-8 lg:p-12 text-white flex flex-col justify-center relative overflow-hidden">
@@ -329,15 +337,11 @@ const signIn = async () => {
                     </div>
                     
                     <h1 className="text-4xl font-bold">Legend POS</h1> */}
-                    
-    
-                        <div className="flex justify-center flex-col items-center mb-8">
-        
-       
+
+                    <div className="flex justify-center flex-col items-center mb-8"></div>
+                    <img src={pos_logo_long_inv} className="h-12" />
+                    <div className="h-1 w-20 bg-white/50 rounded-full"></div>
                   </div>
-                       <img src={pos_logo_long_inv} className='h-12' />
-                  <div className="h-1 w-20 bg-white/50 rounded-full"></div>
-                </div>
                 </div>
 
                 {/* Main Headline */}
@@ -352,11 +356,13 @@ const signIn = async () => {
 
                 {/* Description */}
                 <p className="text-lg text-blue-50 mb-8 leading-relaxed">
-                  Run your store with a modern cloud-based POS system using your existing laptop, PC, or tablet. No expensive hardware required.
+                  Run your store with a modern cloud-based POS system using your
+                  existing laptop, PC, or tablet. No expensive hardware
+                  required.
                 </p>
 
-               {/* Two highlighted features with icons */}
-      {/* <div className="flex flex-col sm:flex-row gap-5 lg:gap-8 justify-center lg:justify-start mb-10">
+                {/* Two highlighted features with icons */}
+                {/* <div className="flex flex-col sm:flex-row gap-5 lg:gap-8 justify-center lg:justify-start mb-10">
         <div className="flex items-center gap-3 text-blue-50">
           <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl flex-shrink-0">
             <Cloud className="w-6 h-6" />
@@ -372,32 +378,24 @@ const signIn = async () => {
         </div>
       </div> */}
 
-<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-  <p className="text-lg font-semibold ">
-    Try Legend Cloud POS free, no credit card required
-  </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <p className="text-lg font-semibold ">
+                    Try Legend Cloud POS free, no credit card required
+                  </p>
 
-  <Link
-    to="/signup"
-    className="inline-flex w-fit items-center gap-1.5 bg-white text-sky-700 px-4 py-4 rounded-md font-semibold text-sm hover:bg-blue-50 transition-colors group"
-  >
-    <span>Sign up for free</span>
-    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-  </Link>
-</div>
-
-
+                  <Link
+                    to="/signup"
+                    className="inline-flex w-fit items-center gap-1.5 bg-white text-sky-700 px-4 py-4 rounded-md font-semibold text-sm hover:bg-blue-50 transition-colors group"
+                  >
+                    <span>Sign up for free</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
               </div>
             </div>
-
-        
           </div>
         </div>
-
-
       </div>
-
-
     </div>
   );
 };
