@@ -7,7 +7,6 @@ import DaisyUIPaginator from "../DaisyUIPaginator";
 import { formatCurrency, formatUtcToLocal } from "../../utils/format";
 import DialogModel2 from "../model/DialogModel2";
 
-// Import the correct API functions directly from your paidInOut.js file
 import { 
   getPaidInOutLogs, 
   addPaidInOutLog, 

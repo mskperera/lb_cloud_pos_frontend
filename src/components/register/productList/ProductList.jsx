@@ -7,7 +7,7 @@ import {
   getVariationProductDetails,
 } from "../../../functions/register";
 import { useDispatch, useSelector } from "react-redux";
-import { addOrder, updateOrderBatchId } from "../../../state/orderList/orderListSlice";
+import { addOrder } from "../../../state/orderList/orderListSlice";
 import ProductItem from "./productItem/ProductItem";
 import DaisyUIPaginator from "../../../components/DaisyUIPaginator";
 import BatchSelectionDialog from "../../BatchSelectionDialog";
@@ -761,9 +761,9 @@ const handleUomSelect = (selectedUom,qty) => {
           </div>
         ) : null}
          <>
-            <span className="text-lg font-semibold text-gray-700">{activeCatLabel}</span>
+            <span className=" font-semibold text-gray-700">{activeCatLabel}</span>
             <span className="text-sm text-gray-500" style={{fontWeight:500}}>
-              {products.length} item{products.length !== 1 ? "s" : ""}
+              {products.length} item{products.length !== 1 ? "s" : ""} found
             </span>
           </>
       </div>

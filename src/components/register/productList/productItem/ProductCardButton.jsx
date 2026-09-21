@@ -2,6 +2,8 @@
 import { formatCurrency, getCurrency } from "../../../../utils/format";
 import { PackageIcon } from "lucide-react";
 import { CURRENCY_DISPLAY_TYPE } from "../../../../utils/constants";
+import { getAppConfigValueSync } from "../../../../utils/dotEnv";
+
 
 const ProductCardButton = ({
   disabled,
@@ -19,6 +21,8 @@ const ProductCardButton = ({
   orderQty,
   product
 }) => {
+
+  const cdnUrl = getAppConfigValueSync('REACT_APP_API_CDN');
 
   console.log('pppppppppproduct:', product);
 
@@ -75,7 +79,7 @@ const ProductCardButton = ({
           <div className="w-full h-full flex items-center justify-center">
             {hasImage ? (
               <img
-                src={`${process.env.REACT_APP_API_CDN}/${imageUrl}?width=200&height=200&quality=80`}
+                src={`${cdnUrl}/${imageUrl}?width=200&height=200&quality=80`}
                 alt={productName}
                 className="w-full h-full object-cover"
               />

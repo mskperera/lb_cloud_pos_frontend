@@ -7,8 +7,7 @@ import {
   addOrder,
   addReturnedProduct,
   clearOrderList,
-  setCustomer,
-  updateOrderBatchId,
+  setCustomer
 } from "../../state/orderList/orderListSlice";
 
 import DialogModel from "../../components/model/DialogModel";
@@ -47,7 +46,9 @@ import {
   ShoppingCartIcon,
   StoreIcon,
   TableIcon,
-  HandCoins
+  HandCoins,
+  PowerOffIcon,
+  PowerIcon
 } from "lucide-react";
 import AdvancedProductSearch from "../../components/AdvancedProductSearch";
 import PaidInOutActivity from "../../components/paidInOut/PaidInOut";
@@ -66,7 +67,7 @@ const Sidebar = ({
   isMobile,
 }) => {
   const navItems = [
-    { id: "home", icon: <HomeIcon />, label: "Home" },
+    { id: "home", icon: <PowerIcon />, label: "Exit" },
     { id: "new", icon: <ShoppingCartIcon />, label: "New Sale" },
     { id: "lookup", icon: <SearchXIcon />, label: "Item Lookup" },
     { id: "history", icon: <HistoryIcon />, label: "Sales History" },
@@ -123,9 +124,13 @@ const Sidebar = ({
           <div key={item.id} className="lpos-si-wrap relative">
             <div
               onClick={() => onAction(item.id)}
-              className="flex items-center gap-4 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)] transition-all duration-150"
+              className={`flex items-center gap-4 px-3 py-2.5 rounded-xl cursor-pointer text-[13.5px] transition-all duration-150 ${
+                item.id === "home"
+                  ? "font-bold text-red-600 hover:bg-red-50 hover:text-red-700"
+                  : "font-medium text-[var(--lpos-text-secondary)] hover:bg-[var(--lpos-bg)] hover:text-[var(--lpos-text-primary)]"
+              }`}
             >
-              <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+              <span className={`flex-shrink-0 w-6 h-6 flex items-center justify-center ${item.id === "home" ? "text-red-600" : ""}`}>
                 {item.icon}
               </span>
               <span className="lpos-si-label">{item.label}</span>
@@ -351,46 +356,6 @@ console.log('batchedItems:',batchedItems)
   }
 };
 
-  // const handleProductClick = async (p) => {
-  //   const description = `${p.productDescription}`;
-  //   const qty = 1;
-  //   const unitPrice = Number(p.unitPrice);
-
-  //   console.log("Selected Productiiii", p);
-  //   setSelectedProduct(p);
-  //   const batchedItemsRes = await getBatchedItems(
-  //     p.allProductId,
-  //     store.storeId,
-  //   );
-  //   const batchedItems = batchedItemsRes.data.results[0];
-  //   console.log("batchedItems", batchedItems);
-
-  //   const order = {
-  //     allProductId: p.allProductId,
-  //     storeId: store.storeId,
-  //        sku: p.sku,
-  //     description,
-  //     unitPrice,
-  //     lineTaxRate: p.taxPerc,
-  //     qty,
-  //     measurementUnitName: p.measurementUnitName,
-  //       stockQty: p.isStockTracked ? p.stockQty : undefined,
-  //              imageUrl:p.imageUrl
-  //   };
-
-  //   if (batchedItems.length > 0) {
-  //     setBatchedItemList(batchedItems);
-  //     setIsBatchedItemsModalOpen(true);
-  //     setAddOrderTemp(order);
-  //     return;
-  //   } else {
-  //     order.stockBatchId = batchedItems[0]?.stockBatchId
-  //       ? batchedItems[0].stockBatchId
-  //       : null;
-  //     dispatch(addOrder(order));
-  //   }
-  // };
-
 
 
 const addItemstoOrderListFinal = (selectedBatch, order) => {
@@ -409,40 +374,6 @@ const addItemstoOrderListFinal = (selectedBatch, order) => {
 
   processUomOrDispatchOrder(orderFinal, selectedProduct);
 };
-
-
-
-// const addItemstoOrderListFinal=(selectedBatch,order)=>{
-//     const isOrderExist = existingOrders.find(
-//       (o) => o.allProductId===order.allProductId && o.storeId===order.storeId
-//     );
-
-//     console.log('selectedBatch',selectedBatch);
-//     const orderFinal = {
-//       ...order,
-//       stockBatchId: selectedBatch.stockBatchId,
-//       batchNo: selectedBatch.batchNo,
-//       unitPrice: selectedBatch.unitPrice ?? order.unitPrice,
-//       lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
-//       stockQty: order.measurementUnitName ? selectedBatch.qty : order.stockQty,
-//     };
-
-//     if (isOrderExist) {
-//       dispatch(updateOrderBatchId({
-//         allProductId: order.allProductId,
-//         storeId: order.storeId,
-//         stockBatchId: selectedBatch.stockBatchId,
-//         batchNo: selectedBatch.batchNo,
-//         unitPrice: selectedBatch.unitPrice,
-//         lineTaxRate: selectedBatch.taxPerc ?? order.lineTaxRate,
-//       }));
-//     } else {
-//       dispatch(addOrder(orderFinal));
-//     }
-
-//     setAddOrderTemp(null);
-//     setIsBatchedItemsModalOpen(false);
-//   }
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
@@ -501,110 +432,12 @@ const addItemstoOrderListFinal = (selectedBatch, order) => {
   };
 
 
-// const handleBarcodeEnter = async (p) => {
-//   const description = `${p.productName}`;
-//   const qty = 1;
-//   const unitPrice = Number(p.unitPrice);
-
-//   setSelectedProduct(p);
-
-//   const batchedItemsRes = await getBatchedItems(
-//     p.allProductId,
-//     store.storeId
-//   );
-//   const batchedItems = batchedItemsRes.data.results[0];
-
-//   // const order = {
-//   //   allProductId: p.allProductId,
-//   //   storeId: store.storeId,
-//   //   productNo: p.productNo,
-//   //   description,
-//   //   unitPrice,
-//   //   lineTaxRate: p.taxPerc,
-//   //   qty,
-//   //   measurementUnitName: p.measurementUnitName,
-//   // };
-
-//   const order = {
-//     allProductId: p.allProductId,
-//     storeId: store.storeId,
-//     sku: p.sku,
-//     description,
-//     unitPrice,
-//     lineTaxRate: p.taxPerc,
-//     qty,
-//     measurementUnitName: p.measurementUnitName,
-//     stockQty: p.isStockTracked ? p.stockQty : undefined,
-//     imageUrl: p.imageUrl,
-//   };
-
-
-
-
-//   if (batchedItems.length > 0) {
-//     setBatchedItemList(batchedItems);
-//     setIsBatchedItemsModalOpen(true);
-//     setAddOrderTemp(order);
-//     return;
-//   } else {
-//     order.stockBatchId = batchedItems[0]?.stockBatchId
-//       ? batchedItems[0].stockBatchId
-//       : null;
-
-//     processUomOrDispatchOrder(order, p);
-//   }
-// };
-
-  // const handleBarcodeEnter = async (p) => {
-  //   const description = `${p.productName}`;
-  //   const qty = 1;
-  //   const unitPrice = Number(p.unitPrice);
-
-  //   const batchedItemsRes = await getBatchedItems(
-  //     p.allProductId,
-  //     store.storeId,
-  //   );
-  //   const batchedItems = batchedItemsRes.data.results[0];
-  //   console.log("batchedItems", batchedItems);
-
-  //   const order = {
-  //     allProductId: p.allProductId,
-  //     storeId: store.storeId,
-  //     productNo: p.productNo,
-  //     description,
-  //     unitPrice,
-  //     lineTaxRate: p.taxPerc,
-  //     qty,
-  //   };
-
-  //   if (batchedItems.length > 0) {
-  //     setBatchedItemList(batchedItems);
-  //     setIsBatchedItemsModalOpen(true);
-  //     setAddOrderTemp(order);
-  //     return;
-  //   } else {
-  //     order.stockBatchId = batchedItems[0]?.stockBatchId
-  //       ? batchedItems[0].stockBatchId
-  //       : null;
-  //     dispatch(addOrder(order));
-  //   }
-  // };
-
 const handleBarcodeEnter = async (p, scannedBarcode) => {
   setSelectedProduct(p);
     console.log('handle barcode enter:',p)
-  // STEP 1: First Priority — Check direct Batch/UOM Barcode match
+ 
   try {
-   
 
-    // if (uomBatchRes.data.result?.status === "WRONG_STORE") {
-    //   showToastWarning(`මෙම Barcode එක ${result.belongsToStoreName} වෙළඳසැලට අයිති එකකි!`);
-    //   // හෝ Dialog popup එකක් පෙන්වා Current Store එකේ Stock/Price එකෙන් Add කරන්න අහන්න.
-    //   return;
-    // }
-  
-
-    // If direct UOM/Batch barcode match exists for this store
     if (p && p.productUomId) {
       const directOrder = {
         allProductId: p.allProductId,
@@ -713,7 +546,6 @@ const handleBarcodeEnter = async (p, scannedBarcode) => {
 
   const [mobSidebarOpen, setMobSidebarOpen] = useState(false);
   const [mobProductsOpen, setMobProductsOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
   const [storeName, setStoreName] = useState(null);
