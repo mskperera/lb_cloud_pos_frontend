@@ -1,21 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {  FaBook, FaPause, FaUndo, FaTags, FaCoins, FaFileAlt, FaCalendarPlus, FaThLarge } from 'react-icons/fa';
 import HoldOrder from './register/HoldOrder';
 import ConfirmDialogCustom from './register/ConfirmDialogCustom';
 import ApplyDiscount from './register/ApplyDiscount';
 import { DISCOUNT_SCOPE } from '../utils/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Home,
   BookOpen,
-  Pause,
-  Undo2,
-  Tag,
-  Coins,
-  FileText,
-  CalendarPlus,
-  LayoutGrid,
   HomeIcon,
   CalendarCheck,
 } from "lucide-react";

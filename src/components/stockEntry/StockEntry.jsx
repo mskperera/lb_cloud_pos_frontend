@@ -383,7 +383,6 @@ const StockEntry = () => {
   showOnlyProductItems={true} 
   onlyAllowToSelectStockTrackedProduct={true} 
 />
-{JSON.stringify(stockEntry)}
           {/* ── Selected Product Panel ── */}
           {stockEntry && (
             <div className="bg-white rounded-lg p-5 transition-all">

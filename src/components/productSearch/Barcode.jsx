@@ -58,7 +58,7 @@ const Barcode = ({ onProductSelect, onBarcodeEnter, isMobile, onlyAllowToSelectS
       }
 
         const results = result.data.results[0] || [];
-        setProducts(results.slice(0, 10));
+        setProducts(results);
         setSelectedIndex(results.length > 0 ? 0 : -1);
       } catch (err) {
         console.error(err);

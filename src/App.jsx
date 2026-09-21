@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css'
 
 import NotFound from './pages/NotFound';
@@ -29,7 +29,6 @@ import CookieConsentBanner from './components/CookieConsentBanner';
 import PublicRoutes from './routes/PublicRoutes';
 import ScrollToHash from './pages/landing/ScrollToHash';
 import TransferOrderDetail from './pages/transferOrderDetail';
-import RegisterPage from './pages/register/register_redesigned';
 import DayendListAll from './components/dayendList/DayendListAll';
 import { useEffect } from 'react';
 import { loadAppConfig } from './utils/tauri/appConfig';
@@ -38,12 +37,8 @@ import Database from '@tauri-apps/plugin-sql';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
-const Payment = React.lazy(() => import("./pages/payment"));
-const PaymentConfirm = React.lazy(() => import("./pages/paymentConfirm"));
-// const Products = React.lazy(() => import("./pages/products"));
 const AddProduct = React.lazy(() => import("./pages/products/addProduct"));
 const EditProduct = React.lazy(() => import("./pages/products/editProduct"));
-const OrdersCompleted = React.lazy(() => import("./pages/ordersCompleted"));
 const StockEntryFull = React.lazy(() => import("./pages/stockEntryFull"));
 const ProductInventoryList  = React.lazy(() => import("./pages/inventory/productInventoryList"));
 const StockEntry  = React.lazy(() => import("./pages/stockEntry/stockAdd"));
@@ -57,9 +52,6 @@ const TransferOrder= React.lazy(() => import("./pages/tranferOrder"));
 const TransferOrderList= React.lazy(() => import("./pages/transferOrderList"));
 
 function AppContent() {
-  const location = useLocation();
-
-  const shouldShowNavBar = location.pathname !== '/login' && location.pathname !== '/';
 
 
 useEffect(() => {
@@ -114,27 +106,11 @@ useEffect(() => {
 // };
 
 
-
-  const value = {
-    appendTo: 'self',
-    ripple: false
-  };
-
-  const appStyle = {
-    // display: 'flex',
-    // flexDirection: 'column',
-    // minHeight: '86vh',
-  };
-
-
   return (
     <>
     <CookieConsentBanner />
       <ToastProvider>
-        {/* {shouldShowNavBar && <TopMenubar />} */}
-
-        {/* <div className="flex flex-col h-[92vh] overflow-hidden"> */}
-        {/* <div className="flex-1 overflow-y-auto"> */}
+        
 <ScrollToHash />
         <React.Suspense fallback={<>Loading...</>}>
           <Routes>
@@ -144,17 +120,6 @@ useEffect(() => {
             {/* <Route path="/" element={<LandingPage />} /> */}
                       <Route path="/signin" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-
-
-
-     {/* <Route path="/signup" element={<SignUpPage />} /> */}
-
-
-            {/* <Route path="/refund" element={<RefundPolicy />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/pricing" element={<PricingPage />} /> */}
-
 
             <Route path="/systemDataInitialization" element={<SystemDataSetup />} />
             <Route path="/selectStore" element={<SelectStore />} />
@@ -249,16 +214,8 @@ useEffect(() => {
 
             {/* Only TopMenubar */}
             <Route element={<TopbarLayout />}>
-              {/* <Route path="/register/:terminalId" element={<Register />} /> */}
               <Route path="/register/:terminalId" element={<Register />} />
-
-               <Route path="/registerr/:terminalId" element={<RegisterPage />} />
-
-              {/* <Route path="/dayend" element={<DayEnd />} /> */}
               <Route path="/daystart/:terminalId" element={<DayOpen />} />
-              {/* <Route path="/payment" element={<Payment />} /> */}
-              {/* <Route path="/ordersCompleted" element={<OrdersCompleted />} />
-              <Route path="/paymentConfirm" element={<PaymentConfirm />} /> */}
             </Route>
 
             {/*Only Sidebar */}

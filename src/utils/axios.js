@@ -1,13 +1,13 @@
 import axios from 'axios';
+import { getAppConfigValue } from './dotEnv';
 
-const customAxios = axios.create({
-  baseURL:process.env.REACT_APP_API_PATH,
-});
 
- console.log('process.env REACT_APP_API_PATH',process.env.REACT_APP_API_PATH)
+const customAxios = axios.create();
+
 customAxios.interceptors.request.use(
-    function (config) {
-
+    async (config)=> {
+       config.baseURL = await getAppConfigValue('REACT_APP_API_PATH'); //process.env.REACT_APP_API_PATH;
+       console.log("Axios Base URL set too:", config.baseURL );
     const token=localStorage.getItem('token');
       config.headers.Authorization =`Bearer ${token}`;
       return config;
@@ -17,6 +17,7 @@ customAxios.interceptors.request.use(
     }
   );
   
+
   customAxios.interceptors.response.use(
     function (response) {
         console.log('custom axios res',response)

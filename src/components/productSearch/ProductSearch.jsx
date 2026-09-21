@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { debounce } from 'lodash';
-import { getProductsAllVariations } from '../../functions/register';
-import { useToast } from '../useToast';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import AdvancedProductSearch from '../AdvancedProductSearch';
-import DialogModel from '../model/DialogModel';
 import Barcode from "./Barcode";
 
 const ProductSearch = ({ 
@@ -71,18 +68,21 @@ const ProductSearch = ({
         )}
       </div>
 
-      <AdvancedProductSearch
-        visible={showAdvancedSearch}
-        onHide={() => setShowAdvancedSearch(false)}
-        onProductSelect={(product) => {
-          if (typeof onProductSelect === 'function') {
-            onProductSelect(product);
-          }
-          setShowAdvancedSearch(false);
-        }}
-        showOnlyProductItems={showOnlyProductItems}
-        onlyAllowToSelectStockTrackedProduct={onlyAllowToSelectStockTrackedProduct}
-      />
+      {showAdvancedSearch && createPortal(
+        <AdvancedProductSearch
+          visible={showAdvancedSearch}
+          onHide={() => setShowAdvancedSearch(false)}
+          onProductSelect={(product) => {
+            if (typeof onProductSelect === 'function') {
+              onProductSelect(product);
+            }
+            setShowAdvancedSearch(false);
+          }}
+          showOnlyProductItems={showOnlyProductItems}
+          onlyAllowToSelectStockTrackedProduct={onlyAllowToSelectStockTrackedProduct}
+        />,
+        document.body
+      )}
     </div>
   );
 };

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useToast } from '../useToast';
-import { getProducts } from '../../functions/register';
-import ProductSearch2 from '../productSearch/ProductSearch2';
-import InputField from '../inputField/InputField';
+import ProductSearch from '../productSearch/ProductSearch';
 import { validate } from '../../utils/formValidation';
 import FormElementMessage from '../messges/FormElementMessage';
 import { FaTrash } from 'react-icons/fa';
@@ -142,7 +140,12 @@ const SubProductList = ({
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center mb-4">
               <div className="flex flex-col col-span-2">
                 <label className="font-medium text-gray-700 mb-1">Search Sub-Product</label>
-                <ProductSearch2 onProductSelect={handleProductClick} />
+                <ProductSearch
+                  onProductSelect={handleProductClick}
+                  onBarcodeEnter={handleProductClick}
+                  showOnlyProductItems={true}
+                  onlyAllowToSelectStockTrackedProduct={true}
+                />
                 {validationMessages(subProductSku)}
               </div>
               <div className="flex flex-col">
