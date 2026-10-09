@@ -306,7 +306,7 @@ isTraditionalMode ? (
               e.currentTarget.style.color = "var(--lpos-text-secondary)";
             }}
           >
-            New
+            New Order
           </button>
 
       <button 

@@ -30,6 +30,7 @@ import { FaTrash, FaPlus, FaLayerGroup, FaInfoCircle } from "react-icons/fa";
 import CheckBox from "../inputField/CheckBox";
 import MessagePopup from "../MessagePopup";
 import { getAppConfigValueSync } from "../../utils/dotEnv";
+import { Loader2 } from "lucide-react";
 
 const CategoryItem = ({ onClick, category }) => {
   return (
@@ -943,7 +944,16 @@ export default function AddProduct({
           {saveType === SAVE_TYPE.ADD ? "Add Product" : "Update Product"}
         </h2> */}
         {isLoading ? (
-          <LoadingSpinner loadingMessage="Loading please wait..." />
+
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex items-center justify-center z-10">
+            <div className="flex items-center gap-2 text-slate-600 font-medium text-sm">
+              <Loader2 className="w-5 h-5 animate-spin text-sky-600" />
+              <span>Loading record...</span>
+            </div>
+          </div>
+      
+
+
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">
             {/* General Information Section */}
@@ -1751,6 +1761,7 @@ export default function AddProduct({
             {/* Enhanced Image Upload Section */}
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
               {/* <h3 className="text-xl font-semibold text-gray-800 mb-6">Product Image</h3> */}
+       
               <div className="flex flex-col items-center justify-center">
                 {imageHash0 || previewUrl ? (
                   <div className="relative group w-full max-w-sm">

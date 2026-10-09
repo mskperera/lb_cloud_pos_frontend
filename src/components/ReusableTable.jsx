@@ -12,6 +12,7 @@ export default function ReusableTable({
   onPageChange,
   rowsPerPageOptions = [10, 30, 50, 100],
   paginationPosition = "bottom", // "bottom", "top", or "both"
+  height = "h-[65vh]", // Default height, can be overridden
 }) {
   // Safely fallback to an empty array if columns is null or undefined[cite: 5]
   const activeColumns = columns || [];
@@ -52,7 +53,7 @@ export default function ReusableTable({
   };
 
   return (
-    <div className="flex flex-col h-[65vh] overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+    <div className={`flex flex-col overflow-hidden ${height} rounded-xl border border-gray-200 shadow-sm`}>
       {/* Top Pagination */}
       {(paginationPosition === "top" || paginationPosition === "both") && renderPaginationBar()}
 

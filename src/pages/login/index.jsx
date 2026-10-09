@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { setUserAssignedStores } from '../../functions/store';
 import {  getSystemInfoFromLocalStorageOpti } from '../../functions/systemSettings';
 import Database from '@tauri-apps/plugin-sql';
+import { getIsLogOut, getSavedCredentials, removeIsLogOut } from '../../utils/sqlite';
 
 
 const Login = () => {
@@ -26,25 +27,41 @@ const Login = () => {
  const navigate = useNavigate();
 
 
-useEffect(()=>{
+const loadingSignInUsingSavedCredientials=async ()=>{
+
+  const isLogout=await getIsLogOut();
+
+  console.log('isLogout000 ---:',isLogout)
+
+if(isLogout){
+  removeIsLogOut();
+  return;
+}
 
   if (isTauriApp) {
     signInUsingSavedCredientials();
   }
 
-  console.log('rrrooiuouorr');
 
-}, [isTauriApp])
+
+  console.log('rrrooiuouorr');
+}
+
+useEffect(() => {
+  if (!isTauriApp) return;
+
+  void loadingSignInUsingSavedCredientials();
+}, [isTauriApp]);
+
+
+
+
 
 const signInUsingSavedCredientials = async () => {
   try {
-    const db = await Database.load('sqlite:credentials.db');
-    const result = await db.select('select email, password from credentials limit 1');
-    await db.close();
-
-    const rows = Array.isArray(result) ? result : [];
-    const credential = rows.length ? rows[0] : null;
-    if (!credential) return;
+  
+    const credential = await getSavedCredentials();
+   if (!credential) return;
 
     const storedEmail = credential.email ?? credential.userName;
     const storedPassword = credential.password;
@@ -56,11 +73,11 @@ const signInUsingSavedCredientials = async () => {
     setSaveCredentials(true);
 
     if(isTauriApp)
-    setInfoMessage('Signing in with saved credentials...');
+    //setInfoMessage('Signing in with saved credentials...');
 
     setAutoSigningIn(true);
 
-    await signInWithCredentials(storedEmail, storedPassword, true);
+    //await signInWithCredentials(storedEmail, storedPassword, true);
   } catch (error) {
     console.error('Failed to load saved credentials:', error);
   }
@@ -71,14 +88,14 @@ const signInWithCredentials = async (loginEmail, loginPassword, remember = false
     localStorage.clear();
     setIsLoading(true);
     setErrorMessage('');
-    setInfoMessage('Signing in with saved credentials...');
+    //setInfoMessage('Signing in with saved credentials...');
 
     const payload = { userName: loginEmail, password: loginPassword };
     const authRes = await userLogin(payload);
 
     if (authRes.status === 422 || authRes.status === 401) {
       setErrorMessage(authRes.data?.error || authRes.data?.exception?.message);
-      setInfoMessage('');
+     // setInfoMessage('');
       setAutoSigningIn(false);
       setIsLoading(false);
       return;
@@ -276,7 +293,7 @@ const signIn = async () => {
                   </button>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="mt-8 pt-4 border-gray-200">
                   <p className="text-center text-xl text-gray-600 mb-4">
                     Don't have an account?{" "}
                     <a

@@ -12,11 +12,11 @@ import SalesByProductMonthlyReport from './pages/reports/SalesByProductMonthlyRe
 import MainLayout from './layouts/MainLayout';
 import SidebarLayout from './layouts/SidebarLayout';
 import TopbarLayout from './layouts/TopbarLayout';
-import EditCustomer from './pages/customers/editCustomer';
-import AddCustomer from './pages/customers/addCustomer';
-import AddUserReg from './components/userRegistration/AddUserReg';
-import EditUserReg from './pages/userRegistration/editUserReg';
-import UserRegList from './pages/userRegistration';
+// import EditCustomer from './pages/customers/editCustomer';
+// import AddCustomer from './pages/customers/addCustomer';
+// import AddUserReg from './components/userRegistration/AddUserReg';
+// import EditUserReg from './pages/userRegistration/editUserReg';
+// import UserRegList from './pages/userRegistration';
 import SystemDataSetup from './pages/systemDataInitialization';
 import SelectStore from './pages/store';
 import About from './pages/about';
@@ -28,18 +28,19 @@ import ForgotPassword from './pages/forgotPassword';
 import CookieConsentBanner from './components/CookieConsentBanner';
 import PublicRoutes from './routes/PublicRoutes';
 import ScrollToHash from './pages/landing/ScrollToHash';
-import TransferOrderDetail from './pages/transferOrderDetail';
+//import TransferOrderDetail from './pages/transferOrderDetail/TransferOrderDetail';
 import DayendListAll from './components/dayendList/DayendListAll';
 import { useEffect } from 'react';
 import { loadAppConfig } from './utils/tauri/appConfig';
 import { invoke } from '@tauri-apps/api/core';
 import Database from '@tauri-apps/plugin-sql';
+import { ensureCredentialsTable } from './utils/sqlite';
 
 const Register = React.lazy(() => import("./pages/register"));
 const Home = React.lazy(() => import("./pages/home/Home"));
 const AddProduct = React.lazy(() => import("./pages/products/addProduct"));
 const EditProduct = React.lazy(() => import("./pages/products/editProduct"));
-const StockEntryFull = React.lazy(() => import("./pages/stockEntryFull"));
+
 const ProductInventoryList  = React.lazy(() => import("./pages/inventory/productInventoryList"));
 const StockEntry  = React.lazy(() => import("./pages/stockEntry/stockAdd"));
 const StockEntryList  = React.lazy(() => import("./pages/stockEntry/stockList"));
@@ -48,10 +49,13 @@ const InventoryTransactionHistory  = React.lazy(() => import("./pages/inventoryT
 const Categories  = React.lazy(() => import("./pages/categories"));
 const MeasurementUnits= React.lazy(() => import("./pages/measurementUnits"));
 const ReportsDashboard= React.lazy(() => import("./pages/reports/ReportsDashboard"));
-const TransferOrder= React.lazy(() => import("./pages/tranferOrder"));
 const TransferOrderList= React.lazy(() => import("./pages/transferOrderList"));
 
 function AppContent() {
+
+
+
+
 
 
 useEffect(() => {
@@ -60,8 +64,17 @@ useEffect(() => {
     loadAppConfig().then(config => {
       console.log('App initialized with runtime config:', config);
       //verifyDeviceLicense();
+
+      ensureCredentialsTable();
     });
   }, []);
+
+
+
+
+
+
+
 
 
 //  const verifyDeviceLicense = async () => {
@@ -131,13 +144,13 @@ useEffect(() => {
    
               
        
-              <Route path="/customers/add" element={<AddCustomer />} />
-              <Route path="/customers/edit" element={<EditCustomer />} />
+              {/* <Route path="/customers/add" element={<AddCustomer />} />
+              <Route path="/customers/edit" element={<EditCustomer />} /> */}
               <Route path="/customers/list" element={<Customers />} />
 
-              <Route path="/userReg/add" element={<AddUserReg />} />
+              {/* <Route path="/userReg/add" element={<AddUserReg />} />
               <Route path="/userReg/edit" element={<EditUserReg />} />
-              <Route path="/userReg/list" element={<UserRegList />} />
+              <Route path="/userReg/list" element={<UserRegList />} /> */}
 
               {/* <Route path="/products/list" element={<Products />} /> */}
               <Route path="/products/add" element={<AddProduct />} />
@@ -160,10 +173,6 @@ useEffect(() => {
               />
 
               <Route
-                path="/inventory/stockEntryFull"
-                element={<StockEntryFull />}
-              />
-              <Route
                 path="/inventory/stockAdjustment"
                 element={<StockAdjustment />}
               />
@@ -174,8 +183,8 @@ useEffect(() => {
 
 
     
-    <Route path="/inventory/transferorders/create" element={<TransferOrder />} />
-<Route path="/inventory/transferorders/:id" element={<TransferOrderDetail />} />
+    {/* <Route path="/inventory/transferorders/create" element={<TransferOrder />} />
+<Route path="/inventory/transferorders/:id" element={<TransferOrderDetail />} /> */}
 <Route path="/inventory/transferorders/list" element={<TransferOrderList />} />
 
          

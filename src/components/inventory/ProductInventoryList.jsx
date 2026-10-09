@@ -23,7 +23,7 @@ import TriStateSelect from "../inputField/TriStateSelect";
 import DialogModel from "../model/DialogModel";
 import AddProduct from "../product/AddProduct";
 
-import { FaPlus, FaBoxes, FaTags, FaLayerGroup, FaBarcode } from "react-icons/fa";
+import { FaPlus, FaBoxes, FaTags, FaLayerGroup, FaBarcode, FaTimes } from "react-icons/fa";
 import ProductInventoryActionMenu from "./ProductInventoryActionMenu";
 import { CURRENCY_DISPLAY_TYPE, SAVE_TYPE } from "../../utils/constants";
 import { Eye, Boxes } from "lucide-react";
@@ -695,6 +695,60 @@ export default function ProductInventoryList({}) {
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
 
+
+
+
+const handleClearSearch = () => {
+  setSearchValue({ ...searchValue, value: "" });
+  setSelectedCategoryId(-1);
+  setSelectedMeasurementUnitId(-1);
+  setCurrentPage(0);
+
+  // Directly reload with reset values
+  const skip = 0;
+  const limit = rowsPerPage;
+
+  const productTypeIds = [];
+  if (isSingleProductChecked) productTypeIds.push(1);
+  if (isVariationProductChecked) productTypeIds.push(2);
+  if (isComboProductChecked) productTypeIds.push(3);
+
+  const filteredData = {
+    productId: null,
+    sku: null,
+    productNo: null,
+    productName: null,
+    productDescription: null,
+    barcode: null,
+    categoryId: -1,
+    measurementUnitId: -1,
+    storeId: selectedStoreId === -1 ? null : selectedStoreId,
+    productTypeIds: productTypeIds.length > 0 ? productTypeIds : null,
+    isProductItem: isProductItemFilter,
+    isStockTracked: isStockTrackedFilter,
+    isExpiringProduct: isExpiringProductFilter,
+    isBatchTracked: isBatchTrackedFilter,
+    searchByKeyword: false,
+    uomType: "PURCHASE",
+    skip: skip,
+    limit: limit,
+  };
+
+  setIsTableDataLoading(true);
+  getInventoryProducts(filteredData, null)
+    .then((_result) => {
+      const { totalRows } = _result.data.outputValues;
+      setTotalRecords(totalRows);
+      setProducts(_result.data.results[0] || []);
+    })
+    .catch((err) => {
+      console.error("Error clearing search:", err);
+    })
+    .finally(() => {
+      setIsTableDataLoading(false);
+    });
+};
+
   const handleOpenProductDetails = (product) => {
     setSelectedProductDetails(product);
     setShowDetailsDialog(true);
@@ -823,6 +877,8 @@ export default function ProductInventoryList({}) {
     rules: { required: false, dataType: "string" },
   });
 
+
+ 
   const loadProducts = async () => {
     try {
       setIsTableDataLoading(true);
@@ -1713,13 +1769,29 @@ const cdnUrl = getAppConfigValueSync('REACT_APP_API_CDN');
             className="w-full px-3 py-1.5 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
             placeholder="Enter search value..."
           />
-          <button
-            type="button"
-            onClick={loadProducts}
-            className="px-4 py-1.5 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none transition whitespace-nowrap"
-          >
-            Search
-          </button>
+
+<div className="flex items-center gap-2 ml-auto">
+    {(Boolean(searchValue.value) || selectedCategoryId !== -1 || selectedMeasurementUnitId !== -1) && (
+       <button
+                     type="button"
+                     onClick={handleClearSearch}
+                     className=" flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 focus:outline-none transition whitespace-nowrap "
+                   >
+                     <FaTimes className="w-3.5 h-3.5" />
+                     <span>Clear Search</span>
+                   </button>
+    )}
+
+    {[1, 2, 3, 6, 7].includes(selectedFilterBy.value) && (
+      <button
+        type="button"
+        onClick={loadProducts}
+        className="px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-lg hover:bg-sky-700 focus:outline-none transition whitespace-nowrap"
+      >
+        Search
+      </button>
+    )}
+  </div>
         </div>
       )}
 
