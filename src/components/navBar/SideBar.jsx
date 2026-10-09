@@ -243,13 +243,20 @@ const Sidebar = ({ isCollapsed = false, onToggle }) => {
           isCollapsed={isCollapsed}
         />
 
-        <SidebarMenu
+        {/* <SidebarMenu
           label="Contacts"
           iconName={Users}
           submenuItems={[
             { label: "Contacts", to: "/customers/list", icon: Users },
-            { label: "Add Contact", to: "/customers/add", icon: UserPlus },
+            // { label: "Add Contact", to: "/customers/add", icon: UserPlus },
           ]}
+          isCollapsed={isCollapsed}
+        /> */}
+
+           <SidebarMenu
+     label="Contacts"
+              iconName={Users}
+          to="/customers/list"
           isCollapsed={isCollapsed}
         />
 
@@ -287,7 +294,7 @@ const Sidebar = ({ isCollapsed = false, onToggle }) => {
           isCollapsed={isCollapsed}
         />
 
-        <SidebarMenu
+        {/* <SidebarMenu
           label="Settings"
           iconName={Settings}
           submenuItems={[
@@ -295,7 +302,7 @@ const Sidebar = ({ isCollapsed = false, onToggle }) => {
             { label: "Permissions", to: "/settings/permissions", icon: Shield },
           ]}
           isCollapsed={isCollapsed}
-        />
+        /> */}
 
         <SidebarMenu
           label="About"

@@ -51,7 +51,7 @@ const MessageBox = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-200">
       
       {/* Main Dialog Box */}
       <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl transition-all transform animate-in fade-in zoom-in-95">

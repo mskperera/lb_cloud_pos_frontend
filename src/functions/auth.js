@@ -1,4 +1,5 @@
 import customAxiosMain from "../utils/axiosMain";
+import { setIsLogOut } from "../utils/sqlite";
 
 
 
@@ -32,7 +33,7 @@ import customAxiosMain from "../utils/axiosMain";
             'Content-Type': 'application/json',
           },
         })
-        .then((res) => {
+        .then(async (res) => {
         
           localStorage.removeItem('token');
           localStorage.removeItem('tenantId');
@@ -44,7 +45,7 @@ import customAxiosMain from "../utils/axiosMain";
 
           localStorage.removeItem('user');
           localStorage.removeItem('userId');
-          
+          await setIsLogOut();
           return res;
         })
         .catch((err) => {

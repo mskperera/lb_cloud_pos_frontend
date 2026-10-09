@@ -607,14 +607,14 @@ return (
   const openingCash = parseFloat(dayendDetails?.openingCashAmount);
   
   // 2. What SHOULD exist in total (Revenue + Starting Float)
-  const expectedTotal = netSales + openingCash;
+  //const expectedTotal = netSales + openingCash;
 
   // 3. What ACTUALLY exists (Physical Cash Counted + Terminal Card Counted)
   // Note: cashDenominationTotal and parsedActualCardSales should also be safe floats
   const actualPaymentTotal = (cashDenominationTotal || 0) + (parsedActualCardSales || 0);
 
   // 4. Calculate Difference
-  const difference = actualPaymentTotal - expectedTotal;
+  const difference = actualPaymentTotal - dayendDetails.expectedTotal;
   const absDifference = Math.abs(difference);
 
   // Tolerance settings
@@ -654,7 +654,7 @@ return (
                     </p>
 
                     <p className="text-lg font-bold font-mono text-slate-900">
-                      {formatCurrency(expectedTotal, false)}
+                      {formatCurrency(dayendDetails.expectedTotal, false)}
                     </p>
                   </div>
 

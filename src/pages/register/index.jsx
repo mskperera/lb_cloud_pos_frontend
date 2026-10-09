@@ -68,7 +68,7 @@ const Sidebar = ({
 }) => {
   const navItems = [
     { id: "home", icon: <PowerIcon />, label: "Exit" },
-    { id: "new", icon: <ShoppingCartIcon />, label: "New Sale" },
+    // { id: "new", icon: <ShoppingCartIcon />, label: "New Sale" },
     { id: "lookup", icon: <SearchXIcon />, label: "Item Lookup" },
     { id: "history", icon: <HistoryIcon />, label: "Sales History" },
     { id: "custom", icon: <PlusIcon />, label: "Add Custom Item" },
